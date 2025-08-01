@@ -8,6 +8,9 @@ import { BackgroundManager } from './background-manager'
 // Track if the app is actually quitting
 let isQuitting = false
 
+// Store reference to main window
+let mainWindow: BrowserWindow | null = null
+
 // Initialize local server
 const localServer = new LocalServer()
 
@@ -16,7 +19,7 @@ let backgroundManager: BackgroundManager | null = null
 
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -29,7 +32,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow?.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -41,7 +44,7 @@ function createWindow(): void {
   mainWindow.on('close', (event) => {
     if (!isQuitting) {
       event.preventDefault()
-      mainWindow.hide()
+      mainWindow?.hide()
     }
   })
 
@@ -145,9 +148,12 @@ app.whenReady().then(() => {
     {
       label: 'Show App',
       click: () => {
-        const windows = BrowserWindow.getAllWindows()
-        if (windows.length > 0) {
-          windows[0].show()
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.show()
+          mainWindow.focus()
+        } else {
+          // If main window is destroyed, create a new one
+          createWindow()
         }
       }
     },
@@ -183,9 +189,12 @@ app.whenReady().then(() => {
 
   // Double click tray icon to show window
   tray.on('double-click', () => {
-    const windows = BrowserWindow.getAllWindows()
-    if (windows.length > 0) {
-      windows[0].show()
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.show()
+      mainWindow.focus()
+    } else {
+      // If main window is destroyed, create a new one
+      createWindow()
     }
   })
 })
