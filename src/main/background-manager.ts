@@ -47,7 +47,8 @@ export class BackgroundManager {
       const backgroundWindow = new BrowserWindow(windowConfig)
 
       // Load the background webview
-      const backgroundUrl = `http://localhost:8080/background/${index}`
+      const monitorUrl = index === 0 ? 'monitor1' : 'monitor2'
+      const backgroundUrl = `http://localhost:5210/app/hadrien/${monitorUrl}`
       console.log(`Loading background for monitor ${index}: ${backgroundUrl}`)
 
       backgroundWindow.loadURL(backgroundUrl)

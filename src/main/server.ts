@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import { join } from 'path'
 
 export class LocalServer {
   private server: express.Application
@@ -21,6 +22,12 @@ export class LocalServer {
 
     // Parse URL-encoded bodies
     this.server.use(express.urlencoded({ extended: true }))
+
+    // Serve static files from the built client (assets, etc.)
+    const clientPath = join(__dirname, '../client/dist')
+    this.server.use('/app/assets', express.static(join(clientPath, 'assets')))
+    this.server.use('/app/vite.svg', express.static(join(clientPath, 'vite.svg')))
+    this.server.use('/app/favicon.ico', express.static(join(clientPath, 'favicon.ico')))
   }
 
   private setupRoutes(): void {
@@ -44,84 +51,25 @@ export class LocalServer {
       })
     })
 
-    // Background routes for each monitor
+    // Background routes for each monitor - serve the Svelte client
     this.server.get('/background/:monitorId', (req, res) => {
       const monitorId = parseInt(req.params.monitorId)
-      res.send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Background Monitor ${monitorId}</title>
-          <style>
-            body {
-              margin: 0;
-              padding: 0;
-              width: 100vw;
-              height: 100vh;
-              overflow: hidden;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-            .background-content {
-              text-align: center;
-              background: rgba(255, 255, 255, 0.1);
-              padding: 40px;
-              border-radius: 20px;
-              backdrop-filter: blur(10px);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-            .monitor-info {
-              font-size: 24px;
-              margin-bottom: 20px;
-              font-weight: 600;
-            }
-            .status {
-              font-size: 16px;
-              opacity: 0.8;
-            }
-            .demo-content {
-              margin-top: 30px;
-              padding: 20px;
-              background: rgba(255, 255, 255, 0.1);
-              border-radius: 10px;
-            }
-            .demo-content h3 {
-              margin-top: 0;
-            }
-            .demo-content p {
-              margin: 10px 0;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="background-content">
-            <div class="monitor-info">
-              🖥️ Monitor ${monitorId}
-            </div>
-            <div class="status">
-              ✅ Background is running
-            </div>
-            <div class="demo-content">
-              <h3>🎨 Interactive Background</h3>
-              <p>This is a demo background for monitor ${monitorId}</p>
-              <p>Future features:</p>
-              <ul style="text-align: left; display: inline-block;">
-                <li>Custom images</li>
-                <li>Weather overlay</li>
-                <li>Clock display</li>
-                <li>Real-time updates</li>
-              </ul>
-            </div>
-          </div>
-        </body>
-        </html>
-      `)
+      // Redirect to the Svelte client with monitor ID as a query parameter
+      res.redirect(`/app/?monitor=${monitorId}`)
+    })
+
+    // Custom URL structure for monitors
+    this.server.get('/app/hadrien/monitor1', (_req, res) => {
+      res.redirect(`/app/?monitor=0`)
+    })
+
+    this.server.get('/app/hadrien/monitor2', (_req, res) => {
+      res.redirect(`/app/?monitor=1`)
+    })
+
+    // Serve the Svelte client at /app
+    this.server.get('/app', (_req, res) => {
+      res.sendFile(join(__dirname, '../client/dist/index.html'))
     })
 
     // Serve a simple HTML page at root
