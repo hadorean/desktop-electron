@@ -2,9 +2,13 @@ import { app, shell, BrowserWindow, ipcMain, Menu, Tray } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { LocalServer } from './server'
 
 // Track if the app is actually quitting
 let isQuitting = false
+
+// Initialize local server
+const localServer = new LocalServer()
 
 function createWindow(): void {
   // Create the browser window.
@@ -63,6 +67,20 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
+  // IPC handlers for server communication
+  ipcMain.handle('get-server-url', () => {
+    return localServer.getUrl()
+  })
+
+  ipcMain.handle('is-server-running', () => {
+    return localServer.isServerRunning()
+  })
+
+  // Start the local server
+  localServer.start().catch((error) => {
+    console.error('Failed to start local server:', error)
+  })
+
   createWindow()
 
   app.on('activate', function () {
@@ -85,11 +103,20 @@ app.whenReady().then(() => {
         }
       }
     },
+    { 
+      label: 'Open in Browser', 
+      click: () => {
+        if (localServer.isServerRunning()) {
+          shell.openExternal(localServer.getUrl())
+        }
+      }
+    },
     { type: 'separator' },
     { 
       label: 'Quit', 
       click: () => {
         isQuitting = true
+        localServer.stop()
         app.quit()
       }
     }
@@ -111,6 +138,7 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    localServer.stop()
     app.quit()
   }
 })
