@@ -24,11 +24,6 @@ export class LocalServer {
   }
 
   private setupRoutes(): void {
-    // Test endpoint
-    this.server.get('/test', (_req, res) => {
-      res.json({ message: 'Server is working!' })
-    })
-
     // Health check endpoint
     this.server.get('/health', (_req, res) => {
       res.json({ 
@@ -136,7 +131,6 @@ export class LocalServer {
                          <div class="endpoints">
                <h3>📡 Available Endpoints:</h3>
                <ul>
-                 <li><a href="/test" target="_blank">Test</a> - Simple test endpoint</li>
                  <li><a href="/health" target="_blank">Health Check</a> - Check server status</li>
                  <li><a href="/api/info" target="_blank">App Info</a> - Get application information</li>
                </ul>
@@ -168,37 +162,24 @@ export class LocalServer {
   public start(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.isRunning) {
-        console.log('Server already running')
         resolve()
         return
       }
 
-      console.log(`Attempting to start server on port ${this.port}...`)
-
       const server = this.server.listen(this.port, () => {
         this.isRunning = true
         console.log(`🚀 Local server running at http://localhost:${this.port}`)
-        console.log(`📱 Access your app at http://localhost:${this.port}`)
-        console.log(`🔍 Server address: ${server.address()}`)
         resolve()
       })
 
       server.on('error', (error: NodeJS.ErrnoException) => {
-        console.error('Server error:', error)
         if (error.code === 'EADDRINUSE') {
           console.log(`⚠️  Port ${this.port} is in use, trying ${this.port + 1}`)
           this.port++
           this.start().then(resolve).catch(reject)
         } else {
-          console.error('Failed to start server:', error.message)
           reject(error)
         }
-      })
-
-      // Add request logging
-      this.server.use((req, res, next) => {
-        console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`)
-        next()
       })
     })
   }
