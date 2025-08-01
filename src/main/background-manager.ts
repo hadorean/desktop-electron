@@ -1,6 +1,5 @@
 import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
-import { platform } from 'os'
 import { attach, detach, reset } from 'electron-as-wallpaper'
 
 export class BackgroundManager {
