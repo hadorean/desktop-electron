@@ -3,12 +3,16 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { LocalServer } from './server'
+import { BackgroundManager } from './background-manager'
 
 // Track if the app is actually quitting
 let isQuitting = false
 
 // Initialize local server
 const localServer = new LocalServer()
+
+// Initialize background manager
+let backgroundManager: BackgroundManager | null = null
 
 function createWindow(): void {
   // Create the browser window.
@@ -62,7 +66,7 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
-  });
+  })
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
@@ -76,10 +80,54 @@ app.whenReady().then(() => {
     return localServer.isServerRunning()
   })
 
-  // Start the local server
-  localServer.start().catch((error) => {
-    console.error('Failed to start local server:', error)
+  // IPC handlers for background management
+  ipcMain.handle('reload-background', (_, monitorId: number) => {
+    if (backgroundManager) {
+      backgroundManager.reloadBackground(monitorId)
+    }
   })
+
+  ipcMain.handle('reload-all-backgrounds', () => {
+    if (backgroundManager) {
+      backgroundManager.reloadAllBackgrounds()
+    }
+  })
+
+  // IPC handlers for background interactivity
+  ipcMain.handle('make-background-interactive', (_, monitorId: number) => {
+    if (backgroundManager) {
+      backgroundManager.makeInteractive(monitorId)
+    }
+  })
+
+  ipcMain.handle('make-all-backgrounds-interactive', () => {
+    if (backgroundManager) {
+      backgroundManager.makeAllInteractive()
+    }
+  })
+
+  ipcMain.handle('make-background-non-interactive', (_, monitorId: number) => {
+    if (backgroundManager) {
+      backgroundManager.makeNonInteractive(monitorId)
+    }
+  })
+
+  ipcMain.handle('make-all-backgrounds-non-interactive', () => {
+    if (backgroundManager) {
+      backgroundManager.makeAllNonInteractive()
+    }
+  })
+
+  // Start the local server
+  localServer
+    .start()
+    .then(() => {
+      // Initialize background manager after server is ready
+      backgroundManager = new BackgroundManager()
+    })
+    .catch((error) => {
+      console.error('Failed to start local server:', error)
+    })
 
   createWindow()
 
@@ -87,15 +135,15 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  });
+  })
 
   const tray = new Tray(icon)
   tray.setToolTip('This is my application.')
-  
+
   // Create tray context menu
   const contextMenu = Menu.buildFromTemplate([
-    { 
-      label: 'Show App', 
+    {
+      label: 'Show App',
       click: () => {
         const windows = BrowserWindow.getAllWindows()
         if (windows.length > 0) {
@@ -103,8 +151,8 @@ app.whenReady().then(() => {
         }
       }
     },
-    { 
-      label: 'Open in Browser', 
+    {
+      label: 'Open in Browser',
       click: () => {
         if (localServer.isServerRunning()) {
           shell.openExternal(localServer.getUrl())
@@ -112,18 +160,27 @@ app.whenReady().then(() => {
       }
     },
     { type: 'separator' },
-    { 
-      label: 'Quit', 
+    {
+      label: 'Quit',
       click: () => {
+        console.log('Tray quit clicked - starting cleanup...')
         isQuitting = true
+        if (backgroundManager) {
+          backgroundManager.cleanup()
+        }
         localServer.stop()
-        app.quit()
+
+        // Force quit after cleanup
+        setTimeout(() => {
+          console.log('Force quitting from tray...')
+          app.exit(0)
+        }, 1000)
       }
     }
   ])
-  
+
   tray.setContextMenu(contextMenu)
-  
+
   // Double click tray icon to show window
   tray.on('double-click', () => {
     const windows = BrowserWindow.getAllWindows()
@@ -133,11 +190,34 @@ app.whenReady().then(() => {
   })
 })
 
+// Handle app quit events to ensure proper cleanup
+app.on('before-quit', () => {
+  console.log('App quitting - starting cleanup...')
+  isQuitting = true
+  if (backgroundManager) {
+    backgroundManager.cleanup()
+  }
+  localServer.stop()
+})
+
+// Force quit after a timeout if normal quit doesn't work
+app.on('will-quit', () => {
+  console.log('App will quit - forcing exit...')
+  // Force exit after 1 second if the app is still running
+  setTimeout(() => {
+    console.log('Forcing app exit...')
+    process.exit(0)
+  }, 1000)
+})
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    if (backgroundManager) {
+      backgroundManager.cleanup()
+    }
     localServer.stop()
     app.quit()
   }

@@ -15,10 +15,10 @@ export class LocalServer {
   private setupMiddleware(): void {
     // Enable CORS for cross-origin requests
     this.server.use(cors())
-    
+
     // Parse JSON bodies
     this.server.use(express.json())
-    
+
     // Parse URL-encoded bodies
     this.server.use(express.urlencoded({ extended: true }))
   }
@@ -26,8 +26,8 @@ export class LocalServer {
   private setupRoutes(): void {
     // Health check endpoint
     this.server.get('/health', (_req, res) => {
-      res.json({ 
-        status: 'ok', 
+      res.json({
+        status: 'ok',
         message: 'Electron app server is running',
         timestamp: new Date().toISOString()
       })
@@ -42,6 +42,86 @@ export class LocalServer {
         arch: process.arch,
         uptime: process.uptime()
       })
+    })
+
+    // Background routes for each monitor
+    this.server.get('/background/:monitorId', (req, res) => {
+      const monitorId = parseInt(req.params.monitorId)
+      res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Background Monitor ${monitorId}</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+              width: 100vw;
+              height: 100vh;
+              overflow: hidden;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .background-content {
+              text-align: center;
+              background: rgba(255, 255, 255, 0.1);
+              padding: 40px;
+              border-radius: 20px;
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .monitor-info {
+              font-size: 24px;
+              margin-bottom: 20px;
+              font-weight: 600;
+            }
+            .status {
+              font-size: 16px;
+              opacity: 0.8;
+            }
+            .demo-content {
+              margin-top: 30px;
+              padding: 20px;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 10px;
+            }
+            .demo-content h3 {
+              margin-top: 0;
+            }
+            .demo-content p {
+              margin: 10px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="background-content">
+            <div class="monitor-info">
+              🖥️ Monitor ${monitorId}
+            </div>
+            <div class="status">
+              ✅ Background is running
+            </div>
+            <div class="demo-content">
+              <h3>🎨 Interactive Background</h3>
+              <p>This is a demo background for monitor ${monitorId}</p>
+              <p>Future features:</p>
+              <ul style="text-align: left; display: inline-block;">
+                <li>Custom images</li>
+                <li>Weather overlay</li>
+                <li>Clock display</li>
+                <li>Real-time updates</li>
+              </ul>
+            </div>
+          </div>
+        </body>
+        </html>
+      `)
     })
 
     // Serve a simple HTML page at root
@@ -151,8 +231,8 @@ export class LocalServer {
 
     // Handle all other routes
     this.server.use((_req, res) => {
-      res.status(404).json({ 
-        error: 'Not Found', 
+      res.status(404).json({
+        error: 'Not Found',
         message: 'The requested resource was not found on this server.',
         availableEndpoints: ['/health', '/api/info']
       })
@@ -200,4 +280,4 @@ export class LocalServer {
   public isServerRunning(): boolean {
     return this.isRunning
   }
-} 
+}

@@ -17,6 +17,34 @@
     }
   }
 
+  // Background management functions
+  async function reloadAllBackgrounds() {
+    try {
+      await window.api.reloadAllBackgrounds()
+      console.log('All backgrounds reloaded')
+    } catch (error) {
+      console.error('Failed to reload backgrounds:', error)
+    }
+  }
+
+  async function makeAllInteractive() {
+    try {
+      await window.api.makeAllBackgroundsInteractive()
+      console.log('Made all backgrounds interactive')
+    } catch (error) {
+      console.error('Failed to make backgrounds interactive:', error)
+    }
+  }
+
+  async function makeAllNonInteractive() {
+    try {
+      await window.api.makeAllBackgroundsNonInteractive()
+      console.log('Made all backgrounds non-interactive')
+    } catch (error) {
+      console.error('Failed to make backgrounds non-interactive:', error)
+    }
+  }
+
   getServerInfo()
 </script>
 
@@ -29,15 +57,27 @@
   <span class="ts">TypeScript</span>
 </div>
 <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
-<div class="actions">
-  <div class="action">
-    <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
+  <div class="actions">
+    <div class="action">
+      <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
+    </div>
+    <div class="action">
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+      <a target="_blank" rel="noreferrer" on:click={ipcHandle}>Send IPC</a>
+    </div>
+    <div class="action">
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+      <a href="#" on:click={reloadAllBackgrounds}>Reload Backgrounds</a>
+    </div>
+    <div class="action">
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+      <a href="#" on:click={makeAllInteractive}>Make Interactive</a>
+    </div>
+    <div class="action">
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+      <a href="#" on:click={makeAllNonInteractive}>Make Non-Interactive</a>
+    </div>
   </div>
-  <div class="action">
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
-    <a target="_blank" rel="noreferrer" on:click={ipcHandle}>Send IPC</a>
-  </div>
-</div>
 <Versions />
 
 <!-- Server Information -->
