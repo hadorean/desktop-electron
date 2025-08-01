@@ -1,7 +1,10 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu, Tray } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+
+// Track if the app is actually quitting
+let isQuitting = false
 
 function createWindow(): void {
   // Create the browser window.
@@ -26,6 +29,14 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
+  // Close to tray behavior
+  mainWindow.on('close', (event) => {
+    if (!isQuitting) {
+      event.preventDefault()
+      mainWindow.hide()
+    }
+  })
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -47,7 +58,7 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
-  })
+  });
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
@@ -58,6 +69,40 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  });
+
+  const tray = new Tray(icon)
+  tray.setToolTip('This is my application.')
+  
+  // Create tray context menu
+  const contextMenu = Menu.buildFromTemplate([
+    { 
+      label: 'Show App', 
+      click: () => {
+        const windows = BrowserWindow.getAllWindows()
+        if (windows.length > 0) {
+          windows[0].show()
+        }
+      }
+    },
+    { type: 'separator' },
+    { 
+      label: 'Quit', 
+      click: () => {
+        isQuitting = true
+        app.quit()
+      }
+    }
+  ])
+  
+  tray.setContextMenu(contextMenu)
+  
+  // Double click tray icon to show window
+  tray.on('double-click', () => {
+    const windows = BrowserWindow.getAllWindows()
+    if (windows.length > 0) {
+      windows[0].show()
+    }
   })
 })
 
