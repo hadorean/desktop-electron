@@ -78,6 +78,14 @@ export interface ImageInfo {
   fullUrl: string;
 }
 
+// Server response type for images endpoint
+interface ServerImageResponse {
+  images: Array<{
+    name: string;
+    thumbnail: string;
+  }>;
+}
+
 /**
  * Get the URL for an image from the server
  */
@@ -87,17 +95,20 @@ export function getImageUrl(imageName: string, useThumbnail: boolean = false): s
   // Get the base URL from store
   const baseUrl = getBaseUrl();
   
+  // Build the endpoint path for our server's API
+  const endpoint = useThumbnail 
+    ? `api/thumbnail?name=${encodeURIComponent(imageName)}`
+    : `api/image?name=${encodeURIComponent(imageName)}`;
+  
   // If we have a configured base URL, use it
   if (baseUrl) {
     // Handle both with and without trailing slashes
     const separator = baseUrl.endsWith('/') ? '' : '/';
-    const path = useThumbnail ? 'thumbnails' : 'images';
-    return `${baseUrl}${separator}${path}/${imageName}`;
+    return `${baseUrl}${separator}${endpoint}`;
   }
   
   // In production with no configured base URL, use relative URLs
-  const path = useThumbnail ? 'thumbnails' : 'images';
-  return `/${path}/${imageName}`;
+  return `/${endpoint}`;
 }
 
 // Types for weather data
@@ -122,7 +133,14 @@ export const api = {
    */
   getImages: async (): Promise<ImageInfo[]> => {
     const url = buildUrl('api/images');
-    return fetchWithErrorHandling<ImageInfo[]>(url, createRequestOptions('GET'));
+    const response = await fetchWithErrorHandling<ServerImageResponse>(url, createRequestOptions('GET'));
+    
+    // Transform server response to client format
+    return response.images.map(img => ({
+      name: img.name,
+      thumbnailUrl: getImageUrl(img.name, true),
+      fullUrl: getImageUrl(img.name, false)
+    }));
   },
 
   /**
