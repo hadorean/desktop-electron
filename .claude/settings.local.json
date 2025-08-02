@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "mcp__MCP_DOCKER__curl",
+      "Bash(curl:*)",
+      "Bash(tasklist:*)",
+      "Bash(npm install:*)",
+      "Bash(taskkill:*)"
+    ],
+    "deny": []
+  }
+}
