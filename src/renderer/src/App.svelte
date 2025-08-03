@@ -3,7 +3,7 @@
   import electronLogo from './assets/electron.svg'
 
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-  
+
   let serverUrl = ''
   let isServerRunning = false
 
@@ -57,27 +57,27 @@
   <span class="ts">TypeScript</span>
 </div>
 <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
-  <div class="actions">
-    <div class="action">
-      <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
-    </div>
-    <div class="action">
-      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
-      <a target="_blank" rel="noreferrer" on:click={ipcHandle}>Send IPC</a>
-    </div>
-    <div class="action">
-      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
-      <a href="#" on:click={reloadAllBackgrounds}>Reload Backgrounds</a>
-    </div>
-    <div class="action">
-      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
-      <a href="#" on:click={makeAllInteractive}>Make Interactive</a>
-    </div>
-    <div class="action">
-      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
-      <a href="#" on:click={makeAllNonInteractive}>Make Non-Interactive</a>
-    </div>
+<div class="actions">
+  <div class="action">
+    <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
   </div>
+  <div class="action">
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+    <a target="_blank" rel="noreferrer" on:click={ipcHandle}>Send IPC</a>
+  </div>
+  <div class="action">
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+    <a href="#" on:click={reloadAllBackgrounds}>Reload Backgrounds</a>
+  </div>
+  <div class="action">
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+    <a href="#" on:click={makeAllInteractive}>Make Interactive</a>
+  </div>
+  <div class="action">
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+    <a href="#" on:click={makeAllNonInteractive}>Make Non-Interactive</a>
+  </div>
+</div>
 <Versions />
 
 <!-- Server Information -->

@@ -5,6 +5,7 @@ import { readdir, stat, access } from 'fs/promises'
 import { constants } from 'fs'
 import { createServer } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
+import { watch } from 'chokidar'
 import { ThumbnailService } from './services/thumbnail-service'
 import { SettingsService, SettingsUpdateEvent } from './services/settings-service'
 
@@ -19,6 +20,9 @@ export class LocalServer {
   private thumbnailService: ThumbnailService
   private settingsService: SettingsService
   private clientAssets: { js: string; css: string } | null = null
+  private templateWatcher: any = null
+  private isRapidDev: boolean = false
+  private clientDevUrl: string = 'http://localhost:5173'
 
   constructor() {
     this.server = express()
@@ -117,6 +121,132 @@ export class LocalServer {
     
     this.server.set('views', templatesPath)
     console.log('📄 Templates path:', templatesPath)
+  }
+
+  private async setupDevelopmentFeatures(): Promise<void> {
+    const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV !== 'production'
+    if (isDev) {
+      console.log('🔧 Setting up development features...')
+      
+      // Check if client dev server is running (rapid development mode)
+      await this.detectRapidDevMode()
+      
+      this.setupTemplateHotReload()
+      this.setupDevelopmentRoutes()
+    } else {
+      console.log('📦 Production mode - development features disabled')
+    }
+  }
+
+  private async detectRapidDevMode(): Promise<void> {
+    // Try multiple common Vite dev server ports
+    const possiblePorts = [5173, 5174, 5175, 5176]
+    
+    for (const port of possiblePorts) {
+      const testUrl = `http://localhost:${port}`
+      try {
+        const response = await fetch(testUrl)
+        if (response.ok) {
+          this.isRapidDev = true
+          this.clientDevUrl = testUrl
+          console.log(`🚀 Rapid development mode detected - using client dev server at ${this.clientDevUrl}`)
+          return
+        }
+      } catch (error) {
+        // Try next port
+      }
+    }
+    
+    this.isRapidDev = false
+    console.log('📦 Using built client assets (rapid dev server not detected)')
+  }
+
+  private setupTemplateHotReload(): void {
+    const isDev = process.env.NODE_ENV !== 'production'
+    const templatesPath = isDev 
+      ? join(process.cwd(), 'src/main/templates')
+      : join(__dirname, 'templates')
+
+    // Watch templates for changes
+    this.templateWatcher = watch(join(templatesPath, '**/*.ejs'), {
+      persistent: true,
+      ignoreInitial: true
+    })
+
+    this.templateWatcher.on('change', (path: string) => {
+      console.log(`📝 Template changed: ${path}`)
+      this.clearTemplateCache()
+      this.invalidateClientAssets()
+    })
+
+    this.templateWatcher.on('add', (path: string) => {
+      console.log(`📄 New template added: ${path}`)
+      this.clearTemplateCache()
+    })
+
+    console.log('🔄 Template hot reload enabled')
+  }
+
+  private clearTemplateCache(): void {
+    // Clear EJS template cache
+    const ejs = require('ejs')
+    ejs.clearCache()
+    console.log('🗑️  Template cache cleared')
+  }
+
+  private invalidateClientAssets(): void {
+    // Force rescan of client assets on next request
+    this.clientAssets = null
+    console.log('♻️  Client assets cache invalidated')
+  }
+
+  private setupDevelopmentRoutes(): void {
+    // Development info endpoint
+    this.server.get('/dev/info', (req, res) => {
+      res.json({
+        development: true,
+        templatePath: this.server.get('views'),
+        clientAssetsPath: join(__dirname, '../../src/client/dist/assets'),
+        currentAssets: this.clientAssets,
+        request: {
+          userAgent: req.get('User-Agent'),
+          hostname: req.hostname,
+          query: req.query,
+          path: req.path
+        },
+        server: {
+          port: this.port,
+          isRunning: this.isRunning,
+          uptime: process.uptime()
+        }
+      })
+    })
+
+    // Endpoint to manually clear caches
+    this.server.post('/dev/clear-cache', (req, res) => {
+      this.clearTemplateCache()
+      this.invalidateClientAssets()
+      res.json({
+        message: 'All caches cleared',
+        timestamp: new Date().toISOString()
+      })
+    })
+
+    // Endpoint to trigger client rebuild notification
+    this.server.post('/dev/client-rebuilt', (req, res) => {
+      this.invalidateClientAssets()
+      // Notify connected clients about the rebuild
+      this.io.emit('client_rebuilt', {
+        timestamp: new Date().toISOString(),
+        message: 'Client assets rebuilt - refresh recommended'
+      })
+      res.json({
+        message: 'Client rebuild notification sent',
+        connectedClients: this.io.sockets.sockets.size
+      })
+    })
+
+    console.log('🛠️  Development routes enabled: /dev/info, /dev/clear-cache, /dev/client-rebuilt')
   }
 
   private setupMiddleware(): void {
@@ -371,9 +501,19 @@ export class LocalServer {
     this.server.get('/app/:userId/:screenId', async (req, res) => {
       const { userId, screenId } = req.params
       
-      // Get client assets if not already cached
-      if (!this.clientAssets) {
-        this.clientAssets = await this.scanForClientAssets()
+      let assets
+      if (this.isRapidDev) {
+        // In rapid dev mode, use the dev server URLs
+        assets = {
+          js: `${this.clientDevUrl}/app/src/main.ts`,
+          css: null // Vite injects CSS automatically in dev mode
+        }
+      } else {
+        // Get client assets if not already cached
+        if (!this.clientAssets) {
+          this.clientAssets = await this.scanForClientAssets()
+        }
+        assets = this.clientAssets
       }
       
       const data = {
@@ -385,7 +525,9 @@ export class LocalServer {
         screenId,
         userAgent: req.get('User-Agent') || 'unknown',
         serverUrl: `http://localhost:${this.port}`,
-        assets: this.clientAssets
+        assets,
+        isRapidDev: this.isRapidDev,
+        clientDevUrl: this.clientDevUrl
       }
       
       res.render('app', data)
@@ -582,11 +724,14 @@ export class LocalServer {
   }
 
   public start(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (this.isRunning) {
         resolve()
         return
       }
+
+      // Setup development features before starting server
+      await this.setupDevelopmentFeatures()
 
       const server = this.httpServer.listen(this.port, () => {
         this.isRunning = true
@@ -623,6 +768,12 @@ export class LocalServer {
 
   public stop(): void {
     if (this.isRunning) {
+      // Close template watcher
+      if (this.templateWatcher) {
+        this.templateWatcher.close()
+        console.log('🔄 Template watcher stopped')
+      }
+      
       // Note: In a real implementation, you'd want to properly close the server
       // This is a simplified version
       this.isRunning = false
