@@ -135,23 +135,27 @@ export interface SyncMessage {
 - [x] Thumbnail service with async queue system and background generation
 - [x] Smart caching with freshness checks (regenerate if source image is newer)
 - [x] Debug endpoints: GET /api/thumbnails/status, POST /api/thumbnails/clear-cache
-- [ ] Server exposes POST /update-settings API endpoint to update the settings
 
-### Phase 2.2: Server Socket.IO
+### Phase 2.2: Settings ✅ (COMPLETED)
 
-- [ ] Server uses Socket.IO to communicate with clients
-- [ ] Server pushes update-settings socket messages to other connected clients when a client update settings
-- [ ] Server pushed stored settings to a newly connected client
+- [x] Server uses Socket.IO to communicate with clients
+- [x] Server pushes update-settings socket messages to other connected clients when a client update settings
+- [x] Server pushes stored settings to a newly connected client
+- [x] Server exposes POST /update-settings API endpoint to update the settings
+- [x] Server exposes GET /api/settings API endpoint to retrieve current settings
+- [x] Server stores settings in memory and persists in local file system
+- [x] When requested settings are not found in memory, server will load them from local file system
+- [x] Settings service with in-memory caching and file system persistence
+- [x] Real-time Socket.IO communication for settings synchronization
 
-### Phase 2.3: Server storage
+### Phase 3: Client Socket.IO ✅ (COMPLETED)
 
-- [ ] Server stores settings in memory and persists in local file system
-- [ ] When requested settings are not found in memory, server will load them from local file system
-
-### Phase 3: Client Socket.IO
-
-- [ ] Web client connects to server : Replace current signalR implementation by socket.io
-- [ ] Create shared state interfaces
+- [x] Web client connects to server: Replace current SignalR implementation by Socket.IO
+- [x] Socket.IO client service with automatic reconnection
+- [x] Real-time settings synchronization between client and server
+- [x] Connection status indicator in client UI
+- [x] Settings update broadcasting to all connected clients
+- [x] Graceful handling of connection errors and reconnection
 
 ### Phase 4: Real-time Sync Implementation
 
@@ -201,25 +205,65 @@ export interface SyncMessage {
 ### HTTP Endpoints:
 
 #### Core Endpoints:
+
 - `GET /` - Server status page
-- `GET /health` - Health check  
+- `GET /health` - Health check
 - `GET /api/info` - Application information
 
 #### Image API ✅ (IMPLEMENTED):
+
 - `GET /api/images` - List all available images with thumbnail URLs
 - `GET /api/image?name={name}` - Serve original image files
 - `GET /api/thumbnail?name={name}` - Serve Sharp-generated thumbnails (200x200px JPEG)
 
 #### Thumbnail Service ✅ (IMPLEMENTED):
+
 - `GET /api/thumbnails/status` - Get thumbnail service queue status
 - `POST /api/thumbnails/clear-cache` - Clear thumbnail cache (development)
 
 #### Features:
+
 - **Smart Caching**: Thumbnails regenerated only if source image is newer
 - **Background Generation**: All thumbnails generated on app startup
 - **Async Queue**: On-demand generation with duplicate request prevention
 - **Error Handling**: Graceful handling of unsupported formats
 - **Security**: Path traversal protection and file validation
+
+#### Settings API ✅ (IMPLEMENTED):
+
+- `GET /api/settings` - Retrieve current settings from memory/file system
+- `POST /api/update-settings` - Update settings with JSON payload
+
+#### Socket.IO Events ✅ (IMPLEMENTED):
+
+- `connection` - Client connects and receives current settings
+- `update_settings` - Client sends settings update
+- `settings_update` - Server broadcasts settings changes to all clients
+- `settings_updated` - Server acknowledges successful settings update
+- `disconnect` - Client disconnects
+
+#### Settings Features:
+
+- **Memory Caching**: Settings stored in memory for fast access
+- **File Persistence**: Settings saved to userData/settings.json
+- **Real-time Sync**: Socket.IO broadcasts updates to all connected clients
+- **Default Values**: Fallback to defaults when settings file doesn't exist
+- **Type Safety**: TypeScript interfaces for settings structure
+
+#### Socket.IO Client ✅ (IMPLEMENTED):
+
+**Service Features:**
+- **Automatic Reconnection**: Built-in retry logic with configurable attempts
+- **Connection Status**: Real-time connection state monitoring
+- **Event Handlers**: Typed event handling for settings updates
+- **Error Handling**: Graceful degradation when connection fails
+- **URL Management**: Dynamic server URL updates with reconnection
+
+**Client Implementation:**
+- **SocketService**: Singleton service managing Socket.IO connection (`src/client/src/lib/services/socket.ts`)
+- **Connection Status UI**: Visual indicator showing connection state
+- **Settings Sync**: Bidirectional settings synchronization
+- **Event Types**: TypeScript interfaces for Socket.IO events
 
 ## Development Commands
 
@@ -296,28 +340,5 @@ npm run build        # Build web client
 
 ---
 
-_Last updated: August 2, 2025_
-_Status: Phase 2.1 Complete - Image API and Thumbnail Service Implemented_
-
-## Recent Progress (August 2025):
-
-### ✅ Completed:
-- **Image API Implementation**: Full image serving with security validation
-- **Thumbnail Service**: Sharp-based thumbnail generation with async queue system
-- **Performance Optimization**: Smart caching and background generation
-- **Development Tools**: Debug endpoints and cache management
-- **Documentation**: Comprehensive error handling and API documentation
-- **Architecture Planning**: Dynamic serving roadmap for demo/full feature split
-
-### 🚀 Key Achievements:
-- **94 images** processed successfully with thumbnail generation
-- **Queue system** prevents duplicate processing and enables async operation  
-- **Sharp integration** provides high-quality 200x200px JPEG thumbnails
-- **Background processing** generates all thumbnails on app startup
-- **Smart caching** only regenerates when source images are modified
-- **Error handling** gracefully manages unsupported formats
-
-### 📋 Next Phase Priority:
-- Settings API implementation (POST /update-settings)
-- Socket.IO integration for real-time sync
-- Dynamic serving architecture for demo vs full features
+_Last updated: [Current Date]_
+_Status: Phase 1 Complete - Ready for Phase 2_

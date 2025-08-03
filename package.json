@@ -27,11 +27,13 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@types/sharp": "^0.31.1",
+    "@types/socket.io": "^3.0.1",
     "cors": "^2.8.5",
     "electron-as-wallpaper": "^2.0.3",
     "electron-updater": "^6.3.9",
     "express": "^5.1.0",
-    "sharp": "^0.34.3"
+    "sharp": "^0.34.3",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",

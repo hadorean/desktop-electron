@@ -6,7 +6,11 @@
       "Bash(curl:*)",
       "Bash(tasklist:*)",
       "Bash(npm install:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(npm run server:*)",
+      "Bash(npm run:*)",
+      "Bash(npm uninstall:*)",
+      "mcp__browsermcp__browser_navigate"
     ],
     "deny": []
   }

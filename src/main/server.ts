@@ -3,21 +3,36 @@ import cors from 'cors'
 import { join } from 'path'
 import { readdir, stat, access } from 'fs/promises'
 import { constants } from 'fs'
+import { createServer } from 'http'
+import { Server as SocketIOServer } from 'socket.io'
 import { ThumbnailService } from './services/thumbnail-service'
+import { SettingsService, SettingsUpdateEvent } from './services/settings-service'
 
 export class LocalServer {
   private server: express.Application
+  private httpServer: any
+  private io: SocketIOServer
   private port: number = 8080
   private isRunning: boolean = false
   private readonly IMAGES_PATH = 'D:\\pictures\\wall'
   private readonly SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']
   private thumbnailService: ThumbnailService
+  private settingsService: SettingsService
 
   constructor() {
     this.server = express()
+    this.httpServer = createServer(this.server)
+    this.io = new SocketIOServer(this.httpServer, {
+      cors: {
+        origin: '*',
+        methods: ['GET', 'POST']
+      }
+    })
     this.thumbnailService = new ThumbnailService()
+    this.settingsService = new SettingsService()
     this.setupMiddleware()
     this.setupRoutes()
+    this.setupSocketIO()
   }
 
   private async scanForImages(): Promise<string[]> {
@@ -246,6 +261,53 @@ export class LocalServer {
       }
     })
 
+    // Settings API endpoints
+    this.server.get('/api/settings', async (_req, res) => {
+      try {
+        const settings = await this.settingsService.getSettings()
+        res.json({
+          settings,
+          message: 'Settings retrieved successfully'
+        })
+      } catch (error) {
+        console.error('Error getting settings:', error)
+        res.status(500).json({
+          error: 'Internal Server Error',
+          message: 'Failed to retrieve settings'
+        })
+      }
+    })
+
+    this.server.post('/api/update-settings', async (req, res) => {
+      try {
+        const { settings, clientId = 'api-client' } = req.body
+
+        if (!settings || typeof settings !== 'object') {
+          return res.status(400).json({
+            error: 'Bad Request',
+            message: 'Invalid settings data provided'
+          })
+        }
+
+        const updateEvent = await this.settingsService.updateSettings(settings, clientId)
+        
+        // Broadcast to all connected Socket.IO clients except the sender
+        this.io.emit('settings_update', updateEvent)
+
+        res.json({
+          message: 'Settings updated successfully',
+          settings: updateEvent.settings,
+          timestamp: updateEvent.timestamp
+        })
+      } catch (error) {
+        console.error('Error updating settings:', error)
+        res.status(500).json({
+          error: 'Internal Server Error',
+          message: 'Failed to update settings'
+        })
+      }
+    })
+
     // Background routes for each monitor - serve the Svelte client
     this.server.get('/background/:monitorId', (req, res) => {
       const monitorId = parseInt(req.params.monitorId)
@@ -400,6 +462,53 @@ export class LocalServer {
     })
   }
 
+  private setupSocketIO(): void {
+    this.io.on('connection', async (socket) => {
+      console.log(`🔌 Client connected: ${socket.id}`)
+
+      // Send current settings to newly connected client
+      try {
+        const settings = await this.settingsService.getSettings()
+        socket.emit('settings_update', {
+          type: 'settings_update',
+          settings,
+          timestamp: Date.now(),
+          clientId: 'server'
+        })
+      } catch (error) {
+        console.error('Error sending settings to new client:', error)
+      }
+
+      // Handle settings updates from clients
+      socket.on('update_settings', async (data) => {
+        try {
+          const { settings, clientId = socket.id } = data
+          const updateEvent = await this.settingsService.updateSettings(settings, clientId)
+          
+          // Broadcast to all other clients
+          socket.broadcast.emit('settings_update', updateEvent)
+          
+          // Acknowledge to sender
+          socket.emit('settings_updated', {
+            success: true,
+            settings: updateEvent.settings,
+            timestamp: updateEvent.timestamp
+          })
+        } catch (error) {
+          console.error('Error handling socket settings update:', error)
+          socket.emit('settings_updated', {
+            success: false,
+            error: 'Failed to update settings'
+          })
+        }
+      })
+
+      socket.on('disconnect', () => {
+        console.log(`🔌 Client disconnected: ${socket.id}`)
+      })
+    })
+  }
+
   public start(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.isRunning) {
@@ -407,9 +516,10 @@ export class LocalServer {
         return
       }
 
-      const server = this.server.listen(this.port, () => {
+      const server = this.httpServer.listen(this.port, () => {
         this.isRunning = true
         console.log(`🚀 Local server running at http://localhost:${this.port}`)
+        console.log(`🔌 Socket.IO enabled for real-time communication`)
 
         // Start background thumbnail generation
         this.startBackgroundThumbnailGeneration()

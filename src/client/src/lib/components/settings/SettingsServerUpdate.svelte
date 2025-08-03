@@ -2,57 +2,55 @@
     import { allSettings, currentScreen } from "../../stores/settingsStore";
     import { apiBaseUrl } from "../../stores/apiStore";
     import { routeParams } from "../../stores/routeStore";
-    import { onMount } from "svelte";
-    import * as signalR from "@microsoft/signalr";
+    import { onMount, onDestroy } from "svelte";
+    import { socketService, type SettingsUpdateEvent } from "../../services/socket";
 
-    let connection: signalR.HubConnection;
+    let isConnected = false;
     let updatingSettingsFromServer = false;
     let initialSubscribeHandled = false;
+    let unsubscribeSettings: (() => void) | null = null;
 
     onMount(() => {
-        apiBaseUrl.subscribe((serverUrl) => {
-            connection = new signalR.HubConnectionBuilder()
-                .withUrl(`${serverUrl}/notificationHub`)
-                .withAutomaticReconnect()
-                .build();
-
-            connection
-                .start()
-                .then(() => {
-                    connection
-                        .invoke("RegisterUser", $routeParams.userId)
-                        .catch((err) =>
-                            console.error("Error sending user ID:", err),
-                        );
-                })
-                .catch((err) => console.error(err));
-
-            connection.on("UpdateSettings", (message: string) => {
-                updatingSettingsFromServer = true;
-                try {
-                    //console.log("Applying settings from server:", message);
-                    const newSettings = JSON.parse(message);
-                    
-                    // Check if current screen exists in server settings
-                    const currentScreenId = $currentScreen;
-                    if (!newSettings.screens[currentScreenId]) {
-                        // Add current screen to settings (empty object)
-                        newSettings.screens[currentScreenId] = {};
-                        updatingSettingsFromServer = false; // we want to update the server settings with the new screen
-                    }
-                    
-                    allSettings.set(newSettings);
-                } catch (error) {
-                    console.error(
-                        "Error updating settings from server:",
-                        error,
-                    );
-                }
-                updatingSettingsFromServer = false;
-            });
+        // Setup Socket.IO connection status monitoring
+        socketService.onConnectionStatus((connected) => {
+            isConnected = connected;
+            console.log('Socket.IO connection status:', connected);
         });
 
-        allSettings.subscribe((value) => {
+        // Setup settings update handler
+        socketService.onSettingsUpdate((event: SettingsUpdateEvent) => {
+            updatingSettingsFromServer = true;
+            try {
+                console.log('Applying settings from server:', event.settings);
+                const newSettings = event.settings;
+                
+                // Check if current screen exists in server settings
+                const currentScreenId = $currentScreen;
+                if (newSettings.screens && !newSettings.screens[currentScreenId]) {
+                    // Add current screen to settings (empty object)
+                    newSettings.screens[currentScreenId] = {};
+                    updatingSettingsFromServer = false; // we want to update the server settings with the new screen
+                }
+                
+                allSettings.set(newSettings);
+            } catch (error) {
+                console.error(
+                    "Error updating settings from server:",
+                    error,
+                );
+            }
+            updatingSettingsFromServer = false;
+        });
+
+        // Monitor API base URL changes and update socket connection
+        apiBaseUrl.subscribe((serverUrl) => {
+            if (serverUrl) {
+                socketService.updateServerUrl(serverUrl);
+            }
+        });
+
+        // Subscribe to settings changes and send to server
+        unsubscribeSettings = allSettings.subscribe((value) => {
             if (!initialSubscribeHandled) {
                 initialSubscribeHandled = true;
                 return; // Skip the initial subscribe callback
@@ -60,19 +58,51 @@
             
             if (
                 !updatingSettingsFromServer &&
-                connection &&
-                connection.state === signalR.HubConnectionState.Connected
+                socketService.getConnectionStatus()
             ) {
-                //console.log("Updating settings from client:", value);
-                // Extract timestamp from settings, fallback to very old date if missing
-                const clientTimestamp = value.lastModified || "1970-01-01T00:00:00.000Z";
-                connection.invoke(
-                    "UpdateSettings",
-                    $routeParams.userId,
-                    JSON.stringify(value),
-                    clientTimestamp
-                );
+                console.log("Updating settings from client:", value);
+                // Use route params userId as client ID if available
+                const clientId = $routeParams.userId || socketService.getSocketId();
+                socketService.updateSettings(value, clientId);
             }
         });
     });
+
+    onDestroy(() => {
+        // Clean up subscriptions
+        if (unsubscribeSettings) {
+            unsubscribeSettings();
+        }
+    });
 </script>
+
+<div class="socket-status">
+    {#if isConnected}
+        <span class="status-indicator connected">🟢 Socket.IO Connected</span>
+    {:else}
+        <span class="status-indicator disconnected">🔴 Socket.IO Disconnected</span>
+    {/if}
+</div>
+
+<style>
+    .socket-status {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .status-indicator.connected {
+        color: #4ade80;
+    }
+    
+    .status-indicator.disconnected {
+        color: #f87171;
+    }
+</style>
