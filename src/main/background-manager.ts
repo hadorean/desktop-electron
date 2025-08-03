@@ -1,5 +1,4 @@
 import { BrowserWindow, screen } from 'electron'
-import { join } from 'path'
 import { attach, detach, reset } from 'electron-as-wallpaper'
 
 export class BackgroundManager {
@@ -41,7 +40,8 @@ export class BackgroundManager {
         webPreferences: {
           nodeIntegration: false,
           contextIsolation: true,
-          webSecurity: false // Allow loading local server content
+          webSecurity: true,
+          allowRunningInsecureContent: false
           // No preload script needed for web content
         }
       }

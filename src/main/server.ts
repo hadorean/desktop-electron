@@ -1,13 +1,13 @@
 import express from 'express'
 import cors from 'cors'
 import { join } from 'path'
-import { readdir, stat, access } from 'fs/promises'
+import { readdir, access } from 'fs/promises'
 import { constants } from 'fs'
 import { createServer } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
 import { watch } from 'chokidar'
 import { ThumbnailService } from './services/thumbnail-service'
-import { SettingsService, SettingsUpdateEvent } from './services/settings-service'
+import { SettingsService } from './services/settings-service'
 
 export class LocalServer {
   private server: express.Application
@@ -45,13 +45,13 @@ export class LocalServer {
     try {
       const clientPath = join(__dirname, '../../src/client/dist')
       const assetsPath = join(clientPath, 'assets')
-      
+
       console.log('Scanning for client assets in:', assetsPath)
       const files = await readdir(assetsPath)
-      
+
       let jsFile = ''
       let cssFile = ''
-      
+
       for (const file of files) {
         if (file.endsWith('.js') && file.startsWith('index-')) {
           jsFile = file
@@ -59,11 +59,11 @@ export class LocalServer {
           cssFile = file
         }
       }
-      
+
       if (!jsFile || !cssFile) {
         throw new Error(`Missing client assets - JS: ${jsFile}, CSS: ${cssFile}`)
       }
-      
+
       console.log('📦 Found client assets:', { js: jsFile, css: cssFile })
       return { js: jsFile, css: cssFile }
     } catch (error) {
@@ -111,14 +111,14 @@ export class LocalServer {
   private setupTemplateEngine(): void {
     // Set EJS as template engine
     this.server.set('view engine', 'ejs')
-    
+
     // In development, templates are in src/main/templates
     // In production, they'll be in out/main/templates
     const isDev = process.env.NODE_ENV !== 'production'
-    const templatesPath = isDev 
+    const templatesPath = isDev
       ? join(process.cwd(), 'src/main/templates')
       : join(__dirname, 'templates')
-    
+
     this.server.set('views', templatesPath)
     console.log('📄 Templates path:', templatesPath)
   }
@@ -127,10 +127,10 @@ export class LocalServer {
     const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV !== 'production'
     if (isDev) {
       console.log('🔧 Setting up development features...')
-      
+
       // Check if client dev server is running (rapid development mode)
       await this.detectRapidDevMode()
-      
+
       this.setupTemplateHotReload()
       this.setupDevelopmentRoutes()
     } else {
@@ -140,8 +140,8 @@ export class LocalServer {
 
   private async detectRapidDevMode(): Promise<void> {
     // Try multiple common Vite dev server ports
-    const possiblePorts = [5173, 5174, 5175, 5176]
-    
+    const possiblePorts = [5173, 5174, 5175, 5176, 5177, 5178, 5179]
+
     for (const port of possiblePorts) {
       const testUrl = `http://localhost:${port}`
       try {
@@ -149,21 +149,23 @@ export class LocalServer {
         if (response.ok) {
           this.isRapidDev = true
           this.clientDevUrl = testUrl
-          console.log(`🚀 Rapid development mode detected - using client dev server at ${this.clientDevUrl}`)
+          console.log(
+            `🚀 Rapid development mode detected - using client dev server at ${this.clientDevUrl}`
+          )
           return
         }
       } catch (error) {
         // Try next port
       }
     }
-    
+
     this.isRapidDev = false
     console.log('📦 Using built client assets (rapid dev server not detected)')
   }
 
   private setupTemplateHotReload(): void {
     const isDev = process.env.NODE_ENV !== 'production'
-    const templatesPath = isDev 
+    const templatesPath = isDev
       ? join(process.cwd(), 'src/main/templates')
       : join(__dirname, 'templates')
 
@@ -472,7 +474,7 @@ export class LocalServer {
         }
 
         const updateEvent = await this.settingsService.updateSettings(settings, clientId)
-        
+
         // Broadcast to all connected Socket.IO clients except the sender
         this.io.emit('settings_update', updateEvent)
 
@@ -500,7 +502,7 @@ export class LocalServer {
     // Serve the Svelte client using correct path format: /app/:userId/:screenId
     this.server.get('/app/:userId/:screenId', async (req, res) => {
       const { userId, screenId } = req.params
-      
+
       let assets
       if (this.isRapidDev) {
         // In rapid dev mode, use the dev server URLs
@@ -515,7 +517,7 @@ export class LocalServer {
         }
         assets = this.clientAssets
       }
-      
+
       const data = {
         title: 'Hey ketsu',
         timestamp: new Date().toISOString(),
@@ -529,7 +531,7 @@ export class LocalServer {
         isRapidDev: this.isRapidDev,
         clientDevUrl: this.clientDevUrl
       }
-      
+
       res.render('app', data)
     })
 
@@ -698,10 +700,10 @@ export class LocalServer {
         try {
           const { settings, clientId = socket.id } = data
           const updateEvent = await this.settingsService.updateSettings(settings, clientId)
-          
+
           // Broadcast to all other clients
           socket.broadcast.emit('settings_update', updateEvent)
-          
+
           // Acknowledge to sender
           socket.emit('settings_updated', {
             success: true,
@@ -773,7 +775,7 @@ export class LocalServer {
         this.templateWatcher.close()
         console.log('🔄 Template watcher stopped')
       }
-      
+
       // Note: In a real implementation, you'd want to properly close the server
       // This is a simplified version
       this.isRunning = false

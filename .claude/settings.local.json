@@ -13,7 +13,8 @@
       "mcp__browsermcp__browser_navigate",
       "Bash(mkdir:*)",
       "WebFetch(domain:localhost)",
-      "Bash(NODE_ENV=development npm run dev)"
+      "Bash(NODE_ENV=development npm run dev)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }
