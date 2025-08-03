@@ -126,7 +126,7 @@ app.whenReady().then(() => {
     .start()
     .then(() => {
       // Initialize background manager after server is ready
-      backgroundManager = new BackgroundManager()
+      backgroundManager = new BackgroundManager(localServer.getUrl())
     })
     .catch((error) => {
       console.error('Failed to start local server:', error)

@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
-import { apiBaseUrl } from '../stores/apiStore';
+import { apiBaseUrl, effectiveApiUrl } from '../stores/apiStore';
 
 export interface SettingsUpdateEvent {
   type: 'settings_update';
@@ -28,11 +28,19 @@ export class SocketService {
   private onConnectionStatusCallback: ((connected: boolean) => void) | null = null;
 
   constructor() {
-    this.initializeConnection();
+    // Don't initialize immediately - wait for stores to be ready
+    this.delayedInitialize();
+  }
+
+  private delayedInitialize(): void {
+    // Wait a bit for server data injection to happen
+    setTimeout(() => {
+      this.initializeConnection();
+    }, 100);
   }
 
   private initializeConnection(): void {
-    const serverUrl = get(apiBaseUrl) || 'http://localhost:8081';
+    const serverUrl = get(effectiveApiUrl) || get(apiBaseUrl) || 'http://localhost:8080';
     
     console.log('🔌 Initializing Socket.IO connection to:', serverUrl);
     
@@ -105,6 +113,19 @@ export class SocketService {
     setTimeout(() => {
       this.initializeConnection();
     }, 500);
+  }
+
+  /**
+   * Reinitialize connection (useful when stores are updated)
+   */
+  public reinitialize(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+    
+    setTimeout(() => {
+      this.initializeConnection();
+    }, 100);
   }
 
   /**

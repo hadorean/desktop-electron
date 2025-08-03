@@ -18,6 +18,7 @@ export class LocalServer {
   private readonly SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']
   private thumbnailService: ThumbnailService
   private settingsService: SettingsService
+  private clientAssets: { js: string; css: string } | null = null
 
   constructor() {
     this.server = express()
@@ -30,9 +31,42 @@ export class LocalServer {
     })
     this.thumbnailService = new ThumbnailService()
     this.settingsService = new SettingsService()
+    this.setupTemplateEngine()
     this.setupMiddleware()
     this.setupRoutes()
     this.setupSocketIO()
+  }
+
+  private async scanForClientAssets(): Promise<{ js: string; css: string }> {
+    try {
+      const clientPath = join(__dirname, '../../src/client/dist')
+      const assetsPath = join(clientPath, 'assets')
+      
+      console.log('Scanning for client assets in:', assetsPath)
+      const files = await readdir(assetsPath)
+      
+      let jsFile = ''
+      let cssFile = ''
+      
+      for (const file of files) {
+        if (file.endsWith('.js') && file.startsWith('index-')) {
+          jsFile = file
+        } else if (file.endsWith('.css') && file.startsWith('index-')) {
+          cssFile = file
+        }
+      }
+      
+      if (!jsFile || !cssFile) {
+        throw new Error(`Missing client assets - JS: ${jsFile}, CSS: ${cssFile}`)
+      }
+      
+      console.log('📦 Found client assets:', { js: jsFile, css: cssFile })
+      return { js: jsFile, css: cssFile }
+    } catch (error) {
+      console.error('Error scanning client assets:', error)
+      // Fallback to hardcoded values if scanning fails
+      return { js: 'index-B8qUNiLk.js', css: 'index-CV3mCCdu.css' }
+    }
   }
 
   private async scanForImages(): Promise<string[]> {
@@ -70,6 +104,21 @@ export class LocalServer {
     }
   }
 
+  private setupTemplateEngine(): void {
+    // Set EJS as template engine
+    this.server.set('view engine', 'ejs')
+    
+    // In development, templates are in src/main/templates
+    // In production, they'll be in out/main/templates
+    const isDev = process.env.NODE_ENV !== 'production'
+    const templatesPath = isDev 
+      ? join(process.cwd(), 'src/main/templates')
+      : join(__dirname, 'templates')
+    
+    this.server.set('views', templatesPath)
+    console.log('📄 Templates path:', templatesPath)
+  }
+
   private setupMiddleware(): void {
     // Enable CORS for cross-origin requests
     this.server.use(cors())
@@ -80,11 +129,14 @@ export class LocalServer {
     // Parse URL-encoded bodies
     this.server.use(express.urlencoded({ extended: true }))
 
-    // Serve static files from the built client (assets, etc.)
-    const clientPath = join(__dirname, '../client/dist')
+    // Serve static files from the built client (src/client/dist)
+    // This serves the separate client app, not the Electron renderer
+    const clientPath = join(__dirname, '../../src/client/dist')
+
     this.server.use('/app/assets', express.static(join(clientPath, 'assets')))
     this.server.use('/app/vite.svg', express.static(join(clientPath, 'vite.svg')))
     this.server.use('/app/favicon.ico', express.static(join(clientPath, 'favicon.ico')))
+    console.log('📁 Client assets path:', join(clientPath, 'assets'))
   }
 
   private setupRoutes(): void {
@@ -311,21 +363,41 @@ export class LocalServer {
     // Background routes for each monitor - serve the Svelte client
     this.server.get('/background/:monitorId', (req, res) => {
       const monitorId = parseInt(req.params.monitorId)
-      // Redirect to the Svelte client with monitor ID as a query parameter
-      res.redirect(`/app/?monitor=${monitorId}`)
+      // Redirect to the correct path format that client expects
+      res.redirect(`/app/hadrien/monitor${monitorId + 1}`)
     })
 
-    // Custom URL structure for monitors
-    this.server.get('/app/hadrien/monitor1', (_req, res) => {
-      res.redirect(`/app/?monitor=0`)
+    // Serve the Svelte client using correct path format: /app/:userId/:screenId
+    this.server.get('/app/:userId/:screenId', async (req, res) => {
+      const { userId, screenId } = req.params
+      
+      // Get client assets if not already cached
+      if (!this.clientAssets) {
+        this.clientAssets = await this.scanForClientAssets()
+      }
+      
+      const data = {
+        title: 'Hey ketsu',
+        timestamp: new Date().toISOString(),
+        route: req.path,
+        query: req.query,
+        userId,
+        screenId,
+        userAgent: req.get('User-Agent') || 'unknown',
+        serverUrl: `http://localhost:${this.port}`,
+        assets: this.clientAssets
+      }
+      
+      res.render('app', data)
     })
 
-    this.server.get('/app/hadrien/monitor2', (_req, res) => {
-      res.redirect(`/app/?monitor=1`)
-    })
-
-    // Serve the Svelte client at /app - handle SPA routing but exclude assets
+    // Fallback route for /app (without params) - redirect to default user/screen
     this.server.get('/app', (_req, res) => {
+      res.redirect('/app/hadrien/monitor1')
+    })
+
+    // Legacy static route for fallback (can be removed once verified)
+    this.server.get('/app-static', (_req, res) => {
       res.sendFile(join(__dirname, '../../src/client/dist/index.html'))
     })
 

@@ -70,6 +70,45 @@ export class LocalServer {
 
 **✅ Milestone**: Basic template rendering works, can inject server data
 
+### ✅ COMPLETED - Additional Phase 1 Enhancements
+
+#### Dynamic Asset Management
+- **Added dynamic asset scanning** - Server automatically detects current asset filenames (`index-*.js`, `index-*.css`)
+- **Enhanced template rendering** - Assets injected as template variables instead of hardcoded paths
+- **Build-resilient** - Works even when Vite generates new asset hashes
+
+```typescript
+// Implemented in src/main/server.ts
+private async scanForClientAssets(): Promise<{ js: string; css: string }> {
+  // Automatically finds current asset files in src/client/dist/assets
+}
+
+// Template data now includes dynamic assets
+const data = {
+  // ... other data
+  assets: this.clientAssets // { js: 'index-BKpD4odt.js', css: 'index-CV3mCCdu.css' }
+}
+```
+
+```html
+<!-- Updated src/main/templates/app.ejs -->
+<script type="module" crossorigin src="/app/assets/<%= assets.js %>"></script>
+<link rel="stylesheet" crossorigin href="/app/assets/<%= assets.css %>">
+```
+
+#### Socket.IO Integration Fixes
+- **Fixed port detection** - Socket.IO now uses server-provided URL instead of hardcoded fallback
+- **Delayed initialization** - Socket service waits for server data injection
+- **Automatic reconnection** - Socket reinitializes when server URL changes
+- **Fallback port updated** - Changed from 8081 to 8080 to match server default
+
+#### Enhanced Route Handling
+- **Path parameters** - Proper `/app/:userId/:screenId` format support
+- **Server data injection** - Includes `serverUrl`, `userId`, `screenId`, `timestamp`, `route`, `query`, `userAgent`
+- **Background window compatibility** - Works with Electron's multi-monitor setup
+
+**Current Status**: Phase 1 complete with production-ready dynamic serving foundation
+
 ---
 
 ## Phase 2: Feature Detection & Gating (2-3 hours)

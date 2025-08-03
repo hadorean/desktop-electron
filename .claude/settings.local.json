@@ -10,7 +10,9 @@
       "Bash(npm run server:*)",
       "Bash(npm run:*)",
       "Bash(npm uninstall:*)",
-      "mcp__browsermcp__browser_navigate"
+      "mcp__browsermcp__browser_navigate",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:localhost)"
     ],
     "deny": []
   }

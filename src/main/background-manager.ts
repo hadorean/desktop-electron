@@ -4,8 +4,10 @@ import { attach, detach, reset } from 'electron-as-wallpaper'
 
 export class BackgroundManager {
   private backgroundWindows: Map<number, BrowserWindow> = new Map()
+  private serverUrl: string
 
-  constructor() {
+  constructor(serverUrl: string) {
+    this.serverUrl = serverUrl
     this.setupMultiMonitorBackgrounds()
   }
 
@@ -39,7 +41,8 @@ export class BackgroundManager {
         webPreferences: {
           nodeIntegration: false,
           contextIsolation: true,
-          preload: join(__dirname, '../preload/index.js')
+          webSecurity: false // Allow loading local server content
+          // No preload script needed for web content
         }
       }
 
@@ -47,7 +50,7 @@ export class BackgroundManager {
 
       // Load the background webview
       const monitorUrl = index === 0 ? 'monitor1' : 'monitor2'
-      const backgroundUrl = `http://localhost:5175/app/hadrien/${monitorUrl}`
+      const backgroundUrl = `${this.serverUrl}/app/hadrien/${monitorUrl}`
       console.log(`Loading background for monitor ${index}: ${backgroundUrl}`)
 
       backgroundWindow.loadURL(backgroundUrl)
@@ -58,11 +61,11 @@ export class BackgroundManager {
         //backgroundWindow.wallpaperState.isForwardMouseInput = true
         // Attach the window to the desktop wallpaper
         try {
-          attach(backgroundWindow, {
-            transparent: false,
-            forwardKeyboardInput: false, // Disable to prevent input interference
-            forwardMouseInput: false // Disable to prevent input interference
-          })
+          // attach(backgroundWindow, {
+          //   transparent: false,
+          //   forwardKeyboardInput: false, // Disable to prevent input interference
+          //   forwardMouseInput: false // Disable to prevent input interference
+          // })
           console.log(`Background window ${index} attached to wallpaper`)
         } catch (error) {
           console.error(`Failed to attach background window ${index} to wallpaper:`, error)
