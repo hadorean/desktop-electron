@@ -1,0 +1,1 @@
+Always read docs/about.md before doing anything.

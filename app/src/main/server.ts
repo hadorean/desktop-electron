@@ -225,7 +225,7 @@ export class LocalServer {
     })
 
     // Endpoint to manually clear caches
-    this.server.post('/dev/clear-cache', (req, res) => {
+    this.server.post('/dev/clear-cache', (_req, res) => {
       this.clearTemplateCache()
       this.invalidateClientAssets()
       res.json({
@@ -235,7 +235,7 @@ export class LocalServer {
     })
 
     // Endpoint to trigger client rebuild notification
-    this.server.post('/dev/client-rebuilt', (req, res) => {
+    this.server.post('/dev/client-rebuilt', (_req, res) => {
       this.invalidateClientAssets()
       // Notify connected clients about the rebuild
       this.io.emit('client_rebuilt', {
@@ -344,16 +344,16 @@ export class LocalServer {
         res.setHeader('Cache-Control', 'public, max-age=3600') // Cache for 1 hour
 
         // Send the file
-        res.sendFile(imagePath)
+        return res.sendFile(imagePath)
       } catch (error) {
         console.error('Error serving image:', error)
         if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-          res.status(404).json({
+          return res.status(404).json({
             error: 'Not Found',
             message: 'Image not found'
           })
         } else {
-          res.status(500).json({
+          return res.status(500).json({
             error: 'Internal Server Error',
             message: 'Failed to serve image'
           })
@@ -402,10 +402,10 @@ export class LocalServer {
         res.setHeader('X-Thumbnail-Generated', 'true')
 
         // Send the thumbnail file
-        res.sendFile(thumbnailPath)
+        return res.sendFile(thumbnailPath)
       } catch (error) {
         console.error('Error serving thumbnail:', error)
-        res.status(500).json({
+        return res.status(500).json({
           error: 'Internal Server Error',
           message: 'Failed to generate or serve thumbnail'
         })
@@ -478,14 +478,14 @@ export class LocalServer {
         // Broadcast to all connected Socket.IO clients except the sender
         this.io.emit('settings_update', updateEvent)
 
-        res.json({
+        return res.json({
           message: 'Settings updated successfully',
           settings: updateEvent.settings,
           timestamp: updateEvent.timestamp
         })
       } catch (error) {
         console.error('Error updating settings:', error)
-        res.status(500).json({
+        return res.status(500).json({
           error: 'Internal Server Error',
           message: 'Failed to update settings'
         })

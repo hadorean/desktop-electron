@@ -3,8 +3,15 @@
 # Doc: https://github.com/casey/just
 
 dev:
-	cd app && npm run dev
+	npm run dev
 
+run:
+	./app/dist/*.exe
+
+build_run:
+	npm run build:app:win
+	just run
+	
 # Claude
 
 # Monitor the claude agent

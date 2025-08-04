@@ -30,3 +30,4 @@ A desktop and browser space, all in one.
 - app: desktop app
 - client: client app running in browser and background
 - docs: documentation
+- scripts: development scripts

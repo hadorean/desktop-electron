@@ -11,11 +11,11 @@ interface ThumbnailRequest {
   reject: (error: Error) => void
 }
 
-interface ThumbnailOptions {
-  width: number
-  height: number
-  quality: number
-}
+// interface ThumbnailOptions {
+//   width: number
+//   height: number
+//   quality: number
+// }
 
 export class ThumbnailService {
   private readonly IMAGES_PATH = 'D:\\pictures\\wall'
@@ -81,7 +81,7 @@ export class ThumbnailService {
    */
   public async generateAllThumbnailsInBackground(imageNames: string[]): Promise<void> {
     console.log(`🖼️  Starting background thumbnail generation for ${imageNames.length} images`)
-    
+
     let generated = 0
     let skipped = 0
 
@@ -91,8 +91,10 @@ export class ThumbnailService {
         const thumbnailPath = this.getThumbnailPath(imageName)
 
         // Skip if thumbnail exists and is fresh
-        if (await this.thumbnailExists(thumbnailPath) && 
-            await this.isThumbnailFresh(imagePath, thumbnailPath)) {
+        if (
+          (await this.thumbnailExists(thumbnailPath)) &&
+          (await this.isThumbnailFresh(imagePath, thumbnailPath))
+        ) {
           skipped++
           continue
         }
@@ -105,10 +107,9 @@ export class ThumbnailService {
               console.log(`📸 Generated ${generated} thumbnails, skipped ${skipped}`)
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.error(`Failed to generate thumbnail for ${imageName}:`, error)
           })
-
       } catch (error) {
         console.error(`Error processing ${imageName} for background generation:`, error)
       }
@@ -122,12 +123,12 @@ export class ThumbnailService {
     const nameWithoutExt = basename(imageName, extname(imageName))
     const relativePath = dirname(imageName)
     const thumbnailName = `${nameWithoutExt}.jpg`
-    
+
     // Preserve directory structure in thumbnails
     if (relativePath === '.' || relativePath === '') {
       return join(this.thumbnailsDir, thumbnailName)
     }
-    
+
     return join(this.thumbnailsDir, relativePath, thumbnailName)
   }
 
@@ -142,11 +143,8 @@ export class ThumbnailService {
 
   private async isThumbnailFresh(imagePath: string, thumbnailPath: string): Promise<boolean> {
     try {
-      const [imageStat, thumbnailStat] = await Promise.all([
-        stat(imagePath),
-        stat(thumbnailPath)
-      ])
-      
+      const [imageStat, thumbnailStat] = await Promise.all([stat(imagePath), stat(thumbnailPath)])
+
       // Thumbnail is fresh if it's newer than the source image
       return thumbnailStat.mtime >= imageStat.mtime
     } catch {
@@ -176,18 +174,18 @@ export class ThumbnailService {
 
   private getQueuedPromise(imagePath: string): Promise<string> {
     // Find existing request in queue
-    const existingRequest = this.processingQueue.find(req => req.imagePath === imagePath)
+    const existingRequest = this.processingQueue.find((req) => req.imagePath === imagePath)
     if (existingRequest) {
       return new Promise((resolve, reject) => {
         // Wrap the existing promise
         const originalResolve = existingRequest.resolve
         const originalReject = existingRequest.reject
-        
+
         existingRequest.resolve = (result) => {
           originalResolve(result)
           resolve(result)
         }
-        
+
         existingRequest.reject = (error) => {
           originalReject(error)
           reject(error)
@@ -208,7 +206,7 @@ export class ThumbnailService {
 
     while (this.processingQueue.length > 0) {
       const request = this.processingQueue.shift()!
-      
+
       try {
         await this.generateThumbnail(request.imagePath, request.thumbnailPath)
         this.queuedPaths.delete(request.imagePath)
@@ -233,12 +231,11 @@ export class ThumbnailService {
           fit: 'cover',
           position: 'center'
         })
-        .jpeg({ 
+        .jpeg({
           quality: this.THUMBNAIL_QUALITY,
           progressive: true
         })
         .toFile(thumbnailPath)
-
     } catch (error) {
       console.error(`Failed to generate thumbnail for ${imagePath}:`, error)
       throw error
@@ -248,7 +245,7 @@ export class ThumbnailService {
   /**
    * Get queue status for debugging
    */
-  public getQueueStatus(): { queueLength: number, processing: boolean, queuedPaths: string[] } {
+  public getQueueStatus(): { queueLength: number; processing: boolean; queuedPaths: string[] } {
     return {
       queueLength: this.processingQueue.length,
       processing: this.isProcessing,
