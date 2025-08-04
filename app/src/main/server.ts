@@ -43,7 +43,11 @@ export class LocalServer {
 
   private async scanForClientAssets(): Promise<{ js: string; css: string }> {
     try {
-      const clientPath = join(__dirname, '../../../client/dist')
+      // Detect if we're running from built/packaged app
+      const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
+      const clientPath = isPackaged 
+        ? join(__dirname, 'client')  // Production: client assets are in out/main/client
+        : join(__dirname, '../../../client/dist')  // Development: client assets in ../client/dist
       const assetsPath = join(clientPath, 'assets')
 
       console.log('Scanning for client assets in:', assetsPath)
@@ -112,19 +116,29 @@ export class LocalServer {
     // Set EJS as template engine
     this.server.set('view engine', 'ejs')
 
-    // In development, templates are in src/main/templates
-    // In production, they'll be in out/main/templates
-    const isDev = process.env.NODE_ENV !== 'production'
-    const templatesPath = isDev
-      ? join(process.cwd(), 'src/main/templates')
-      : join(__dirname, 'templates')
+    // Detect if we're running from built/packaged app
+    const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
+    const isDev = process.env.NODE_ENV !== 'production' && !isPackaged
+    
+    let templatesPath: string
+    if (isDev) {
+      // Development: templates are in src/main/templates
+      templatesPath = join(process.cwd(), 'src/main/templates')
+    } else {
+      // Production/Packaged: templates are in out/main/templates (relative to __dirname)
+      templatesPath = join(__dirname, 'templates')
+    }
 
     this.server.set('views', templatesPath)
     console.log('📄 Templates path:', templatesPath)
+    console.log('📄 Is packaged:', isPackaged)
+    console.log('📄 Is dev:', isDev)
+    console.log('📄 __dirname:', __dirname)
   }
 
   private async setupDevelopmentFeatures(): Promise<void> {
-    const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV !== 'production'
+    const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
+    const isDev = process.env.NODE_ENV !== 'production' && !isPackaged
     if (isDev) {
       console.log('🔧 Setting up development features...')
 
@@ -164,7 +178,8 @@ export class LocalServer {
   }
 
   private setupTemplateHotReload(): void {
-    const isDev = process.env.NODE_ENV !== 'production'
+    const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
+    const isDev = process.env.NODE_ENV !== 'production' && !isPackaged
     const templatesPath = isDev
       ? join(process.cwd(), 'src/main/templates')
       : join(__dirname, 'templates')
@@ -205,10 +220,15 @@ export class LocalServer {
   private setupDevelopmentRoutes(): void {
     // Development info endpoint
     this.server.get('/dev/info', (req, res) => {
+      const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
+      const clientPath = isPackaged 
+        ? join(__dirname, 'client')
+        : join(__dirname, '../../../client/dist')
+      
       res.json({
         development: true,
         templatePath: this.server.get('views'),
-        clientAssetsPath: join(__dirname, '../../../client/dist/assets'),
+        clientAssetsPath: join(clientPath, 'assets'),
         currentAssets: this.clientAssets,
         request: {
           userAgent: req.get('User-Agent'),
@@ -263,12 +283,16 @@ export class LocalServer {
 
     // Serve static files from the built client (client/dist)
     // This serves the separate client app, not the Electron renderer
-    const clientPath = join(__dirname, '../../../client/dist')
+    const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
+    const clientPath = isPackaged 
+      ? join(__dirname, 'client')  // Production: client assets are in out/main/client
+      : join(__dirname, '../../../client/dist')  // Development: client assets in ../client/dist
 
     this.server.use('/app/assets', express.static(join(clientPath, 'assets')))
     this.server.use('/app/vite.svg', express.static(join(clientPath, 'vite.svg')))
     this.server.use('/app/favicon.ico', express.static(join(clientPath, 'favicon.ico')))
     console.log('📁 Client assets path:', join(clientPath, 'assets'))
+    console.log('📁 Is packaged (middleware):', isPackaged)
   }
 
   private setupRoutes(): void {
@@ -542,12 +566,20 @@ export class LocalServer {
 
     // Legacy static route for fallback (can be removed once verified)
     this.server.get('/app-static', (_req, res) => {
-      res.sendFile(join(__dirname, '../../../client/dist/index.html'))
+      const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
+      const clientPath = isPackaged 
+        ? join(__dirname, 'client')
+        : join(__dirname, '../../../client/dist')
+      res.sendFile(join(clientPath, 'index.html'))
     })
 
     // Handle any other /app/* routes (but not /app/assets/*) for client-side routing
     this.server.get(/^\/app\/(?!assets\/).*/, (_req, res) => {
-      res.sendFile(join(__dirname, '../../../client/dist/index.html'))
+      const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
+      const clientPath = isPackaged 
+        ? join(__dirname, 'client')
+        : join(__dirname, '../../../client/dist')
+      res.sendFile(join(clientPath, 'index.html'))
     })
 
     // Serve a simple HTML page at root
