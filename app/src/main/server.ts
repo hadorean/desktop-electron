@@ -44,10 +44,10 @@ export class LocalServer {
   private async scanForClientAssets(): Promise<{ js: string; css: string }> {
     try {
       // Detect if we're running from built/packaged app
-      const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
-      const clientPath = isPackaged 
-        ? join(__dirname, 'client')  // Production: client assets are in out/main/client
-        : join(__dirname, '../../../client/dist')  // Development: client assets in ../client/dist
+      const isPackaged = __dirname.includes('app.asar')
+      const clientPath = isPackaged
+        ? join(__dirname, 'client') // Production: client assets are in out/main/client
+        : join(__dirname, '../../../client/dist') // Development: client assets in ../client/dist
       const assetsPath = join(clientPath, 'assets')
 
       console.log('Scanning for client assets in:', assetsPath)
@@ -117,9 +117,9 @@ export class LocalServer {
     this.server.set('view engine', 'ejs')
 
     // Detect if we're running from built/packaged app
-    const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
-    const isDev = process.env.NODE_ENV !== 'production' && !isPackaged
-    
+    const isPackaged = __dirname.includes('app.asar')
+    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
+
     let templatesPath: string
     if (isDev) {
       // Development: templates are in src/main/templates
@@ -137,8 +137,17 @@ export class LocalServer {
   }
 
   private async setupDevelopmentFeatures(): Promise<void> {
-    const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
-    const isDev = process.env.NODE_ENV !== 'production' && !isPackaged
+    // In electron-vite, the main process is built to 'out' even in dev mode
+    // Only consider it packaged if it's in app.asar (actual distribution package)
+    const isPackaged = __dirname.includes('app.asar')
+    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
+    
+    console.log('🔍 Development mode check:')
+    console.log('  NODE_ENV:', process.env.NODE_ENV)
+    console.log('  __dirname:', __dirname)
+    console.log('  isPackaged:', isPackaged)
+    console.log('  isDev:', isDev)
+    
     if (isDev) {
       console.log('🔧 Setting up development features...')
 
@@ -157,12 +166,12 @@ export class LocalServer {
     const possiblePorts = [5173, 5174, 5175, 5176, 5177, 5178, 5179]
 
     for (const port of possiblePorts) {
-      const testUrl = `http://localhost:${port}`
+      const testUrl = `http://localhost:${port}/app/`
       try {
         const response = await fetch(testUrl)
         if (response.ok) {
           this.isRapidDev = true
-          this.clientDevUrl = testUrl
+          this.clientDevUrl = `http://localhost:${port}`
           console.log(
             `🚀 Rapid development mode detected - using client dev server at ${this.clientDevUrl}`
           )
@@ -178,8 +187,8 @@ export class LocalServer {
   }
 
   private setupTemplateHotReload(): void {
-    const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
-    const isDev = process.env.NODE_ENV !== 'production' && !isPackaged
+    const isPackaged = __dirname.includes('app.asar')
+    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
     const templatesPath = isDev
       ? join(process.cwd(), 'src/main/templates')
       : join(__dirname, 'templates')
@@ -220,11 +229,11 @@ export class LocalServer {
   private setupDevelopmentRoutes(): void {
     // Development info endpoint
     this.server.get('/dev/info', (req, res) => {
-      const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
-      const clientPath = isPackaged 
+      const isPackaged = __dirname.includes('app.asar')
+      const clientPath = isPackaged
         ? join(__dirname, 'client')
         : join(__dirname, '../../../client/dist')
-      
+
       res.json({
         development: true,
         templatePath: this.server.get('views'),
@@ -283,10 +292,10 @@ export class LocalServer {
 
     // Serve static files from the built client (client/dist)
     // This serves the separate client app, not the Electron renderer
-    const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
-    const clientPath = isPackaged 
-      ? join(__dirname, 'client')  // Production: client assets are in out/main/client
-      : join(__dirname, '../../../client/dist')  // Development: client assets in ../client/dist
+    const isPackaged = __dirname.includes('app.asar')
+    const clientPath = isPackaged
+      ? join(__dirname, 'client') // Production: client assets are in out/main/client
+      : join(__dirname, '../../../client/dist') // Development: client assets in ../client/dist
 
     this.server.use('/app/assets', express.static(join(clientPath, 'assets')))
     this.server.use('/app/vite.svg', express.static(join(clientPath, 'vite.svg')))
@@ -566,8 +575,8 @@ export class LocalServer {
 
     // Legacy static route for fallback (can be removed once verified)
     this.server.get('/app-static', (_req, res) => {
-      const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
-      const clientPath = isPackaged 
+      const isPackaged = __dirname.includes('app.asar')
+      const clientPath = isPackaged
         ? join(__dirname, 'client')
         : join(__dirname, '../../../client/dist')
       res.sendFile(join(clientPath, 'index.html'))
@@ -575,8 +584,8 @@ export class LocalServer {
 
     // Handle any other /app/* routes (but not /app/assets/*) for client-side routing
     this.server.get(/^\/app\/(?!assets\/).*/, (_req, res) => {
-      const isPackaged = __dirname.includes('app.asar') || __dirname.includes('out')
-      const clientPath = isPackaged 
+      const isPackaged = __dirname.includes('app.asar')
+      const clientPath = isPackaged
         ? join(__dirname, 'client')
         : join(__dirname, '../../../client/dist')
       res.sendFile(join(clientPath, 'index.html'))
