@@ -27,6 +27,6 @@ A desktop and browser space, all in one.
 
 ### Project structure
 
-- dsk: desktop app
-- web: client app running in browser and background
+- app: desktop app
+- client: client app running in browser and background
 - docs: documentation

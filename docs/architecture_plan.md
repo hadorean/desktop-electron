@@ -91,16 +91,16 @@ electron-app/
 ```typescript
 // Shared state interface
 export interface AppState {
-  theme: 'light' | 'dark'
-  settings: UserSettings
+  theme: "light" | "dark";
+  settings: UserSettings;
   // ... other shared state
 }
 
 export interface SyncMessage {
-  type: 'state_update' | 'user_action'
-  payload: any
-  timestamp: number
-  clientId: string
+  type: "state_update" | "user_action";
+  payload: any;
+  timestamp: number;
+  clientId: string;
 }
 ```
 
@@ -253,6 +253,7 @@ export interface SyncMessage {
 #### Socket.IO Client ✅ (IMPLEMENTED):
 
 **Service Features:**
+
 - **Automatic Reconnection**: Built-in retry logic with configurable attempts
 - **Connection Status**: Real-time connection state monitoring
 - **Event Handlers**: Typed event handling for settings updates
@@ -260,7 +261,8 @@ export interface SyncMessage {
 - **URL Management**: Dynamic server URL updates with reconnection
 
 **Client Implementation:**
-- **SocketService**: Singleton service managing Socket.IO connection (`src/client/src/lib/services/socket.ts`)
+
+- **SocketService**: Singleton service managing Socket.IO connection (`client/src/lib/services/socket.ts`)
 - **Connection Status UI**: Visual indicator showing connection state
 - **Settings Sync**: Bidirectional settings synchronization
 - **Event Types**: TypeScript interfaces for Socket.IO events

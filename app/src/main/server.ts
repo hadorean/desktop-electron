@@ -43,7 +43,7 @@ export class LocalServer {
 
   private async scanForClientAssets(): Promise<{ js: string; css: string }> {
     try {
-      const clientPath = join(__dirname, '../../src/client/dist')
+      const clientPath = join(__dirname, '../../../client/dist')
       const assetsPath = join(clientPath, 'assets')
 
       console.log('Scanning for client assets in:', assetsPath)
@@ -208,7 +208,7 @@ export class LocalServer {
       res.json({
         development: true,
         templatePath: this.server.get('views'),
-        clientAssetsPath: join(__dirname, '../../src/client/dist/assets'),
+        clientAssetsPath: join(__dirname, '../../../client/dist/assets'),
         currentAssets: this.clientAssets,
         request: {
           userAgent: req.get('User-Agent'),
@@ -261,9 +261,9 @@ export class LocalServer {
     // Parse URL-encoded bodies
     this.server.use(express.urlencoded({ extended: true }))
 
-    // Serve static files from the built client (src/client/dist)
+    // Serve static files from the built client (client/dist)
     // This serves the separate client app, not the Electron renderer
-    const clientPath = join(__dirname, '../../src/client/dist')
+    const clientPath = join(__dirname, '../../../client/dist')
 
     this.server.use('/app/assets', express.static(join(clientPath, 'assets')))
     this.server.use('/app/vite.svg', express.static(join(clientPath, 'vite.svg')))
@@ -542,12 +542,12 @@ export class LocalServer {
 
     // Legacy static route for fallback (can be removed once verified)
     this.server.get('/app-static', (_req, res) => {
-      res.sendFile(join(__dirname, '../../src/client/dist/index.html'))
+      res.sendFile(join(__dirname, '../../../client/dist/index.html'))
     })
 
     // Handle any other /app/* routes (but not /app/assets/*) for client-side routing
     this.server.get(/^\/app\/(?!assets\/).*/, (_req, res) => {
-      res.sendFile(join(__dirname, '../../src/client/dist/index.html'))
+      res.sendFile(join(__dirname, '../../../client/dist/index.html'))
     })
 
     // Serve a simple HTML page at root

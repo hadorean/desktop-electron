@@ -3,7 +3,7 @@
 # Doc: https://github.com/casey/just
 
 dev:
-	npm run dev
+	cd app && npm run dev
 
 # Claude
 
