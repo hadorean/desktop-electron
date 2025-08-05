@@ -6,10 +6,10 @@ dev:
 	npm run dev
 
 run:
-	./app/dist/*.exe
+	./pkg/app/dist/*.exe
 
 build_run:
-	npm run build:app:win
+	npm run package:win
 	just run
 	
 

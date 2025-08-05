@@ -1,5 +1,5 @@
 {
-  "name": "svelte-app",
+  "name": "heyketsu-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -25,6 +25,7 @@
     "vite": "^6.2.0"
   },
   "dependencies": {
+    "@heyketsu/shared": "file:../shared",
     "@tweenjs/tween.js": "^25.0.0",
     "socket.io-client": "^4.8.1"
   }

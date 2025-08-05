@@ -1,26 +1,21 @@
-appId: com.electron.app
-productName: electron-app
+appId: com.heyketsu.app
+productName: Hey Ketsu
+electronVersion: 37.2.3
 directories:
   buildResources: build
 files:
+  - out/**/*
+  - node_modules/**/*
+  - build/**/*
+  - package.json
   - '!**/.vscode/*'
   - '!src/*'
-  - '!../client/src/*'
-  - '!../client/node_modules/*'
-  - '!../client/package*.json'
-  - '!../client/vite*.config.*'
-  - '!../client/tsconfig*.json'
-  - '!../client/svelte.config.*'
-  - '!../client/postcss.config.*'
-  - '!../client/tailwind.config.*'
-  - '!../client/.gitignore'
-  - '!../client/README.md'
-  - '!../client/demo-dist/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!svelte.config.mjs'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+asar: true
 asarUnpack:
   - resources/**
 win:
