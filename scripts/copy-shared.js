@@ -1,13 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const chokidar = require('chokidar');
 
 // Define source and target paths
 const sharedDistPath = path.join(__dirname, '..', 'pkg', 'shared', 'dist');
 const sharedPackageJsonPath = path.join(__dirname, '..', 'pkg', 'shared', 'package.json');
 const targetDir = path.join(__dirname, '..', 'pkg', 'app', 'node_modules', '@heyketsu', 'shared');
-
-// Create target directory
-fs.mkdirSync(targetDir, { recursive: true });
 
 // Copy dist directory
 function copyDirectory(src, dest) {
@@ -28,12 +26,61 @@ function copyDirectory(src, dest) {
     });
 }
 
-// Copy shared dist to target
-copyDirectory(sharedDistPath, targetDir);
-
-// Copy package.json
-if (fs.existsSync(sharedPackageJsonPath)) {
-    fs.copyFileSync(sharedPackageJsonPath, path.join(targetDir, 'package.json'));
+function copySharedPackage() {
+    // Create target directory
+    fs.mkdirSync(targetDir, { recursive: true });
+    
+    // Copy shared dist to target
+    copyDirectory(sharedDistPath, targetDir);
+    
+    // Copy package.json
+    if (fs.existsSync(sharedPackageJsonPath)) {
+        fs.copyFileSync(sharedPackageJsonPath, path.join(targetDir, 'package.json'));
+    }
+    
+    console.log('✅ Shared package copied to node_modules');
 }
 
-console.log('✅ Shared package copied to node_modules');
+// Check if we should watch for changes
+const watchMode = process.argv.includes('--watch');
+
+if (watchMode) {
+    console.log('👀 Watching shared package for changes...');
+    
+    // Initial copy
+    copySharedPackage();
+    
+    // Watch for changes in the shared dist directory
+    const watcher = chokidar.watch(sharedDistPath, {
+        ignored: /node_modules/,
+        persistent: true,
+        ignoreInitial: true,
+        awaitWriteFinish: {
+            stabilityThreshold: 100,
+            pollInterval: 100
+        }
+    });
+    
+    let copyTimeout;
+    function debouncedCopy(reason) {
+        clearTimeout(copyTimeout);
+        copyTimeout = setTimeout(() => {
+            console.log(`🔄 Shared package ${reason}, copying...`);
+            copySharedPackage();
+        }, 200);
+    }
+    
+    watcher.on('change', () => debouncedCopy('changed'));
+    watcher.on('add', () => debouncedCopy('added'));
+    watcher.on('unlink', () => debouncedCopy('removed'));
+    
+    // Keep the process running
+    process.on('SIGINT', () => {
+        console.log('\n👋 Stopping shared package watcher...');
+        watcher.close();
+        process.exit(0);
+    });
+} else {
+    // One-time copy
+    copySharedPackage();
+}
