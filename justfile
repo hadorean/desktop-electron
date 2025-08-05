@@ -8,11 +8,16 @@ dev:
 run:
 	./pkg/app/dist/*.exe
 
-build_run:
+build:
+	just rename_exe_prev
 	npm run package:win
+
+build_run:
+	just build
 	just run
 	
-
+rename_exe_prev:
+	node scripts/rename-exe-prev.js
 # Run the mkdocs server
 doc:
 	python -m mkdocs serve
