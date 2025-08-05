@@ -30,8 +30,9 @@ function copySharedPackage() {
     // Create target directory
     fs.mkdirSync(targetDir, { recursive: true });
     
-    // Copy shared dist to target
-    copyDirectory(sharedDistPath, targetDir);
+    // Copy shared dist to target/dist (preserve dist directory structure)
+    const targetDistDir = path.join(targetDir, 'dist');
+    copyDirectory(sharedDistPath, targetDistDir);
     
     // Copy package.json
     if (fs.existsSync(sharedPackageJsonPath)) {

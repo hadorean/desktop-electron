@@ -1,13 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
 import { apiBaseUrl, effectiveApiUrl } from '../stores/apiStore';
-
-export interface SettingsUpdateEvent {
-  type: 'settings_update';
-  settings: any;
-  timestamp: number;
-  clientId: string;
-}
+import type { SettingsUpdateEvent } from '@heyketsu/shared/types';
+import { SOCKET_EVENTS } from '@heyketsu/shared/constants';
 
 export interface SettingsUpdatedResponse {
   success: boolean;
@@ -58,14 +53,14 @@ export class SocketService {
   private setupEventHandlers(): void {
     if (!this.socket) return;
 
-    this.socket.on('connect', () => {
+    this.socket.on(SOCKET_EVENTS.CONNECT, () => {
       console.log('🔌 Socket.IO connected:', this.socket?.id);
       this.isConnected = true;
       this.reconnectAttempts = 0;
       this.onConnectionStatusCallback?.(true);
     });
 
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on(SOCKET_EVENTS.DISCONNECT, (reason) => {
       console.log('🔌 Socket.IO disconnected:', reason);
       this.isConnected = false;
       this.onConnectionStatusCallback?.(false);
@@ -84,7 +79,7 @@ export class SocketService {
     });
 
     // Handle settings updates from server
-    this.socket.on('settings_update', (event: SettingsUpdateEvent) => {
+    this.socket.on(SOCKET_EVENTS.SETTINGS_UPDATE, (event: SettingsUpdateEvent) => {
       console.log('🔌 Received settings update:', event);
       this.onSettingsUpdateCallback?.(event);
     });

@@ -12,51 +12,20 @@ currentScreen.subscribe((screenId) => {
   localStorage.setItem("currentScreen", screenId);
 });
 
-// Default settings
-export type SettingsButtonPosition =
-  | "bottom-right"
-  | "top-right"
-  | "bottom-left"
-  | "top-left";
+import type { 
+  UISettings, 
+  ServerSettings, 
+  SettingsButtonPosition 
+} from "@heyketsu/shared/types";
+import { DEFAULT_UI_SETTINGS, DEFAULT_SERVER_SETTINGS } from "@heyketsu/shared/constants";
 
-export interface Settings {
-  selectedImage: string;
-  opacity: number;
-  blur: number;
-  saturation: number;
-  hideButton: boolean;
-  transitionTime: number;
-  showTimeDate: boolean;
-  showWeather: boolean;
-  showScreenSwitcher: boolean;
-  favorites: string[];
-  settingsButtonPosition: SettingsButtonPosition;
-}
+// Legacy aliases for backward compatibility
+export type Settings = UISettings;
+export type { SettingsButtonPosition };
 
-export interface ServerSettings {
-  lastModified?: string; // ISO 8601 timestamp
-  shared: Settings;
-  screens: Record<string, Partial<Settings>>;
-}
+const defaultSettings: Settings = DEFAULT_UI_SETTINGS;
 
-const defaultSettings: Settings = {
-  selectedImage: "",
-  opacity: 1,
-  blur: 0,
-  saturation: 1,
-  hideButton: false,
-  transitionTime: 1,
-  showTimeDate: true,
-  showWeather: false,
-  showScreenSwitcher: true,
-  favorites: [],
-  settingsButtonPosition: "bottom-right",
-};
-
-const defaultServerSettings: ServerSettings = {
-  shared: defaultSettings,
-  screens: {},
-};
+const defaultServerSettings: ServerSettings = DEFAULT_SERVER_SETTINGS;
 
 export const allSettings = writable<ServerSettings>(defaultServerSettings);
 

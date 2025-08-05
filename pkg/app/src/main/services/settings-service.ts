@@ -1,55 +1,21 @@
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import { app } from 'electron'
+import type { 
+  UISettings, 
+  ServerSettings, 
+  SettingsUpdateEvent 
+} from '@heyketsu/shared/types'
+import { DEFAULT_SERVER_SETTINGS } from '@heyketsu/shared/constants'
 
-export type SettingsButtonPosition = 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left'
-
-export interface Settings {
-  selectedImage: string
-  opacity: number
-  blur: number
-  saturation: number
-  hideButton: boolean
-  transitionTime: number
-  showTimeDate: boolean
-  showWeather: boolean
-  showScreenSwitcher: boolean
-  favorites: string[]
-  settingsButtonPosition: SettingsButtonPosition
-}
-
-export interface ServerSettings {
-  lastModified?: string // ISO 8601 timestamp
-  shared: Settings
-  screens: Record<string, Partial<Settings>>
-}
-
-export interface SettingsUpdateEvent {
-  type: 'settings_update'
-  settings: ServerSettings
-  timestamp: number
-  clientId: string
-}
+// Legacy aliases for backward compatibility
+export type Settings = UISettings
+export type { SettingsButtonPosition } from '@heyketsu/shared/types'
 
 export class SettingsService {
   private settings: ServerSettings | null = null
   private settingsPath: string
-  private defaultSettings: ServerSettings = {
-    shared: {
-      selectedImage: '',
-      opacity: 1,
-      blur: 0,
-      saturation: 1,
-      hideButton: false,
-      transitionTime: 1,
-      showTimeDate: true,
-      showWeather: false,
-      showScreenSwitcher: true,
-      favorites: [],
-      settingsButtonPosition: 'bottom-right'
-    },
-    screens: {}
-  }
+  private defaultSettings: ServerSettings = DEFAULT_SERVER_SETTINGS
 
   constructor() {
     this.settingsPath = join(app.getPath('userData'), 'settings.json')

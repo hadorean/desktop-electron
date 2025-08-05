@@ -1,31 +1,34 @@
 // Settings type definitions
-export interface ScreenSettings {
-  id: string;
-  name: string;
-  imageUrl?: string;
-  webUrl?: string;
-  blur: number;
-  brightness: number;
-  contrast: number;
+
+export type SettingsButtonPosition = 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left';
+
+export interface UISettings {
+  selectedImage: string;
   opacity: number;
-  interactive: boolean;
-  visible: boolean;
+  blur: number;
+  saturation: number;
+  hideButton: boolean;
+  transitionTime: number;
+  showTimeDate: boolean;
+  showWeather: boolean;
+  showScreenSwitcher: boolean;
+  favorites: string[];
+  settingsButtonPosition: SettingsButtonPosition;
 }
 
-export interface GlobalSettings {
-  screens: ScreenSettings[];
-  currentScreenId: string;
-  theme: 'light' | 'dark' | 'auto';
-  autoStart: boolean;
-  hotkeys: {
-    toggleVisible: string;
-    nextScreen: string;
-    previousScreen: string;
-  };
+export interface ServerSettings {
+  lastModified?: string; // ISO 8601 timestamp
+  shared: UISettings;
+  screens: Record<string, Partial<UISettings>>;
 }
 
-export interface ApiSettings {
-  weatherApiKey?: string;
-  timeZone: string;
-  units: 'metric' | 'imperial';
+export interface SettingsUpdateEvent {
+  type: 'settings_update';
+  settings: ServerSettings;
+  timestamp: number;
+  clientId: string;
 }
+
+// Legacy alias for backward compatibility
+/** @deprecated Use UISettings instead */
+export type Settings = UISettings;
