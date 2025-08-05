@@ -1,0 +1,34 @@
+# Main navigation configuration for awesome-nav plugin
+
+# Sort configuration
+sort:
+  direction: asc
+  type: natural
+  by: filename
+  sections: first
+  sort_type: natural
+
+# Navigation structure
+nav:
+  - 'About':
+      - 'ℹ️ About': readme.md
+      - '📖 MkDocs': setup/mkdocs.md
+
+  - 'Process':
+      - 'Claude':
+          - '💬 Commands': claude/commands/
+          
+  - 'Notes':
+      - '📋 Overview': memories/index.md
+      - '2025-08': memories/2025-08/
+
+# Include unmatched files at the end
+append_unmatched: true
+
+# Hide certain patterns
+ignore:
+  - '*.draft.md'
+  - 'gen_nav.py'
+
+# Flatten single child sections
+flatten_single_child_sections: true

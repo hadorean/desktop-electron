@@ -147,7 +147,7 @@ app.whenReady().then(() => {
   })
 
   const tray = new Tray(icon)
-  tray.setToolTip('This is my application.')
+  tray.setToolTip('Hey Ketsu')
 
   // Create tray context menu
   const contextMenu = Menu.buildFromTemplate([

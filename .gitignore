@@ -8,3 +8,7 @@ out
 nul
 
 .claude/settings.local.json
+
+electronbg.code-workspace
+
+desktop.ini

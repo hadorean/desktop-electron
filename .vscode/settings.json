@@ -17,37 +17,5 @@
     "javascript",
     "javascriptreact",
     "svelte"
-  ],
-  "files.exclude": {
-    "nul": true,
-    "client/package-lock.json": true,
-    "client/postcss.config.cjs": true,
-    "client/vite.demo.config.ts": true,
-    "client/vite.config.ts": true,
-    "client/tsconfig.node.json": true,
-    "client/tsconfig.json": true,
-    "client/svelte.config.js": true,
-    "client/tsconfig.app.json": true,
-    "app/.prettierignore": true,
-    "app/.prettierrc.yaml": true,
-    "app/.editorconfig": true,
-    "app/dev-app-update.yml": true,
-    "app/electron-builder.yml": true,
-    "app/electron.log": true,
-    "app/electron.vite.config.ts": true,
-    "app/eslint.config.mjs": true,
-    "app/package-lock.json": true,
-    "app/svelte.config.mjs": true,
-    "app/tsconfig.json": true,
-    "app/tsconfig.node.json": true,
-    "app/tsconfig.web.json": true,
-    "client/tailwind.config.cjs": true,
-    "client/.gitignore": true,
-    "client/.env.production": true,
-    "client/.env": true,
-    "app/out": true,
-    "client/dist": true,
-    "client/.vite": true,
-    "client/demo-dist": true
-  }
+  ]
 }

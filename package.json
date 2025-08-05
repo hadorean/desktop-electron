@@ -1,10 +1,10 @@
 {
-  "name": "electron-app",
+  "name": "Hey Ketsu",
   "version": "1.0.0",
-  "description": "An Electron application with Svelte and TypeScript",
+  "description": "A peaceful space for your desktop and browser",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Hadrien Grandry",
+  "homepage": "https://hgrandry.net",
   "scripts": {
     "format": "cd app && prettier --plugin prettier-plugin-svelte --write .",
     "lint": "cd app && eslint --cache .",

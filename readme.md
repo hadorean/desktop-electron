@@ -1,4 +1,4 @@
-A desktop and browser space, all in one.
+A peaceful space for your desktop and browser.
 
 - Control your windows backgrounds and browser new tab in one place.
 - Use static images or any web pages (TODO)

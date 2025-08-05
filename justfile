@@ -12,6 +12,11 @@ build_run:
 	npm run build:app:win
 	just run
 	
+
+# Run the mkdocs server
+doc:
+	python -m mkdocs serve
+	
 # Claude
 
 # Monitor the claude agent
