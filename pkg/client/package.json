@@ -9,7 +9,9 @@
     "build:demo": "vite build --config vite.demo.config.ts",
     "preview": "vite preview",
     "preview:demo": "vite preview --config vite.demo.config.ts",
-    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "format": "prettier --write src --end-of-line lf",
+    "format:check": "prettier --check src --end-of-line lf"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
@@ -18,6 +20,9 @@
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.9.4",
     "postcss": "^8.4.31",
+    "prettier": "^3.0.0",
+    "prettier-plugin-svelte": "^3.0.0",
+    "prettier-plugin-tailwindcss": "^0.5.0",
     "svelte": "^5.20.2",
     "svelte-check": "^4.1.4",
     "tailwindcss": "^3.3.5",
