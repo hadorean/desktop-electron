@@ -8,7 +8,7 @@
   let isServerRunning = false
 
   // Get server information on component mount
-  async function getServerInfo() {
+  async function getServerInfo(): Promise<void> {
     try {
       serverUrl = await window.api.getServerUrl()
       isServerRunning = await window.api.isServerRunning()
@@ -18,7 +18,7 @@
   }
 
   // Background management functions
-  async function reloadAllBackgrounds() {
+  async function reloadAllBackgrounds(): Promise<void> {
     try {
       await window.api.reloadAllBackgrounds()
       console.log('All backgrounds reloaded')
@@ -27,7 +27,7 @@
     }
   }
 
-  async function makeAllInteractive() {
+  async function makeAllInteractive(): Promise<void> {
     try {
       await window.api.makeAllBackgroundsInteractive()
       console.log('Made all backgrounds interactive')
@@ -36,7 +36,7 @@
     }
   }
 
-  async function makeAllNonInteractive() {
+  async function makeAllNonInteractive(): Promise<void> {
     try {
       await window.api.makeAllBackgroundsNonInteractive()
       console.log('Made all backgrounds non-interactive')

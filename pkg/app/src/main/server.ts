@@ -11,7 +11,7 @@ import { SettingsService } from './services/settings-service'
 
 export class LocalServer {
   private server: express.Application
-  private httpServer: any
+  private httpServer: ReturnType<typeof createServer>
   private io: SocketIOServer
   private port: number = 8080
   private isRunning: boolean = false
@@ -20,7 +20,7 @@ export class LocalServer {
   private thumbnailService: ThumbnailService
   private settingsService: SettingsService
   private clientAssets: { js: string; css: string } | null = null
-  private templateWatcher: any = null
+  private templateWatcher: ReturnType<typeof watch> | null = null
   private isRapidDev: boolean = false
   private clientDevUrl: string = 'http://localhost:5173'
 
@@ -97,7 +97,7 @@ export class LocalServer {
             const ext = item.name.toLowerCase().substring(item.name.lastIndexOf('.'))
             if (this.SUPPORTED_EXTENSIONS.includes(ext)) {
               // Store relative path from images directory
-              const relativePath = fullPath.replace(this.IMAGES_PATH, '').replace(/^[\\\/]/, '')
+              const relativePath = fullPath.replace(this.IMAGES_PATH, '').replace(/^[\\/]/, '')
               allFiles.push(relativePath.replace(/\\/g, '/')) // Normalize path separators
             }
           }
@@ -118,7 +118,9 @@ export class LocalServer {
 
     // Detect if we're running from built/packaged app
     const isPackaged = __dirname.includes('app.asar')
-    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
+    const isDev =
+      process.env.NODE_ENV === 'development' ||
+      (process.env.NODE_ENV !== 'production' && !isPackaged)
 
     let templatesPath: string
     if (isDev) {
@@ -140,14 +142,16 @@ export class LocalServer {
     // In electron-vite, the main process is built to 'out' even in dev mode
     // Only consider it packaged if it's in app.asar (actual distribution package)
     const isPackaged = __dirname.includes('app.asar')
-    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
-    
+    const isDev =
+      process.env.NODE_ENV === 'development' ||
+      (process.env.NODE_ENV !== 'production' && !isPackaged)
+
     console.log('🔍 Development mode check:')
     console.log('  NODE_ENV:', process.env.NODE_ENV)
     console.log('  __dirname:', __dirname)
     console.log('  isPackaged:', isPackaged)
     console.log('  isDev:', isDev)
-    
+
     if (isDev) {
       console.log('🔧 Setting up development features...')
 
@@ -177,7 +181,7 @@ export class LocalServer {
           )
           return
         }
-      } catch (error) {
+      } catch {
         // Try next port
       }
     }
@@ -188,7 +192,9 @@ export class LocalServer {
 
   private setupTemplateHotReload(): void {
     const isPackaged = __dirname.includes('app.asar')
-    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
+    const isDev =
+      process.env.NODE_ENV === 'development' ||
+      (process.env.NODE_ENV !== 'production' && !isPackaged)
     const templatesPath = isDev
       ? join(process.cwd(), 'src/main/templates')
       : join(__dirname, 'templates')
@@ -201,21 +207,21 @@ export class LocalServer {
 
     this.templateWatcher.on('change', (path: string) => {
       console.log(`📝 Template changed: ${path}`)
-      this.clearTemplateCache()
+      this.clearTemplateCache().catch(console.error)
       this.invalidateClientAssets()
     })
 
     this.templateWatcher.on('add', (path: string) => {
       console.log(`📄 New template added: ${path}`)
-      this.clearTemplateCache()
+      this.clearTemplateCache().catch(console.error)
     })
 
     console.log('🔄 Template hot reload enabled')
   }
 
-  private clearTemplateCache(): void {
+  private async clearTemplateCache(): Promise<void> {
     // Clear EJS template cache
-    const ejs = require('ejs')
+    const ejs = await import('ejs')
     ejs.clearCache()
     console.log('🗑️  Template cache cleared')
   }
@@ -254,8 +260,8 @@ export class LocalServer {
     })
 
     // Endpoint to manually clear caches
-    this.server.post('/dev/clear-cache', (_req, res) => {
-      this.clearTemplateCache()
+    this.server.post('/dev/clear-cache', async (_req, res) => {
+      await this.clearTemplateCache()
       this.invalidateClientAssets()
       res.json({
         message: 'All caches cleared',
@@ -766,16 +772,15 @@ export class LocalServer {
     })
   }
 
-  public start(): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      if (this.isRunning) {
-        resolve()
-        return
-      }
+  public async start(): Promise<void> {
+    if (this.isRunning) {
+      return
+    }
 
-      // Setup development features before starting server
-      await this.setupDevelopmentFeatures()
+    // Setup development features before starting server
+    await this.setupDevelopmentFeatures()
 
+    return new Promise((resolve, reject) => {
       const server = this.httpServer.listen(this.port, () => {
         this.isRunning = true
         console.log(`🚀 Local server running at http://localhost:${this.port}`)

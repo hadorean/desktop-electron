@@ -7,9 +7,11 @@ const api = {
   isServerRunning: () => ipcRenderer.invoke('is-server-running'),
   reloadBackground: (monitorId: number) => ipcRenderer.invoke('reload-background', monitorId),
   reloadAllBackgrounds: () => ipcRenderer.invoke('reload-all-backgrounds'),
-  makeBackgroundInteractive: (monitorId: number) => ipcRenderer.invoke('make-background-interactive', monitorId),
+  makeBackgroundInteractive: (monitorId: number) =>
+    ipcRenderer.invoke('make-background-interactive', monitorId),
   makeAllBackgroundsInteractive: () => ipcRenderer.invoke('make-all-backgrounds-interactive'),
-  makeBackgroundNonInteractive: (monitorId: number) => ipcRenderer.invoke('make-background-non-interactive', monitorId),
+  makeBackgroundNonInteractive: (monitorId: number) =>
+    ipcRenderer.invoke('make-background-non-interactive', monitorId),
   makeAllBackgroundsNonInteractive: () => ipcRenderer.invoke('make-all-backgrounds-non-interactive')
 }
 

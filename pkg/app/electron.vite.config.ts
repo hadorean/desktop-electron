@@ -4,32 +4,32 @@ import { copyFileSync, mkdirSync, existsSync, readdirSync } from 'fs'
 import { join } from 'path'
 
 // Custom plugin to copy templates and client assets after build
-const copyAssetsPlugin = () => ({
+const copyAssetsPlugin = (): { name: string; writeBundle: () => void } => ({
   name: 'copy-assets',
   writeBundle() {
     const templatesSourceDir = join(__dirname, 'src/main/templates')
     const templatesDestDir = join(__dirname, 'out/main/templates')
     const clientSourceDir = join(__dirname, '../client/dist')
     const clientDestDir = join(__dirname, 'out/main/client')
-    
+
     try {
       // Copy templates
       mkdirSync(templatesDestDir, { recursive: true })
       copyFileSync(join(templatesSourceDir, 'app.ejs'), join(templatesDestDir, 'app.ejs'))
       console.log('✅ Templates copied to build output')
-      
+
       // Copy client assets
       if (existsSync(clientSourceDir)) {
         mkdirSync(clientDestDir, { recursive: true })
-        
+
         // Copy client files recursively
-        const copyDir = (src: string, dest: string) => {
+        const copyDir = (src: string, dest: string): void => {
           const entries = readdirSync(src, { withFileTypes: true })
-          
+
           for (const entry of entries) {
             const srcPath = join(src, entry.name)
             const destPath = join(dest, entry.name)
-            
+
             if (entry.isDirectory()) {
               mkdirSync(destPath, { recursive: true })
               copyDir(srcPath, destPath)
@@ -38,7 +38,7 @@ const copyAssetsPlugin = () => ({
             }
           }
         }
-        
+
         copyDir(clientSourceDir, clientDestDir)
         console.log('✅ Client assets copied to build output')
       } else {
@@ -52,10 +52,7 @@ const copyAssetsPlugin = () => ({
 
 export default defineConfig({
   main: {
-    plugins: [
-      externalizeDepsPlugin(),
-      copyAssetsPlugin()
-    ]
+    plugins: [externalizeDepsPlugin(), copyAssetsPlugin()]
   },
   preload: {
     plugins: [externalizeDepsPlugin()]
