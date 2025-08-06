@@ -1,0 +1,5 @@
+sort:
+  by: filename
+  direction: desc
+nav:
+  - '**/*.md'
