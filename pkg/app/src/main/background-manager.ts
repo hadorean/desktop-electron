@@ -61,11 +61,11 @@ export class BackgroundManager {
         //backgroundWindow.wallpaperState.isForwardMouseInput = true
         // Attach the window to the desktop wallpaper
         try {
-          // attach(backgroundWindow, {
-          //   transparent: false,
-          //   forwardKeyboardInput: false, // Disable to prevent input interference
-          //   forwardMouseInput: false // Disable to prevent input interference
-          // })
+          attach(backgroundWindow, {
+            transparent: false,
+            forwardKeyboardInput: false, // Disable to prevent input interference
+            forwardMouseInput: false // Disable to prevent input interference
+          })
           console.log(`Background window ${index} attached to wallpaper`)
         } catch (error) {
           console.error(`Failed to attach background window ${index} to wallpaper:`, error)
