@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, Menu, Tray } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu, Tray, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -69,6 +69,17 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  // Register global keyboard shortcut (Ctrl+B) to show main window
+  globalShortcut.register('CommandOrControl+B', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.show()
+      mainWindow.focus()
+    } else {
+      // If main window is destroyed, create a new one
+      createWindow()
+    }
+  })
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -209,6 +220,8 @@ app.whenReady().then(() => {
 app.on('before-quit', () => {
   console.log('App quitting - starting cleanup...')
   isQuitting = true
+  // Unregister global shortcuts
+  globalShortcut.unregisterAll()
   if (backgroundManager) {
     backgroundManager.cleanup()
   }
@@ -218,6 +231,8 @@ app.on('before-quit', () => {
 // Force quit after a timeout if normal quit doesn't work
 app.on('will-quit', () => {
   console.log('App will quit - forcing exit...')
+  // Unregister global shortcuts
+  globalShortcut.unregisterAll()
   // Force exit after 1 second if the app is still running
   setTimeout(() => {
     console.log('Forcing app exit...')
@@ -230,6 +245,8 @@ app.on('will-quit', () => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    // Unregister global shortcuts
+    globalShortcut.unregisterAll()
     if (backgroundManager) {
       backgroundManager.cleanup()
     }
