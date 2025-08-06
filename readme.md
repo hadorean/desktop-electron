@@ -27,7 +27,9 @@ A peaceful space for your desktop and browser.
 
 ### Project structure
 
-- app: desktop app
-- client: client app running in browser and background
+- pkg: packages
+- pkg/app: desktop app
+- pkg/client: client app running in browser and background
+- pkg/shared: shared code
 - docs: documentation
 - scripts: development scripts
