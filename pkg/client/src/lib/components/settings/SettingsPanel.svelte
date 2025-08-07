@@ -14,7 +14,7 @@
 	import type { ImageInfo } from '../../services/api';
 	import ImageGrid from './ImageGrid.svelte';
 	import SliderControl from './SliderControl.svelte';
-	import ToggleControl from './ToggleControl.svelte';
+	import ToggleControl from '../../../../../shared/src/components/settings/ToggleControl.svelte';
 	import ApiConfig from './ApiConfig.svelte';
 	import PositionSelector from './PositionSelector.svelte';
 

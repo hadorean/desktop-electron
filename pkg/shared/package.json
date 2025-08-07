@@ -30,6 +30,12 @@
 			"types": "./dist/adapters/index.d.ts",
 			"import": "./dist/adapters/index.js",
 			"require": "./dist/adapters/index.js"
+		},
+		"./components": {
+			"types": "./dist/components/index.d.ts",
+			"import": "./dist/components/index.js",
+			"require": "./dist/components/index.js",
+			"svelte": "./src/components/index.ts"
 		}
 	},
 	"files": [
