@@ -19,8 +19,10 @@
 		"package:win": "npm run build:all && cd pkg/app && electron-builder --win",
 		"package:mac": "npm run build:all && cd pkg/app && electron-builder --mac",
 		"package:linux": "npm run build:all && cd pkg/app && electron-builder --linux",
-		"release": "node scripts/release.js",
-		"delete-tags": "node scripts/delete-tags.js"
+		"version": "node scripts/version.js",
+		"publish": "node scripts/publish.js",
+		"delete-tags": "node scripts/delete-tags.js",
+		"remote-build": "node scripts/gh-build.js"
 	},
 	"devDependencies": {
 		"@electron-toolkit/eslint-config-prettier": "^3.0.0",

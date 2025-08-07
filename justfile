@@ -7,12 +7,22 @@ default-version := "patch"
 dev:
 	npm run dev
 
+# Run the mkdocs server
+doc:
+	python -m mkdocs serve
+
 run:
 	./pkg/app/dist/*.exe
 
 [confirm("Are you sure you want to clean the node_modules (y/n)?")]
 clean:
 	node scripts/rm_modules.js
+
+# Publish a new version
+publish-patch:
+	just version
+	just build
+	just publish
 
 build:
 	just rename_exe_prev
@@ -21,20 +31,22 @@ build:
 build_run:
 	just build
 	just run
+
+# Update the version
+# To set version explicitly: publish 1.0.1
+# To auto-bump current version: publish patch | minor | major
+version version=default-version:
+	npm run version {{version}}
+
+publish:
+	npm run publish
 	
 rename_exe_prev:
 	node scripts/rename-exe-prev.js
-# Run the mkdocs server
-doc:
-	python -m mkdocs serve
 
-# Publish a new version
-# To set version explicitly: publish 1.0.1
-# To auto-bump current version: publish patch | minor | major
-#[confirm("Are you sure you want to publish the app (y/n)?")]
-publish version=default-version:
-	npm run release {{version}}
-	
+delete-tags:
+	npm run delete-tags
+
 # Claude
 
 # Monitor the claude agent
