@@ -9,12 +9,12 @@
 		screenIds,
 		getScreenSettings,
 		currentScreen
-	} from '../../stores/settingsStore';
-	import { apiBaseUrl } from '../../stores/apiStore';
+	} from '$stores/settingsStore';
+	import { apiBaseUrl } from '$stores/apiStore';
 	import type { ImageInfo } from '../../services/api';
 	import ImageGrid from './ImageGrid.svelte';
 	import SliderControl from './SliderControl.svelte';
-	import ToggleControl from '../../../../../shared/src/components/settings/ToggleControl.svelte';
+	import { ToggleControl } from '$shared';
 	import ApiConfig from './ApiConfig.svelte';
 	import PositionSelector from './PositionSelector.svelte';
 

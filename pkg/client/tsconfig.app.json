@@ -14,7 +14,12 @@
 		"isolatedModules": true,
 		"moduleDetection": "force",
 		"composite": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"$shared/*": ["../shared/src/*"],
+			"$stores/*": ["./src/lib/stores/*"]
+		}
 	},
 	"include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "../shared/src/**/*.svelte"]
 }
