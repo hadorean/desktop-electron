@@ -2,11 +2,17 @@
 # Installation: winget install --id Casey.Just --exact
 # Doc: https://github.com/casey/just
 
+default-version := "patch" 
+
 dev:
 	npm run dev
 
 run:
 	./pkg/app/dist/*.exe
+
+[confirm("Are you sure you want to clean the node_modules (y/n)?")]
+clean:
+	node scripts/rm_modules.js
 
 build:
 	just rename_exe_prev
@@ -21,6 +27,13 @@ rename_exe_prev:
 # Run the mkdocs server
 doc:
 	python -m mkdocs serve
+
+# Publish a new version
+# To set version explicitly: publish 1.0.1
+# To auto-bump current version: publish patch | minor | major
+#[confirm("Are you sure you want to publish the app (y/n)?")]
+publish version=default-version:
+	npm run release {{version}}
 	
 # Claude
 

@@ -20,7 +20,7 @@ asar: true
 asarUnpack:
   - resources/**
 win:
-  executableName: electron-app
+  executableName: hey-ketsu
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -47,5 +47,7 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  private: false
+  releaseType: release
+  channel: latest
