@@ -60,6 +60,10 @@ defaultGitCommitLogs := "3"
 log count=defaultGitCommitLogs:
 	git log --oneline -{{count}}
 
+# Squash the last two commits  
+squash-last-two:
+    node scripts/squash-last-two.js
+
 # Push to origin
 push:
 	git push

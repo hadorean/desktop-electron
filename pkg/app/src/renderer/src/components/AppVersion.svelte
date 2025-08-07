@@ -5,12 +5,17 @@
   let updateAvailable = false
   let updateDownloaded = false
   let updateProgress = 0
-  let newVersionInfo: VersionInfo | null = null /*{
-    version: '1.0.0',
-    releaseDate: '2021-01-01',
-    releaseNotes: 'This is a test release'
-  }*/
-  let showInfo = false
+  let newVersionInfo: VersionInfo | null = null
+  let showInfo = true
+
+  if (false) {
+    updateAvailable = true
+    newVersionInfo = {
+      version: '1.0.0',
+      releaseDate: new Date().toLocaleDateString(),
+      releaseNotes: 'This is a test release'
+    }
+  }
 
   async function getAppVersion(): Promise<void> {
     try {
@@ -78,11 +83,13 @@
         >
           {#if showInfo && newVersionInfo && updateProgress === 0}
             <div class="update-info">
-              <h2>Version: {newVersionInfo?.version}</h2>
-              <p>Release Date: {newVersionInfo?.releaseDate}</p>
+              <h3>Version: {newVersionInfo?.version}</h3>
+              <p class="release-date">
+                Released {new Date(newVersionInfo?.releaseDate).toLocaleDateString()}
+              </p>
               {#if newVersionInfo?.releaseNotes}
-                <p>Release Notes</p>
-                <p>{newVersionInfo?.releaseNotes}</p>
+                <h4>Release Notes</h4>
+                <p class="release-notes">{newVersionInfo?.releaseNotes}</p>
               {/if}
             </div>
           {/if}
@@ -167,6 +174,7 @@
 
   .update-info {
     background-color: rgba(153, 153, 153, 0.082);
+    color: rgb(121, 121, 121);
     padding: 1rem;
     border-radius: 8px;
     max-width: 400px;
@@ -174,9 +182,24 @@
     left: 1rem;
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
     justify-content: flex-end;
     align-items: flex-end;
     text-align: right;
+  }
+
+  .release-date {
+    font-weight: bold;
+  }
+
+  h3,
+  h4 {
+    font-weight: bold;
+  }
+
+  h4,
+  .release-notes {
+    font-style: italic;
   }
 
   /* button.whats-new-btn {
