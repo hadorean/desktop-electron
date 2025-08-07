@@ -26,6 +26,7 @@ export class BackgroundManager {
         y: display.bounds.y,
         width: display.bounds.width,
         height: display.bounds.height,
+        backgroundColor: '#000000',
         alwaysOnTop: false,
         focusable: true,
         skipTaskbar: true,
