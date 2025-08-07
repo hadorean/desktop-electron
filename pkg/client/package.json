@@ -1,38 +1,37 @@
 {
-  "name": "heyketsu-client",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:demo": "vite build --config vite.demo.config.ts",
-    "preview": "vite preview",
-    "preview:demo": "vite preview --config vite.demo.config.ts",
-    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
-    "format": "prettier --write src --end-of-line lf",
-    "format:check": "prettier --check src --end-of-line lf"
-  },
-  "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^5.0.3",
-    "@tsconfig/svelte": "^5.0.4",
-    "@types/node": "^22.13.10",
-    "autoprefixer": "^10.4.16",
-    "daisyui": "^3.9.4",
-    "postcss": "^8.4.31",
-    "prettier": "^3.0.0",
-    "prettier-plugin-svelte": "^3.0.0",
-    "prettier-plugin-tailwindcss": "^0.5.0",
-    "svelte": "^5.20.2",
-    "svelte-check": "^4.1.4",
-    "tailwindcss": "^3.3.5",
-    "typescript": "~5.7.2",
-    "vite": "^6.2.0"
-  },
-  "dependencies": {
-    "@hgrandry/dbg": "0.1.5",
-    "@heyketsu/shared": "file:../shared",
-    "@tweenjs/tween.js": "^25.0.0",
-    "socket.io-client": "^4.8.1"
-  }
+	"name": "heyketsu-client",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"build:demo": "vite build --config vite.demo.config.ts",
+		"preview": "vite preview",
+		"preview:demo": "vite preview --config vite.demo.config.ts",
+		"check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+		"format": "prettier --write src --end-of-line lf",
+		"format:check": "prettier --check src --end-of-line lf"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
+		"@types/node": "^22.13.10",
+		"autoprefixer": "^10.4.16",
+		"daisyui": "^3.9.4",
+		"postcss": "^8.4.31",
+		"prettier": "^3.0.0",
+		"prettier-plugin-svelte": "^3.0.0",
+		"prettier-plugin-tailwindcss": "^0.5.0",
+		"svelte": "^5.20.2",
+		"svelte-check": "^4.1.4",
+		"tailwindcss": "^3.3.5",
+		"typescript": "~5.7.2",
+		"vite": "^6.2.0"
+	},
+	"dependencies": {
+		"@hgrandry/dbg": "0.1.5",
+		"@heyketsu/shared": "file:../shared",
+		"@tweenjs/tween.js": "^25.0.0",
+		"socket.io-client": "^4.8.1"
+	}
 }
