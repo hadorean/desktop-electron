@@ -84,6 +84,14 @@ function createWindow(): void {
     //mainWindow?.show()
   })
 
+  // Check for updates when window is shown
+  mainWindow.on('show', () => {
+    if (!is.dev) {
+      console.log('Window shown - checking for updates...')
+      autoUpdater.checkForUpdates()
+    }
+  })
+
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
