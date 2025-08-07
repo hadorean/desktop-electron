@@ -1,2 +1,3 @@
 // Shared type definitions
-export * from './settings.js';
+export * from './settings';
+export * from './version';

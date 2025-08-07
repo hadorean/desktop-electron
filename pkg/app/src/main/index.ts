@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, Menu, Tray, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { autoUpdater } from 'electron-updater'
+import { autoUpdater, UpdateInfo } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import { LocalServer } from './server'
 import { BackgroundManager } from './background-manager'
@@ -27,10 +27,14 @@ autoUpdater.on('checking-for-update', () => {
   console.log('Checking for updates...')
 })
 
-autoUpdater.on('update-available', (info) => {
+autoUpdater.on('update-available', (info: UpdateInfo) => {
   console.log('Update available:', info)
   if (mainWindow) {
-    mainWindow.webContents.send('update-available', info)
+    mainWindow.webContents.send('update-available', {
+      version: info.version,
+      releaseDate: info.releaseDate,
+      releaseNotes: info.releaseNotes
+    })
   }
 })
 

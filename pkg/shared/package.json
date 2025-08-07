@@ -1,47 +1,47 @@
 {
-  "name": "@heyketsu/shared",
-  "version": "1.0.0",
-  "description": "Shared types, utilities, and constants for Hey Ketsu",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
-    },
-    "./types": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/types/index.js",
-      "require": "./dist/types/index.js"
-    },
-    "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js",
-      "require": "./dist/utils/index.js"
-    },
-    "./constants": {
-      "types": "./dist/constants/index.d.ts",
-      "import": "./dist/constants/index.js",
-      "require": "./dist/constants/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "src"
-  ],
-  "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "typescript": "^5.8.3"
-  },
-  "peerDependencies": {
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
-  }
+	"name": "@heyketsu/shared",
+	"version": "1.0.0",
+	"description": "Shared types, utilities, and constants for Hey Ketsu",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.js"
+		},
+		"./types": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/types/index.js",
+			"require": "./dist/types/index.js"
+		},
+		"./utils": {
+			"types": "./dist/utils/index.d.ts",
+			"import": "./dist/utils/index.js",
+			"require": "./dist/utils/index.js"
+		},
+		"./constants": {
+			"types": "./dist/constants/index.d.ts",
+			"import": "./dist/constants/index.js",
+			"require": "./dist/constants/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"src"
+	],
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"clean": "rm -rf dist",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"typescript": "^5.8.3"
+	},
+	"peerDependencies": {
+		"socket.io": "^4.8.1",
+		"socket.io-client": "^4.8.1"
+	}
 }

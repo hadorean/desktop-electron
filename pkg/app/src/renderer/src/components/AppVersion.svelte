@@ -1,8 +1,16 @@
 <script lang="ts">
+  import type { VersionInfo } from '@heyketsu/shared'
+
   let appVersion = ''
   let updateAvailable = false
   let updateDownloaded = false
   let updateProgress = 0
+  let newVersionInfo: VersionInfo | null = null /*{
+    version: '1.0.0',
+    releaseDate: '2021-01-01',
+    releaseNotes: 'This is a test release'
+  }*/
+  let showInfo = false
 
   async function getAppVersion(): Promise<void> {
     try {
@@ -30,8 +38,13 @@
     }
   }
 
+  // function toggleInfo(): void {
+  //   showInfo = !showInfo
+  // }
+
   function setupAutoUpdateListeners(): void {
-    window.api.onUpdateAvailable((info) => {
+    window.api.onUpdateAvailable((info: VersionInfo) => {
+      newVersionInfo = info
       updateAvailable = true
       console.log('Update available:', info)
     })
@@ -53,13 +66,29 @@
 </script>
 
 <div class="version-container">
-  <!-- Auto-update section -->
   {#if updateAvailable || updateDownloaded || updateProgress > 0}
     <div class="update-section">
       {#if updateAvailable && !updateDownloaded && updateProgress === 0}
-        <div class="update-available">
+        <div
+          class="update-available"
+          role="button"
+          tabindex="0"
+          on:mouseenter={() => (showInfo = true)}
+          on:mouseleave={() => (showInfo = false)}
+        >
+          {#if showInfo && newVersionInfo && updateProgress === 0}
+            <div class="update-info">
+              <h2>Version: {newVersionInfo?.version}</h2>
+              <p>Release Date: {newVersionInfo?.releaseDate}</p>
+              {#if newVersionInfo?.releaseNotes}
+                <p>Release Notes</p>
+                <p>{newVersionInfo?.releaseNotes}</p>
+              {/if}
+            </div>
+          {/if}
           <button on:click={downloadUpdate}>🔄 Update available</button>
         </div>
+        <!-- <button class="whats-new-btn" on:click={toggleInfo}>what's new</button> -->
       {/if}
 
       {#if !updateDownloaded && updateProgress > 0 && updateProgress < 100}
@@ -103,16 +132,60 @@
     opacity: 0.5;
   }
 
+  .update-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
   .update-section button {
     background-color: var(--ev-c-brand);
-    color: white;
+    color: rgb(177, 177, 177);
     border: none;
     border-radius: 4px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
   }
+
+  .update-section button:hover,
+  .update-section button:focus {
+    color: white;
+  }
+
+  .update-available {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: right;
+    gap: 0.5rem;
+  }
+
+  .update-info {
+    background-color: rgba(153, 153, 153, 0.082);
+    padding: 1rem;
+    border-radius: 8px;
+    max-width: 400px;
+    bottom: 2rem;
+    left: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  /* button.whats-new-btn {
+    color: rgb(156, 156, 156);
+    text-decoration: underline;
+    border-radius: 15%;
+    font-size: 12px;
+    padding: 0.25rem 0.5rem;
+  } */
 
   .update-progress {
     display: flex;
@@ -134,42 +207,4 @@
     background-color: rgb(105, 198, 235);
     transition: width 0.3s ease;
   }
-  /* 
-  
-   .update-section button:hover {
-    background-color: var(--ev-c-brand-hover);
-  }
-  .update-section {
-    margin-top: 20px;
-    padding: 16px;
-    border: 1px solid var(--ev-c-divider);
-    border-radius: 8px;
-    background-color: var(--ev-c-bg-soft);
-    max-width: 400px;
-  }
-
-  .update-section h3 {
-    margin: 0 0 12px 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--ev-c-text-1);
-  }
-
-  .update-available,
-  .update-progress,
-  .update-downloaded {
-    margin-bottom: 12px;
-  }
-
-  .update-available p,
-  .update-progress p,
-  .update-downloaded p {
-    margin: 0 0 8px 0;
-    font-size: 14px;
-    color: var(--ev-c-text-2);
-  }
-
-  
-
- */
 </style>

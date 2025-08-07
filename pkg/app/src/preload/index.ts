@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import type { VersionInfo } from '@heyketsu/shared'
 
 // Custom APIs for renderer
 const api = {
@@ -20,7 +21,7 @@ const api = {
   downloadUpdate: () => ipcRenderer.invoke('download-update'),
   installUpdate: () => ipcRenderer.invoke('install-update'),
   // Auto-update event listeners
-  onUpdateAvailable: (callback: (info: any) => void) => {
+  onUpdateAvailable: (callback: (info: VersionInfo) => void) => {
     ipcRenderer.on('update-available', (_, info) => callback(info))
   },
   onUpdateDownloadProgress: (callback: (progressObj: any) => void) => {
