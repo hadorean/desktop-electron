@@ -1,6 +1,6 @@
 {
   "name": "heyketsu",
-  "version": "0.1.37",
+  "version": "0.1.41",
   "description": "A peaceful space for your desktop and browser",
   "main": "./out/main/index.js",
   "author": "Hadrien Grandry",
@@ -34,6 +34,7 @@
     "build:linux": "npm run build:all && electron-builder --linux"
   },
   "dependencies": {
+    "@hgrandry/dbg": "0.1.5",
     "@heyketsu/shared": "1.0.0",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",

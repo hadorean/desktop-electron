@@ -57,9 +57,9 @@ function main() {
 			tagName,
 			...filesToUpload.map((f) => `"${f}"`),
 			'--title',
-			`"${releaseTitle}"`
-			// '--notes',
-			// `"Auto-generated release for version ${version}"`
+			`"${releaseTitle}"`,
+			'--notes',
+			`""`
 		].join(' ');
 
 		console.log(`\n🚀 Creating GitHub release...`);
