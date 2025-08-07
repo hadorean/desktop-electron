@@ -836,4 +836,8 @@ export class LocalServer {
   public isServerRunning(): boolean {
     return this.isRunning
   }
+
+  public getSettingsService(): SettingsService {
+    return this.settingsService
+  }
 }

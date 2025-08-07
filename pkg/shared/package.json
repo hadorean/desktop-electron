@@ -25,6 +25,11 @@
 			"types": "./dist/constants/index.d.ts",
 			"import": "./dist/constants/index.js",
 			"require": "./dist/constants/index.js"
+		},
+		"./adapters": {
+			"types": "./dist/adapters/index.d.ts",
+			"import": "./dist/adapters/index.js",
+			"require": "./dist/adapters/index.js"
 		}
 	},
 	"files": [

@@ -29,7 +29,12 @@ const api = {
   },
   onUpdateDownloaded: (callback: (info: any) => void) => {
     ipcRenderer.on('update-downloaded', (_, info) => callback(info))
-  }
+  },
+  // Settings APIs
+  getSettings: () => ipcRenderer.invoke('settings-get'),
+  updateSharedSettings: (settings: any) => ipcRenderer.invoke('settings-update-shared', settings),
+  updateLocalSettings: (screenId: string, settings: any) => ipcRenderer.invoke('settings-update-local', screenId, settings),
+  isSettingsAvailable: () => ipcRenderer.invoke('settings-is-available')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

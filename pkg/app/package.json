@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@hgrandry/dbg": "0.1.5",
-    "@heyketsu/shared": "1.0.0",
+    "@heyketsu/shared": "file:../shared",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@types/ejs": "^3.1.5",

@@ -207,6 +207,64 @@ app.whenReady().then(() => {
     autoUpdater.quitAndInstall()
   })
 
+  // IPC handlers for settings
+  ipcMain.handle('settings-get', async () => {
+    try {
+      const settings = await localServer.getSettingsService().getSettings()
+      return { success: true, data: settings }
+    } catch (error) {
+      console.error('IPC settings-get error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  })
+
+  ipcMain.handle('settings-update-shared', async (_, settings) => {
+    try {
+      const currentSettings = await localServer.getSettingsService().getSettings()
+      const updatedSettings = {
+        shared: {
+          ...currentSettings.shared,
+          ...settings
+        }
+      }
+      const updateEvent = await localServer.getSettingsService().updateSettings(updatedSettings, 'ipc-client')
+      return { success: true, data: updateEvent.settings }
+    } catch (error) {
+      console.error('IPC settings-update-shared error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  })
+
+  ipcMain.handle('settings-update-local', async (_, screenId, settings) => {
+    try {
+      const currentSettings = await localServer.getSettingsService().getSettings()
+      const updatedSettings = {
+        screens: {
+          ...currentSettings.screens,
+          [screenId]: {
+            ...currentSettings.screens[screenId],
+            ...settings
+          }
+        }
+      }
+      const updateEvent = await localServer.getSettingsService().updateSettings(updatedSettings, 'ipc-client')
+      return { success: true, data: updateEvent.settings }
+    } catch (error) {
+      console.error('IPC settings-update-local error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  })
+
+  ipcMain.handle('settings-is-available', async () => {
+    try {
+      await localServer.getSettingsService().getSettings()
+      return { success: true, data: true }
+    } catch (error) {
+      console.error('IPC settings-is-available error:', error)
+      return { success: false, data: false }
+    }
+  })
+
   // Start the local server
   localServer
     .start()
