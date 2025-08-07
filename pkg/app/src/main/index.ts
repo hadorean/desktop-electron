@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, Menu, Tray, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import { LocalServer } from './server'
 import { BackgroundManager } from './background-manager'
@@ -16,6 +17,44 @@ const localServer = new LocalServer()
 
 // Initialize background manager
 let backgroundManager: BackgroundManager | null = null
+
+// Configure auto-updater
+autoUpdater.autoDownload = false
+autoUpdater.autoInstallOnAppQuit = true
+
+// Auto-updater event handlers
+autoUpdater.on('checking-for-update', () => {
+  console.log('Checking for updates...')
+})
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Update available:', info)
+  if (mainWindow) {
+    mainWindow.webContents.send('update-available', info)
+  }
+})
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log('Update not available:', info)
+})
+
+autoUpdater.on('error', (err) => {
+  console.error('Auto-updater error:', err)
+})
+
+autoUpdater.on('download-progress', (progressObj) => {
+  console.log('Download progress:', progressObj)
+  if (mainWindow) {
+    mainWindow.webContents.send('update-download-progress', progressObj)
+  }
+})
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Update downloaded:', info)
+  if (mainWindow) {
+    mainWindow.webContents.send('update-downloaded', info)
+  }
+})
 
 function createWindow(): void {
   // Create the browser window.
@@ -138,6 +177,19 @@ app.whenReady().then(() => {
     }
   })
 
+  // IPC handlers for auto-update
+  ipcMain.handle('check-for-updates', () => {
+    autoUpdater.checkForUpdates()
+  })
+
+  ipcMain.handle('download-update', () => {
+    autoUpdater.downloadUpdate()
+  })
+
+  ipcMain.handle('install-update', () => {
+    autoUpdater.quitAndInstall()
+  })
+
   // Start the local server
   localServer
     .start()
@@ -150,6 +202,14 @@ app.whenReady().then(() => {
     })
 
   createWindow()
+
+  // Check for updates (only in production)
+  if (!is.dev) {
+    // Check for updates after a short delay to ensure app is fully loaded
+    setTimeout(() => {
+      autoUpdater.checkForUpdates()
+    }, 3000)
+  }
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

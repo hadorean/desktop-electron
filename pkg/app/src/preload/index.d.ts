@@ -12,6 +12,13 @@ declare global {
       makeAllBackgroundsInteractive: () => Promise<void>
       makeBackgroundNonInteractive: (monitorId: number) => Promise<void>
       makeAllBackgroundsNonInteractive: () => Promise<void>
+      // Auto-update APIs
+      checkForUpdates: () => Promise<void>
+      downloadUpdate: () => Promise<void>
+      installUpdate: () => Promise<void>
+      onUpdateAvailable: (callback: (info: any) => void) => void
+      onUpdateDownloadProgress: (callback: (progressObj: any) => void) => void
+      onUpdateDownloaded: (callback: (info: any) => void) => void
     }
   }
 }

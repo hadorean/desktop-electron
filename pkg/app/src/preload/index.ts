@@ -12,7 +12,22 @@ const api = {
   makeAllBackgroundsInteractive: () => ipcRenderer.invoke('make-all-backgrounds-interactive'),
   makeBackgroundNonInteractive: (monitorId: number) =>
     ipcRenderer.invoke('make-background-non-interactive', monitorId),
-  makeAllBackgroundsNonInteractive: () => ipcRenderer.invoke('make-all-backgrounds-non-interactive')
+  makeAllBackgroundsNonInteractive: () =>
+    ipcRenderer.invoke('make-all-backgrounds-non-interactive'),
+  // Auto-update APIs
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
+  // Auto-update event listeners
+  onUpdateAvailable: (callback: (info: any) => void) => {
+    ipcRenderer.on('update-available', (_, info) => callback(info))
+  },
+  onUpdateDownloadProgress: (callback: (progressObj: any) => void) => {
+    ipcRenderer.on('update-download-progress', (_, progressObj) => callback(progressObj))
+  },
+  onUpdateDownloaded: (callback: (info: any) => void) => {
+    ipcRenderer.on('update-downloaded', (_, info) => callback(info))
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

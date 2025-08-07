@@ -7,6 +7,12 @@
   let serverUrl = ''
   let isServerRunning = false
 
+  // Auto-update state
+  let updateAvailable = false
+  let updateDownloaded = false
+  let updateProgress = 0
+  let updateInfo: any = null
+
   // Get server information on component mount
   async function getServerInfo(): Promise<void> {
     try {
@@ -15,6 +21,54 @@
     } catch (error) {
       console.error('Failed to get server info:', error)
     }
+  }
+
+  // Auto-update functions
+  async function checkForUpdates(): Promise<void> {
+    try {
+      await window.api.checkForUpdates()
+      console.log('Checking for updates...')
+    } catch (error) {
+      console.error('Failed to check for updates:', error)
+    }
+  }
+
+  async function downloadUpdate(): Promise<void> {
+    try {
+      await window.api.downloadUpdate()
+      console.log('Downloading update...')
+    } catch (error) {
+      console.error('Failed to download update:', error)
+    }
+  }
+
+  async function installUpdate(): Promise<void> {
+    try {
+      await window.api.installUpdate()
+      console.log('Installing update...')
+    } catch (error) {
+      console.error('Failed to install update:', error)
+    }
+  }
+
+  // Setup auto-update event listeners
+  function setupAutoUpdateListeners(): void {
+    window.api.onUpdateAvailable((info) => {
+      updateAvailable = true
+      updateInfo = info
+      console.log('Update available:', info)
+    })
+
+    window.api.onUpdateDownloadProgress((progressObj) => {
+      updateProgress = progressObj.percent || 0
+      console.log('Download progress:', progressObj)
+    })
+
+    window.api.onUpdateDownloaded((info) => {
+      updateDownloaded = true
+      updateProgress = 100
+      console.log('Update downloaded:', info)
+    })
   }
 
   // Background management functions
@@ -46,6 +100,7 @@
   }
 
   getServerInfo()
+  setupAutoUpdateListeners()
 </script>
 
 <img alt="logo" class="logo" src={electronLogo} />
@@ -77,8 +132,41 @@
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
     <a href="#" on:click={makeAllNonInteractive}>Make Non-Interactive</a>
   </div>
+  <div class="action">
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-missing-attribute-->
+    <a href="#" on:click={checkForUpdates}>Check for Updates</a>
+  </div>
 </div>
 <Versions />
+
+<!-- Auto-update section -->
+{#if updateAvailable || updateDownloaded}
+  <div class="update-section">
+    <h3>Auto Update</h3>
+    {#if updateAvailable && !updateDownloaded}
+      <div class="update-available">
+        <p>🔄 Update available: {updateInfo?.version || 'New version'}</p>
+        <button on:click={downloadUpdate}>Download Update</button>
+      </div>
+    {/if}
+
+    {#if updateProgress > 0 && updateProgress < 100}
+      <div class="update-progress">
+        <p>📥 Downloading update... {updateProgress.toFixed(1)}%</p>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: {updateProgress}%"></div>
+        </div>
+      </div>
+    {/if}
+
+    {#if updateDownloaded}
+      <div class="update-downloaded">
+        <p>✅ Update downloaded and ready to install</p>
+        <button on:click={installUpdate}>Install Update</button>
+      </div>
+    {/if}
+  </div>
+{/if}
 
 <!-- Server Information -->
 <div class="server-info">
