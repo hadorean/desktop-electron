@@ -134,6 +134,10 @@
 			cancelRename();
 		}
 	}
+
+	function focus(element: HTMLElement) {
+		element.focus();
+	}
 </script>
 
 <!-- Hover trigger area at bottom center -->
@@ -153,7 +157,7 @@
 					bind:value={renameValue}
 					on:keydown={handleKeyDown}
 					on:blur={confirmRename}
-					autofocus
+					use:focus
 				/>
 			{:else}
 				<button

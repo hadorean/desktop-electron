@@ -281,12 +281,4 @@
 	.settings-panel::-webkit-scrollbar-thumb:hover {
 		background: rgba(255, 255, 255, 0.4);
 	}
-
-	.select {
-		color: white;
-		border: none;
-		border-radius: 0.375rem;
-		padding: 0.5rem;
-		width: 100%;
-	}
 </style>

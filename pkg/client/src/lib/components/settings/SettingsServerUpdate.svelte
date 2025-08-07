@@ -81,7 +81,7 @@
 </Inspect>
 
 <style>
-	.socket-status {
+	/* .socket-status {
 		position: fixed;
 		top: 10px;
 		right: 10px;
@@ -92,7 +92,7 @@
 		border-radius: 6px;
 		font-size: 12px;
 		font-weight: bold;
-	}
+	} */
 
 	.status-indicator.connected {
 		color: #4ade80;

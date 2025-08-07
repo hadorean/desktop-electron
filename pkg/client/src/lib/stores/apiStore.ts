@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store';
+import { socketService } from '../services/socket';
 
 // Create a store for the API configuration toggle
 export const apiConfigEnabled = writable(false);
@@ -56,14 +57,7 @@ apiBaseUrl.subscribe((value) => {
 // Reinitialize socket when effective URL changes
 effectiveApiUrl.subscribe((url) => {
 	if (typeof window !== 'undefined' && url) {
-		// Dynamically import socket service to avoid circular imports
-		import('../services/socket')
-			.then(({ socketService }) => {
-				console.log('🔌 API URL changed, reinitializing socket:', url);
-				socketService.reinitialize();
-			})
-			.catch((err) => {
-				console.warn('Failed to reinitialize socket:', err);
-			});
+		console.log('🔌 API URL changed, reinitializing socket:', url);
+		socketService.reinitialize();
 	}
 });
