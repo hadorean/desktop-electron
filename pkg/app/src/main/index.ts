@@ -139,6 +139,11 @@ app.whenReady().then(() => {
     return localServer.isServerRunning()
   })
 
+  // IPC handler for app version
+  ipcMain.handle('get-app-version', () => {
+    return app.getVersion()
+  })
+
   // IPC handlers for background management
   ipcMain.handle('reload-background', (_, monitorId: number) => {
     if (backgroundManager) {

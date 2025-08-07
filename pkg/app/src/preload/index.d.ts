@@ -6,6 +6,7 @@ declare global {
     api: {
       getServerUrl: () => Promise<string>
       isServerRunning: () => Promise<boolean>
+      getAppVersion: () => Promise<string>
       reloadBackground: (monitorId: number) => Promise<void>
       reloadAllBackgrounds: () => Promise<void>
       makeBackgroundInteractive: (monitorId: number) => Promise<void>

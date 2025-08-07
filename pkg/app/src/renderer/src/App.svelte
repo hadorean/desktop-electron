@@ -6,6 +6,7 @@
 
   let serverUrl = ''
   let isServerRunning = false
+  let appVersion = ''
 
   // Auto-update state
   let updateAvailable = false
@@ -20,6 +21,15 @@
       isServerRunning = await window.api.isServerRunning()
     } catch (error) {
       console.error('Failed to get server info:', error)
+    }
+  }
+
+  // Get app version on component mount
+  async function getAppVersion(): Promise<void> {
+    try {
+      appVersion = await window.api.getAppVersion()
+    } catch (error) {
+      console.error('Failed to get app version:', error)
     }
   }
 
@@ -100,11 +110,18 @@
   }
 
   getServerInfo()
+  getAppVersion()
   setupAutoUpdateListeners()
 </script>
 
 <img alt="logo" class="logo" src={electronLogo} />
 <div class="creator">Powered by electron-vite</div>
+{#if appVersion}
+  <div class="version">
+    <span class="version-label">Version:</span>
+    <span class="version-number">{appVersion}</span>
+  </div>
+{/if}
 <div class="text">
   Build an Electron app with
   <span class="svelte">Svelte</span>

@@ -5,6 +5,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   getServerUrl: () => ipcRenderer.invoke('get-server-url'),
   isServerRunning: () => ipcRenderer.invoke('is-server-running'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   reloadBackground: (monitorId: number) => ipcRenderer.invoke('reload-background', monitorId),
   reloadAllBackgrounds: () => ipcRenderer.invoke('reload-all-backgrounds'),
   makeBackgroundInteractive: (monitorId: number) =>
