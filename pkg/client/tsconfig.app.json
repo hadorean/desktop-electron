@@ -17,9 +17,16 @@
 		"skipLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
+			"$shared": ["../shared/src"],
 			"$shared/*": ["../shared/src/*"],
 			"$stores/*": ["./src/lib/stores/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "../shared/src/**/*.svelte"]
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.js",
+		"src/**/*.svelte",
+		"../shared/src/**/*.ts",
+		"../shared/src/**/*.svelte"
+	]
 }
