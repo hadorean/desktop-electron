@@ -6,10 +6,10 @@
 		isLocalMode,
 		updateSharedSettings,
 		updateLocalSettings
-	} from '$stores/settingsStore';
+	} from '../../stores/settingsStore';
 	import type { ImageInfo } from '../../services/api';
-	import ImageGrid from './ImageGrid.svelte';
-	import { SliderControl, ToggleControl } from '$shared';
+	import ImageGrid from '$shared/components/settings/ImageGrid.svelte';
+	import { SliderControl, ToggleControl } from './';
 
 	// Props
 	export let expanded: boolean = false;

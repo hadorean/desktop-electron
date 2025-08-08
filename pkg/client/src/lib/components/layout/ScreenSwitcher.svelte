@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { currentScreen, screenIds, allSettings } from '../../stores/settingsStore';
+	import { currentScreen, screenIds, allSettings } from '$shared/stores/settingsStore';
 
 	let isVisible = false;
 	let hoverTimeout: NodeJS.Timeout | null = null;

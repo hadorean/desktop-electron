@@ -13,6 +13,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			$shared: path.resolve(__dirname, '../shared/src'),
+			'@heyketsu/shared': path.resolve(__dirname, '../shared/src'),
 			$stores: path.resolve(__dirname, './src/lib/stores')
 		}
 	}

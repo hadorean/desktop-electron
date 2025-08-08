@@ -1,8 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
 import { apiBaseUrl, effectiveApiUrl } from '../stores/apiStore';
-import type { SettingsUpdateEvent } from '@heyketsu/shared';
-import { SOCKET_EVENTS } from '@heyketsu/shared/constants';
+import type { SettingsUpdateEvent } from '../types';
+import { SOCKET_EVENTS } from '../constants';
 
 export interface SettingsUpdatedResponse {
 	success: boolean;

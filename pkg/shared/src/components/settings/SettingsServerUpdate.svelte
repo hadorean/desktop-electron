@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { allSettings, currentScreen } from '$stores/settingsStore';
-	import { apiBaseUrl } from '$stores/apiStore';
-	import { routeParams } from '$stores/routeStore';
+	import { allSettings, currentScreen } from '../../stores/settingsStore';
+	import { apiBaseUrl } from '../../stores/apiStore';
+	import { routeParams } from '../../stores/routeStore';
 	import { onMount, onDestroy } from 'svelte';
 	import { socketService } from '../../services/socket';
 	import { Inspect } from '@hgrandry/dbg';
-	import type { SettingsUpdateEvent } from '@heyketsu/shared';
+	import type { SettingsUpdateEvent } from '../../types';
 
 	let isConnected = false;
 	let updatingSettingsFromServer = false;

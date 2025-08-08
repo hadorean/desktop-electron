@@ -4,8 +4,8 @@ export * from './utils';
 export * from './constants';
 
 // Legacy adapters (IPC/HTTP) - will be phased out
-export { 
-	BaseSettingsAdapter, 
+export {
+	BaseSettingsAdapter,
 	HttpSettingsAdapter,
 	IpcSettingsAdapter,
 	createIpcAdapterIfAvailable,

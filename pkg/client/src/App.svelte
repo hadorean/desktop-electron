@@ -1,18 +1,22 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import { api, type ImageInfo } from './lib/services/api';
-	import { apiBaseUrl } from './lib/stores/apiStore';
+	import { api, type ImageInfo } from '$shared/services/api';
+	import { apiBaseUrl } from '$shared/stores/apiStore';
 	import { DebugContext, DebugMenu } from '@hgrandry/dbg';
-	import { settings, loadSettings, expandSettings } from './lib/stores/settingsStore';
-	import SettingsPanel from './lib/components/settings/SettingsPanel.svelte';
-	import TimeDisplay from './lib/components/layout/TimeDisplay.svelte';
-	import WeatherDisplay from './lib/components/layout/WeatherDisplay.svelte';
-	import BackgroundImage from './lib/components/layout/BackgroundImage.svelte';
-	import SettingsButton from './lib/components/settings/SettingsButton.svelte';
-	import ErrorMessage from './lib/components/settings/ErrorMessage.svelte';
-	import SettingsServerUpdate from './lib/components/settings/SettingsServerUpdate.svelte';
-	import ParamsValidator from './lib/components/shared/ParamsValidator.svelte';
-	import ScreenSwitcher from './lib/components/layout/ScreenSwitcher.svelte';
+	import { settings, loadSettings, expandSettings } from '$shared/stores/settingsStore';
+	import {
+		SettingsPanel,
+		SettingsButton,
+		ErrorMessage,
+		SettingsServerUpdate,
+		ParamsValidator
+	} from '@heyketsu/shared';
+	import {
+		TimeDisplay,
+		WeatherDisplay,
+		BackgroundImage,
+		ScreenSwitcher
+	} from './lib/components/layout';
 
 	let images: ImageInfo[] = [];
 	let showSettings: boolean = false;

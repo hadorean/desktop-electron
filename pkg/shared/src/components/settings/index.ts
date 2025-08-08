@@ -3,6 +3,12 @@
  *
  */
 
-export { default as ToggleControl } from './ToggleControl.svelte';
-export { default as SliderControl } from './SliderControl.svelte';
+export { default as ApiConfig } from './ApiConfig.svelte';
 export { default as ErrorMessage } from './ErrorMessage.svelte';
+export { default as ImageGrid } from './ImageGrid.svelte';
+export { default as PositionSelector } from './PositionSelector.svelte';
+export { default as SettingsButton } from './SettingsButton.svelte';
+export { default as SettingsPanel } from './SettingsPanel.svelte';
+export { default as SettingsServerUpdate } from './SettingsServerUpdate.svelte';
+export { default as SliderControl } from './SliderControl.svelte';
+export { default as ToggleControl } from './ToggleControl.svelte';

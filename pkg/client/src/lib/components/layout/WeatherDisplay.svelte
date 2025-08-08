@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { api, type WeatherData } from '../../services/api';
+	import { api, type WeatherData } from '$shared/services/api';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 

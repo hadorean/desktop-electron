@@ -52,16 +52,27 @@ const copyAssetsPlugin = (): { name: string; writeBundle: () => void } => ({
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin(), copyAssetsPlugin()]
+    plugins: [externalizeDepsPlugin(), copyAssetsPlugin()],
+    resolve: {
+      alias: {
+        '@heyketsu/shared': resolve(__dirname, '../shared/src')
+      }
+    }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    resolve: {
+      alias: {
+        '@heyketsu/shared': resolve(__dirname, '../shared/src')
+      }
+    }
   },
   renderer: {
     plugins: [svelte()],
     resolve: {
       alias: {
-        '$shared': resolve(__dirname, '../shared/src')
+        $shared: resolve(__dirname, '../shared/src'),
+        '@heyketsu/shared': resolve(__dirname, '../shared/src')
       }
     }
   }

@@ -12,8 +12,8 @@ currentScreen.subscribe((screenId) => {
 	localStorage.setItem('currentScreen', screenId);
 });
 
-import type { UISettings, ServerSettings, SettingsButtonPosition } from '@heyketsu/shared/types';
-import { DEFAULT_UI_SETTINGS, DEFAULT_SERVER_SETTINGS } from '@heyketsu/shared/constants';
+import type { UISettings, ServerSettings, SettingsButtonPosition } from '../types';
+import { DEFAULT_UI_SETTINGS, DEFAULT_SERVER_SETTINGS } from '../constants';
 
 // Legacy aliases for backward compatibility
 export type Settings = UISettings;

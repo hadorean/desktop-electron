@@ -15,8 +15,11 @@
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"lib": ["ES2022", "DOM"],
-		"types": ["node"]
+		"types": ["node"],
+		"paths": {
+			"$stores/*": ["./src/stores/*"]
+		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.js", "src/**/*.d.ts"],
-	"exclude": ["node_modules", "dist", "src/**/*.svelte"]
+	"include": ["src/**/*.ts", "src/**/*.js", "src/**/*.d.ts", "src/**/*.svelte"],
+	"exclude": ["node_modules", "dist"]
 }

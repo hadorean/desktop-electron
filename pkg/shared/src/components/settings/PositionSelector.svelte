@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { settings, updateSharedSettings, updateLocalSettings } from '$stores/settingsStore';
-	import type { SettingsButtonPosition } from '$stores/settingsStore';
+	import { settings, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore';
+	import type { SettingsButtonPosition } from '../../stores/settingsStore';
 
 	const props = $props<{
 		disabled?: boolean;

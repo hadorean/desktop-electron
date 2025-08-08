@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getImageUrl, type ImageInfo } from '../../services/api';
-	import { settings, updateSharedSettings } from '$stores/settingsStore';
+	import { getImageUrl, type ImageInfo } from '../../services';
+	import { settings, updateSharedSettings } from '../../stores';
 
 	const {
 		images = [],

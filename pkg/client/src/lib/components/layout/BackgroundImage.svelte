@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { settings } from '../../stores/settingsStore';
-	import { getImageUrl } from '../../services/api';
+	import { settings } from '$shared/stores/settingsStore';
+	import { getImageUrl } from '$shared/services/api';
 	import { Tween, Easing } from '@tweenjs/tween.js';
 
 	interface ImageState {

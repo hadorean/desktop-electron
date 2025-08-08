@@ -5,6 +5,7 @@
 default-version := "patch" 
 
 dev:
+	clear
 	npm run dev
 
 # Run the mkdocs server

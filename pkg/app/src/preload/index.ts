@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { VersionInfo } from '@heyketsu/shared'
+import type { VersionInfo } from '@heyketsu/shared/types'
 
 // Custom APIs for renderer
 const api = {
@@ -33,7 +33,8 @@ const api = {
   // Settings APIs
   getSettings: () => ipcRenderer.invoke('settings-get'),
   updateSharedSettings: (settings: any) => ipcRenderer.invoke('settings-update-shared', settings),
-  updateLocalSettings: (screenId: string, settings: any) => ipcRenderer.invoke('settings-update-local', screenId, settings),
+  updateLocalSettings: (screenId: string, settings: any) =>
+    ipcRenderer.invoke('settings-update-local', screenId, settings),
   isSettingsAvailable: () => ipcRenderer.invoke('settings-is-available')
 }
 
