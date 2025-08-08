@@ -12,3 +12,4 @@ export { default as SettingsPanel } from './SettingsPanel.svelte';
 export { default as SettingsServerUpdate } from './SettingsServerUpdate.svelte';
 export { default as SliderControl } from './SliderControl.svelte';
 export { default as ToggleControl } from './ToggleControl.svelte';
+export { default as ScreenSwitcher } from './ScreenSwitcher.svelte';

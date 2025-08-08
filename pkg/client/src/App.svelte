@@ -9,14 +9,10 @@
 		SettingsButton,
 		ErrorMessage,
 		SettingsServerUpdate,
-		ParamsValidator
-	} from '@heyketsu/shared';
-	import {
-		TimeDisplay,
-		WeatherDisplay,
-		BackgroundImage,
+		ParamsValidator,
 		ScreenSwitcher
-	} from './lib/components/layout';
+	} from '@heyketsu/shared';
+	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout';
 
 	let images: ImageInfo[] = [];
 	let showSettings: boolean = false;
