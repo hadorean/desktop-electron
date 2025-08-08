@@ -5,18 +5,11 @@
 		localSettings,
 		isLocalMode,
 		updateSharedSettings,
-		updateLocalSettings,
-		screenIds,
-		getScreenSettings,
-		currentScreen
+		updateLocalSettings
 	} from '$stores/settingsStore';
-	import { apiBaseUrl } from '$stores/apiStore';
 	import type { ImageInfo } from '../../services/api';
 	import ImageGrid from './ImageGrid.svelte';
-	import SliderControl from './SliderControl.svelte';
-	import { ToggleControl } from '$shared';
-	import ApiConfig from './ApiConfig.svelte';
-	import PositionSelector from './PositionSelector.svelte';
+	import { SliderControl, ToggleControl } from '$shared';
 
 	// Props
 	export let expanded: boolean = false;
@@ -115,8 +108,8 @@
 					min={0}
 					max={1}
 					step={0.01}
-					onChange={(newOpacity) => handleSettingChange('opacity', newOpacity)}
-					formatValue={(v) => v.toFixed(2)}
+					onChange={(newOpacity: number | null) => handleSettingChange('opacity', newOpacity)}
+					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
 					defaultValue={$settings.opacity}
 					overrideValue={$localSettings?.opacity}
@@ -128,8 +121,9 @@
 					min={0}
 					max={2}
 					step={0.01}
-					onChange={(newSaturation) => handleSettingChange('saturation', newSaturation)}
-					formatValue={(v) => v.toFixed(2)}
+					onChange={(newSaturation: number | null) =>
+						handleSettingChange('saturation', newSaturation)}
+					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
 					defaultValue={$settings.saturation}
 					overrideValue={$localSettings?.saturation}
@@ -141,8 +135,8 @@
 					min={0}
 					max={50}
 					step={0.1}
-					onChange={(newBlur) => handleSettingChange('blur', newBlur)}
-					formatValue={(v) => `${v.toFixed(1)}px`}
+					onChange={(newBlur: number | null) => handleSettingChange('blur', newBlur)}
+					formatValue={(v: number) => `${v.toFixed(1)}px`}
 					isOverride={$isLocalMode}
 					defaultValue={$settings.blur}
 					overrideValue={$localSettings?.blur}
@@ -156,8 +150,9 @@
 					min={0}
 					max={10}
 					step={0.1}
-					onChange={(newTransitionTime) => handleSettingChange('transitionTime', newTransitionTime)}
-					formatValue={(v) => `${v.toFixed(1)}s`}
+					onChange={(newTransitionTime: number | null) =>
+						handleSettingChange('transitionTime', newTransitionTime)}
+					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
 					defaultValue={$settings.transitionTime}
 					overrideValue={$localSettings?.transitionTime}
@@ -169,7 +164,8 @@
 				checked={$isLocalMode
 					? ($localSettings?.showTimeDate ?? $settings.showTimeDate)
 					: $sharedSettings.showTimeDate}
-				onChange={(newShowTimeDate) => handleSettingChange('showTimeDate', newShowTimeDate)}
+				onChange={(newShowTimeDate: boolean | null) =>
+					handleSettingChange('showTimeDate', newShowTimeDate)}
 				isOverride={$isLocalMode}
 				overrideValue={$localSettings?.showTimeDate}
 				defaultValue={$settings.showTimeDate}
@@ -180,7 +176,8 @@
 				checked={$isLocalMode
 					? ($localSettings?.showWeather ?? $settings.showWeather)
 					: $sharedSettings.showWeather}
-				onChange={(newShowWeather) => handleSettingChange('showWeather', newShowWeather)}
+				onChange={(newShowWeather: boolean | null) =>
+					handleSettingChange('showWeather', newShowWeather)}
 				isOverride={$isLocalMode}
 				overrideValue={$localSettings?.showWeather}
 				defaultValue={$settings.showWeather}
@@ -191,7 +188,8 @@
 				checked={$isLocalMode
 					? ($localSettings?.hideButton ?? $settings.hideButton)
 					: $sharedSettings.hideButton}
-				onChange={(newHideButton) => handleSettingChange('hideButton', newHideButton)}
+				onChange={(newHideButton: boolean | null) =>
+					handleSettingChange('hideButton', newHideButton)}
 				isOverride={$isLocalMode}
 				overrideValue={$localSettings?.hideButton}
 				defaultValue={$settings.hideButton}
@@ -202,7 +200,7 @@
 				checked={$isLocalMode
 					? ($localSettings?.showScreenSwitcher ?? $settings.showScreenSwitcher)
 					: $sharedSettings.showScreenSwitcher}
-				onChange={(newShowScreenSwitcher) =>
+				onChange={(newShowScreenSwitcher: boolean | null) =>
 					handleSettingChange('showScreenSwitcher', newShowScreenSwitcher)}
 				isOverride={$isLocalMode}
 				overrideValue={$localSettings?.showScreenSwitcher}

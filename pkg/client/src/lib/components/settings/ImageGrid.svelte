@@ -1,12 +1,6 @@
 <script lang="ts">
 	import { getImageUrl, type ImageInfo } from '../../services/api';
-	import {
-		settings,
-		sharedSettings,
-		updateSharedSettings,
-		localSettings,
-		isLocalMode
-	} from '../../stores/settingsStore';
+	import { settings, updateSharedSettings } from '$stores/settingsStore';
 
 	const {
 		images = [],
@@ -86,7 +80,7 @@
 		{/if}
 	</div>
 	<div
-		class="grid max-h-[280px] grid-cols-3 gap-2 overflow-y-auto rounded-lg bg-base-200 bg-opacity-30 p-2"
+		class="bg-base-200 grid max-h-[280px] grid-cols-3 gap-2 overflow-y-auto rounded-lg bg-opacity-30 p-2"
 		class:ghost={isOverride && !isOverridden}
 	>
 		{#each sortedImages as image}

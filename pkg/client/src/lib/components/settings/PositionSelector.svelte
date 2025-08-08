@@ -1,13 +1,6 @@
 <script lang="ts">
-	import {
-		settings,
-		sharedSettings,
-		updateSharedSettings,
-		localSettings,
-		isLocalMode,
-		updateLocalSettings
-	} from '../../stores/settingsStore';
-	import type { Settings, SettingsButtonPosition } from '../../stores/settingsStore';
+	import { settings, updateSharedSettings, updateLocalSettings } from '$stores/settingsStore';
+	import type { SettingsButtonPosition } from '$stores/settingsStore';
 
 	const props = $props<{
 		disabled?: boolean;
@@ -66,7 +59,7 @@
 		{/if}
 	</div>
 	<div
-		class="grid grid-cols-2 gap-2 rounded-lg bg-base-200 bg-opacity-30 p-2"
+		class="bg-base-200 grid grid-cols-2 gap-2 rounded-lg bg-opacity-30 p-2"
 		class:ghost={isOverride && !isOverridden}
 	>
 		{#each positions as position}

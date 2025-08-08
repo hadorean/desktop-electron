@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { settings } from '../../stores/settingsStore';
-	import type { SettingsButtonPosition } from '../../stores/settingsStore';
+	import { settings } from '$stores/settingsStore';
 
 	export let hideButton: boolean = false;
 	export let buttonHovered: boolean = false;

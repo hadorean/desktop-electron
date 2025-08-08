@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { apiBaseUrl, apiConfigEnabled } from '../../stores/apiStore';
+	import { apiBaseUrl, apiConfigEnabled } from '$stores/apiStore';
 
 	export let onApiUrlChange: (value: string) => void;
 	export let onReconnect: () => void;

@@ -2,8 +2,8 @@
  * Settings communication adapters
  */
 
-export { BaseSettingsAdapter } from './settings-communication.js'
-export type { SettingsAdapter, SettingsAdapterEvent } from './settings-communication.js'
-export { HttpSettingsAdapter } from './http-settings-adapter.js'
-export type { HttpAdapterConfig } from './http-settings-adapter.js'
-export { IpcSettingsAdapter, createIpcAdapterIfAvailable } from './ipc-settings-adapter.js'
+export { BaseSettingsAdapter } from './settings-communication'
+export type { SettingsAdapter, SettingsAdapterEvent } from './settings-communication'
+export { HttpSettingsAdapter } from './http-settings-adapter'
+export type { HttpAdapterConfig } from './http-settings-adapter'
+export { IpcSettingsAdapter, createIpcAdapterIfAvailable } from './ipc-settings-adapter'

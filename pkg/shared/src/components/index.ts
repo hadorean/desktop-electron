@@ -7,3 +7,6 @@
 
 // Settings components - re-export from settings index
 export * from './settings';
+
+// Shared utility components
+export * from './shared';
