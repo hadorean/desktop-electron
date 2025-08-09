@@ -2,7 +2,7 @@
 	import { onMount, untrack } from 'svelte';
 	import { api, type ImageInfo } from '$shared/services/api';
 	import { apiBaseUrl } from '$shared/stores/apiStore';
-	import { DebugContext, DebugMenu } from '@hgrandry/dbg';
+	import { DebugMenu } from '@hgrandry/dbg';
 	import { settings, loadSettings, expandSettings } from '$shared/stores/settingsStore';
 	import {
 		SettingsPanel,
@@ -135,44 +135,42 @@
 </script>
 
 <div class="full-page-container">
-	<DebugContext>
-		<DebugMenu visible={true} />
+	<DebugMenu visible={true} />
 
-		<ParamsValidator>
-			<SettingsServerUpdate />
+	<ParamsValidator>
+		<SettingsServerUpdate />
 
-			<BackgroundImage />
+		<BackgroundImage />
 
-			{#if $settings.showTimeDate}
-				<TimeDisplay />
+		{#if $settings.showTimeDate}
+			<TimeDisplay />
+		{/if}
+
+		{#if $settings.showWeather}
+			<WeatherDisplay />
+		{/if}
+
+		<SettingsButton
+			hideButton={$settings.hideButton}
+			{buttonHovered}
+			onToggle={toggleSettings}
+			onMouseEnter={handleButtonMouseEnter}
+			onMouseLeave={handleButtonMouseLeave}
+			bind:buttonRef={settingsButton}
+		/>
+
+		<ErrorMessage message={errorMessage} />
+
+		{#if $settings.showScreenSwitcher}
+			<ScreenSwitcher />
+		{/if}
+
+		<div id="settings-drawer" class:open={showSettings && $expandSettings}>
+			{#if showSettings}
+				<SettingsPanel bind:settingsPanel expanded={$expandSettings} {images} />
 			{/if}
-
-			{#if $settings.showWeather}
-				<WeatherDisplay />
-			{/if}
-
-			<SettingsButton
-				hideButton={$settings.hideButton}
-				{buttonHovered}
-				onToggle={toggleSettings}
-				onMouseEnter={handleButtonMouseEnter}
-				onMouseLeave={handleButtonMouseLeave}
-				bind:buttonRef={settingsButton}
-			/>
-
-			<ErrorMessage message={errorMessage} />
-
-			{#if $settings.showScreenSwitcher}
-				<ScreenSwitcher />
-			{/if}
-
-			<div id="settings-drawer" class:open={showSettings && $expandSettings}>
-				{#if showSettings}
-					<SettingsPanel bind:settingsPanel expanded={$expandSettings} {images} />
-				{/if}
-			</div>
-		</ParamsValidator>
-	</DebugContext>
+		</div>
+	</ParamsValidator>
 </div>
 
 <style>

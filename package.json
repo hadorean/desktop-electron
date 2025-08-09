@@ -22,6 +22,9 @@
 		"delete-tags": "node scripts/delete-tags.js",
 		"remote-build": "node scripts/gh-build.js"
 	},
+	"dependencies": {
+		"@hgrandry/dbg": "0.1.10"
+	},
 	"devDependencies": {
 		"@electron-toolkit/eslint-config-prettier": "^3.0.0",
 		"@electron-toolkit/eslint-config-ts": "^3.0.0",
