@@ -13,7 +13,7 @@ const chokidar = require('chokidar');
 // Define source and target paths
 const sharedDistPath = path.join(__dirname, '..', 'pkg', 'shared', 'dist');
 const sharedPackageJsonPath = path.join(__dirname, '..', 'pkg', 'shared', 'package.json');
-const targetDir = path.join(__dirname, '..', 'pkg', 'app', 'node_modules', '@heyketsu', 'shared');
+const targetDir = path.join(__dirname, '..', 'pkg', 'app', 'out', 'shared');
 
 // Copy dist directory
 function copyDirectory(src, dest) {

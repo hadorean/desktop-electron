@@ -19,7 +19,7 @@
     "dev:electron": "electron-vite dev",
     "dev": "concurrently --kill-others --names \"CLIENT,ELECTRON\" --prefix-colors \"blue,green\" \"npm run dev:client:start\" \"npm run dev:electron:start\"",
     "dev:client:start": "cd ../client && npm run dev",
-    "dev:electron:start": "concurrently --kill-others --names \"WATCH-SHARED,ELECTRON\" --prefix-colors \"magenta,green\" \"node ../../scripts/copy-shared.js --watch\" \"node ../../scripts/wait-for-client.js && cross-env NODE_ENV=development npm run dev:electron\"",
+    "dev:electron:start": "concurrently --kill-others --names \"WATCH-SHARED,ELECTRON\" --prefix-colors \"magenta,green\" \"node ../../scripts/wait-for-client.js && cross-env NODE_ENV=development npm run dev:electron\"",
     "dev:templates:watch": "nodemon --watch src/main/templates --ext ejs --exec \"echo Templates changed - refresh browser\"",
     "dev:client:build": "cd ../client && npm run build",
     "build": "npm run typecheck && electron-vite build && npm run copy-shared",
@@ -34,7 +34,6 @@
     "build:linux": "npm run build:all && electron-builder --linux"
   },
   "dependencies": {
-    "@heyketsu/shared": "file:../shared",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@types/ejs": "^3.1.5",
