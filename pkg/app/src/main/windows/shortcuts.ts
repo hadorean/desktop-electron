@@ -7,6 +7,13 @@ export function registerGlobalShortcuts(mainWindow: MainWindow) {
     globalShortcut.register('CommandOrControl+B', () => {
       mainWindow.toggle()
     })
+
+    globalShortcut.register('CommandOrControl+Shift+I', () => {
+      const win = mainWindow.get()
+      if (win && win.isFocused()) {
+        win.webContents.toggleDevTools()
+      }
+    })
   } catch (err) {
     console.error('Failed to register global shortcuts:', err)
   }
