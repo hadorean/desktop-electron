@@ -1,29 +1,11 @@
 <script lang="ts">
 	import { currentScreen, screenIds, allSettings } from '../../stores/settingsStore';
 
-	let isVisible = false;
-	let hoverTimeout: NodeJS.Timeout | null = null;
+	let isVisible = true;
 	let editMode = false;
 	let renamingScreen: string | null = null;
 	let renameValue = '';
 	let showDeleteConfirm: string | null = null;
-
-	function handleMouseEnter() {
-		if (hoverTimeout) {
-			clearTimeout(hoverTimeout);
-			hoverTimeout = null;
-		}
-		isVisible = true;
-	}
-
-	function handleMouseLeave() {
-		hoverTimeout = setTimeout(() => {
-			if (!editMode) {
-				// Don't hide if in edit mode
-				isVisible = false;
-			}
-		}, 300);
-	}
 
 	function switchToScreen(screenId: string) {
 		if (!editMode) {
@@ -33,9 +15,6 @@
 
 	function toggleEditMode() {
 		editMode = !editMode;
-		if (editMode) {
-			isVisible = true; // Keep visible in edit mode
-		}
 		renamingScreen = null;
 		showDeleteConfirm = null;
 	}
@@ -140,14 +119,8 @@
 	}
 </script>
 
-<!-- Hover trigger area at bottom center -->
-<div
-	class="screen-switcher-trigger"
-	on:mouseenter={handleMouseEnter}
-	on:mouseleave={handleMouseLeave}
-	role="navigation"
-	aria-label="Screen switcher"
->
+<!-- Screen switcher container at bottom center -->
+<div class="screen-switcher-trigger" role="navigation" aria-label="Screen switcher">
 	<!-- Pills container -->
 	<div class="screen-pills" class:visible={isVisible}>
 		{#each $screenIds as screenId}
@@ -207,35 +180,21 @@
 
 <style>
 	.screen-switcher-trigger {
-		position: fixed;
-		bottom: 0;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 200px;
-		height: 80px;
-		z-index: 900;
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
-		padding-bottom: 20px;
+		margin-bottom: 1rem;
 	}
 
 	.screen-pills {
 		display: flex;
 		gap: 8px;
-		background: rgba(0, 0, 0, 0.6);
 		backdrop-filter: blur(10px);
 		padding: 8px 16px;
 		border-radius: 24px;
-		opacity: 0;
-		transform: translateY(20px);
-		transition: all 0.3s cubic-bezier(0.35, 1.04, 0.58, 1);
-		pointer-events: none;
-	}
-
-	.screen-pills.visible {
 		opacity: 1;
 		transform: translateY(0);
+		transition: all 0.3s cubic-bezier(0.35, 1.04, 0.58, 1);
 		pointer-events: auto;
 	}
 

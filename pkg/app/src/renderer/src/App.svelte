@@ -40,7 +40,6 @@
 
 <SettingsPanel {images} expanded={true} />
 <SettingsServerUpdate />
-<ScreenSwitcher />
 <AppVersion />
 <ActionButtons />
 <ErrorMessage message={errorMessage} />

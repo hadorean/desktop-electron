@@ -10,6 +10,7 @@
 	import type { ImageInfo } from '../../services/api';
 	import ImageGrid from '$shared/components/settings/ImageGrid.svelte';
 	import { SliderControl, ToggleControl } from './';
+	import ScreenSwitcher from './ScreenSwitcher.svelte';
 
 	// Props
 	export let expanded: boolean = false;
@@ -70,6 +71,7 @@
 </script>
 
 <div class="settings-panel" bind:this={settingsPanel} class:expanded>
+	<ScreenSwitcher />
 	<div class="settings-content">
 		<div class="mb-4 flex items-center justify-between">
 			<h2 class="text-xl font-semibold">Settings</h2>

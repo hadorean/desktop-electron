@@ -161,10 +161,6 @@
 
 		<ErrorMessage message={errorMessage} />
 
-		{#if $settings.showScreenSwitcher}
-			<ScreenSwitcher />
-		{/if}
-
 		<div id="settings-drawer" class:open={showSettings && $expandSettings}>
 			{#if showSettings}
 				<SettingsPanel bind:settingsPanel expanded={$expandSettings} {images} />
