@@ -6,7 +6,7 @@ default-version := "patch"
 
 dev:
 	clear
-	npm run dev
+	pnpm dev
 
 # Run the mkdocs server
 doc:
@@ -27,7 +27,7 @@ publish-patch:
 
 build:
 	just rename_exe_prev
-	npm run package:win
+	pnpm package:win
 
 build_run:
 	just build
@@ -37,16 +37,16 @@ build_run:
 # To set version explicitly: publish 1.0.1
 # To auto-bump current version: publish patch | minor | major
 version version=default-version:
-	npm run version {{version}}
+	node scripts/version.js {{version}}
 
 publish:
-	npm run publish
+	pnpm publish
 	
 rename_exe_prev:
 	node scripts/rename-exe-prev.js
 
 delete-tags:
-	npm run delete-tags
+	pnpm delete-tags
 
 # Claude
 
