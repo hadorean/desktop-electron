@@ -4,7 +4,7 @@
   import { effectiveApiUrl } from '$shared/stores/apiStore'
   import { ErrorMessage } from '@heyketsu/shared'
   import { Versions, AppVersion, AppHeader, ActionButtons, ServerInfo } from './components'
-  import { DebugContext, DebugMenu } from '@hgrandry/dbg'
+  // import { DebugContext, DebugMenu } from '@hgrandry/dbg'
   import { onMount } from 'svelte'
   import SettingsServerUpdate from '$shared/components/settings/SettingsServerUpdate.svelte'
   import ScreenSwitcher from '$shared/components/settings/ScreenSwitcher.svelte'
@@ -38,21 +38,22 @@
   })
 </script>
 
-<DebugContext>
-  <SettingsPanel {images} expanded={true} />
-  <SettingsServerUpdate />
-  <ScreenSwitcher />
-  <AppVersion />
-  <ActionButtons />
-  <ErrorMessage message={errorMessage} />
+<!-- <DebugContext> -->
+<SettingsPanel {images} expanded={true} />
+<SettingsServerUpdate />
+<ScreenSwitcher />
+<AppVersion />
+<ActionButtons />
+<ErrorMessage message={errorMessage} />
 
-  {#if !disabled}
-    <AppHeader />
-    <ServerInfo />
-    <Versions />
-  {/if}
-  <DebugMenu visible={true} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} />
-</DebugContext>
+{#if !disabled}
+  <AppHeader />
+  <ServerInfo />
+  <Versions />
+{/if}
+
+<!-- <DebugMenu visible={true} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} /> -->
+<!-- </DebugContext> -->
 
 <style>
 </style>

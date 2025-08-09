@@ -4,7 +4,7 @@
 	import { routeParams } from '../../stores/routeStore';
 	import { onMount, onDestroy } from 'svelte';
 	import { socketService } from '../../services/socket';
-	import { Inspect } from '@hgrandry/dbg';
+	// import { Inspect } from '@hgrandry/dbg';
 	import type { SettingsUpdateEvent } from '../../types';
 
 	let isConnected = false;
@@ -72,13 +72,13 @@
 	});
 </script>
 
-<Inspect>
+<!-- <Inspect>
 	{#if isConnected}
 		<span class="status-indicator connected">🟢 Socket.IO Connected</span>
 	{:else}
 		<span class="status-indicator disconnected">🔴 Socket.IO Disconnected</span>
 	{/if}
-</Inspect>
+</Inspect> -->
 
 <style>
 	/* .socket-status {
@@ -92,7 +92,7 @@
 		border-radius: 6px;
 		font-size: 12px;
 		font-weight: bold;
-	} */
+	}
 
 	.status-indicator.connected {
 		color: #4ade80;
@@ -100,5 +100,5 @@
 
 	.status-indicator.disconnected {
 		color: #f87171;
-	}
+	} */
 </style>
