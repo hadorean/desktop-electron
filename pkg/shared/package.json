@@ -44,6 +44,9 @@
 		"dist",
 		"src"
 	],
+	"dependencies": {
+		"@hgrandry/dbg": "0.1.9"
+	},
 	"scripts": {
 		"build": "tsc",
 		"dev": "tsc --watch",
