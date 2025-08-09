@@ -1,9 +1,8 @@
 import { ipcMain } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
+import { MainWindow } from '../windows/mainWindow'
 
-type GetMainWindow = () => Electron.BrowserWindow | null
-
-export function setupAutoUpdate(getMainWindow: GetMainWindow) {
+export function setupAutoUpdate(mainWindow: MainWindow) {
   // Configure auto-updater
   autoUpdater.autoDownload = false
   autoUpdater.autoInstallOnAppQuit = true
@@ -15,9 +14,9 @@ export function setupAutoUpdate(getMainWindow: GetMainWindow) {
 
   autoUpdater.on('update-available', (info: UpdateInfo) => {
     console.log('Update available:', info)
-    const mainWindow = getMainWindow()
-    if (mainWindow) {
-      mainWindow.webContents.send('update-available', {
+    const window = mainWindow.get()
+    if (window) {
+      window.webContents.send('update-available', {
         version: info.version,
         releaseDate: info.releaseDate,
         releaseNotes: info.releaseNotes
@@ -35,17 +34,17 @@ export function setupAutoUpdate(getMainWindow: GetMainWindow) {
 
   autoUpdater.on('download-progress', (progressObj) => {
     console.log('Download progress:', progressObj)
-    const mainWindow = getMainWindow()
-    if (mainWindow) {
-      mainWindow.webContents.send('update-download-progress', progressObj)
+    const window = mainWindow.get()
+    if (window) {
+      window.webContents.send('update-download-progress', progressObj)
     }
   })
 
   autoUpdater.on('update-downloaded', (info) => {
     console.log('Update downloaded:', info)
-    const mainWindow = getMainWindow()
-    if (mainWindow) {
-      mainWindow.webContents.send('update-downloaded', info)
+    const window = mainWindow.get()
+    if (window) {
+      window.webContents.send('update-downloaded', info)
     }
   })
 
@@ -61,6 +60,8 @@ export function setupAutoUpdate(getMainWindow: GetMainWindow) {
   ipcMain.handle('install-update', () => {
     autoUpdater.quitAndInstall()
   })
+
+  autoUpdater.checkForUpdates()
 
   // Expose a small API for programmatic use
   return {
