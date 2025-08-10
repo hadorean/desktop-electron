@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store';
 
-export const defaultScreenId = 'default';
+export const defaultScreenId = 'monitor1';
 
 // Define the route parameters interface
 export interface RouteParams {
@@ -40,14 +40,14 @@ export function setRouteParams(userId: string, screenId: string): void {
  */
 export function setCurrentScreen(screenId: string): void {
 	currentScreen.set(screenId);
-	routeParams.update(params => ({ ...params, screenId }));
+	routeParams.update((params) => ({ ...params, screenId }));
 }
 
 /**
  * Update just the user ID
  */
 export function setCurrentUser(userId: string): void {
-	routeParams.update(params => ({ ...params, userId }));
+	routeParams.update((params) => ({ ...params, userId }));
 }
 
 /**
@@ -55,7 +55,7 @@ export function setCurrentUser(userId: string): void {
  */
 export function getCurrentParams(): RouteParams {
 	let params: RouteParams = { userId: '', screenId: defaultScreenId };
-	const unsubscribe = routeParams.subscribe(p => params = p);
+	const unsubscribe = routeParams.subscribe((p) => (params = p));
 	unsubscribe();
 	return params;
 }
@@ -79,7 +79,7 @@ export function parseRouteParams(path: string): void {
 	}
 	// Handle single parameter case (unlikely but included for completeness)
 	else if (parts.length === 1 && parts[0]) {
-		routeParams.update(params => ({ ...params, userId: parts[0] }));
+		routeParams.update((params) => ({ ...params, userId: parts[0] }));
 	}
 }
 

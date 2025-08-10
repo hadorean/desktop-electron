@@ -1,6 +1,6 @@
 import { writable, readable } from 'svelte/store';
 
-export const defaultScreenId = 'default';
+export const defaultScreenId = 'monitor1';
 
 // Define the route parameters interface
 export interface RouteParams {

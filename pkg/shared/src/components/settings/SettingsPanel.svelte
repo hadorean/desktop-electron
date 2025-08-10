@@ -1,16 +1,10 @@
 <script lang="ts">
-	import {
-		settings,
-		sharedSettings,
-		localSettings,
-		isLocalMode,
-		updateSharedSettings,
-		updateLocalSettings
-	} from '../../stores/settingsStore';
+	import { settings, sharedSettings, localSettings, isLocalMode, currentScreen, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore';
 	import type { ImageInfo } from '../../services/api';
 	import ImageGrid from '$shared/components/settings/ImageGrid.svelte';
 	import { SliderControl, ToggleControl } from './';
 	import ScreenSwitcher from './ScreenSwitcher.svelte';
+	import { Inspect } from '@hgrandry/dbg';
 
 	// Props
 	export let expanded: boolean = false;
@@ -30,10 +24,7 @@
 		}
 	}
 
-	function handleSettingChange<K extends keyof typeof $settings>(
-		key: K,
-		value: (typeof $settings)[K] | null
-	) {
+	function handleSettingChange<K extends keyof typeof $settings>(key: K, value: (typeof $settings)[K] | null) {
 		if ($isLocalMode) {
 			if (value === null) {
 				// Remove from local settings
@@ -73,23 +64,13 @@
 <div class="settings-panel" bind:this={settingsPanel} class:expanded>
 	<ScreenSwitcher />
 	<div class="settings-content">
-		<div class="mb-4 flex items-center justify-between">
-			<h2 class="text-xl font-semibold">Settings</h2>
-			<div class="flex items-center space-x-2">
-				<button
-					class="btn btn-sm {!$isLocalMode ? 'btn-primary' : 'btn-ghost'}"
-					on:click={() => isLocalMode.set(false)}
-				>
-					Shared
-				</button>
-				<button
-					class="btn btn-sm {$isLocalMode ? 'btn-primary' : 'btn-ghost'}"
-					on:click={() => isLocalMode.set(true)}
-				>
-					Local
-				</button>
-			</div>
-		</div>
+		<Inspect>
+			{#if $isLocalMode}
+				Settings - {$currentScreen}
+			{:else}
+				Settings - Shared
+			{/if}
+		</Inspect>
 
 		<div class="space-y-6">
 			<!-- Image Selection -->
@@ -123,8 +104,7 @@
 					min={0}
 					max={2}
 					step={0.01}
-					onChange={(newSaturation: number | null) =>
-						handleSettingChange('saturation', newSaturation)}
+					onChange={(newSaturation: number | null) => handleSettingChange('saturation', newSaturation)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
 					defaultValue={$settings.saturation}
@@ -146,14 +126,11 @@
 
 				<SliderControl
 					label="Transition Time"
-					value={$isLocalMode
-						? ($localSettings?.transitionTime ?? null)
-						: $sharedSettings.transitionTime}
+					value={$isLocalMode ? ($localSettings?.transitionTime ?? null) : $sharedSettings.transitionTime}
 					min={0}
 					max={10}
 					step={0.1}
-					onChange={(newTransitionTime: number | null) =>
-						handleSettingChange('transitionTime', newTransitionTime)}
+					onChange={(newTransitionTime: number | null) => handleSettingChange('transitionTime', newTransitionTime)}
 					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
 					defaultValue={$settings.transitionTime}
@@ -163,11 +140,8 @@
 
 			<ToggleControl
 				label="Time and date"
-				checked={$isLocalMode
-					? ($localSettings?.showTimeDate ?? $settings.showTimeDate)
-					: $sharedSettings.showTimeDate}
-				onChange={(newShowTimeDate: boolean | null) =>
-					handleSettingChange('showTimeDate', newShowTimeDate)}
+				checked={$isLocalMode ? ($localSettings?.showTimeDate ?? $settings.showTimeDate) : $sharedSettings.showTimeDate}
+				onChange={(newShowTimeDate: boolean | null) => handleSettingChange('showTimeDate', newShowTimeDate)}
 				isOverride={$isLocalMode}
 				overrideValue={$localSettings?.showTimeDate}
 				defaultValue={$settings.showTimeDate}
@@ -175,11 +149,8 @@
 
 			<ToggleControl
 				label="Weather"
-				checked={$isLocalMode
-					? ($localSettings?.showWeather ?? $settings.showWeather)
-					: $sharedSettings.showWeather}
-				onChange={(newShowWeather: boolean | null) =>
-					handleSettingChange('showWeather', newShowWeather)}
+				checked={$isLocalMode ? ($localSettings?.showWeather ?? $settings.showWeather) : $sharedSettings.showWeather}
+				onChange={(newShowWeather: boolean | null) => handleSettingChange('showWeather', newShowWeather)}
 				isOverride={$isLocalMode}
 				overrideValue={$localSettings?.showWeather}
 				defaultValue={$settings.showWeather}
@@ -187,11 +158,8 @@
 
 			<ToggleControl
 				label="Auto-hide settings button"
-				checked={$isLocalMode
-					? ($localSettings?.hideButton ?? $settings.hideButton)
-					: $sharedSettings.hideButton}
-				onChange={(newHideButton: boolean | null) =>
-					handleSettingChange('hideButton', newHideButton)}
+				checked={$isLocalMode ? ($localSettings?.hideButton ?? $settings.hideButton) : $sharedSettings.hideButton}
+				onChange={(newHideButton: boolean | null) => handleSettingChange('hideButton', newHideButton)}
 				isOverride={$isLocalMode}
 				overrideValue={$localSettings?.hideButton}
 				defaultValue={$settings.hideButton}
@@ -199,11 +167,8 @@
 
 			<ToggleControl
 				label="Show screen switcher"
-				checked={$isLocalMode
-					? ($localSettings?.showScreenSwitcher ?? $settings.showScreenSwitcher)
-					: $sharedSettings.showScreenSwitcher}
-				onChange={(newShowScreenSwitcher: boolean | null) =>
-					handleSettingChange('showScreenSwitcher', newShowScreenSwitcher)}
+				checked={$isLocalMode ? ($localSettings?.showScreenSwitcher ?? $settings.showScreenSwitcher) : $sharedSettings.showScreenSwitcher}
+				onChange={(newShowScreenSwitcher: boolean | null) => handleSettingChange('showScreenSwitcher', newShowScreenSwitcher)}
 				isOverride={$isLocalMode}
 				overrideValue={$localSettings?.showScreenSwitcher}
 				defaultValue={$settings.showScreenSwitcher}

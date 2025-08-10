@@ -3,12 +3,11 @@
   import { api, type ImageInfo } from '$shared/services'
   import { effectiveApiUrl } from '$shared/stores/apiStore'
   import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
-  import { ErrorMessage } from '@heyketsu/shared'
+  import ErrorMessage from '$shared/components/settings/ErrorMessage.svelte'
   import { Versions, AppVersion, AppHeader, ActionButtons, ServerInfo } from './components'
   import { DebugMenu } from '@hgrandry/dbg'
   import { onMount } from 'svelte'
   import SettingsServerUpdate from '$shared/components/settings/SettingsServerUpdate.svelte'
-  import ScreenSwitcher from '$shared/components/settings/ScreenSwitcher.svelte'
   const disabled = true
   let images: ImageInfo[] = []
   let errorMessage: string = ''
@@ -35,9 +34,9 @@
 
   onMount(async () => {
     effectiveApiUrl.set('http://localhost:8080')
-    
+
     await fetchImages()
-    
+
     // Setup IPC listener for debug state changes
     if (window.api) {
       window.api.onDebugStateChanged((visible) => {

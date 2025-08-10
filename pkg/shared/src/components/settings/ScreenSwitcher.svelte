@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { currentScreen, screenIds, allSettings } from '../../stores/settingsStore';
+	import { currentScreen, screenIds, allSettings, isLocalMode } from '../../stores/settingsStore';
 
 	let isVisible = true;
 	let editMode = false;
@@ -10,6 +10,13 @@
 	function switchToScreen(screenId: string) {
 		if (!editMode) {
 			currentScreen.set(screenId);
+			isLocalMode.set(true); // Always set to local mode when switching to a specific screen
+		}
+	}
+
+	function switchToShared() {
+		if (!editMode) {
+			isLocalMode.set(false); // Switch to shared settings mode
 		}
 	}
 
@@ -123,6 +130,16 @@
 <div class="screen-switcher-trigger" role="navigation" aria-label="Screen switcher">
 	<!-- Pills container -->
 	<div class="screen-pills" class:visible={isVisible}>
+		<!-- Shared settings button -->
+		<button
+			class="screen-pill shared-pill"
+			class:active={!$isLocalMode}
+			on:click={switchToShared}
+			aria-label="Switch to shared settings"
+		>
+			🌐 Shared
+		</button>
+
 		{#each $screenIds as screenId}
 			{#if renamingScreen === screenId}
 				<input
@@ -135,7 +152,7 @@
 			{:else}
 				<button
 					class="screen-pill"
-					class:active={screenId === $currentScreen}
+					class:active={$isLocalMode && screenId === $currentScreen}
 					class:edit-mode={editMode}
 					on:click={() => (editMode ? startRename(screenId) : switchToScreen(screenId))}
 					on:contextmenu={(e) => (editMode ? showDelete(screenId, e) : null)}
@@ -227,6 +244,27 @@
 
 	.screen-pill.active:hover {
 		background: rgba(59, 130, 246, 0.9);
+	}
+
+	.shared-pill {
+		background: rgba(34, 197, 94, 0.2);
+		border-color: rgba(34, 197, 94, 0.4);
+		font-weight: 600;
+	}
+
+	.shared-pill:hover {
+		background: rgba(34, 197, 94, 0.3);
+		border-color: rgba(34, 197, 94, 0.6);
+	}
+
+	.shared-pill.active {
+		background: rgba(34, 197, 94, 0.8);
+		border-color: rgba(34, 197, 94, 1);
+		box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+	}
+
+	.shared-pill.active:hover {
+		background: rgba(34, 197, 94, 0.9);
 	}
 
 	.screen-pill.edit-mode {
