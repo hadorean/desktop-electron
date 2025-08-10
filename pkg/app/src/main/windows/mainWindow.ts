@@ -11,15 +11,17 @@ let window: BrowserWindow | null = null
 let isQuitting = false
 
 export function createWindow(): void {
+  const transparent = true
+
   // Create the browser window.
   window = new BrowserWindow({
-    width: 900,
+    width: 650,
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    resizable: true,
-    frame: true,
-    // transparent: true,
+    resizable: !transparent,
+    frame: !transparent,
+    transparent: transparent,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),

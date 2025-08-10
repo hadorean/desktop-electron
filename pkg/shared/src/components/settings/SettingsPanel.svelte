@@ -195,7 +195,7 @@
 		top: 50%;
 		right: 10px;
 		transform: translate(0, -50%);
-		/* background-color: rgba(0, 0, 0, 0.4); */
+		background-color: rgba(0, 0, 0, 0.4);
 		padding: 2rem;
 		border-radius: 1rem;
 		color: white;
