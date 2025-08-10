@@ -35,6 +35,18 @@ export class ThumbnailService {
   }
 
   /**
+   * Starts background thumbnail generation for all images
+   */
+  public async startBackgroundThumbnailGeneration(images: string[]): Promise<void> {
+    try {
+      console.log('📸 Starting background thumbnail generation...')
+      await thumbnailService.generateAllThumbnailsInBackground(images)
+    } catch (error) {
+      console.error('Error starting background thumbnail generation:', error)
+    }
+  }
+
+  /**
    * Get thumbnail path for an image. Creates if doesn't exist.
    * @param imageName Relative path from images directory
    * @returns Promise resolving to thumbnail file path

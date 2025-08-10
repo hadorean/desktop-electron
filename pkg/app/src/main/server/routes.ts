@@ -1,9 +1,10 @@
 import { join } from 'path'
 import { constants } from 'fs'
 import { access } from 'fs/promises'
-import { LocalServer } from '.'
+import { type LocalServer } from '.'
 import { thumbnailService } from '../services/thumbnails'
 import { settingsService } from '../services/settings'
+import { imageService } from '../services/images'
 
 export function registerRoutes(localServer: LocalServer) {
   const server = localServer.server
@@ -31,7 +32,7 @@ export function registerRoutes(localServer: LocalServer) {
   // Images API endpoint
   server.get('/api/images', async (_req, res) => {
     try {
-      const images = await localServer.scanForImages()
+      const images = await imageService.scanForImages()
       res.json({
         images: images.map((imagePath: string) => ({
           name: imagePath,
@@ -51,10 +52,10 @@ export function registerRoutes(localServer: LocalServer) {
   server.get('/api/image', async (req, res) => {
     try {
       const imageName = decodeURIComponent((req.query.name as string) || '')
-      const imagePath = join(localServer.IMAGES_PATH, imageName)
+      const imagePath = join(imageService.getImagesPath(), imageName)
 
       // Security check: ensure the path is within the images directory
-      if (!imagePath.startsWith(localServer.IMAGES_PATH)) {
+      if (!imagePath.startsWith(imageService.getImagesPath())) {
         return res.status(403).json({
           error: 'Forbidden',
           message: 'Access denied to path outside images directory'
@@ -108,10 +109,10 @@ export function registerRoutes(localServer: LocalServer) {
         })
       }
 
-      const imagePath = join(localServer.IMAGES_PATH, imageName)
+      const imagePath = join(imageService.getImagesPath(), imageName)
 
       // Security check
-      if (!imagePath.startsWith(localServer.IMAGES_PATH)) {
+      if (!imagePath.startsWith(imageService.getImagesPath())) {
         return res.status(403).json({
           error: 'Forbidden',
           message: 'Access denied to path outside images directory'
