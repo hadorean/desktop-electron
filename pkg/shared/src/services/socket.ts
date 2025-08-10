@@ -87,15 +87,6 @@ export class SocketService {
 			this.onSettingsUpdateCallback?.(event);
 		});
 
-		// Handle settings update acknowledgments
-		this.socket.on(SocketEvents.SettingsUpdated, (response: SettingsUpdatedResponse) => {
-			if (response.success) {
-				console.log('🔌 Settings update acknowledged by server');
-			} else {
-				console.error('🔌 Settings update failed:', response.error);
-			}
-		});
-
 		// Handle debug state change events
 		this.socket.on(SocketEvents.DebugStateChanged, (data: { visible: boolean }) => {
 			console.log('🔌 Received debug state change event:', data.visible);
@@ -154,7 +145,7 @@ export class SocketService {
 
 		console.log('🔌 Sending settings update to server:', settings);
 
-		this.emitToServer(SocketEvents.UpdateSettings, {
+		this.emitToServer(SocketEvents.ClientUpdatedSettings, {
 			settings,
 			clientId: clientId || this.socket.id
 		});

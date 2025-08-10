@@ -56,26 +56,15 @@ export class SocketManager {
       }
 
       // Handle settings updates from clients - type-safe
-      this.onClientEvent(socket, SocketEvents.UpdateSettings, async (data) => {
+      this.onClientEvent(socket, SocketEvents.ClientUpdatedSettings, async (data) => {
         try {
           const { settings, clientId } = data
           const updateEvent = await settingsService.updateSettings(settings, clientId)
 
           // Broadcast to all other clients
           socket.broadcast.emit(SocketEvents.SettingsUpdate, updateEvent)
-
-          // Acknowledge to sender
-          socket.emit(SocketEvents.SettingsUpdated, {
-            success: true,
-            settings: updateEvent.settings,
-            timestamp: updateEvent.timestamp
-          })
         } catch (error) {
           console.error('Error handling socket settings update:', error)
-          socket.emit(SocketEvents.SettingsUpdated, {
-            success: false,
-            error: 'Failed to update settings'
-          })
         }
       })
 
