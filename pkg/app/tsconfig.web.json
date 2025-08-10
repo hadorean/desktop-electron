@@ -5,9 +5,11 @@
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.svelte",
     "src/preload/*.d.ts",
+    "src/shared/*.d.ts",
     "../shared/src/**/*.svelte"
   ],
   "compilerOptions": {
+    "composite": true,
     "verbatimModuleSyntax": true,
     "useDefineForClassFields": true,
     "strict": false,
