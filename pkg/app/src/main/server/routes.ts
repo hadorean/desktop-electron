@@ -198,7 +198,7 @@ export function registerRoutes(localServer: LocalServer) {
       }
 
       const updateEvent = await settingsService.updateSettings(settings, clientId)
-      localServer.io.emit('settings_update', updateEvent)
+      localServer.emit('settings_update', updateEvent)
 
       return res.json({
         message: 'Settings updated successfully',

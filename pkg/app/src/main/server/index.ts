@@ -3,17 +3,16 @@ import cors from 'cors'
 import { join } from 'path'
 import { readdir } from 'fs/promises'
 import { createServer } from 'http'
-import { Server as SocketIOServer } from 'socket.io'
 import { watch } from 'chokidar'
 import { registerRoutes } from './routes'
-import { settingsService } from '../services/settings'
 import { thumbnailService } from '../services/thumbnails'
 import { imageService } from '../services/images'
+import { SocketManager } from './sockets'
 
 export class LocalServer {
   public server: express.Application
   private httpServer: ReturnType<typeof createServer>
-  public io: SocketIOServer
+  private sockets: SocketManager
   public port: number = 8080
   private isRunning: boolean = false
   public clientAssets: { js: string; css: string } | null = null
@@ -24,16 +23,10 @@ export class LocalServer {
   constructor() {
     this.server = express()
     this.httpServer = createServer(this.server)
-    this.io = new SocketIOServer(this.httpServer, {
-      cors: {
-        origin: '*',
-        methods: ['GET', 'POST']
-      }
-    })
+    this.sockets = new SocketManager(this.httpServer)
     this.setupTemplateEngine()
     this.setupMiddleware()
     registerRoutes(this)
-    this.setupSocketIO()
   }
 
   public async scanForClientAssets(): Promise<{ js: string; css: string }> {
@@ -233,13 +226,13 @@ export class LocalServer {
     this.server.post('/dev/client-rebuilt', (_req, res) => {
       this.invalidateClientAssets()
       // Notify connected clients about the rebuild
-      this.io.emit('client_rebuilt', {
+      this.emit('client_rebuilt', {
         timestamp: new Date().toISOString(),
         message: 'Client assets rebuilt - refresh recommended'
       })
       res.json({
         message: 'Client rebuild notification sent',
-        connectedClients: this.io.sockets.sockets.size
+        connectedClients: this.sockets.getConnectedClientsCount()
       })
     })
 
@@ -271,53 +264,6 @@ export class LocalServer {
   }
 
   // routes are registered in server/routes.ts
-
-  private setupSocketIO(): void {
-    this.io.on('connection', async (socket) => {
-      console.log(`🔌 Client connected: ${socket.id}`)
-
-      // Send current settings to newly connected client
-      try {
-        const settings = await settingsService.getSettings()
-        socket.emit('settings_update', {
-          type: 'settings_update',
-          settings,
-          timestamp: Date.now(),
-          clientId: 'server'
-        })
-      } catch (error) {
-        console.error('Error sending settings to new client:', error)
-      }
-
-      // Handle settings updates from clients
-      socket.on('update_settings', async (data) => {
-        try {
-          const { settings, clientId = socket.id } = data
-          const updateEvent = await settingsService.updateSettings(settings, clientId)
-
-          // Broadcast to all other clients
-          socket.broadcast.emit('settings_update', updateEvent)
-
-          // Acknowledge to sender
-          socket.emit('settings_updated', {
-            success: true,
-            settings: updateEvent.settings,
-            timestamp: updateEvent.timestamp
-          })
-        } catch (error) {
-          console.error('Error handling socket settings update:', error)
-          socket.emit('settings_updated', {
-            success: false,
-            error: 'Failed to update settings'
-          })
-        }
-      })
-
-      socket.on('disconnect', () => {
-        console.log(`🔌 Client disconnected: ${socket.id}`)
-      })
-    })
-  }
 
   public async start(): Promise<void> {
     if (this.isRunning) {
@@ -368,6 +314,9 @@ export class LocalServer {
         console.log('🔄 Template watcher stopped')
       }
 
+      // Close socket manager
+      this.sockets.close()
+
       // Note: In a real implementation, you'd want to properly close the server
       // This is a simplified version
       this.isRunning = false
@@ -381,5 +330,9 @@ export class LocalServer {
 
   public isServerRunning(): boolean {
     return this.isRunning
+  }
+
+  public emit(event: string, data: any): void {
+    this.sockets.emit(event, data)
   }
 }
