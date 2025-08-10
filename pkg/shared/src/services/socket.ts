@@ -2,7 +2,7 @@ import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
 import { apiBaseUrl, effectiveApiUrl } from '../stores/apiStore';
 import type { SettingsUpdateEvent } from '../types';
-import { SOCKET_EVENTS } from '../constants';
+import { SOCKET_EVENTS } from '../types';
 
 export interface SettingsUpdatedResponse {
 	success: boolean;

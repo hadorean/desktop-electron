@@ -1,7 +1,6 @@
 // Main exports for @heyketsu/shared package
 export * from './types';
 export * from './utils';
-export * from './constants';
 
 // Legacy adapters (IPC/HTTP) - will be phased out
 export {

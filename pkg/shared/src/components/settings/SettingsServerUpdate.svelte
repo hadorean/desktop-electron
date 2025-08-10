@@ -57,8 +57,8 @@
 
 			if (!updatingSettingsFromServer && socketService.getConnectionStatus()) {
 				console.log('Updating settings from client:', value);
-				// Use route params userId as client ID if available
-				const clientId = $routeParams.userId || socketService.getSocketId();
+				// Use socket ID as client ID
+				const clientId = socketService.getSocketId();
 				socketService.updateSettings(value, clientId);
 			}
 		});

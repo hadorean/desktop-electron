@@ -1,6 +1,5 @@
 import { get, writable, derived } from 'svelte/store';
 import { routeParams, defaultScreenId } from './routeStore';
-import { checkStorageAvailability } from '../utils';
 
 export const currentScreen = writable(defaultScreenId);
 
@@ -14,7 +13,7 @@ currentScreen.subscribe((screenId) => {
 });
 
 import type { UISettings, ServerSettings, SettingsButtonPosition } from '../types';
-import { DEFAULT_UI_SETTINGS, DEFAULT_SERVER_SETTINGS } from '../constants';
+import { DEFAULT_UI_SETTINGS, DEFAULT_SERVER_SETTINGS } from '../types';
 
 // Legacy aliases for backward compatibility
 export type Settings = UISettings;

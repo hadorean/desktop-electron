@@ -2,7 +2,7 @@ import { promises as fs } from 'fs'
 import { join } from 'path'
 import { app } from 'electron'
 import type { UISettings, ServerSettings, SettingsUpdateEvent } from '@heyketsu/shared/types'
-import { DEFAULT_SERVER_SETTINGS } from '@heyketsu/shared/constants'
+import { DEFAULT_SERVER_SETTINGS } from '@heyketsu/shared/types/settings'
 
 // Legacy aliases for backward compatibility
 export type Settings = UISettings

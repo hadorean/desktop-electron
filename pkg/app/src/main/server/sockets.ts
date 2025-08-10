@@ -46,7 +46,7 @@ export class SocketManager {
       // Handle settings updates from clients
       socket.on('update_settings', async (data) => {
         try {
-          const { settings, clientId = socket.id } = data
+          const { settings, clientId } = data
           const updateEvent = await settingsService.updateSettings(settings, clientId)
 
           // Broadcast to all other clients
