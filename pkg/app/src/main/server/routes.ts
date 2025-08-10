@@ -5,6 +5,7 @@ import { type LocalServer } from '.'
 import { thumbnailService } from '../services/thumbnails'
 import { settingsService } from '../services/settings'
 import { imageService } from '../services/images'
+import { scanForClientAssets } from './assets'
 
 export function registerRoutes(localServer: LocalServer) {
   const server = localServer.server
@@ -228,7 +229,7 @@ export function registerRoutes(localServer: LocalServer) {
       assets = { js: `${localServer.clientDevUrl}/app/src/main.ts`, css: null }
     } else {
       if (!localServer.clientAssets) {
-        localServer.clientAssets = await localServer.scanForClientAssets()
+        localServer.clientAssets = await scanForClientAssets()
       }
       assets = localServer.clientAssets
     }

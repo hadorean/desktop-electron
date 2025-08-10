@@ -1,22 +1,21 @@
 import express from 'express'
 import cors from 'cors'
 import { join } from 'path'
-import { readdir } from 'fs/promises'
 import { createServer } from 'http'
-import { watch } from 'chokidar'
 import { registerRoutes } from './routes'
 import { thumbnailService } from '../services/thumbnails'
 import { imageService } from '../services/images'
 import { SocketManager } from './sockets'
+import { TemplateManager } from './template'
 
 export class LocalServer {
   public server: express.Application
   private httpServer: ReturnType<typeof createServer>
   private sockets: SocketManager
+  private templateManager: TemplateManager
   public port: number = 8080
   private isRunning: boolean = false
   public clientAssets: { js: string; css: string } | null = null
-  private templateWatcher: ReturnType<typeof watch> | null = null
   public isRapidDev: boolean = false
   public clientDevUrl: string = 'http://localhost:5173'
 
@@ -24,71 +23,9 @@ export class LocalServer {
     this.server = express()
     this.httpServer = createServer(this.server)
     this.sockets = new SocketManager(this.httpServer)
-    this.setupTemplateEngine()
+    this.templateManager = new TemplateManager(this.server)
     this.setupMiddleware()
     registerRoutes(this)
-  }
-
-  public async scanForClientAssets(): Promise<{ js: string; css: string }> {
-    try {
-      // Detect if we're running from built/packaged app
-      const isPackaged = __dirname.includes('app.asar')
-      const clientPath = isPackaged
-        ? join(__dirname, 'client') // Production: client assets are in out/main/client
-        : join(__dirname, '../../../client/dist') // Development: client assets in ../client/dist
-      const assetsPath = join(clientPath, 'assets')
-
-      console.log('Scanning for client assets in:', assetsPath)
-      const files = await readdir(assetsPath)
-
-      let jsFile = ''
-      let cssFile = ''
-
-      for (const file of files) {
-        if (file.endsWith('.js') && file.startsWith('index-')) {
-          jsFile = file
-        } else if (file.endsWith('.css') && file.startsWith('index-')) {
-          cssFile = file
-        }
-      }
-
-      if (!jsFile || !cssFile) {
-        throw new Error(`Missing client assets - JS: ${jsFile}, CSS: ${cssFile}`)
-      }
-
-      console.log('📦 Found client assets:', { js: jsFile, css: cssFile })
-      return { js: jsFile, css: cssFile }
-    } catch (error) {
-      console.error('Error scanning client assets:', error)
-      // Fallback to hardcoded values if scanning fails
-      return { js: 'index-B8qUNiLk.js', css: 'index-CV3mCCdu.css' }
-    }
-  }
-
-  private setupTemplateEngine(): void {
-    // Set EJS as template engine
-    this.server.set('view engine', 'ejs')
-
-    // Detect if we're running from built/packaged app
-    const isPackaged = __dirname.includes('app.asar')
-    const isDev =
-      process.env.NODE_ENV === 'development' ||
-      (process.env.NODE_ENV !== 'production' && !isPackaged)
-
-    let templatesPath: string
-    if (isDev) {
-      // Development: templates are in src/main/templates
-      templatesPath = join(process.cwd(), 'src/main/templates')
-    } else {
-      // Production/Packaged: templates are in out/main/templates (relative to __dirname)
-      templatesPath = join(__dirname, 'templates')
-    }
-
-    this.server.set('views', templatesPath)
-    console.log('📄 Templates path:', templatesPath)
-    console.log('📄 Is packaged:', isPackaged)
-    console.log('📄 Is dev:', isDev)
-    console.log('📄 __dirname:', __dirname)
   }
 
   private async setupDevelopmentFeatures(): Promise<void> {
@@ -111,7 +48,7 @@ export class LocalServer {
       // Check if client dev server is running (rapid development mode)
       await this.detectRapidDevMode()
 
-      this.setupTemplateHotReload()
+      this.templateManager.setupHotReload()
       this.setupDevelopmentRoutes()
     } else {
       console.log('📦 Production mode - development features disabled')
@@ -143,42 +80,6 @@ export class LocalServer {
     console.log('📦 Using built client assets (rapid dev server not detected)')
   }
 
-  private setupTemplateHotReload(): void {
-    const isPackaged = __dirname.includes('app.asar')
-    const isDev =
-      process.env.NODE_ENV === 'development' ||
-      (process.env.NODE_ENV !== 'production' && !isPackaged)
-    const templatesPath = isDev
-      ? join(process.cwd(), 'src/main/templates')
-      : join(__dirname, 'templates')
-
-    // Watch templates for changes
-    this.templateWatcher = watch(join(templatesPath, '**/*.ejs'), {
-      persistent: true,
-      ignoreInitial: true
-    })
-
-    this.templateWatcher.on('change', (path: string) => {
-      console.log(`📝 Template changed: ${path}`)
-      this.clearTemplateCache().catch(console.error)
-      this.invalidateClientAssets()
-    })
-
-    this.templateWatcher.on('add', (path: string) => {
-      console.log(`📄 New template added: ${path}`)
-      this.clearTemplateCache().catch(console.error)
-    })
-
-    console.log('🔄 Template hot reload enabled')
-  }
-
-  private async clearTemplateCache(): Promise<void> {
-    // Clear EJS template cache
-    const ejs = await import('ejs')
-    ejs.clearCache()
-    console.log('🗑️  Template cache cleared')
-  }
-
   private invalidateClientAssets(): void {
     // Force rescan of client assets on next request
     this.clientAssets = null
@@ -195,7 +96,7 @@ export class LocalServer {
 
       res.json({
         development: true,
-        templatePath: this.server.get('views'),
+        templatePath: this.templateManager.getTemplatesPath(),
         clientAssetsPath: join(clientPath, 'assets'),
         currentAssets: this.clientAssets,
         request: {
@@ -214,7 +115,7 @@ export class LocalServer {
 
     // Endpoint to manually clear caches
     this.server.post('/dev/clear-cache', async (_req, res) => {
-      await this.clearTemplateCache()
+      await this.templateManager.clearCache()
       this.invalidateClientAssets()
       res.json({
         message: 'All caches cleared',
@@ -308,11 +209,8 @@ export class LocalServer {
 
   public stop(): void {
     if (this.isRunning) {
-      // Close template watcher
-      if (this.templateWatcher) {
-        this.templateWatcher.close()
-        console.log('🔄 Template watcher stopped')
-      }
+      // Close template manager
+      this.templateManager.stop()
 
       // Close socket manager
       this.sockets.close()
