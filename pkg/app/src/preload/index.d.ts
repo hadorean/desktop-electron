@@ -20,6 +20,14 @@ declare global {
       onUpdateAvailable: (callback: (info: any) => void) => void
       onUpdateDownloadProgress: (callback: (progressObj: any) => void) => void
       onUpdateDownloaded: (callback: (info: any) => void) => void
+      // Settings APIs
+      getSettings: () => Promise<any>
+      updateSharedSettings: (settings: any) => Promise<any>
+      updateLocalSettings: (screenId: string, settings: any) => Promise<any>
+      isSettingsAvailable: () => Promise<any>
+      // Debug menu APIs
+      getDebugState: () => Promise<any>
+      onDebugStateChanged: (callback: (visible: boolean) => void) => void
     }
   }
 }

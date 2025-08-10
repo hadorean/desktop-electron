@@ -39,3 +39,11 @@ export {
 	type RouteParams,
 	type ScreenAdapter
 } from './screenStore';
+
+// Debug store
+export {
+	debugVisible,
+	toggleDebugMenu,
+	setDebugMenuVisible,
+	loadDebugState
+} from './debugStore';

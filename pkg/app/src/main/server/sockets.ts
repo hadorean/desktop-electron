@@ -1,6 +1,7 @@
 import { Server as SocketIOServer } from 'socket.io'
 import { createServer } from 'http'
 import { settingsService } from '../services/settings'
+import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
 
 export class SocketManager {
   private io: SocketIOServer
@@ -30,6 +31,16 @@ export class SocketManager {
         })
       } catch (error) {
         console.error('Error sending settings to new client:', error)
+      }
+
+      // Send current debug state to newly connected client
+      try {
+        socket.emit('debug_state_changed', {
+          visible: getDebugMenuVisible(),
+          timestamp: Date.now()
+        })
+      } catch (error) {
+        console.error('Error sending debug state to new client:', error)
       }
 
       // Handle settings updates from clients

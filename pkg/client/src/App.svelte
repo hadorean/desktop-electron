@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
+	import { onMount } from 'svelte';
 	import { api, type ImageInfo } from '$shared/services/api';
 	import { apiBaseUrl } from '$shared/stores/apiStore';
 	import { DebugMenu } from '@hgrandry/dbg';
 	import { settings, loadSettings, expandSettings } from '$shared/stores/settingsStore';
+	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore';
 	import {
 		SettingsPanel,
 		SettingsButton,
@@ -74,6 +75,13 @@
 				window.addEventListener('keydown', handleKeyDown);
 				document.addEventListener('mousedown', handleClickOutside);
 
+				// Setup socket listener for debug state changes
+				const { socketService } = await import('$shared/services/socket');
+				socketService.onDebugStateChanged((visible) => {
+					console.log('Client app: Received debug state change:', visible);
+					setDebugMenuVisible(visible);
+				});
+
 				// Return cleanup function
 				return () => {
 					window.removeEventListener('reconnectApi', handleReconnect);
@@ -135,7 +143,7 @@
 </script>
 
 <div class="full-page-container">
-	<DebugMenu visible={true} />
+	<DebugMenu visible={$debugVisible} open={true} />
 
 	<ParamsValidator>
 		<SettingsServerUpdate />

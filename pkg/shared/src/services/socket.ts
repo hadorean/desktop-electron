@@ -21,6 +21,7 @@ export class SocketService {
 	// Event handlers
 	private onSettingsUpdateCallback: ((event: SettingsUpdateEvent) => void) | null = null;
 	private onConnectionStatusCallback: ((connected: boolean) => void) | null = null;
+	private onDebugStateChangedCallback: ((visible: boolean) => void) | null = null;
 
 	constructor() {
 		// Don't initialize immediately - wait for stores to be ready
@@ -92,6 +93,12 @@ export class SocketService {
 				console.error('🔌 Settings update failed:', response.error);
 			}
 		});
+
+		// Handle debug state change events
+		this.socket.on(SOCKET_EVENTS.DEBUG_STATE_CHANGED, (data: { visible: boolean }) => {
+			console.log('🔌 Received debug state change event:', data.visible);
+			this.onDebugStateChangedCallback?.(data.visible);
+		});
 	}
 
 	/**
@@ -152,6 +159,13 @@ export class SocketService {
 	 */
 	public onConnectionStatus(callback: (connected: boolean) => void): void {
 		this.onConnectionStatusCallback = callback;
+	}
+
+	/**
+	 * Set callback for debug state change events
+	 */
+	public onDebugStateChanged(callback: (visible: boolean) => void): void {
+		this.onDebugStateChangedCallback = callback;
 	}
 
 	/**

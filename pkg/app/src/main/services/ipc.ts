@@ -1,6 +1,7 @@
 import { ipcMain, app } from 'electron'
 import { AppContext } from './context'
 import { settingsService } from './settings'
+import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
 
 export function setupIpc(options: AppContext) {
   const { localServer, bg } = options
@@ -103,6 +104,16 @@ export function setupIpc(options: AppContext) {
     } catch (error) {
       console.error('IPC settings-is-available error:', error)
       return { success: false, data: false }
+    }
+  })
+
+  // IPC handler to get current debug state
+  ipcMain.handle('get-debug-state', () => {
+    try {
+      return { success: true, visible: getDebugMenuVisible() }
+    } catch (error) {
+      console.error('IPC get-debug-state error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   })
 }

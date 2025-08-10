@@ -4,4 +4,5 @@ export const SOCKET_EVENTS = {
   SETTINGS_UPDATE: 'settings_update',
   CONNECT: 'connect',
   DISCONNECT: 'disconnect',
+  DEBUG_STATE_CHANGED: 'debug_state_changed',
 } as const;

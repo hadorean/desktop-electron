@@ -8,6 +8,7 @@ import { createTray } from './windows/tray'
 import { LocalServer } from './server'
 import { BackgroundManager } from './windows/backgrounds'
 import { createWindow, mainWindow } from './windows/mainWindow'
+import { debugService } from './services/debug'
 
 const localServer = new LocalServer()
 const bg = new BackgroundManager()
@@ -28,7 +29,11 @@ function setupApp() {
 
   localServer
     .start()
-    .then(() => bg.start(localServer.getUrl()))
+    .then(() => {
+      bg.start(localServer.getUrl())
+      // Set dependencies for debug state manager so it can broadcast changes
+      debugService.setDependencies(localServer, mainWindow)
+    })
     .catch((error) => console.error('Failed to start local server:', error))
 
   if (!is.dev) {

@@ -35,7 +35,12 @@ const api = {
   updateSharedSettings: (settings: any) => ipcRenderer.invoke('settings-update-shared', settings),
   updateLocalSettings: (screenId: string, settings: any) =>
     ipcRenderer.invoke('settings-update-local', screenId, settings),
-  isSettingsAvailable: () => ipcRenderer.invoke('settings-is-available')
+  isSettingsAvailable: () => ipcRenderer.invoke('settings-is-available'),
+  // Debug menu API
+  getDebugState: () => ipcRenderer.invoke('get-debug-state'),
+  onDebugStateChanged: (callback: (visible: boolean) => void) => {
+    ipcRenderer.on('debug-state-changed', (_, visible) => callback(visible))
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

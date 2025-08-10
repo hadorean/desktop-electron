@@ -2,6 +2,7 @@
   import SettingsPanel from '$shared/components/settings/SettingsPanel.svelte'
   import { api, type ImageInfo } from '$shared/services'
   import { effectiveApiUrl } from '$shared/stores/apiStore'
+  import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
   import { ErrorMessage } from '@heyketsu/shared'
   import { Versions, AppVersion, AppHeader, ActionButtons, ServerInfo } from './components'
   import { DebugMenu } from '@hgrandry/dbg'
@@ -34,7 +35,16 @@
 
   onMount(async () => {
     effectiveApiUrl.set('http://localhost:8080')
+    
     await fetchImages()
+    
+    // Setup IPC listener for debug state changes
+    if (window.api) {
+      window.api.onDebugStateChanged((visible) => {
+        console.log('Desktop app: Received debug state change:', visible)
+        setDebugMenuVisible(visible)
+      })
+    }
   })
 </script>
 
@@ -49,7 +59,7 @@
   <ServerInfo />
   <Versions />
 {/if}
-<DebugMenu visible={true} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} />
+<DebugMenu visible={$debugVisible} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} />
 
 <style>
 </style>

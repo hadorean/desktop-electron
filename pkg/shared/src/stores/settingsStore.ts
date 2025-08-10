@@ -1,5 +1,6 @@
 import { get, writable, derived } from 'svelte/store';
 import { routeParams, defaultScreenId } from './routeStore';
+import { checkStorageAvailability } from '../utils';
 
 export const currentScreen = writable(defaultScreenId);
 
@@ -127,20 +128,6 @@ export const expandSettings = writable(false);
 //     updatingLocally = false;
 //   }
 // }
-
-// Helper function to check if localStorage is available
-export function checkStorageAvailability(): boolean {
-	try {
-		const testKey = '__storage_test__';
-		localStorage.setItem(testKey, testKey);
-		const result = localStorage.getItem(testKey);
-		localStorage.removeItem(testKey);
-		return result === testKey;
-	} catch (error) {
-		console.error('localStorage availability check failed:', error);
-		return false;
-	}
-}
 
 // Load settings from localStorage
 export function loadSettings(images: { name: string }[]): string {

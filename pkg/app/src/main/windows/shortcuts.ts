@@ -1,8 +1,9 @@
 import { globalShortcut } from 'electron'
 import { MainWindow } from './mainWindow'
+import { toggleDebugMenu } from '@heyketsu/shared/stores/debugStore'
 
 export function registerGlobalShortcuts(mainWindow: MainWindow) {
-  // Register global keyboard shortcut (Ctrl+B) to toggle main window
+  // (Ctrl+B) to toggle main window
   try {
     globalShortcut.register('CommandOrControl+B', () => {
       mainWindow.toggle()
@@ -10,8 +11,18 @@ export function registerGlobalShortcuts(mainWindow: MainWindow) {
 
     globalShortcut.register('CommandOrControl+Shift+I', () => {
       const win = mainWindow.get()
-      if (win && win.isFocused()) {
-        win.webContents.toggleDevTools()
+      if (!win || !win.isFocused()) return
+      win.webContents.toggleDevTools()
+    })
+
+    // (Ctrl+D) to toggle debug menu
+    globalShortcut.register('CommandOrControl+D', () => {
+      try {
+        const win = mainWindow.get()
+        if (!win || !win.isFocused()) return
+        toggleDebugMenu()
+      } catch (error) {
+        console.error('Failed to toggle debug menu:', error)
       }
     })
   } catch (err) {
