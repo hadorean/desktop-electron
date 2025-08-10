@@ -1,11 +1,24 @@
 import { ipcMain } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
 import { MainWindow } from '../windows/mainWindow'
+import { IpcEvents, MainEvents, RendererEvents } from '@heyketsu/shared/types/ipc'
 
 export function setupAutoUpdate(mainWindow: MainWindow) {
   // Configure auto-updater
   autoUpdater.autoDownload = false
   autoUpdater.autoInstallOnAppQuit = true
+
+  // Type-safe IPC wrappers
+  const handleIpc = (event: MainEvents, handler: (...args: any[]) => any) => {
+    ipcMain.handle(event, handler)
+  }
+
+  const sendToRenderer = (event: RendererEvents, data: any) => {
+    const window = mainWindow.get()
+    if (window) {
+      window.webContents.send(event, data)
+    }
+  }
 
   // Auto-updater event handlers
   autoUpdater.on('checking-for-update', () => {
@@ -14,14 +27,11 @@ export function setupAutoUpdate(mainWindow: MainWindow) {
 
   autoUpdater.on('update-available', (info: UpdateInfo) => {
     console.log('Update available:', info)
-    const window = mainWindow.get()
-    if (window) {
-      window.webContents.send('update-available', {
-        version: info.version,
-        releaseDate: info.releaseDate,
-        releaseNotes: info.releaseNotes
-      })
-    }
+    sendToRenderer(IpcEvents.UpdateAvailable, {
+      version: info.version,
+      releaseDate: info.releaseDate,
+      releaseNotes: info.releaseNotes
+    })
   })
 
   autoUpdater.on('update-not-available', (info) => {
@@ -34,30 +44,24 @@ export function setupAutoUpdate(mainWindow: MainWindow) {
 
   autoUpdater.on('download-progress', (progressObj) => {
     console.log('Download progress:', progressObj)
-    const window = mainWindow.get()
-    if (window) {
-      window.webContents.send('update-download-progress', progressObj)
-    }
+    sendToRenderer(IpcEvents.UpdateDownloadProgress, progressObj)
   })
 
   autoUpdater.on('update-downloaded', (info) => {
     console.log('Update downloaded:', info)
-    const window = mainWindow.get()
-    if (window) {
-      window.webContents.send('update-downloaded', info)
-    }
+    sendToRenderer(IpcEvents.UpdateDownloaded, info)
   })
 
   // IPC handlers for auto-update
-  ipcMain.handle('check-for-updates', () => {
+  handleIpc(IpcEvents.CheckForUpdates, () => {
     autoUpdater.checkForUpdates()
   })
 
-  ipcMain.handle('download-update', () => {
+  handleIpc(IpcEvents.DownloadUpdate, () => {
     autoUpdater.downloadUpdate()
   })
 
-  ipcMain.handle('install-update', () => {
+  handleIpc(IpcEvents.InstallUpdate, () => {
     autoUpdater.quitAndInstall()
   })
 

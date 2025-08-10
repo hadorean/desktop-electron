@@ -1,45 +1,42 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { VersionInfo } from '@heyketsu/shared/types'
+import { IpcEvents } from '@heyketsu/shared/types/ipc'
 
 // Custom APIs for renderer
 const api = {
-  getServerUrl: () => ipcRenderer.invoke('get-server-url'),
-  isServerRunning: () => ipcRenderer.invoke('is-server-running'),
-  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
-  reloadBackground: (monitorId: number) => ipcRenderer.invoke('reload-background', monitorId),
-  reloadAllBackgrounds: () => ipcRenderer.invoke('reload-all-backgrounds'),
-  makeBackgroundInteractive: (monitorId: number) =>
-    ipcRenderer.invoke('make-background-interactive', monitorId),
-  makeAllBackgroundsInteractive: () => ipcRenderer.invoke('make-all-backgrounds-interactive'),
-  makeBackgroundNonInteractive: (monitorId: number) =>
-    ipcRenderer.invoke('make-background-non-interactive', monitorId),
-  makeAllBackgroundsNonInteractive: () =>
-    ipcRenderer.invoke('make-all-backgrounds-non-interactive'),
+  getServerUrl: () => ipcRenderer.invoke(IpcEvents.GetServerUrl),
+  isServerRunning: () => ipcRenderer.invoke(IpcEvents.IsServerRunning),
+  getAppVersion: () => ipcRenderer.invoke(IpcEvents.GetAppVersion),
+  reloadBackground: (monitorId: number) => ipcRenderer.invoke(IpcEvents.ReloadBackground, monitorId),
+  reloadAllBackgrounds: () => ipcRenderer.invoke(IpcEvents.ReloadAllBackgrounds),
+  makeBackgroundInteractive: (monitorId: number) => ipcRenderer.invoke(IpcEvents.MakeBackgroundInteractive, monitorId),
+  makeAllBackgroundsInteractive: () => ipcRenderer.invoke(IpcEvents.MakeAllBackgroundsInteractive),
+  makeBackgroundNonInteractive: (monitorId: number) => ipcRenderer.invoke(IpcEvents.MakeBackgroundNonInteractive, monitorId),
+  makeAllBackgroundsNonInteractive: () => ipcRenderer.invoke(IpcEvents.MakeAllBackgroundsNonInteractive),
   // Auto-update APIs
-  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
-  downloadUpdate: () => ipcRenderer.invoke('download-update'),
-  installUpdate: () => ipcRenderer.invoke('install-update'),
+  checkForUpdates: () => ipcRenderer.invoke(IpcEvents.CheckForUpdates),
+  downloadUpdate: () => ipcRenderer.invoke(IpcEvents.DownloadUpdate),
+  installUpdate: () => ipcRenderer.invoke(IpcEvents.InstallUpdate),
   // Auto-update event listeners
   onUpdateAvailable: (callback: (info: VersionInfo) => void) => {
-    ipcRenderer.on('update-available', (_, info) => callback(info))
+    ipcRenderer.on(IpcEvents.UpdateAvailable, (_, info) => callback(info))
   },
   onUpdateDownloadProgress: (callback: (progressObj: any) => void) => {
-    ipcRenderer.on('update-download-progress', (_, progressObj) => callback(progressObj))
+    ipcRenderer.on(IpcEvents.UpdateDownloadProgress, (_, progressObj) => callback(progressObj))
   },
   onUpdateDownloaded: (callback: (info: any) => void) => {
-    ipcRenderer.on('update-downloaded', (_, info) => callback(info))
+    ipcRenderer.on(IpcEvents.UpdateDownloaded, (_, info) => callback(info))
   },
   // Settings APIs
-  getSettings: () => ipcRenderer.invoke('settings-get'),
-  updateSharedSettings: (settings: any) => ipcRenderer.invoke('settings-update-shared', settings),
-  updateLocalSettings: (screenId: string, settings: any) =>
-    ipcRenderer.invoke('settings-update-local', screenId, settings),
-  isSettingsAvailable: () => ipcRenderer.invoke('settings-is-available'),
+  getSettings: () => ipcRenderer.invoke(IpcEvents.SettingsGet),
+  updateSharedSettings: (settings: any) => ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
+  updateLocalSettings: (screenId: string, settings: any) => ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
+  isSettingsAvailable: () => ipcRenderer.invoke(IpcEvents.SettingsIsAvailable),
   // Debug menu API
-  getDebugState: () => ipcRenderer.invoke('get-debug-state'),
+  getDebugState: () => ipcRenderer.invoke(IpcEvents.GetDebugState),
   onDebugStateChanged: (callback: (visible: boolean) => void) => {
-    ipcRenderer.on('debug-state-changed', (_, visible) => callback(visible))
+    ipcRenderer.on(IpcEvents.DebugStateChanged, (_, visible) => callback(visible))
   }
 }
 

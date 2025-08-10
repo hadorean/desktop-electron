@@ -1,9 +1,8 @@
 <script lang="ts">
   import { Button, Inspect } from '@hgrandry/dbg'
+  import { IpcEvents } from '@heyketsu/shared/types/ipc'
 
-  // Disabled for now - placeholder component
-
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  const ipcHandle = (): void => window.electron.ipcRenderer.send(IpcEvents.Ping)
 
   async function reloadAllBackgrounds(): Promise<void> {
     try {

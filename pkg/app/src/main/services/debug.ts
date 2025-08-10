@@ -3,6 +3,7 @@ import { join } from 'path'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { debugVisible } from '@heyketsu/shared/stores/debugStore'
 import { SocketEvents } from '@heyketsu/shared/types/sockets'
+import { IpcEvents, RendererEvents } from '@heyketsu/shared/types/ipc'
 import type { LocalServer } from '../server'
 import type { MainWindow } from '../windows/mainWindow'
 
@@ -56,6 +57,15 @@ class DebugService {
     }
   }
 
+  private sendToRenderer(event: RendererEvents, data: any): void {
+    if (this.mainWindow) {
+      const win = this.mainWindow.get()
+      if (win) {
+        win.webContents.send(event, data)
+      }
+    }
+  }
+
   private broadcastState(visible: boolean): void {
     try {
       // Broadcast to socket clients
@@ -64,12 +74,7 @@ class DebugService {
       }
 
       // Send to main window renderer via IPC
-      if (this.mainWindow) {
-        const win = this.mainWindow.get()
-        if (win) {
-          win.webContents.send('debug-state-changed', visible)
-        }
-      }
+      this.sendToRenderer(IpcEvents.DebugStateChanged, visible)
     } catch (error) {
       console.error('Error broadcasting debug state:', error)
     }

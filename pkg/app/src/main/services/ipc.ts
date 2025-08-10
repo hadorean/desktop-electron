@@ -2,55 +2,65 @@ import { ipcMain, app } from 'electron'
 import { AppContext } from './context'
 import { settingsService } from './settings'
 import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
+import { IpcEvents, MainEvents } from '@heyketsu/shared/types/ipc'
 
 export function setupIpc(options: AppContext) {
   const { localServer, bg } = options
 
+  // Type-safe wrappers for IPC
+  const handleIpc = (event: MainEvents, handler: (...args: any[]) => any) => {
+    ipcMain.handle(event, handler)
+  }
+
+  const onIpc = (event: MainEvents, handler: (...args: any[]) => void) => {
+    ipcMain.on(event, handler)
+  }
+
   // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  onIpc(IpcEvents.Ping, () => console.log('pong'))
 
   // IPC handlers for server communication
-  ipcMain.handle('get-server-url', () => {
+  handleIpc(IpcEvents.GetServerUrl, () => {
     return localServer.getUrl()
   })
 
-  ipcMain.handle('is-server-running', () => {
+  handleIpc(IpcEvents.IsServerRunning, () => {
     return localServer.isServerRunning()
   })
 
   // IPC handler for app version
-  ipcMain.handle('get-app-version', () => {
+  handleIpc(IpcEvents.GetAppVersion, () => {
     return app.getVersion()
   })
 
   // IPC handlers for background management
-  ipcMain.handle('reload-background', (_, monitorId: number) => {
+  handleIpc(IpcEvents.ReloadBackground, (_, monitorId: number) => {
     bg?.reloadBackground(monitorId)
   })
 
-  ipcMain.handle('reload-all-backgrounds', () => {
+  handleIpc(IpcEvents.ReloadAllBackgrounds, () => {
     bg?.reloadAllBackgrounds()
   })
 
   // IPC handlers for background interactivity
-  ipcMain.handle('make-background-interactive', (_, monitorId: number) => {
+  handleIpc(IpcEvents.MakeBackgroundInteractive, (_, monitorId: number) => {
     bg?.makeInteractive(monitorId)
   })
 
-  ipcMain.handle('make-all-backgrounds-interactive', () => {
+  handleIpc(IpcEvents.MakeAllBackgroundsInteractive, () => {
     bg?.makeAllInteractive()
   })
 
-  ipcMain.handle('make-background-non-interactive', (_, monitorId: number) => {
+  handleIpc(IpcEvents.MakeBackgroundNonInteractive, (_, monitorId: number) => {
     bg?.makeNonInteractive(monitorId)
   })
 
-  ipcMain.handle('make-all-backgrounds-non-interactive', () => {
+  handleIpc(IpcEvents.MakeAllBackgroundsNonInteractive, () => {
     bg?.makeAllNonInteractive()
   })
 
   // IPC handlers for settings
-  ipcMain.handle('settings-get', async () => {
+  handleIpc(IpcEvents.SettingsGet, async () => {
     try {
       const settings = await settingsService.getSettings()
       return { success: true, data: settings }
@@ -60,7 +70,7 @@ export function setupIpc(options: AppContext) {
     }
   })
 
-  ipcMain.handle('settings-update-shared', async (_, settings) => {
+  handleIpc(IpcEvents.SettingsUpdateShared, async (_, settings) => {
     try {
       const currentSettings = await settingsService.getSettings()
       const updatedSettings = {
@@ -77,7 +87,7 @@ export function setupIpc(options: AppContext) {
     }
   })
 
-  ipcMain.handle('settings-update-local', async (_, screenId, settings) => {
+  handleIpc(IpcEvents.SettingsUpdateLocal, async (_, screenId, settings) => {
     try {
       const currentSettings = await settingsService.getSettings()
       const updatedSettings = {
@@ -97,7 +107,7 @@ export function setupIpc(options: AppContext) {
     }
   })
 
-  ipcMain.handle('settings-is-available', async () => {
+  handleIpc(IpcEvents.SettingsIsAvailable, async () => {
     try {
       await settingsService.getSettings()
       return { success: true, data: true }
@@ -108,7 +118,7 @@ export function setupIpc(options: AppContext) {
   })
 
   // IPC handler to get current debug state
-  ipcMain.handle('get-debug-state', () => {
+  handleIpc(IpcEvents.GetDebugState, () => {
     try {
       return { success: true, visible: getDebugMenuVisible() }
     } catch (error) {
