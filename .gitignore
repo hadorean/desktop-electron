@@ -12,3 +12,5 @@ nul
 electronbg.code-workspace
 
 desktop.ini
+
+pkg/shared/tsconfig.tsbuildinfo
