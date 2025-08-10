@@ -217,12 +217,12 @@ export function registerRoutes(localServer: LocalServer) {
   // Background routes for each monitor
   server.get('/background/:monitorId', (req, res) => {
     const monitorId = parseInt(req.params.monitorId)
-    res.redirect(`/app/hadrien/monitor${monitorId + 1}`)
+    res.redirect(`/app/monitor${monitorId + 1}`)
   })
 
   // Serve the Svelte client using correct path format: /app/:userId/:screenId
-  server.get('/app/:userId/:screenId', async (req, res) => {
-    const { userId, screenId } = req.params
+  server.get('/app/:screenId', async (req, res) => {
+    const { screenId } = req.params
 
     let assets
     if (localServer.isRapidDev) {
@@ -239,7 +239,6 @@ export function registerRoutes(localServer: LocalServer) {
       timestamp: new Date().toISOString(),
       route: req.path,
       query: req.query,
-      userId,
       screenId,
       userAgent: req.get('User-Agent') || 'unknown',
       serverUrl: `http://localhost:${localServer.port}`,
@@ -253,7 +252,7 @@ export function registerRoutes(localServer: LocalServer) {
 
   // Fallback route for /app
   server.get('/app', (_req, res) => {
-    res.redirect('/app/hadrien/monitor1')
+    res.redirect('/app/monitor1')
   })
 
   // Legacy static route for fallback

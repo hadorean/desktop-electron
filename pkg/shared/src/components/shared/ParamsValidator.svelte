@@ -8,10 +8,9 @@
 	<div class="missing-params-message">
 		<h2>Missing Required Parameters</h2>
 		<p>This application requires a valid user ID and screen ID in the URL.</p>
-		<p>Expected format: /app/{`{userId}`}/{`{screenId}`}</p>
+		<p>Expected format: /app/{`{screenId}`}</p>
 		<p>
-			Current params: User ID: {$routeParams.userId || 'missing'}, Screen ID: {$routeParams.screenId ||
-				'missing'}
+			Current params: Screen ID: {$routeParams.screenId || 'missing'}
 		</p>
 	</div>
 {/if}

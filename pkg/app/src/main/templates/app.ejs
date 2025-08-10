@@ -20,7 +20,7 @@
     
     <!-- Inject server data for client access -->
     <script>
-      window.__SERVER_DATA__ = <%- JSON.stringify({ timestamp, route, query, userId, screenId, userAgent, serverUrl }) %>;
+      window.__SERVER_DATA__ = <%- JSON.stringify({ timestamp, route, query, screenId, userAgent, serverUrl }) %>;
     </script>
   </body>
 </html>
