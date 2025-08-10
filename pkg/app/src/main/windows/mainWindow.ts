@@ -46,7 +46,7 @@ export function createWindow(): void {
     window.setBounds({
       x: x,
       y: y,
-      width: 500,
+      width: winW,
       height: workArea.height
     })
     window.setPosition(x, y)
