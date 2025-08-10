@@ -1,5 +1,6 @@
 import { ipcMain, app } from 'electron'
 import { AppContext } from './context'
+import { settingsService } from './settings'
 
 export function setupIpc(options: AppContext) {
   const { localServer, bg } = options
@@ -50,7 +51,7 @@ export function setupIpc(options: AppContext) {
   // IPC handlers for settings
   ipcMain.handle('settings-get', async () => {
     try {
-      const settings = await localServer.getSettingsService().getSettings()
+      const settings = await settingsService.getSettings()
       return { success: true, data: settings }
     } catch (error) {
       console.error('IPC settings-get error:', error)
@@ -60,16 +61,14 @@ export function setupIpc(options: AppContext) {
 
   ipcMain.handle('settings-update-shared', async (_, settings) => {
     try {
-      const currentSettings = await localServer.getSettingsService().getSettings()
+      const currentSettings = await settingsService.getSettings()
       const updatedSettings = {
         shared: {
           ...currentSettings.shared,
           ...settings
         }
       }
-      const updateEvent = await localServer
-        .getSettingsService()
-        .updateSettings(updatedSettings, 'ipc-client')
+      const updateEvent = await settingsService.updateSettings(updatedSettings, 'ipc-client')
       return { success: true, data: updateEvent.settings }
     } catch (error) {
       console.error('IPC settings-update-shared error:', error)
@@ -79,7 +78,7 @@ export function setupIpc(options: AppContext) {
 
   ipcMain.handle('settings-update-local', async (_, screenId, settings) => {
     try {
-      const currentSettings = await localServer.getSettingsService().getSettings()
+      const currentSettings = await settingsService.getSettings()
       const updatedSettings = {
         screens: {
           ...currentSettings.screens,
@@ -89,9 +88,7 @@ export function setupIpc(options: AppContext) {
           }
         }
       }
-      const updateEvent = await localServer
-        .getSettingsService()
-        .updateSettings(updatedSettings, 'ipc-client')
+      const updateEvent = await settingsService.updateSettings(updatedSettings, 'ipc-client')
       return { success: true, data: updateEvent.settings }
     } catch (error) {
       console.error('IPC settings-update-local error:', error)
@@ -101,7 +98,7 @@ export function setupIpc(options: AppContext) {
 
   ipcMain.handle('settings-is-available', async () => {
     try {
-      await localServer.getSettingsService().getSettings()
+      await settingsService.getSettings()
       return { success: true, data: true }
     } catch (error) {
       console.error('IPC settings-is-available error:', error)

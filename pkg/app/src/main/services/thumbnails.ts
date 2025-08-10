@@ -261,3 +261,5 @@ export class ThumbnailService {
     }
   }
 }
+
+export const thumbnailService = new ThumbnailService()

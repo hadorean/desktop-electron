@@ -6,23 +6,21 @@ import { createServer } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
 import { watch } from 'chokidar'
 import { registerRoutes } from './routes'
-import { ThumbnailService } from '../services/thumbnails'
-import { SettingsService } from '../services/settings'
+import { thumbnailService } from '../services/thumbnails'
+import { settingsService } from '../services/settings'
 
 export class LocalServer {
-  private server: express.Application
+  public server: express.Application
   private httpServer: ReturnType<typeof createServer>
-  private io: SocketIOServer
-  private port: number = 8080
+  public io: SocketIOServer
+  public port: number = 8080
   private isRunning: boolean = false
-  private readonly IMAGES_PATH = 'D:\\pictures\\wall'
+  public readonly IMAGES_PATH = 'D:\\pictures\\wall'
   private readonly SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']
-  private thumbnailService: ThumbnailService
-  private settingsService: SettingsService
-  private clientAssets: { js: string; css: string } | null = null
+  public clientAssets: { js: string; css: string } | null = null
   private templateWatcher: ReturnType<typeof watch> | null = null
   public isRapidDev: boolean = false
-  private clientDevUrl: string = 'http://localhost:5173'
+  public clientDevUrl: string = 'http://localhost:5173'
 
   constructor() {
     this.server = express()
@@ -33,8 +31,6 @@ export class LocalServer {
         methods: ['GET', 'POST']
       }
     })
-    this.thumbnailService = new ThumbnailService()
-    this.settingsService = new SettingsService()
     this.setupTemplateEngine()
     this.setupMiddleware()
     registerRoutes(this)
@@ -77,7 +73,7 @@ export class LocalServer {
     }
   }
 
-  private async scanForImages(): Promise<string[]> {
+  public async scanForImages(): Promise<string[]> {
     try {
       console.log('Scanning for images in:', this.IMAGES_PATH)
       const allFiles: string[] = []
@@ -318,7 +314,7 @@ export class LocalServer {
 
       // Send current settings to newly connected client
       try {
-        const settings = await this.settingsService.getSettings()
+        const settings = await settingsService.getSettings()
         socket.emit('settings_update', {
           type: 'settings_update',
           settings,
@@ -333,7 +329,7 @@ export class LocalServer {
       socket.on('update_settings', async (data) => {
         try {
           const { settings, clientId = socket.id } = data
-          const updateEvent = await this.settingsService.updateSettings(settings, clientId)
+          const updateEvent = await settingsService.updateSettings(settings, clientId)
 
           // Broadcast to all other clients
           socket.broadcast.emit('settings_update', updateEvent)
@@ -395,7 +391,7 @@ export class LocalServer {
     try {
       console.log('📸 Starting background thumbnail generation...')
       const images = await this.scanForImages()
-      await this.thumbnailService.generateAllThumbnailsInBackground(images)
+      await thumbnailService.generateAllThumbnailsInBackground(images)
     } catch (error) {
       console.error('Error starting background thumbnail generation:', error)
     }
@@ -422,9 +418,5 @@ export class LocalServer {
 
   public isServerRunning(): boolean {
     return this.isRunning
-  }
-
-  public getSettingsService(): SettingsService {
-    return this.settingsService
   }
 }

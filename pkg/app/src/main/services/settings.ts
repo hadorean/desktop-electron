@@ -105,3 +105,5 @@ export class SettingsService {
     return this.settingsPath
   }
 }
+
+export const settingsService = new SettingsService()

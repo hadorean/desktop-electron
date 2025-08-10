@@ -1,8 +1,11 @@
 import { join } from 'path'
 import { constants } from 'fs'
 import { access } from 'fs/promises'
+import { LocalServer } from '.'
+import { thumbnailService } from '../services/thumbnails'
+import { settingsService } from '../services/settings'
 
-export function registerRoutes(localServer: any) {
+export function registerRoutes(localServer: LocalServer) {
   const server = localServer.server
 
   // Health check endpoint
@@ -124,7 +127,7 @@ export function registerRoutes(localServer: any) {
         })
       }
 
-      const thumbnailPath = await localServer.thumbnailService.getThumbnailAsync(imageName)
+      const thumbnailPath = await thumbnailService.getThumbnailAsync(imageName)
 
       res.setHeader('Content-Type', 'image/jpeg')
       res.setHeader('Cache-Control', 'public, max-age=86400')
@@ -143,7 +146,7 @@ export function registerRoutes(localServer: any) {
   // Debug endpoint for thumbnail service status
   server.get('/api/thumbnails/status', (_req, res) => {
     try {
-      const status = localServer.thumbnailService.getQueueStatus()
+      const status = thumbnailService.getQueueStatus()
       res.json({
         ...status,
         message: 'Thumbnail service status'
@@ -160,7 +163,7 @@ export function registerRoutes(localServer: any) {
   // Clear thumbnail cache endpoint
   server.post('/api/thumbnails/clear-cache', async (_req, res) => {
     try {
-      await localServer.thumbnailService.clearThumbnailCache()
+      await thumbnailService.clearThumbnailCache()
       res.json({ message: 'Thumbnail cache cleared successfully' })
     } catch (error) {
       console.error('Error clearing thumbnail cache:', error)
@@ -173,7 +176,7 @@ export function registerRoutes(localServer: any) {
   // Settings API endpoints
   server.get('/api/settings', async (_req, res) => {
     try {
-      const settings = await localServer.settingsService.getSettings()
+      const settings = await settingsService.getSettings()
       res.json({ settings, message: 'Settings retrieved successfully' })
     } catch (error) {
       console.error('Error getting settings:', error)
@@ -193,7 +196,7 @@ export function registerRoutes(localServer: any) {
           .json({ error: 'Bad Request', message: 'Invalid settings data provided' })
       }
 
-      const updateEvent = await localServer.settingsService.updateSettings(settings, clientId)
+      const updateEvent = await settingsService.updateSettings(settings, clientId)
       localServer.io.emit('settings_update', updateEvent)
 
       return res.json({
