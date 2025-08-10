@@ -2,7 +2,7 @@ import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
 import { apiBaseUrl, effectiveApiUrl } from '../stores/apiStore';
 import type { SettingsUpdateEvent } from '../types';
-import { SOCKET_EVENTS } from '../types';
+import { SocketEvents } from '../types';
 
 export interface SettingsUpdatedResponse {
 	success: boolean;
@@ -54,14 +54,14 @@ export class SocketService {
 	private setupEventHandlers(): void {
 		if (!this.socket) return;
 
-		this.socket.on(SOCKET_EVENTS.CONNECT, () => {
+		this.socket.on(SocketEvents.Connect, () => {
 			console.log('🔌 Socket.IO connected:', this.socket?.id);
 			this.isConnected = true;
 			this.reconnectAttempts = 0;
 			this.onConnectionStatusCallback?.(true);
 		});
 
-		this.socket.on(SOCKET_EVENTS.DISCONNECT, (reason) => {
+		this.socket.on(SocketEvents.Disconnect, (reason) => {
 			console.log('🔌 Socket.IO disconnected:', reason);
 			this.isConnected = false;
 			this.onConnectionStatusCallback?.(false);
@@ -80,7 +80,7 @@ export class SocketService {
 		});
 
 		// Handle settings updates from server
-		this.socket.on(SOCKET_EVENTS.SETTINGS_UPDATE, (event: SettingsUpdateEvent) => {
+		this.socket.on(SocketEvents.SettingsUpdate, (event: SettingsUpdateEvent) => {
 			console.log('🔌 Received settings update:', event);
 			this.onSettingsUpdateCallback?.(event);
 		});
@@ -95,7 +95,7 @@ export class SocketService {
 		});
 
 		// Handle debug state change events
-		this.socket.on(SOCKET_EVENTS.DEBUG_STATE_CHANGED, (data: { visible: boolean }) => {
+		this.socket.on(SocketEvents.DebugStateChanged, (data: { visible: boolean }) => {
 			console.log('🔌 Received debug state change event:', data.visible);
 			this.onDebugStateChangedCallback?.(data.visible);
 		});
