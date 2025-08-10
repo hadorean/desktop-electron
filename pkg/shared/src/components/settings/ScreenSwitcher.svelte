@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { currentScreen, screenIds, allSettings, isLocalMode } from '../../stores/settingsStore';
+	import { Button } from '../ui';
 
 	let isVisible = true;
 	let editMode = false;
