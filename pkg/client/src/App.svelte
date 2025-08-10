@@ -14,6 +14,7 @@
 		ScreenSwitcher
 	} from '@heyketsu/shared';
 	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout';
+	import { socketService } from '$shared/services/socket';
 
 	let images: ImageInfo[] = [];
 	let showSettings: boolean = false;
@@ -76,7 +77,6 @@
 				document.addEventListener('mousedown', handleClickOutside);
 
 				// Setup socket listener for debug state changes
-				const { socketService } = await import('$shared/services/socket');
 				socketService.onDebugStateChanged((visible) => {
 					console.log('Client app: Received debug state change:', visible);
 					setDebugMenuVisible(visible);
