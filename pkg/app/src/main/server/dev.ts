@@ -130,13 +130,8 @@ export class DevelopmentManager {
     // Endpoint to trigger client rebuild notification
     this.server.post('/dev/client-rebuilt', (_req, res) => {
       this.invalidateClientAssets()
-      // Notify connected clients about the rebuild
-      this.sockets.emit('client_rebuilt', {
-        timestamp: new Date().toISOString(),
-        message: 'Client assets rebuilt - refresh recommended'
-      })
       res.json({
-        message: 'Client rebuild notification sent',
+        message: 'Client assets invalidated',
         connectedClients: this.sockets.getConnectedClientsCount()
       })
     })

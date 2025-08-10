@@ -2,6 +2,7 @@ import { Server as SocketIOServer } from 'socket.io'
 import { createServer } from 'http'
 import { settingsService } from '../services/settings'
 import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
+import { SocketEvents, ServerEvents, ClientEvents } from '@heyketsu/shared/types/sockets'
 
 export class SocketManager {
   private io: SocketIOServer
@@ -16,6 +17,17 @@ export class SocketManager {
     this.setupSocketHandlers()
   }
 
+  /**
+   * Type-safe wrapper for handling client-to-server events
+   */
+  private onClientEvent(
+    socket: any,
+    event: ClientEvents,
+    handler: (data: any) => void | Promise<void>
+  ): void {
+    socket.on(event, handler)
+  }
+
   private setupSocketHandlers(): void {
     this.io.on('connection', async (socket) => {
       console.log(`🔌 Client connected: ${socket.id}`)
@@ -23,7 +35,7 @@ export class SocketManager {
       // Send current settings to newly connected client
       try {
         const settings = await settingsService.getSettings()
-        socket.emit('settings_update', {
+        socket.emit(SocketEvents.SettingsUpdate, {
           type: 'settings_update',
           settings,
           timestamp: Date.now(),
@@ -35,7 +47,7 @@ export class SocketManager {
 
       // Send current debug state to newly connected client
       try {
-        socket.emit('debug_state_changed', {
+        socket.emit(SocketEvents.DebugStateChanged, {
           visible: getDebugMenuVisible(),
           timestamp: Date.now()
         })
@@ -43,24 +55,24 @@ export class SocketManager {
         console.error('Error sending debug state to new client:', error)
       }
 
-      // Handle settings updates from clients
-      socket.on('update_settings', async (data) => {
+      // Handle settings updates from clients - type-safe
+      this.onClientEvent(socket, SocketEvents.UpdateSettings, async (data) => {
         try {
           const { settings, clientId } = data
           const updateEvent = await settingsService.updateSettings(settings, clientId)
 
           // Broadcast to all other clients
-          socket.broadcast.emit('settings_update', updateEvent)
+          socket.broadcast.emit(SocketEvents.SettingsUpdate, updateEvent)
 
           // Acknowledge to sender
-          socket.emit('settings_updated', {
+          socket.emit(SocketEvents.SettingsUpdated, {
             success: true,
             settings: updateEvent.settings,
             timestamp: updateEvent.timestamp
           })
         } catch (error) {
           console.error('Error handling socket settings update:', error)
-          socket.emit('settings_updated', {
+          socket.emit(SocketEvents.SettingsUpdated, {
             success: false,
             error: 'Failed to update settings'
           })
@@ -76,7 +88,7 @@ export class SocketManager {
   /**
    * Broadcast an event to all connected clients
    */
-  public emit(event: string, data: any): void {
+  public emit(event: ServerEvents, data: any): void {
     this.io.emit(event, data)
   }
 

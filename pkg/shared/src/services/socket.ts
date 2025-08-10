@@ -2,7 +2,7 @@ import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
 import { apiBaseUrl, effectiveApiUrl } from '../stores/apiStore';
 import type { SettingsUpdateEvent } from '../types';
-import { SocketEvents } from '../types';
+import { SocketEvents, ClientEvents } from '../types';
 
 export interface SettingsUpdatedResponse {
 	success: boolean;
@@ -54,14 +54,16 @@ export class SocketService {
 	private setupEventHandlers(): void {
 		if (!this.socket) return;
 
-		this.socket.on(SocketEvents.Connect, () => {
+		// Handling standard events: 'connect' | 'disconnect' | 'connect_error'
+
+		this.socket.on('connect', () => {
 			console.log('🔌 Socket.IO connected:', this.socket?.id);
 			this.isConnected = true;
 			this.reconnectAttempts = 0;
 			this.onConnectionStatusCallback?.(true);
 		});
 
-		this.socket.on(SocketEvents.Disconnect, (reason) => {
+		this.socket.on('disconnect', (reason) => {
 			console.log('🔌 Socket.IO disconnected:', reason);
 			this.isConnected = false;
 			this.onConnectionStatusCallback?.(false);
@@ -86,7 +88,7 @@ export class SocketService {
 		});
 
 		// Handle settings update acknowledgments
-		this.socket.on('settings_updated', (response: SettingsUpdatedResponse) => {
+		this.socket.on(SocketEvents.SettingsUpdated, (response: SettingsUpdatedResponse) => {
 			if (response.success) {
 				console.log('🔌 Settings update acknowledged by server');
 			} else {
@@ -131,6 +133,17 @@ export class SocketService {
 	}
 
 	/**
+	 * Type-safe emit for client-to-server events
+	 */
+	private emitToServer(event: ClientEvents, data: any): void {
+		if (!this.isConnected || !this.socket) {
+			console.warn('🔌 Cannot send event - not connected');
+			return;
+		}
+		this.socket.emit(event, data);
+	}
+
+	/**
 	 * Send settings update to server
 	 */
 	public updateSettings(settings: any, clientId?: string): void {
@@ -141,7 +154,7 @@ export class SocketService {
 
 		console.log('🔌 Sending settings update to server:', settings);
 
-		this.socket.emit('update_settings', {
+		this.emitToServer(SocketEvents.UpdateSettings, {
 			settings,
 			clientId: clientId || this.socket.id
 		});

@@ -6,6 +6,7 @@ import { thumbnailService } from '../services/thumbnails'
 import { settingsService } from '../services/settings'
 import { imageService } from '../services/images'
 import { scanForClientAssets } from './assets'
+import { SocketEvents } from '@heyketsu/shared/types/sockets'
 
 export function registerRoutes(localServer: LocalServer) {
   const server = localServer.server
@@ -199,7 +200,7 @@ export function registerRoutes(localServer: LocalServer) {
       }
 
       const updateEvent = await settingsService.updateSettings(settings, clientId)
-      localServer.emit('settings_update', updateEvent)
+      localServer.emit(SocketEvents.SettingsUpdate, updateEvent)
 
       return res.json({
         message: 'Settings updated successfully',

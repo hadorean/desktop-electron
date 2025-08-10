@@ -2,6 +2,7 @@ import { app } from 'electron'
 import { join } from 'path'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { debugVisible } from '@heyketsu/shared/stores/debugStore'
+import { SocketEvents } from '@heyketsu/shared/types/sockets'
 import type { LocalServer } from '../server'
 import type { MainWindow } from '../windows/mainWindow'
 
@@ -59,7 +60,7 @@ class DebugService {
     try {
       // Broadcast to socket clients
       if (this.localServer) {
-        this.localServer.emit('debug_state_changed', { visible, timestamp: Date.now() })
+        this.localServer.emit(SocketEvents.DebugStateChanged, { visible, timestamp: Date.now() })
       }
 
       // Send to main window renderer via IPC
