@@ -97,22 +97,28 @@
 
 	/* Ghost mode styling */
 	:global(.ghost-toggle) {
-		opacity: 0.3;
+		opacity: 0.5;
 		transition: opacity 0.2s ease;
 	}
 
 	:global(.ghost-toggle:hover) {
-		opacity: 0.5;
+		opacity: 0.7;
 	}
 
-	/* Custom ghost styling for switch components */
-	:global(.ghost-toggle[data-state="unchecked"]) {
+	/* Ghost styling for switch background */
+	:global(.ghost-toggle.bg-primary) {
 		background-color: transparent !important;
 		border: 1px solid hsl(var(--border)) !important;
 	}
 
-	:global(.ghost-toggle[data-state="checked"]) {
-		background-color: rgba(59, 130, 246, 0.3) !important;
+	:global(.ghost-toggle.bg-input) {
+		background-color: transparent !important;
+		border: 1px solid hsl(var(--border)) !important;
+	}
+
+	/* Ghost styling for switch thumb */
+	:global(.ghost-toggle .bg-background) {
+		background-color: transparent !important;
 		border: 1px solid hsl(var(--border)) !important;
 	}
 </style>

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Switch as SwitchPrimitive } from "bits-ui";
-	import { cn } from "../../../lib/utils.js";
+	import { cn } from '../../../lib/utils.js';
 
 	interface Props {
 		class?: string;
@@ -10,32 +9,40 @@
 		id?: string;
 	}
 
-	let {
-		class: className,
-		checked = false,
-		disabled = false,
-		onCheckedChange,
-		id,
-		...restProps
-	}: Props = $props();
+	let { class: className, checked = $bindable(false), disabled = false, onCheckedChange, id, ...restProps }: Props = $props();
+
+	function handleClick() {
+		if (disabled) return;
+		checked = !checked;
+		onCheckedChange?.(checked);
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (disabled) return;
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			handleClick();
+		}
+	}
 </script>
 
-<SwitchPrimitive.Root
-	bind:checked
+<button
+	role="switch"
+	aria-checked={checked}
 	{disabled}
-	{onCheckedChange}
 	{id}
+	onclick={handleClick}
+	onkeydown={handleKeydown}
 	class={cn(
-		"peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
+		'focus-visible:ring-ring focus-visible:ring-offset-background relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+		checked ? 'bg-primary' : 'bg-input',
 		className
 	)}
 	{...restProps}
 >
-	{#snippet children()}
-		<SwitchPrimitive.Thumb
-			class={cn(
-				"pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0"
-			)}
-		/>
-	{/snippet}
-</SwitchPrimitive.Root>
+	<!-- Thumb -->
+	<div
+		class="bg-background pointer-events-none absolute block h-4 w-4 rounded-full shadow-lg ring-0 transition-all duration-200 ease-in-out"
+		style="top: 50%; left: {checked ? '16px' : '2px'}; transform: translateY(-50%);"
+	></div>
+</button>

@@ -127,25 +127,28 @@
 
 	/* Ghost mode styling */
 	:global(.ghost-slider) {
-		opacity: 0.7;
+		opacity: 0.5;
 		transition: opacity 0.2s ease;
 	}
 
 	:global(.ghost-slider:hover) {
-		opacity: 0.9;
+		opacity: 0.7;
 	}
 
-	/* Custom ghost styling for slider components */
+	/* Ghost styling for slider track and fill */
+	:global(.ghost-slider .bg-secondary) {
+		background-color: transparent !important;
+		border: 1px solid hsl(var(--border)) !important;
+	}
+
 	:global(.ghost-slider .bg-primary) {
-		background-color: rgba(127, 127, 127, 0.3) !important;
+		background-color: transparent !important;
+		border: 1px solid hsl(var(--border)) !important;
 	}
 
-	:global(.ghost-slider .border-primary\/50) {
-		border-color: rgba(127, 127, 127, 0.288) !important;
-		background-color: rgba(46, 46, 46, 0.2) !important;
-	}
-
-	:global(.ghost-slider .bg-primary\/20) {
-		background-color: rgba(127, 127, 127, 0.1) !important;
+	/* Ghost styling for slider thumb */
+	:global(.ghost-slider .bg-background) {
+		background-color: transparent !important;
+		border: 1px solid hsl(var(--border)) !important;
 	}
 </style>

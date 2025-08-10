@@ -5,14 +5,7 @@
 	import { DebugMenu } from '@hgrandry/dbg';
 	import { settings, loadSettings, expandSettings } from '$shared/stores/settingsStore';
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore';
-	import {
-		SettingsPanel,
-		SettingsButton,
-		ErrorMessage,
-		SettingsServerUpdate,
-		ParamsValidator,
-		ScreenSwitcher
-	} from '@heyketsu/shared';
+	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator, ScreenSwitcher } from '@heyketsu/shared';
 	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout';
 	import { socketService } from '$shared/services/socket';
 
@@ -181,15 +174,27 @@
 	#settings-drawer {
 		position: fixed;
 		top: 50%;
-		height: 100%;
 		right: 0;
-		transform: translate(500px, -50%);
+		width: auto;
+		transform: translate(100%, -50%);
 		transition: transform 0.3s cubic-bezier(0.35, 1.04, 0.58, 1);
 	}
 
 	#settings-drawer.open {
 		transition: transform 0.5s cubic-bezier(0.35, 1.04, 0.58, 1);
-		transform: translate(0, -50%);
+		transform: translate(-1rem, -50%);
+	}
+
+	/* Override SettingsPanel positioning since drawer handles it */
+	#settings-drawer :global(.settings-panel) {
+		position: static !important;
+		top: auto !important;
+		right: auto !important;
+		transform: none !important;
+		/* Keep the sizing and styling */
+		min-width: 450px;
+		max-width: 120vw;
+		width: auto;
 	}
 
 	.full-page-container {

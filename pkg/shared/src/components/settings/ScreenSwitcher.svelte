@@ -1,12 +1,26 @@
 <script lang="ts">
 	import { currentScreen, screenIds, allSettings, isLocalMode } from '../../stores/settingsStore';
 	import { Button } from '../ui';
+	import { Tabs, TabsList, TabsTrigger } from '../ui';
 
-	let isVisible = true;
 	let editMode = false;
 	let renamingScreen: string | null = null;
 	let renameValue = '';
 	let showDeleteConfirm: string | null = null;
+
+	// Reactive current tab value based on local mode and current screen
+	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared');
+
+	function handleTabChange(value: string) {
+		if (!editMode) {
+			if (value === 'shared') {
+				isLocalMode.set(false);
+			} else {
+				currentScreen.set(value);
+				isLocalMode.set(true);
+			}
+		}
+	}
 
 	function switchToScreen(screenId: string) {
 		if (!editMode) {
@@ -127,60 +141,75 @@
 	}
 </script>
 
-<!-- Screen switcher container at bottom center -->
-<div class="screen-switcher-trigger" role="navigation" aria-label="Screen switcher">
-	<!-- Pills container -->
-	<div class="screen-pills" class:visible={isVisible}>
-		<!-- Shared settings button -->
-		<button
-			class="screen-pill shared-pill"
-			class:active={!$isLocalMode}
-			on:click={switchToShared}
-			aria-label="Switch to shared settings"
-		>
-			🌐 Shared
-		</button>
+<!-- Screen switcher container -->
+<div class="screen-switcher-container" role="navigation" aria-label="Screen switcher">
+	<Tabs value={currentTab} onValueChange={handleTabChange}>
+		<div class="tabs-wrapper">
+			<TabsList class="screen-tabs-list">
+				<!-- Shared settings tab -->
+				<TabsTrigger value="shared" class="screen-tab shared-tab">
+					🌐 Shared
+				</TabsTrigger>
 
-		{#each $screenIds as screenId}
-			{#if renamingScreen === screenId}
-				<input
-					class="screen-rename-input"
-					bind:value={renameValue}
-					on:keydown={handleKeyDown}
-					on:blur={confirmRename}
-					use:focus
-				/>
-			{:else}
-				<button
-					class="screen-pill"
-					class:active={$isLocalMode && screenId === $currentScreen}
-					class:edit-mode={editMode}
-					on:click={() => (editMode ? startRename(screenId) : switchToScreen(screenId))}
-					on:contextmenu={(e) => (editMode ? showDelete(screenId, e) : null)}
-					aria-label={editMode ? 'Rename screen {screenId}' : 'Switch to screen {screenId}'}
-				>
-					{screenId}
-					{#if editMode}
-						<span class="edit-icon">✏️</span>
+				{#each $screenIds as screenId}
+					{#if renamingScreen === screenId}
+						<input
+							class="screen-rename-input"
+							bind:value={renameValue}
+							on:keydown={handleKeyDown}
+							on:blur={confirmRename}
+							use:focus
+						/>
+					{:else}
+						<TabsTrigger
+							value={screenId}
+							disabled={editMode}
+							class="screen-tab"
+							onclick={(e) => {
+								if (editMode) {
+									e.preventDefault();
+									startRename(screenId);
+								}
+							}}
+							oncontextmenu={(e) => {
+								if (editMode) {
+									showDelete(screenId, e);
+								}
+							}}
+						>
+							{screenId}
+							{#if editMode}
+								<span class="edit-icon">✏️</span>
+							{/if}
+						</TabsTrigger>
 					{/if}
-				</button>
-			{/if}
-		{/each}
+				{/each}
+			</TabsList>
 
-		{#if editMode}
-			<button class="add-screen-btn" on:click={addNewScreen} aria-label="Add new screen">
-				+ Add
-			</button>
-		{/if}
+			<!-- Edit controls -->
+			<div class="edit-controls">
+				{#if editMode}
+					<Button
+						variant="secondary"
+						size="sm"
+						onclick={addNewScreen}
+						class="add-screen-btn"
+					>
+						+ Add
+					</Button>
+				{/if}
 
-		<button
-			class="edit-toggle-btn"
-			on:click={toggleEditMode}
-			aria-label={editMode ? 'Exit edit mode' : 'Enter edit mode'}
-		>
-			{editMode ? '✓ Done' : '✏️'}
-		</button>
-	</div>
+				<Button
+					variant={editMode ? "default" : "ghost"}
+					size="sm"
+					onclick={toggleEditMode}
+					class="edit-toggle-btn"
+				>
+					{editMode ? '✓ Done' : '✏️'}
+				</Button>
+			</div>
+		</div>
+	</Tabs>
 
 	<!-- Delete confirmation dialog -->
 	{#if showDeleteConfirm}
@@ -188,8 +217,12 @@
 			<div class="delete-dialog">
 				<p>Delete "{showDeleteConfirm}"?</p>
 				<div class="delete-actions">
-					<button class="delete-btn" on:click={confirmDelete}>Delete</button>
-					<button class="cancel-btn" on:click={cancelDelete}>Cancel</button>
+					<Button variant="destructive" size="sm" onclick={confirmDelete}>
+						Delete
+					</Button>
+					<Button variant="secondary" size="sm" onclick={cancelDelete}>
+						Cancel
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -197,80 +230,51 @@
 </div>
 
 <style>
-	.screen-switcher-trigger {
+	.screen-switcher-container {
 		display: flex;
-		align-items: flex-end;
+		align-items: center;
 		justify-content: center;
 		margin-bottom: 1rem;
 	}
 
-	.screen-pills {
+	.tabs-wrapper {
 		display: flex;
-		gap: 8px;
+		align-items: center;
+		gap: 1rem;
 		backdrop-filter: blur(10px);
 		padding: 8px 16px;
-		border-radius: 24px;
-		opacity: 1;
-		transform: translateY(0);
-		transition: all 0.3s cubic-bezier(0.35, 1.04, 0.58, 1);
-		pointer-events: auto;
+		border-radius: 12px;
+		background: rgba(0, 0, 0, 0.3);
 	}
 
-	.screen-pill {
-		background: rgba(255, 255, 255, 0.2);
-		border: 1px solid rgba(255, 255, 255, 0.3);
-		color: white;
-		padding: 6px 12px;
-		border-radius: 16px;
-		font-size: 0.875rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
+	:global(.screen-tabs-list) {
+		background: transparent !important;
+		gap: 4px;
+	}
+
+	:global(.screen-tab) {
+		color: rgba(255, 255, 255, 0.7) !important;
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+		font-size: 0.875rem;
 		min-width: 60px;
-		text-align: center;
+		border-radius: 8px !important;
 	}
 
-	.screen-pill:hover {
-		background: rgba(255, 255, 255, 0.3);
-		border-color: rgba(255, 255, 255, 0.5);
-		transform: translateY(-2px);
+	:global(.screen-tab[data-state="active"]) {
+		background: hsl(var(--primary)) !important;
+		color: hsl(var(--primary-foreground)) !important;
+		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.3);
 	}
 
-	.screen-pill.active {
-		background: rgba(59, 130, 246, 0.8);
-		border-color: rgba(59, 130, 246, 1);
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+	:global(.screen-tab.shared-tab[data-state="active"]) {
+		background: hsl(142 76% 36%) !important; /* Green for shared */
+		box-shadow: 0 0 0 2px hsl(142 76% 36% / 0.3);
 	}
 
-	.screen-pill.active:hover {
-		background: rgba(59, 130, 246, 0.9);
-	}
-
-	.shared-pill {
-		background: rgba(34, 197, 94, 0.2);
-		border-color: rgba(34, 197, 94, 0.4);
-		font-weight: 600;
-	}
-
-	.shared-pill:hover {
-		background: rgba(34, 197, 94, 0.3);
-		border-color: rgba(34, 197, 94, 0.6);
-	}
-
-	.shared-pill.active {
-		background: rgba(34, 197, 94, 0.8);
-		border-color: rgba(34, 197, 94, 1);
-		box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
-	}
-
-	.shared-pill.active:hover {
-		background: rgba(34, 197, 94, 0.9);
-	}
-
-	.screen-pill.edit-mode {
-		background: rgba(255, 193, 7, 0.3);
-		border-color: rgba(255, 193, 7, 0.6);
+	.edit-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	.edit-icon {
@@ -281,9 +285,9 @@
 	.screen-rename-input {
 		background: rgba(255, 255, 255, 0.9);
 		color: black;
-		border: 2px solid rgba(59, 130, 246, 1);
+		border: 2px solid hsl(var(--primary));
 		padding: 6px 12px;
-		border-radius: 16px;
+		border-radius: 8px;
 		font-size: 0.875rem;
 		font-weight: 500;
 		min-width: 60px;
@@ -291,39 +295,12 @@
 		outline: none;
 	}
 
-	.add-screen-btn {
-		background: rgba(34, 197, 94, 0.3);
-		border: 1px solid rgba(34, 197, 94, 0.6);
-		color: white;
-		padding: 6px 12px;
-		border-radius: 16px;
-		font-size: 0.875rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+	:global(.add-screen-btn) {
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
 	}
 
-	.add-screen-btn:hover {
-		background: rgba(34, 197, 94, 0.5);
-		transform: translateY(-2px);
-	}
-
-	.edit-toggle-btn {
-		color: white;
-		padding: 6px 12px;
-		border-radius: 16px;
-		font-size: 0.875rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-		margin-left: 8px;
-	}
-
-	.edit-toggle-btn:hover {
-		background: rgba(156, 163, 175, 0.5);
-		transform: translateY(-2px);
+	:global(.edit-toggle-btn) {
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
 	}
 
 	.delete-confirm {
@@ -354,33 +331,5 @@
 		gap: 8px;
 		margin-top: 12px;
 		justify-content: center;
-	}
-
-	.delete-btn {
-		background: rgba(239, 68, 68, 0.8);
-		border: 1px solid rgba(239, 68, 68, 1);
-		color: white;
-		padding: 6px 16px;
-		border-radius: 8px;
-		cursor: pointer;
-		font-weight: 500;
-	}
-
-	.delete-btn:hover {
-		background: rgba(239, 68, 68, 1);
-	}
-
-	.cancel-btn {
-		background: rgba(75, 85, 99, 0.8);
-		border: 1px solid rgba(75, 85, 99, 1);
-		color: white;
-		padding: 6px 16px;
-		border-radius: 8px;
-		cursor: pointer;
-		font-weight: 500;
-	}
-
-	.cancel-btn:hover {
-		background: rgba(75, 85, 99, 1);
 	}
 </style>
