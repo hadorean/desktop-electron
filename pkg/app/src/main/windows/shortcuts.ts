@@ -1,6 +1,6 @@
 import { globalShortcut } from 'electron'
 import { MainWindow } from './mainWindow'
-import { toggleDebugMenu } from '@heyketsu/shared/stores/debugStore'
+import { getDebugMenuVisible, toggleDebugMenu } from '@heyketsu/shared/stores/debugStore'
 
 export function registerGlobalShortcuts(mainWindow: MainWindow) {
   // (Ctrl+B) to toggle main window
@@ -12,6 +12,7 @@ export function registerGlobalShortcuts(mainWindow: MainWindow) {
     globalShortcut.register('CommandOrControl+Shift+I', () => {
       const win = mainWindow.get()
       if (!win || !win.isFocused()) return
+      if (!getDebugMenuVisible()) return
       win.webContents.toggleDevTools()
     })
 

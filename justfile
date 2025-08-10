@@ -40,7 +40,7 @@ version version=default-version:
 	node scripts/version.js {{version}}
 
 publish:
-	pnpm publish
+	node scripts/publish.js
 	
 rename_exe_prev:
 	node scripts/rename-exe-prev.js
