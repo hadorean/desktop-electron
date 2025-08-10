@@ -7,12 +7,13 @@ import { settingsService } from '../services/settings'
 import { imageService } from '../services/images'
 import { scanForClientAssets } from './assets'
 import { SocketEvents } from '@heyketsu/shared/types/sockets'
+import { ApiRoutes } from '@heyketsu/shared/types/api'
 
 export function registerRoutes(localServer: LocalServer) {
   const server = localServer.server
 
   // Health check endpoint
-  server.get('/health', (_req, res) => {
+  server.get(ApiRoutes.Health, (_req, res) => {
     res.json({
       status: 'ok',
       message: 'Electron app server is running',
@@ -21,7 +22,7 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // API endpoint example
-  server.get('/api/info', (_req, res) => {
+  server.get(ApiRoutes.Info, (_req, res) => {
     res.json({
       appName: 'Electron App',
       version: '1.0.0',
@@ -32,7 +33,7 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // Images API endpoint
-  server.get('/api/images', async (_req, res) => {
+  server.get(ApiRoutes.Images, async (_req, res) => {
     try {
       const images = await imageService.scanForImages()
       res.json({
@@ -51,7 +52,7 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // Image file endpoint - handle nested paths with query parameter
-  server.get('/api/image', async (req, res) => {
+  server.get(ApiRoutes.Image, async (req, res) => {
     try {
       const imageName = decodeURIComponent((req.query.name as string) || '')
       const imagePath = join(imageService.getImagesPath(), imageName)
@@ -100,7 +101,7 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // Thumbnail endpoint
-  server.get('/api/thumbnail', async (req, res) => {
+  server.get(ApiRoutes.Thumbnail, async (req, res) => {
     try {
       const imageName = decodeURIComponent((req.query.name as string) || '')
 
@@ -147,7 +148,7 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // Debug endpoint for thumbnail service status
-  server.get('/api/thumbnails/status', (_req, res) => {
+  server.get(ApiRoutes.ThumbnailsStatus, (_req, res) => {
     try {
       const status = thumbnailService.getQueueStatus()
       res.json({
@@ -164,7 +165,7 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // Clear thumbnail cache endpoint
-  server.post('/api/thumbnails/clear-cache', async (_req, res) => {
+  server.post(ApiRoutes.ThumbnailsClearCache, async (_req, res) => {
     try {
       await thumbnailService.clearThumbnailCache()
       res.json({ message: 'Thumbnail cache cleared successfully' })
@@ -177,7 +178,7 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // Settings API endpoints
-  server.get('/api/settings', async (_req, res) => {
+  server.get(ApiRoutes.Settings, async (_req, res) => {
     try {
       const settings = await settingsService.getSettings()
       res.json({ settings, message: 'Settings retrieved successfully' })
@@ -189,7 +190,7 @@ export function registerRoutes(localServer: LocalServer) {
     }
   })
 
-  server.post('/api/update-settings', async (req, res) => {
+  server.post(ApiRoutes.UpdateSettings, async (req, res) => {
     try {
       const { settings, clientId = 'api-client' } = req.body
 
@@ -216,13 +217,13 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // Background routes for each monitor
-  server.get('/background/:monitorId', (req, res) => {
+  server.get(`${ApiRoutes.Background}/:monitorId`, (req, res) => {
     const monitorId = parseInt(req.params.monitorId)
     res.redirect(`/app/monitor${monitorId + 1}`)
   })
 
   // Serve the Svelte client using correct path format: /app/:userId/:screenId
-  server.get('/app/:screenId', async (req, res) => {
+  server.get(ApiRoutes.AppDynamic, async (req, res) => {
     const { screenId } = req.params
 
     let assets
@@ -252,12 +253,12 @@ export function registerRoutes(localServer: LocalServer) {
   })
 
   // Fallback route for /app
-  server.get('/app', (_req, res) => {
+  server.get(ApiRoutes.App, (_req, res) => {
     res.redirect('/app/monitor1')
   })
 
   // Legacy static route for fallback
-  server.get('/app-static', (_req, res) => {
+  server.get(ApiRoutes.AppStatic, (_req, res) => {
     const isPackaged = __dirname.includes('app.asar')
     const clientPath = isPackaged
       ? join(__dirname, 'client')

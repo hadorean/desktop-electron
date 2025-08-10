@@ -3,6 +3,7 @@ import { join } from 'path'
 import { TemplateManager } from './template'
 import { SocketManager } from './sockets'
 import { LocalServer } from '.'
+import { ApiRoutes } from '@heyketsu/shared/types/api'
 
 export class DevelopmentManager {
   private localServer: LocalServer
@@ -92,7 +93,7 @@ export class DevelopmentManager {
    */
   private setupDevelopmentRoutes(): void {
     // Development info endpoint
-    this.server.get('/dev/info', (req, res) => {
+    this.server.get(ApiRoutes.DevInfo, (req, res) => {
       const isPackaged = __dirname.includes('app.asar')
       const clientPath = isPackaged
         ? join(__dirname, 'client')
@@ -118,7 +119,7 @@ export class DevelopmentManager {
     })
 
     // Endpoint to manually clear caches
-    this.server.post('/dev/clear-cache', async (_req, res) => {
+    this.server.post(ApiRoutes.DevClearCache, async (_req, res) => {
       await this.templateManager.clearCache()
       this.invalidateClientAssets()
       res.json({
@@ -128,7 +129,7 @@ export class DevelopmentManager {
     })
 
     // Endpoint to trigger client rebuild notification
-    this.server.post('/dev/client-rebuilt', (_req, res) => {
+    this.server.post(ApiRoutes.DevClientRebuilt, (_req, res) => {
       this.invalidateClientAssets()
       res.json({
         message: 'Client assets invalidated',

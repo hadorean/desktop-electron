@@ -3,6 +3,7 @@
  */
 import { get } from 'svelte/store';
 import { effectiveApiUrl } from '../stores/apiStore';
+import { ApiRoutes, buildRoute } from '../types/api';
 
 /**
  * Creates API request options with proper headers
@@ -95,20 +96,19 @@ export function getImageUrl(imageName: string, useThumbnail: boolean = false): s
 	// Get the base URL from store
 	const baseUrl = getBaseUrl();
 
-	// Build the endpoint path for our server's API
-	const endpoint = useThumbnail
-		? `api/thumbnail?name=${encodeURIComponent(imageName)}`
-		: `api/image?name=${encodeURIComponent(imageName)}`;
+	// Build the endpoint path using constants
+	const endpoint = useThumbnail ? buildRoute.thumbnail(imageName) : buildRoute.image(imageName);
 
 	// If we have a configured base URL, use it
 	if (baseUrl) {
-		// Handle both with and without trailing slashes
-		const separator = baseUrl.endsWith('/') ? '' : '/';
-		return `${baseUrl}${separator}${endpoint}`;
+		// Handle both with and without trailing slashes in baseUrl
+		// The endpoint already starts with '/', so no need for separator
+		const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+		return `${cleanBaseUrl}${endpoint}`;
 	}
 
-	// In production with no configured base URL, use relative URLs
-	return `/${endpoint}`;
+	// In production with no configured base URL, use the endpoint as-is (already starts with '/')
+	return endpoint;
 }
 
 // Types for weather data
@@ -132,11 +132,8 @@ export const api = {
 	 * Get list of available images with thumbnails
 	 */
 	getImages: async (): Promise<ImageInfo[]> => {
-		const url = buildUrl('api/images');
-		const response = await fetchWithErrorHandling<ServerImageResponse>(
-			url,
-			createRequestOptions('GET')
-		);
+		const url = buildUrl(ApiRoutes.Images);
+		const response = await fetchWithErrorHandling<ServerImageResponse>(url, createRequestOptions('GET'));
 
 		// Transform server response to client format
 		return response.images.map((img) => ({
@@ -150,7 +147,7 @@ export const api = {
 	 * Get weather forecast (example)
 	 */
 	getWeatherForecast: async () => {
-		const url = buildUrl('weatherforecast');
+		const url = buildUrl(ApiRoutes.WeatherForecast);
 		return fetchWithErrorHandling(url, createRequestOptions('GET'));
 	},
 
@@ -180,7 +177,7 @@ export const api = {
 				}
 			}
 
-			const url = buildUrl(`api/weather/${location}`);
+			const url = buildUrl(buildRoute.weather(location));
 			const response = await fetch(url);
 			if (!response.ok) {
 				throw new Error(`Weather API error: ${response.statusText}`);
