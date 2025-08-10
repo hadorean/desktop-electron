@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { getImageUrl, type ImageInfo } from '../../services';
 	import { settings, updateSharedSettings } from '../../stores';
+	import { Button, Card, CardContent } from '../ui';
+	import { cn } from '../../lib/utils';
 
 	const {
 		images = [],
@@ -17,6 +19,7 @@
 	}>();
 
 	const isOverridden = $derived(isOverride && overrideValue !== null);
+	const isGhost = $derived(isOverride && !isOverridden);
 
 	// Function to get thumbnail URL
 	function getThumbnailUrl(imageName: string) {
@@ -45,9 +48,7 @@
 	function toggleFavorite(imageName: string, event: Event) {
 		event.stopPropagation(); // Prevent triggering the image selection
 		updateSharedSettings((current) => ({
-			favorites: current.favorites.includes(imageName)
-				? current.favorites.filter((name: string) => name !== imageName)
-				: [...current.favorites, imageName]
+			favorites: current.favorites.includes(imageName) ? current.favorites.filter((name: string) => name !== imageName) : [...current.favorites, imageName]
 		}));
 	}
 
@@ -65,133 +66,130 @@
 	const effectiveImage = $derived(isOverridden ? overrideValue : selectedImage);
 </script>
 
-<div class="form-control w-full">
+<div class="image-grid-container">
 	<div class="mb-2 flex items-center justify-between">
-		<!--  <label class="label" for="image-grid">
-            <span class="label-text">Background Image</span>
-        </label>-->
 		{#if isOverride}
-			<button
-				class="btn btn-xs {isOverridden ? 'btn-primary' : 'btn-ghost'} ml-auto"
-				onclick={handleOverride}
-			>
+			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" onclick={handleOverride} class="ml-auto h-8 px-3 text-xs">
 				{isOverridden ? 'Clear' : 'Override'}
-			</button>
+			</Button>
 		{/if}
 	</div>
-	<div
-		class="bg-base-200 grid max-h-[280px] grid-cols-3 gap-2 overflow-y-auto rounded-lg bg-opacity-30 p-2"
-		class:ghost={isOverride && !isOverridden}
-	>
-		{#each sortedImages as image}
-			<div
-				class="thumbnail-container {effectiveImage === image.name ? 'selected' : ''}"
-				class:favorite={$settings.favorites.includes(image.name)}
-				class:ghost={isOverride && !isOverridden}
-				onclick={() => handleImageClick(image.name)}
-				onkeydown={(e) => e.key === 'Enter' && handleImageClick(image.name)}
-				tabindex="0"
-				role="button"
-				aria-pressed={effectiveImage === image.name}
-				title={image.name}
-			>
-				<img src={getThumbnailUrl(image.name)} alt={image.name} class="thumbnail" loading="lazy" />
-				<button
-					class="favorite-button"
-					onclick={(e) => toggleFavorite(image.name, e)}
-					title={$settings.favorites.includes(image.name)
-						? 'Remove from favorites'
-						: 'Add to favorites'}
-				>
-					{#if $settings.favorites.includes(image.name)}
-						★
-					{:else}
-						☆
-					{/if}
-				</button>
+
+	<Card class={cn('image-grid-card', isGhost && 'ghost-image-grid')}>
+		<CardContent class="p-2">
+			<div class="grid max-h-[280px] grid-cols-4 gap-2 overflow-y-auto overflow-x-hidden pr-2">
+				{#each sortedImages as image}
+					<div class="card-container aspect-square p-1">
+						<Card
+							class={cn(
+								'image-thumbnail-card group cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-102 h-full w-full',
+								effectiveImage === image.name && 'ring-primary shadow-primary/20 shadow-lg ring-2',
+								isGhost && 'ghost-thumbnail'
+							)}
+							onclick={() => handleImageClick(image.name)}
+							onkeydown={(e) => e.key === 'Enter' && handleImageClick(image.name)}
+							tabindex="0"
+							role="button"
+							aria-pressed={effectiveImage === image.name}
+							title={image.name}
+						>
+						<CardContent class="relative aspect-square p-0">
+							<img
+								src={getThumbnailUrl(image.name)}
+								alt={image.name}
+								class="h-full w-full rounded-md object-cover transition-all duration-200 group-hover:brightness-110"
+								loading="lazy"
+							/>
+							<button
+								class={cn(
+									'absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-black/20 text-sm backdrop-blur-sm transition-colors duration-200 hover:bg-black/40',
+									$settings.favorites.includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
+								)}
+								onclick={(e) => toggleFavorite(image.name, e)}
+								title={$settings.favorites.includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
+							>
+								{#if $settings.favorites.includes(image.name)}
+									★
+								{:else}
+									☆
+								{/if}
+							</button>
+						</CardContent>
+					</Card>
+				</div>
+				{/each}
 			</div>
-		{/each}
-	</div>
+		</CardContent>
+	</Card>
 </div>
 
 <style>
-	.thumbnail-container {
-		position: relative;
-		cursor: pointer;
-		border-radius: 4px;
-		overflow: hidden;
-		/* Firefox has issues with aspect-ratio in grid layouts */
-		padding-top: 100%; /* Create a perfect square regardless of content */
-		height: 0;
-		transition:
-			transform 0.2s,
-			box-shadow 0.2s;
-		background: #333;
-	}
-
-	.thumbnail-container:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-	}
-
-	.thumbnail-container.selected {
-		outline: 3px solid #0078d7;
-		box-shadow: 0 0 10px rgba(0, 120, 215, 0.7);
-	}
-
-	.thumbnail-container.ghost {
-		opacity: 0.7;
-	}
-
-	.thumbnail-container.ghost:hover {
-		opacity: 0.9;
-	}
-
-	.thumbnail {
-		position: absolute;
-		top: 0;
-		left: 0;
+	.image-grid-container {
 		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		transition: filter 0.2s;
 	}
 
-	.thumbnail-container:hover .thumbnail {
-		filter: brightness(1.1);
-	}
-
-	.favorite-button {
-		position: absolute;
-		top: 0;
-		right: 0;
-		padding: 0;
-		background: rgba(0, 0, 0, 0);
-		border: none;
-		border-radius: 50%;
-		width: 24px;
-		height: 24px;
+	.card-container {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: rgba(255, 255, 255, 0.61);
-		font-size: 16px;
-		cursor: pointer;
-		transition: background-color 0.2s;
-		outline: none;
-		z-index: 1;
+		overflow: hidden;
+		border-radius: 0.5rem; /* Match card border radius */
 	}
 
-	.favorite .favorite-button,
-	.favorite-button:hover {
-		color: #ffd700;
+	:global(.image-grid-card) {
+		background: hsl(var(--card) / 0.3) !important;
+		backdrop-filter: blur(10px);
+		border: 1px solid hsl(var(--border) / 0.3) !important;
 	}
 
-	.ghost {
-		opacity: 0.7;
+	:global(.image-thumbnail-card) {
+		background: hsl(var(--card) / 0.8) !important;
+		border: 1px solid hsl(var(--border) / 0.3) !important;
+		aspect-ratio: 1;
+		overflow: hidden;
 	}
 
-	.ghost:hover {
-		opacity: 0.9;
+	/* Custom subtle scale hover effect */
+	:global(.hover\:scale-102:hover) {
+		transform: scale(1.02);
+	}
+
+	/* Ghost mode styling */
+	:global(.ghost-image-grid) {
+		opacity: 0.5 !important;
+		transition: opacity 0.2s ease;
+	}
+
+	:global(.ghost-image-grid:hover) {
+		opacity: 0.7 !important;
+	}
+
+	:global(.ghost-thumbnail) {
+		opacity: 0.6 !important;
+		border: 1px solid hsl(var(--border) / 0.5) !important;
+		background: transparent !important;
+	}
+
+	:global(.ghost-thumbnail:hover) {
+		opacity: 0.8 !important;
+	}
+
+	/* Scrollbar styling for the grid */
+	.image-grid-container :global(.overflow-y-auto)::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	.image-grid-container :global(.overflow-y-auto)::-webkit-scrollbar-track {
+		background: hsl(var(--muted) / 0.3);
+		border-radius: 3px;
+	}
+
+	.image-grid-container :global(.overflow-y-auto)::-webkit-scrollbar-thumb {
+		background: hsl(var(--muted-foreground) / 0.5);
+		border-radius: 3px;
+	}
+
+	.image-grid-container :global(.overflow-y-auto)::-webkit-scrollbar-thumb:hover {
+		background: hsl(var(--muted-foreground) / 0.7);
 	}
 </style>
