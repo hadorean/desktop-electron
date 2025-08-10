@@ -2,17 +2,6 @@
 export * from './types';
 export * from './utils';
 
-// Legacy adapters (IPC/HTTP) - will be phased out
-export {
-	BaseSettingsAdapter,
-	HttpSettingsAdapter,
-	IpcSettingsAdapter,
-	createIpcAdapterIfAvailable,
-	type HttpAdapterConfig,
-	type SettingsAdapterEvent
-} from './adapters';
-
-// UI Components
 export * from './components';
 
 // Services (API, Socket.IO)

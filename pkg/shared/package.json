@@ -23,16 +23,6 @@
 			"import": "./dist/utils/index.js",
 			"require": "./dist/utils/index.js"
 		},
-		"./constants": {
-			"types": "./dist/constants/index.d.ts",
-			"import": "./dist/constants/index.js",
-			"require": "./dist/constants/index.js"
-		},
-		"./adapters": {
-			"types": "./dist/adapters/index.d.ts",
-			"import": "./dist/adapters/index.js",
-			"require": "./dist/adapters/index.js"
-		},
 		"./components": {
 			"types": "./dist/components/index.d.ts",
 			"svelte": "./src/components/index.ts",
