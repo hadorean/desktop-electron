@@ -21,7 +21,6 @@ export {
 	resetSettings,
 	validateSelectedImages,
 	getScreenSettings,
-	type Settings as StoreSettings,
 	type SettingsButtonPosition
 } from './settingsStore'
 

@@ -1,17 +1,17 @@
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import { app } from 'electron'
-import type { UISettings, ServerSettings, SettingsUpdateEvent } from '@heyketsu/shared/types'
-import { DEFAULT_SERVER_SETTINGS } from '@heyketsu/shared/types/settings'
+import type { ScreenSettings, UserSettings, SettingsUpdateEvent } from '@heyketsu/shared/types'
+import { DefaultUserSettings } from '@heyketsu/shared/types/settings'
 
 // Legacy aliases for backward compatibility
-export type Settings = UISettings
+export type Settings = ScreenSettings
 export type { SettingsButtonPosition } from '@heyketsu/shared/types'
 
 export class SettingsService {
-	private settings: ServerSettings | null = null
+	private settings: UserSettings | null = null
 	private settingsPath: string
-	private defaultSettings: ServerSettings = DEFAULT_SERVER_SETTINGS
+	private defaultSettings: UserSettings = DefaultUserSettings
 
 	constructor() {
 		this.settingsPath = join(app.getPath('userData'), 'settings.json')
@@ -20,7 +20,7 @@ export class SettingsService {
 	/**
 	 * Get current settings from memory, loading from file if not cached
 	 */
-	async getSettings(): Promise<ServerSettings> {
+	async getSettings(): Promise<UserSettings> {
 		if (this.settings === null) {
 			await this.loadFromFileSystem()
 		}
@@ -30,7 +30,7 @@ export class SettingsService {
 	/**
 	 * Update settings and persist to file system
 	 */
-	async updateSettings(newSettings: Partial<ServerSettings>, clientId: string): Promise<SettingsUpdateEvent> {
+	async updateSettings(newSettings: Partial<UserSettings>, clientId: string): Promise<SettingsUpdateEvent> {
 		const currentSettings = await this.getSettings()
 		const updatedSettings = { ...currentSettings, ...newSettings }
 
@@ -89,7 +89,7 @@ export class SettingsService {
 	/**
 	 * Reset settings to defaults
 	 */
-	async resetSettings(): Promise<ServerSettings> {
+	async resetSettings(): Promise<UserSettings> {
 		this.settings = { ...this.defaultSettings }
 		await this.saveToFileSystem()
 		return this.settings

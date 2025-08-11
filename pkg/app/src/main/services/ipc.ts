@@ -3,7 +3,7 @@ import { AppContext } from './context'
 import { settingsService } from './settings'
 import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
 import { IpcEvents, MainEvents } from '@heyketsu/shared/types/ipc'
-import type { UISettings } from '@heyketsu/shared/types/settings'
+import type { ScreenSettings } from '@heyketsu/shared/types/settings'
 
 export function setupIpc(options: AppContext): void {
 	const { localServer, bg } = options
@@ -76,7 +76,7 @@ export function setupIpc(options: AppContext): void {
 
 	handleIpc(IpcEvents.SettingsUpdateShared, async (...args: unknown[]) => {
 		try {
-			const settings = args[1] as Partial<UISettings>
+			const settings = args[1] as Partial<ScreenSettings>
 			const currentSettings = await settingsService.getSettings()
 			const updatedSettings = {
 				shared: {
@@ -95,7 +95,7 @@ export function setupIpc(options: AppContext): void {
 	handleIpc(IpcEvents.SettingsUpdateLocal, async (...args: unknown[]) => {
 		try {
 			const screenId = args[1] as string
-			const settings = args[2] as Partial<UISettings>
+			const settings = args[2] as Partial<ScreenSettings>
 			const currentSettings = await settingsService.getSettings()
 			const updatedSettings = {
 				screens: {

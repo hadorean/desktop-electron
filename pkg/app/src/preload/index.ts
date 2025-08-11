@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { VersionInfo } from '@heyketsu/shared/types'
-import type { UISettings } from '@heyketsu/shared/types/settings'
+import type { ScreenSettings } from '@heyketsu/shared/types/settings'
 import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 import { IpcEvents } from '@heyketsu/shared/types/ipc'
 
@@ -32,8 +32,8 @@ const api = {
 	},
 	// Settings APIs
 	getSettings: () => ipcRenderer.invoke(IpcEvents.SettingsGet),
-	updateSharedSettings: (settings: Partial<UISettings>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
-	updateLocalSettings: (screenId: string, settings: Partial<UISettings>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
+	updateSharedSettings: (settings: Partial<ScreenSettings>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
+	updateLocalSettings: (screenId: string, settings: Partial<ScreenSettings>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
 	isSettingsAvailable: () => ipcRenderer.invoke(IpcEvents.SettingsIsAvailable),
 	// Debug menu API
 	getDebugState: () => ipcRenderer.invoke(IpcEvents.GetDebugState),

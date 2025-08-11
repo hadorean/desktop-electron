@@ -1,4 +1,4 @@
-import type { SettingsUpdateEvent, ServerSettings } from './settings'
+import type { SettingsUpdateEvent, UserSettings } from './settings'
 
 export const SocketEvents = {
 	SettingsUpdate: 'settings_update',
@@ -22,7 +22,7 @@ export interface ImagesUpdatedEvent {
 
 // Data types for client events
 export interface ClientSettingsUpdateEvent {
-	settings: Partial<ServerSettings>
+	settings: Partial<UserSettings>
 	clientId: string
 }
 

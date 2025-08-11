@@ -2,7 +2,7 @@
 
 export type SettingsButtonPosition = 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left'
 
-export interface UISettings {
+export interface ScreenSettings {
 	selectedImage: string
 	opacity: number
 	blur: number
@@ -16,24 +16,20 @@ export interface UISettings {
 	settingsButtonPosition: SettingsButtonPosition
 }
 
-export interface ServerSettings {
+export interface UserSettings {
 	lastModified?: string // ISO 8601 timestamp
-	shared: UISettings
-	screens: Record<string, Partial<UISettings>>
+	shared: ScreenSettings
+	screens: Record<string, Partial<ScreenSettings>>
 }
 
 export interface SettingsUpdateEvent {
 	type: 'settings_update'
-	settings: ServerSettings
+	settings: UserSettings
 	timestamp: number
 	clientId: string
 }
 
-// Legacy alias for backward compatibility
-/** @deprecated Use UISettings instead */
-export type Settings = UISettings
-
-export const DEFAULT_UI_SETTINGS: UISettings = {
+export const DefaultScreenSettings: ScreenSettings = {
 	selectedImage: '',
 	opacity: 1,
 	blur: 0,
@@ -47,7 +43,7 @@ export const DEFAULT_UI_SETTINGS: UISettings = {
 	settingsButtonPosition: 'bottom-right'
 }
 
-export const DEFAULT_SERVER_SETTINGS: ServerSettings = {
-	shared: DEFAULT_UI_SETTINGS,
+export const DefaultUserSettings: UserSettings = {
+	shared: DefaultScreenSettings,
 	screens: {}
 }

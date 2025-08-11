@@ -12,21 +12,20 @@ currentScreen.subscribe((screenId) => {
 	localStorage.setItem('currentScreen', screenId)
 })
 
-import type { UISettings, ServerSettings, SettingsButtonPosition } from '../types'
-import { DEFAULT_UI_SETTINGS, DEFAULT_SERVER_SETTINGS } from '../types'
+import type { ScreenSettings, UserSettings, SettingsButtonPosition } from '../types'
+import { DefaultScreenSettings, DefaultUserSettings } from '../types'
 
 // Legacy aliases for backward compatibility
-export type Settings = UISettings
 export type { SettingsButtonPosition }
 
-const defaultSettings: Settings = DEFAULT_UI_SETTINGS
+const defaultSettings: ScreenSettings = DefaultScreenSettings
 
-const defaultServerSettings: ServerSettings = DEFAULT_SERVER_SETTINGS
+const defaultUserSettings: UserSettings = DefaultUserSettings
 
 // Flag to prevent server sync during internal operations
 let preventServerSync = false
 
-export const allSettings = writable<ServerSettings>(defaultServerSettings)
+export const allSettings = writable<UserSettings>(defaultUserSettings)
 
 // Create a derived store that returns the list of screen IDs
 export const screenIds = derived(allSettings, ($allSettings) =>
@@ -34,7 +33,7 @@ export const screenIds = derived(allSettings, ($allSettings) =>
 )
 
 // Return the settings for a given screen id
-export function getScreenSettings(id: string): Partial<Settings> | undefined {
+export function getScreenSettings(id: string): Partial<ScreenSettings> | undefined {
 	const value = get(allSettings)
 	return value.screens[id] ?? {}
 }
@@ -49,7 +48,7 @@ export const localSettings = derived([allSettings, currentScreen], ([all, screen
 	...(all.screens[screen] ?? {})
 }))
 
-export function updateSharedSettings(settings: (current: Settings) => Partial<Settings>): void {
+export function updateSharedSettings(settings: (current: ScreenSettings) => Partial<ScreenSettings>): void {
 	allSettings.update((value) => {
 		return {
 			...value,
@@ -64,7 +63,7 @@ export function updateSharedSettings(settings: (current: Settings) => Partial<Se
 /**
  * Update shared settings without triggering server sync (for internal operations like validation)
  */
-export function updateSharedSettingsSilent(settings: (current: Settings) => Partial<Settings>): void {
+export function updateSharedSettingsSilent(settings: (current: ScreenSettings) => Partial<ScreenSettings>): void {
 	preventServerSync = true
 	try {
 		updateSharedSettings(settings)
@@ -76,7 +75,7 @@ export function updateSharedSettingsSilent(settings: (current: Settings) => Part
 	}
 }
 
-export function updateLocalSettings(settings: (current: Partial<Settings>) => Partial<Settings>): void {
+export function updateLocalSettings(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
 	allSettings.update((value) => {
 		const screen = get(currentScreen) || defaultScreenId
 		const currentSettings = value.screens[screen] ?? {}
@@ -94,7 +93,7 @@ export function updateLocalSettings(settings: (current: Partial<Settings>) => Pa
 /**
  * Update local settings without triggering server sync (for internal operations like validation)
  */
-export function updateLocalSettingsSilent(settings: (current: Partial<Settings>) => Partial<Settings>): void {
+export function updateLocalSettingsSilent(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
 	preventServerSync = true
 	try {
 		updateLocalSettings(settings)
@@ -223,7 +222,7 @@ export function loadSettings(images: { name: string }[]): string {
 }
 
 // Save shared settings to localStorage
-function saveSharedSettings(currentSettings: Settings): string {
+function saveSharedSettings(currentSettings: ScreenSettings): string {
 	try {
 		localStorage.setItem('settings.shared', JSON.stringify(currentSettings))
 		return ''
@@ -234,7 +233,7 @@ function saveSharedSettings(currentSettings: Settings): string {
 }
 
 // Save local settings to localStorage
-function saveLocalSettings(currentSettings: Partial<Settings> | null): string {
+function saveLocalSettings(currentSettings: Partial<ScreenSettings> | null): string {
 	try {
 		if (currentSettings === null) {
 			localStorage.removeItem('settings.local')
