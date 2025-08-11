@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { editingSettings, screenSettings, isLocalMode, currentScreen, updateEditingSettings } from '../../stores'
+	import { editingSettings, screenSettings, isLocalMode, currentScreen, updateEditingSettings, inTransition } from '../../stores'
 	import ImageGrid from '$shared/components/settings/ImageGrid.svelte'
 	import SliderControl from './SliderControl.svelte'
 	import ToggleControl from './ToggleControl.svelte'
@@ -63,6 +63,7 @@
 					isOverride={$isLocalMode}
 					defaultValue={$screenSettings.opacity ?? 1}
 					overrideValue={$editingSettings.opacity}
+					disabled={$inTransition}
 				/>
 
 				<SliderControl
@@ -76,6 +77,7 @@
 					isOverride={$isLocalMode}
 					defaultValue={$screenSettings.saturation ?? 1}
 					overrideValue={$editingSettings.saturation}
+					disabled={$inTransition}
 				/>
 
 				<SliderControl
@@ -89,6 +91,7 @@
 					isOverride={$isLocalMode}
 					defaultValue={$screenSettings.blur ?? 0}
 					overrideValue={$editingSettings.blur}
+					disabled={$inTransition}
 				/>
 
 				<SliderControl
@@ -102,6 +105,7 @@
 					isOverride={$isLocalMode}
 					defaultValue={$screenSettings.transitionTime ?? 1}
 					overrideValue={$editingSettings.transitionTime}
+					disabled={$inTransition}
 				/>
 			</div>
 
@@ -112,6 +116,7 @@
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.showTimeDate}
 				defaultValue={$screenSettings.showTimeDate ?? true}
+				disabled={$inTransition}
 			/>
 
 			<ToggleControl
@@ -121,6 +126,7 @@
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.showWeather}
 				defaultValue={$screenSettings.showWeather ?? false}
+				disabled={$inTransition}
 			/>
 
 			<ToggleControl
@@ -130,6 +136,7 @@
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.hideButton}
 				defaultValue={$screenSettings.hideButton ?? false}
+				disabled={$inTransition}
 			/>
 		</div>
 	</div>

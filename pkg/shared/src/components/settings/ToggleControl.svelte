@@ -9,7 +9,8 @@
 		onChange,
 		defaultValue = null,
 		isOverride = false,
-		overrideValue = null
+		overrideValue = null,
+		disabled = false
 	} = $props<{
 		label: string
 		checked: boolean | null
@@ -17,12 +18,15 @@
 		defaultValue?: boolean | null
 		isOverride?: boolean
 		overrideValue?: boolean | null
+		disabled?: boolean
 	}>()
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
 	const isGhost = $derived(isOverride && !isOverridden)
 
 	function handleOverride(): void {
+		if (disabled) return
+
 		if (!isOverridden) {
 			// When enabling override, use either the defaultValue or the current shared value
 			const newValue = defaultValue ?? checked ?? false
@@ -34,23 +38,31 @@
 	}
 
 	function handleToggleChange(newChecked: boolean): void {
+		if (disabled) return
+
 		onChange(newChecked)
 	}
 
 	const displayChecked = $derived(isOverridden ? (overrideValue ?? false) : (checked ?? false))
 </script>
 
-<div class="toggle-control">
+<div class="toggle-control" class:disabled>
 	<div class="toggle-row">
 		<label class="toggle-label" for={`toggle-${label}`}>
 			<span class="label-text">{label}</span>
 		</label>
 		{#if isOverride}
-			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="mr-2 h-8 px-3 text-xs" onclick={handleOverride}>
+			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="mr-2 h-8 px-3 text-xs" onclick={handleOverride} {disabled}>
 				{isOverridden ? 'Clear' : 'Override'}
 			</Button>
 		{/if}
-		<Switch id={`toggle-${label}`} checked={displayChecked} onCheckedChange={handleToggleChange} class={cn('flex-shrink-0', isGhost && 'ghost-toggle')} />
+		<Switch
+			id={`toggle-${label}`}
+			checked={displayChecked}
+			onCheckedChange={handleToggleChange}
+			class={cn('flex-shrink-0', isGhost && 'ghost-toggle', disabled && 'disabled-toggle')}
+			{disabled}
+		/>
 	</div>
 </div>
 
@@ -106,5 +118,16 @@
 	:global(.ghost-toggle .bg-background) {
 		background-color: transparent !important;
 		border: 1px solid hsl(var(--border)) !important;
+	}
+
+	/* Disabled styling */
+	.toggle-control.disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	:global(.disabled-toggle) {
+		opacity: 0.5;
+		pointer-events: none;
 	}
 </style>

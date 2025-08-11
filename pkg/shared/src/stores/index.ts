@@ -11,7 +11,9 @@ export {
 	isLocalMode,
 	expandSettings,
 	screenIds,
+	baseScreenSettings,
 	screenSettings,
+	baseEditingSettings,
 	editingSettings,
 	updateSharedSettings,
 	updateSharedSettingsSilent,
@@ -23,7 +25,10 @@ export {
 	validateSelectedImages,
 	getScreenSettings,
 	getScreenDayNightSettings,
-	toggleDayNightMode
+	toggleDayNightMode,
+	inTransition,
+	transitionSettings,
+	startThemeTransition
 } from './settingsStore'
 
 // Debug store

@@ -1,12 +1,17 @@
 import { get, writable, derived } from 'svelte/store'
-import { type ScreenSettings, type UserSettings, type DayNightMode, type DayNightScreenSettings, getThemeScreenSettings, getThemeEditingSettings } from '../types'
+import {
+	type ScreenSettings,
+	type UserSettings,
+	type DayNightMode,
+	type DayNightScreenSettings,
+	getThemeScreenSettings,
+	getThemeEditingSettings
+} from '../types'
 import { DefaultScreenSettings, DefaultUserSettings, DefaultDayNightSettings } from '../types'
 
 const defaultScreenId = 'monitor1'
 
 export const currentScreen = writable(defaultScreenId)
-
-
 
 currentScreen.subscribe((screenId) => {
 	// Update the current screen in localStorage
@@ -24,6 +29,22 @@ export const expandSettings = writable(false)
 // Flag to prevent server sync during internal operations
 let preventServerSync = false
 
+// Transition state stores
+export const inTransition = writable<boolean>(false)
+export const transitionSettings = writable<Partial<ScreenSettings>>({})
+let transitionStartTime = 0
+let transitionDuration = 1000
+let animationFrameId: number | null = null
+
+// Interpolation helper functions
+function lerp(start: number, end: number, progress: number): number {
+	return start + (end - start) * progress
+}
+
+function easeQuadraticOut(t: number): number {
+	return 1 - (1 - t) * (1 - t)
+}
+
 export const allSettings = writable<UserSettings>(defaultUserSettings)
 
 // Derived store for current theme from UserSettings
@@ -40,12 +61,224 @@ export function setCurrentScreen(screenId: string): void {
 	currentScreen.set(screenId)
 }
 
-// Function to toggle day/night mode
-export function toggleDayNightMode(): void {
+// Function to start a smooth theme transition
+export function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightMode): void {
+	// Cancel any existing transition
+	if (animationFrameId !== null) {
+		cancelAnimationFrame(animationFrameId)
+		animationFrameId = null
+	}
+
+	// Get the current screen settings to determine transition duration
+	const currentScreenId = get(currentScreen) || defaultScreenId
+	const isLocal = get(isLocalMode)
+	const allSettingsValue = get(allSettings)
+
+	// Get transition duration from current screen's transitionTime
+	let duration = 1000 // Default 1 second
+	if (isLocal) {
+		const screenDayNightSettings = allSettingsValue.screens[currentScreenId]
+		if (screenDayNightSettings) {
+			const currentSettings = getThemeScreenSettings(screenDayNightSettings, fromTheme)
+			duration = (currentSettings.transitionTime ?? 1) * 1000
+		}
+	} else {
+		const sharedSettings = getThemeScreenSettings(allSettingsValue.shared, fromTheme)
+		duration = (sharedSettings.transitionTime ?? 1) * 1000
+	}
+
+	// Get start settings: use current transition values if in transition, otherwise theme values
+	const fromSettings = get(inTransition)
+		? get(transitionSettings) // Start from current interpolated values for smooth interruption
+		: isLocal
+			? {
+					...getThemeScreenSettings(allSettingsValue.shared, fromTheme),
+					...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultDayNightSettings, fromTheme)
+				}
+			: getThemeScreenSettings(allSettingsValue.shared, fromTheme)
+
+	const toSettings = isLocal
+		? {
+				...getThemeScreenSettings(allSettingsValue.shared, toTheme),
+				...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultDayNightSettings, toTheme)
+			}
+		: getThemeScreenSettings(allSettingsValue.shared, toTheme)
+
+	// Update the theme immediately (this will sync to other clients)
 	allSettings.update((settings) => ({
 		...settings,
-		currentTheme: settings.currentTheme === 'night' ? 'day' : 'night'
+		currentTheme: toTheme
 	}))
+
+	// Set transition state
+	transitionStartTime = performance.now()
+	transitionDuration = duration
+	inTransition.set(true)
+	transitionSettings.set(fromSettings)
+
+	// Handle non-numeric properties immediately (booleans, strings, arrays)
+	const immediateUpdates: Partial<ScreenSettings> = {
+		hideButton: toSettings.hideButton,
+		showTimeDate: toSettings.showTimeDate,
+		showWeather: toSettings.showWeather,
+		showScreenSwitcher: toSettings.showScreenSwitcher,
+		selectedImage: toSettings.selectedImage,
+		favorites: toSettings.favorites,
+		settingsButtonPosition: toSettings.settingsButtonPosition
+	}
+
+	// Start animation loop
+	function animate(): void {
+		const now = performance.now()
+		const elapsed = now - transitionStartTime
+		const progress = Math.min(elapsed / transitionDuration, 1)
+		const easedProgress = easeQuadraticOut(progress)
+
+		// Interpolate numeric values
+		const interpolatedSettings: Partial<ScreenSettings> = {
+			...immediateUpdates,
+			opacity: lerp(fromSettings.opacity ?? 1, toSettings.opacity ?? 1, easedProgress),
+			blur: lerp(fromSettings.blur ?? 0, toSettings.blur ?? 0, easedProgress),
+			saturation: lerp(fromSettings.saturation ?? 1, toSettings.saturation ?? 1, easedProgress),
+			transitionTime: lerp(fromSettings.transitionTime ?? 1, toSettings.transitionTime ?? 1, easedProgress)
+		}
+
+		transitionSettings.set(interpolatedSettings)
+
+		if (progress >= 1) {
+			// Transition complete
+			inTransition.set(false)
+			animationFrameId = null
+		} else {
+			// Continue animation
+			animationFrameId = requestAnimationFrame(animate)
+		}
+	}
+
+	// Start the animation
+	animationFrameId = requestAnimationFrame(animate)
+}
+
+// Track previous theme to detect external changes
+let previousTheme: DayNightMode | null = null
+
+// Subscribe to theme changes and automatically start transitions for external updates
+currentTheme.subscribe((newTheme) => {
+	// Skip if this is the first subscription
+	if (previousTheme === null) {
+		previousTheme = newTheme
+		return
+	}
+
+	// If theme changed externally (from other client), start smooth transition
+	if (newTheme !== previousTheme) {
+		const oldTheme = previousTheme
+		previousTheme = newTheme
+
+		// Start transition from old theme to new theme (but don't update currentTheme again)
+		startThemeTransitionWithoutThemeUpdate(oldTheme, newTheme)
+	}
+
+	previousTheme = newTheme
+})
+
+// Internal function for transitions triggered by external theme changes
+function startThemeTransitionWithoutThemeUpdate(fromTheme: DayNightMode, toTheme: DayNightMode): void {
+	// Cancel any existing transition
+	if (animationFrameId !== null) {
+		cancelAnimationFrame(animationFrameId)
+		animationFrameId = null
+	}
+
+	// Get the current screen settings to determine transition duration
+	const currentScreenId = get(currentScreen) || defaultScreenId
+	const isLocal = get(isLocalMode)
+	const allSettingsValue = get(allSettings)
+
+	// Get transition duration from current screen's transitionTime
+	let duration = 1000 // Default 1 second
+	if (isLocal) {
+		const screenDayNightSettings = allSettingsValue.screens[currentScreenId]
+		if (screenDayNightSettings) {
+			const currentSettings = getThemeScreenSettings(screenDayNightSettings, fromTheme)
+			duration = (currentSettings.transitionTime ?? 1) * 1000
+		}
+	} else {
+		const sharedSettings = getThemeScreenSettings(allSettingsValue.shared, fromTheme)
+		duration = (sharedSettings.transitionTime ?? 1) * 1000
+	}
+
+	// Get start settings: use current transition values if in transition, otherwise theme values
+	const fromSettings = get(inTransition)
+		? get(transitionSettings) // Start from current interpolated values for smooth interruption
+		: isLocal
+			? {
+					...getThemeScreenSettings(allSettingsValue.shared, fromTheme),
+					...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultDayNightSettings, fromTheme)
+				}
+			: getThemeScreenSettings(allSettingsValue.shared, fromTheme)
+
+	const toSettings = isLocal
+		? {
+				...getThemeScreenSettings(allSettingsValue.shared, toTheme),
+				...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultDayNightSettings, toTheme)
+			}
+		: getThemeScreenSettings(allSettingsValue.shared, toTheme)
+
+	// Set transition state
+	transitionStartTime = performance.now()
+	transitionDuration = duration
+	inTransition.set(true)
+	transitionSettings.set(fromSettings)
+
+	// Handle non-numeric properties immediately (booleans, strings, arrays)
+	const immediateUpdates: Partial<ScreenSettings> = {
+		hideButton: toSettings.hideButton,
+		showTimeDate: toSettings.showTimeDate,
+		showWeather: toSettings.showWeather,
+		showScreenSwitcher: toSettings.showScreenSwitcher,
+		selectedImage: toSettings.selectedImage,
+		favorites: toSettings.favorites,
+		settingsButtonPosition: toSettings.settingsButtonPosition
+	}
+
+	// Start animation loop
+	function animate(): void {
+		const now = performance.now()
+		const elapsed = now - transitionStartTime
+		const progress = Math.min(elapsed / transitionDuration, 1)
+		const easedProgress = easeQuadraticOut(progress)
+
+		// Interpolate numeric values
+		const interpolatedSettings: Partial<ScreenSettings> = {
+			...immediateUpdates,
+			opacity: lerp(fromSettings.opacity ?? 1, toSettings.opacity ?? 1, easedProgress),
+			blur: lerp(fromSettings.blur ?? 0, toSettings.blur ?? 0, easedProgress),
+			saturation: lerp(fromSettings.saturation ?? 1, toSettings.saturation ?? 1, easedProgress),
+			transitionTime: lerp(fromSettings.transitionTime ?? 1, toSettings.transitionTime ?? 1, easedProgress)
+		}
+
+		transitionSettings.set(interpolatedSettings)
+
+		if (progress >= 1) {
+			// Transition complete
+			inTransition.set(false)
+			animationFrameId = null
+		} else {
+			// Continue animation
+			animationFrameId = requestAnimationFrame(animate)
+		}
+	}
+
+	// Start the animation
+	animationFrameId = requestAnimationFrame(animate)
+}
+
+// Function to toggle day/night mode
+export function toggleDayNightMode(): void {
+	const currentThemeValue = getCurrentTheme()
+	const targetTheme = currentThemeValue === 'night' ? 'day' : 'night'
+	startThemeTransition(currentThemeValue, targetTheme)
 }
 
 export function setCurrentTheme(theme: DayNightMode): void {
@@ -72,17 +305,29 @@ export function getScreenSettings(id: string): Partial<ScreenSettings> | undefin
 	return value.screens[id]?.[theme] ?? {}
 }
 
-// Settings to use to render the current screen image
-export const screenSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
+// Base screen settings without transitions (for syncing to other clients)
+export const baseScreenSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
 	const currentTheme = theme as 'day' | 'night'
 	const themeShared = getThemeScreenSettings(all.shared, currentTheme)
 	return isLocal ? { ...themeShared, ...getThemeScreenSettings(all.screens[screen], currentTheme) } : themeShared
 })
 
-// Settings to use in the settings panel
-export const editingSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
+// Settings to use to render the current screen image (includes transitions for UI)
+export const screenSettings = derived([baseScreenSettings, inTransition, transitionSettings], ([base, isTransitioning, transition]) => {
+	// During transition, return the interpolated transition settings for UI display
+	return isTransitioning ? transition : base
+})
+
+// Base editing settings without transitions (for syncing to other clients)
+export const baseEditingSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
 	const currentTheme = theme as 'day' | 'night'
 	return isLocal ? getThemeEditingSettings(all.screens[screen], currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
+})
+
+// Settings to use in the settings panel (includes transitions for UI display)
+export const editingSettings = derived([baseEditingSettings, inTransition, transitionSettings], ([base, isTransitioning, transition]) => {
+	// During transition, return the interpolated transition settings for UI display
+	return isTransitioning ? transition : base
 })
 
 export function updateSharedSettings(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {

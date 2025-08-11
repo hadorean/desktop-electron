@@ -13,7 +13,8 @@
 		formatValue,
 		isOverride = false,
 		defaultValue = 0,
-		overrideValue = null
+		overrideValue = null,
+		disabled = false
 	} = $props<{
 		label: string
 		value: number | null
@@ -25,12 +26,15 @@
 		isOverride?: boolean
 		defaultValue: number
 		overrideValue?: number | null
+		disabled?: boolean
 	}>()
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
 	const isGhost = $derived(isOverride && !isOverridden)
 
 	function handleOverride(): void {
+		if (disabled) return
+
 		console.log(`[SliderControl ${label}] handleOverride called:`, {
 			isOverridden,
 			overrideValue
@@ -46,6 +50,8 @@
 	}
 
 	function handleValueChange(newValues: number[]): void {
+		if (disabled) return
+
 		const newValue = newValues[0]
 		console.log(`[SliderControl ${label}] handleValueChange called:`, {
 			newValue,
@@ -58,16 +64,24 @@
 	const displayValue = $derived(isOverridden ? (overrideValue ?? min) : currentValue)
 </script>
 
-<div class="slider-control">
+<div class="slider-control" class:disabled>
 	<label class="slider-label">
 		<span class="label-text">{label}</span>
 		<div class="slider-row">
 			{#if isOverride}
-				<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-btn h-8 px-3 text-xs" onclick={handleOverride}>
+				<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-btn h-8 px-3 text-xs" onclick={handleOverride} {disabled}>
 					{isOverridden ? 'Clear' : 'Override'}
 				</Button>
 			{/if}
-			<Slider value={[displayValue]} {min} {max} {step} onValueChange={handleValueChange} class={cn('flex-1', isGhost && 'ghost-slider')} />
+			<Slider
+				value={[displayValue]}
+				{min}
+				{max}
+				{step}
+				onValueChange={handleValueChange}
+				class={cn('flex-1', isGhost && 'ghost-slider', disabled && 'disabled-slider')}
+				{disabled}
+			/>
 			<span class="value-display">
 				{formatValue(displayValue)}
 			</span>
@@ -134,5 +148,16 @@
 	:global(.ghost-slider .bg-background) {
 		background-color: transparent !important;
 		border: 1px solid hsl(var(--border)) !important;
+	}
+
+	/* Disabled styling */
+	.slider-control.disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	:global(.disabled-slider) {
+		opacity: 0.5;
+		pointer-events: none;
 	}
 </style>
