@@ -24,6 +24,7 @@ The project uses a monorepo structure with three main packages:
 ## Development Commands
 
 ### Primary Development
+
 ```bash
 # Start all services in development mode (shared, client, electron)
 pnpm dev
@@ -33,17 +34,19 @@ just dev
 ```
 
 ### Building
+
 ```bash
 # Build all packages
 pnpm build:all
 
 # Build individual packages
 pnpm build:shared
-pnpm build:client  
+pnpm build:client
 pnpm build:app
 ```
 
 ### Testing and Quality
+
 ```bash
 # Lint code (runs in pkg/app)
 pnpm lint
@@ -56,6 +59,7 @@ pnpm format
 ```
 
 ### Packaging
+
 ```bash
 # Create unpacked build for testing
 pnpm package:unpack

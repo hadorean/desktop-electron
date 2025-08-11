@@ -9,7 +9,7 @@
 		"dev:shared": "cd pkg/shared && pnpm dev",
 		"dev:client": "cd pkg/client && pnpm dev",
 		"dev:app": "cd pkg/app && pnpm dev:electron:start",
-		"format": "cd pkg/app && prettier --plugin prettier-plugin-svelte --write .",
+		"format": "prettier --plugin prettier-plugin-svelte --write .",
 		"lint": "pnpm lint:app && pnpm lint:shared && pnpm lint:client",
 		"lint:app": "cd pkg/app && eslint --cache .",
 		"lint:shared": "cd pkg/shared && eslint --cache .",

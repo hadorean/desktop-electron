@@ -12,33 +12,33 @@ npm install ejs @types/ejs
 
 ```typescript
 // src/main/server.ts
-import express from "express";
-import { join } from "path";
+import express from 'express';
+import { join } from 'path';
 
 export class LocalServer {
-  private setupTemplateEngine(): void {
-    // Set EJS as template engine
-    this.server.set("view engine", "ejs");
-    this.server.set("views", join(__dirname, "templates"));
-  }
+	private setupTemplateEngine(): void {
+		// Set EJS as template engine
+		this.server.set('view engine', 'ejs');
+		this.server.set('views', join(__dirname, 'templates'));
+	}
 
-  private setupRoutes(): void {
-    // ... existing routes ...
+	private setupRoutes(): void {
+		// ... existing routes ...
 
-    // Replace static /app route with template rendering
-    this.server.get("/app*", async (req, res) => {
-      const data = {
-        title: "Electron App",
-        initialState: {
-          images: await this.scanForImages(),
-          route: req.path,
-          query: req.query,
-        },
-      };
+		// Replace static /app route with template rendering
+		this.server.get('/app*', async (req, res) => {
+			const data = {
+				title: 'Electron App',
+				initialState: {
+					images: await this.scanForImages(),
+					route: req.path,
+					query: req.query
+				}
+			};
 
-      res.render("app", data);
-    });
-  }
+			res.render('app', data);
+		});
+	}
 }
 ```
 
@@ -48,21 +48,21 @@ export class LocalServer {
 <!-- src/main/templates/app.ejs -->
 <!DOCTYPE html>
 <html lang="en" data-theme="night">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/app/assets/index-BJb3gbpS.css" />
-  </head>
-  <body>
-    <div id="app"></div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title><%= title %></title>
+		<link rel="stylesheet" href="/app/assets/index-BJb3gbpS.css" />
+	</head>
+	<body>
+		<div id="app"></div>
 
-    <script>
-      window.__INITIAL_STATE__ = <%- JSON.stringify(initialState) %>;
-    </script>
+		<script>
+			window.__INITIAL_STATE__ = <%- JSON.stringify(initialState) %>;
+		</script>
 
-    <script type="module" src="/app/assets/index-C-fQ0O9-.js"></script>
-  </body>
+		<script type="module" src="/app/assets/index-C-fQ0O9-.js"></script>
+	</body>
 </html>
 ```
 
@@ -125,52 +125,52 @@ const data = {
 ```typescript
 // src/shared/types.ts
 export enum ClientType {
-  ELECTRON_FULL = "electron",
-  WEB_DEMO = "demo",
-  WEB_FULL = "web",
+	ELECTRON_FULL = 'electron',
+	WEB_DEMO = 'demo',
+	WEB_FULL = 'web'
 }
 
 export interface FeatureFlags {
-  settingsSaving: boolean;
-  userImageUpload: boolean;
-  localStoragePersistence: boolean;
-  fullImageLibrary: boolean;
-  realtimeSync: boolean;
+	settingsSaving: boolean;
+	userImageUpload: boolean;
+	localStoragePersistence: boolean;
+	fullImageLibrary: boolean;
+	realtimeSync: boolean;
 }
 
 // src/main/services/client-detection.ts
 export function detectClientType(req: express.Request): ClientType {
-  const userAgent = req.get("User-Agent") || "";
-  const isElectron = userAgent.includes("Electron");
-  const isDemoMode = req.query.demo === "true" || req.hostname !== "localhost";
+	const userAgent = req.get('User-Agent') || '';
+	const isElectron = userAgent.includes('Electron');
+	const isDemoMode = req.query.demo === 'true' || req.hostname !== 'localhost';
 
-  if (isElectron) return ClientType.ELECTRON_FULL;
-  if (isDemoMode) return ClientType.WEB_DEMO;
-  return ClientType.WEB_FULL;
+	if (isElectron) return ClientType.ELECTRON_FULL;
+	if (isDemoMode) return ClientType.WEB_DEMO;
+	return ClientType.WEB_FULL;
 }
 
 export const FEATURE_SETS: Record<ClientType, FeatureFlags> = {
-  [ClientType.ELECTRON_FULL]: {
-    settingsSaving: true,
-    userImageUpload: true,
-    localStoragePersistence: true,
-    fullImageLibrary: true,
-    realtimeSync: true,
-  },
-  [ClientType.WEB_DEMO]: {
-    settingsSaving: false,
-    userImageUpload: false,
-    localStoragePersistence: false,
-    fullImageLibrary: false,
-    realtimeSync: true,
-  },
-  [ClientType.WEB_FULL]: {
-    settingsSaving: true,
-    userImageUpload: false, // Future: enable for authenticated users
-    localStoragePersistence: true,
-    fullImageLibrary: true,
-    realtimeSync: true,
-  },
+	[ClientType.ELECTRON_FULL]: {
+		settingsSaving: true,
+		userImageUpload: true,
+		localStoragePersistence: true,
+		fullImageLibrary: true,
+		realtimeSync: true
+	},
+	[ClientType.WEB_DEMO]: {
+		settingsSaving: false,
+		userImageUpload: false,
+		localStoragePersistence: false,
+		fullImageLibrary: false,
+		realtimeSync: true
+	},
+	[ClientType.WEB_FULL]: {
+		settingsSaving: true,
+		userImageUpload: false, // Future: enable for authenticated users
+		localStoragePersistence: true,
+		fullImageLibrary: true,
+		realtimeSync: true
+	}
 };
 ```
 
@@ -241,35 +241,29 @@ private getDemoImages(): any[] {
 <!-- src/main/templates/app.ejs -->
 <!DOCTYPE html>
 <html lang="en" data-theme="night">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title><%= title %></title>
 
-    <% if (clientType === 'demo') { %>
-    <meta
-      name="description"
-      content="Try our desktop background manager - demo version with limited features"
-    />
-    <% } else { %>
-    <meta
-      name="description"
-      content="Desktop background manager - full featured application"
-    />
-    <% } %>
+		<% if (clientType === 'demo') { %>
+		<meta name="description" content="Try our desktop background manager - demo version with limited features" />
+		<% } else { %>
+		<meta name="description" content="Desktop background manager - full featured application" />
+		<% } %>
 
-    <link rel="stylesheet" href="/app/assets/index-BJb3gbpS.css" />
-  </head>
-  <body>
-    <div id="app"></div>
+		<link rel="stylesheet" href="/app/assets/index-BJb3gbpS.css" />
+	</head>
+	<body>
+		<div id="app"></div>
 
-    <script>
-      window.__INITIAL_STATE__ = <%- JSON.stringify(initialState) %>;
-      window.__CLIENT_CONFIG__ = <%- JSON.stringify({ clientType, features }) %>;
-    </script>
+		<script>
+			window.__INITIAL_STATE__ = <%- JSON.stringify(initialState) %>;
+			window.__CLIENT_CONFIG__ = <%- JSON.stringify({ clientType, features }) %>;
+		</script>
 
-    <script type="module" src="/app/assets/index-C-fQ0O9-.js"></script>
-  </body>
+		<script type="module" src="/app/assets/index-C-fQ0O9-.js"></script>
+	</body>
 </html>
 ```
 
@@ -281,41 +275,41 @@ const initialState = (window as any).__INITIAL_STATE__ || {};
 const clientConfig = (window as any).__CLIENT_CONFIG__ || {};
 
 const app = new App({
-  target: document.getElementById("app")!,
-  props: {
-    initialState,
-    features: clientConfig.features,
-    clientType: clientConfig.clientType,
-  },
+	target: document.getElementById('app')!,
+	props: {
+		initialState,
+		features: clientConfig.features,
+		clientType: clientConfig.clientType
+	}
 });
 ```
 
 ```svelte
 <!-- client/src/App.svelte -->
 <script lang="ts">
-  export let features: FeatureFlags
-  export let clientType: string
-  export let initialState: any
+	export let features: FeatureFlags;
+	export let clientType: string;
+	export let initialState: any;
 </script>
 
 <main>
-  {#if clientType === 'demo'}
-    <div class="demo-banner">
-      🚀 Demo Mode - <a href="/download">Get full version</a>
-    </div>
-  {/if}
+	{#if clientType === 'demo'}
+		<div class="demo-banner">
+			🚀 Demo Mode - <a href="/download">Get full version</a>
+		</div>
+	{/if}
 
-  <ImageGallery images={initialState.images} />
+	<ImageGallery images={initialState.images} />
 
-  {#if features.settingsSaving}
-    <SettingsPanel />
-  {:else}
-    <div class="demo-notice">Settings are read-only in demo mode</div>
-  {/if}
+	{#if features.settingsSaving}
+		<SettingsPanel />
+	{:else}
+		<div class="demo-notice">Settings are read-only in demo mode</div>
+	{/if}
 
-  {#if features.userImageUpload}
-    <ImageUploader />
-  {/if}
+	{#if features.userImageUpload}
+		<ImageUploader />
+	{/if}
 </main>
 ```
 
@@ -341,16 +335,16 @@ npm install --save-dev concurrently nodemon chokidar
 
 ```json
 {
-  "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "nodemon src/main/server.ts --watch src/main --watch src/shared",
-    "dev:client": "electron-vite dev",
-    "dev:templates": "nodemon --watch src/main/templates --exec \"echo Templates changed\"",
+	"scripts": {
+		"dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+		"dev:server": "nodemon src/main/server.ts --watch src/main --watch src/shared",
+		"dev:client": "electron-vite dev",
+		"dev:templates": "nodemon --watch src/main/templates --exec \"echo Templates changed\"",
 
-    "build": "npm run typecheck && electron-vite build",
-    "build:demo": "vite build --mode demo --outDir client/demo-dist",
-    "build:web": "vite build --mode web --outDir client/web-dist"
-  }
+		"build": "npm run typecheck && electron-vite build",
+		"build:demo": "vite build --mode demo --outDir client/demo-dist",
+		"build:web": "vite build --mode web --outDir client/web-dist"
+	}
 }
 ```
 
@@ -358,48 +352,48 @@ npm install --save-dev concurrently nodemon chokidar
 
 ```typescript
 // src/main/dev-server.ts
-import { watch } from "chokidar";
+import { watch } from 'chokidar';
 
 export class DevelopmentServer extends LocalServer {
-  private templateWatcher?: any;
+	private templateWatcher?: any;
 
-  constructor() {
-    super();
-    if (process.env.NODE_ENV === "development") {
-      this.setupDevelopmentFeatures();
-    }
-  }
+	constructor() {
+		super();
+		if (process.env.NODE_ENV === 'development') {
+			this.setupDevelopmentFeatures();
+		}
+	}
 
-  private setupDevelopmentFeatures(): void {
-    // Watch templates for changes
-    this.templateWatcher = watch("src/main/templates/**/*.ejs");
-    this.templateWatcher.on("change", (path: string) => {
-      console.log(`📝 Template changed: ${path}`);
-      // Clear require cache for templates
-      delete require.cache[require.resolve(path)];
-    });
+	private setupDevelopmentFeatures(): void {
+		// Watch templates for changes
+		this.templateWatcher = watch('src/main/templates/**/*.ejs');
+		this.templateWatcher.on('change', (path: string) => {
+			console.log(`📝 Template changed: ${path}`);
+			// Clear require cache for templates
+			delete require.cache[require.resolve(path)];
+		});
 
-    // Add development-specific routes
-    this.setupDevelopmentRoutes();
-  }
+		// Add development-specific routes
+		this.setupDevelopmentRoutes();
+	}
 
-  private setupDevelopmentRoutes(): void {
-    // Development info endpoint
-    this.server.get("/dev/info", (req, res) => {
-      const clientType = detectClientType(req);
-      const features = FEATURE_SETS[clientType];
+	private setupDevelopmentRoutes(): void {
+		// Development info endpoint
+		this.server.get('/dev/info', (req, res) => {
+			const clientType = detectClientType(req);
+			const features = FEATURE_SETS[clientType];
 
-      res.json({
-        clientType,
-        features,
-        request: {
-          userAgent: req.get("User-Agent"),
-          hostname: req.hostname,
-          query: req.query,
-        },
-      });
-    });
-  }
+			res.json({
+				clientType,
+				features,
+				request: {
+					userAgent: req.get('User-Agent'),
+					hostname: req.hostname,
+					query: req.query
+				}
+			});
+		});
+	}
 }
 ```
 
@@ -429,10 +423,10 @@ private clearTemplateCache(): void {
 
 ```json
 {
-  "dev:rapid": "concurrently --names \"CLIENT,TEMPLATES\" --prefix-colors \"blue,yellow\" \"npm run dev:client:watch\" \"npm run dev:templates:watch\"",
-  "dev:client:watch": "cd client && npm run dev",
-  "dev:templates:watch": "nodemon --watch src/main/templates --ext ejs --exec \"echo Templates changed - refresh browser\"",
-  "dev:client:build": "cd client && npm run build"
+	"dev:rapid": "concurrently --names \"CLIENT,TEMPLATES\" --prefix-colors \"blue,yellow\" \"npm run dev:client:watch\" \"npm run dev:templates:watch\"",
+	"dev:client:watch": "cd client && npm run dev",
+	"dev:templates:watch": "nodemon --watch src/main/templates --ext ejs --exec \"echo Templates changed - refresh browser\"",
+	"dev:client:build": "cd client && npm run build"
 }
 ```
 

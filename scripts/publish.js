@@ -50,17 +50,7 @@ function main() {
 		const tagName = `v${version}`;
 		const releaseTitle = `Release ${version}`;
 
-		const command = [
-			'gh',
-			'release',
-			'create',
-			tagName,
-			...filesToUpload.map((f) => `"${f}"`),
-			'--title',
-			`"${releaseTitle}"`,
-			'--notes',
-			`""`
-		].join(' ');
+		const command = ['gh', 'release', 'create', tagName, ...filesToUpload.map((f) => `"${f}"`), '--title', `"${releaseTitle}"`, '--notes', `""`].join(' ');
 
 		console.log(`\n🚀 Creating GitHub release...`);
 		console.log(`Command: ${command}\n`);
@@ -73,9 +63,7 @@ function main() {
 			});
 
 			console.log(`⚠️  Release ${tagName} already exists!`);
-			console.log(
-				`🔗 View at: https://github.com/hgrandry/desktop-electron/releases/tag/${tagName}`
-			);
+			console.log(`🔗 View at: https://github.com/hgrandry/desktop-electron/releases/tag/${tagName}`);
 			console.log(`\nTo create a new release:`);
 			console.log(`1. Bump version in pkg/app/package.json`);
 			console.log(`2. Run "npm run package:win" to rebuild`);

@@ -22,19 +22,19 @@ The server can dynamically determine client type and serve appropriate features:
 
 ```typescript
 enum ClientType {
-  ELECTRON_FULL = "electron",
-  WEB_DEMO = "demo",
-  WEB_FULL = "web-full", // Future: authenticated web version
+	ELECTRON_FULL = 'electron',
+	WEB_DEMO = 'demo',
+	WEB_FULL = 'web-full' // Future: authenticated web version
 }
 
 function detectClientType(req: Request): ClientType {
-  const userAgent = req.get("User-Agent") || "";
-  const isElectron = userAgent.includes("Electron");
-  const isDemoMode = req.query.demo === "true" || req.hostname !== "localhost";
+	const userAgent = req.get('User-Agent') || '';
+	const isElectron = userAgent.includes('Electron');
+	const isDemoMode = req.query.demo === 'true' || req.hostname !== 'localhost';
 
-  if (isElectron) return ClientType.ELECTRON_FULL;
-  if (isDemoMode) return ClientType.WEB_DEMO;
-  return ClientType.WEB_FULL;
+	if (isElectron) return ClientType.ELECTRON_FULL;
+	if (isDemoMode) return ClientType.WEB_DEMO;
+	return ClientType.WEB_FULL;
 }
 ```
 
@@ -42,31 +42,31 @@ function detectClientType(req: Request): ClientType {
 
 ```typescript
 interface FeatureFlags {
-  settingsSaving: boolean;
-  userImageUpload: boolean;
-  localStoragePersistence: boolean;
-  fullImageLibrary: boolean;
-  realtimeSync: boolean;
-  nativeIntegration: boolean;
+	settingsSaving: boolean;
+	userImageUpload: boolean;
+	localStoragePersistence: boolean;
+	fullImageLibrary: boolean;
+	realtimeSync: boolean;
+	nativeIntegration: boolean;
 }
 
 const FEATURE_SETS: Record<ClientType, FeatureFlags> = {
-  [ClientType.ELECTRON_FULL]: {
-    settingsSaving: true,
-    userImageUpload: true,
-    localStoragePersistence: true,
-    fullImageLibrary: true,
-    realtimeSync: true,
-    nativeIntegration: true,
-  },
-  [ClientType.WEB_DEMO]: {
-    settingsSaving: false,
-    userImageUpload: false,
-    localStoragePersistence: false,
-    fullImageLibrary: false, // Preset images only
-    realtimeSync: true,
-    nativeIntegration: false,
-  },
+	[ClientType.ELECTRON_FULL]: {
+		settingsSaving: true,
+		userImageUpload: true,
+		localStoragePersistence: true,
+		fullImageLibrary: true,
+		realtimeSync: true,
+		nativeIntegration: true
+	},
+	[ClientType.WEB_DEMO]: {
+		settingsSaving: false,
+		userImageUpload: false,
+		localStoragePersistence: false,
+		fullImageLibrary: false, // Preset images only
+		realtimeSync: true,
+		nativeIntegration: false
+	}
 };
 ```
 
@@ -78,12 +78,12 @@ const FEATURE_SETS: Record<ClientType, FeatureFlags> = {
 
 ```json
 {
-  "scripts": {
-    "build:electron": "vite build --mode electron",
-    "build:demo": "vite build --mode demo",
-    "build:web": "vite build --mode web",
-    "build:all": "npm run build:electron && npm run build:demo && npm run build:web"
-  }
+	"scripts": {
+		"build:electron": "vite build --mode electron",
+		"build:demo": "vite build --mode demo",
+		"build:web": "vite build --mode web",
+		"build:all": "npm run build:electron && npm run build:demo && npm run build:web"
+	}
 }
 ```
 
@@ -103,8 +103,8 @@ client/
 
 ```json
 {
-  "ejs": "^3.1.9",
-  "@types/ejs": "^3.1.2"
+	"ejs": "^3.1.9",
+	"@types/ejs": "^3.1.2"
 }
 ```
 
@@ -139,46 +139,46 @@ src/
 
 ```typescript
 // Dynamic client serving with feature-specific data
-app.get("/app*", async (req, res) => {
-  const clientType = detectClientType(req);
-  const features = FEATURE_SETS[clientType];
-  const routeData = await getRouteSpecificData(req.path, req.query, clientType);
-  const config = await generateClientConfig(req, clientType);
+app.get('/app*', async (req, res) => {
+	const clientType = detectClientType(req);
+	const features = FEATURE_SETS[clientType];
+	const routeData = await getRouteSpecificData(req.path, req.query, clientType);
+	const config = await generateClientConfig(req, clientType);
 
-  // Serve different client builds based on type
-  const clientDistPath = getClientDistPath(clientType);
+	// Serve different client builds based on type
+	const clientDistPath = getClientDistPath(clientType);
 
-  res.render("app", {
-    title: routeData.title,
-    initialState: routeData.state,
-    config: config,
-    features: features,
-    clientType: clientType,
-    monitor: req.query.monitor,
-    images: await getImagesList(clientType), // Different image sets
-    route: req.path,
-    assetsPath: `/app/${clientType}/assets/`, // Different asset paths
-  });
+	res.render('app', {
+		title: routeData.title,
+		initialState: routeData.state,
+		config: config,
+		features: features,
+		clientType: clientType,
+		monitor: req.query.monitor,
+		images: await getImagesList(clientType), // Different image sets
+		route: req.path,
+		assetsPath: `/app/${clientType}/assets/` // Different asset paths
+	});
 });
 
 function getClientDistPath(clientType: ClientType): string {
-  switch (clientType) {
-    case ClientType.ELECTRON_FULL:
-      return "client/electron-dist";
-    case ClientType.WEB_DEMO:
-      return "client/demo-dist";
-    case ClientType.WEB_FULL:
-      return "client/web-dist";
-  }
+	switch (clientType) {
+		case ClientType.ELECTRON_FULL:
+			return 'client/electron-dist';
+		case ClientType.WEB_DEMO:
+			return 'client/demo-dist';
+		case ClientType.WEB_FULL:
+			return 'client/web-dist';
+	}
 }
 
 async function getImagesList(clientType: ClientType): Promise<ImageItem[]> {
-  if (clientType === ClientType.WEB_DEMO) {
-    // Return curated preset images for demo
-    return DEMO_PRESET_IMAGES;
-  }
-  // Return full user images for Electron/full web
-  return await scanForImages();
+	if (clientType === ClientType.WEB_DEMO) {
+		// Return curated preset images for demo
+		return DEMO_PRESET_IMAGES;
+	}
+	// Return full user images for Electron/full web
+	return await scanForImages();
 }
 ```
 
@@ -186,14 +186,14 @@ async function getImagesList(clientType: ClientType): Promise<ImageItem[]> {
 
 ```typescript
 export class TemplateService {
-  async renderApp(route: string, query: any) {
-    return {
-      title: this.getTitleForRoute(route),
-      initialState: await this.getInitialState(route, query),
-      config: await this.getClientConfig(),
-      preloadedData: await this.getPreloadedData(route),
-    };
-  }
+	async renderApp(route: string, query: any) {
+		return {
+			title: this.getTitleForRoute(route),
+			initialState: await this.getInitialState(route, query),
+			config: await this.getClientConfig(),
+			preloadedData: await this.getPreloadedData(route)
+		};
+	}
 }
 ```
 
@@ -204,21 +204,21 @@ export class TemplateService {
 ```html
 <!DOCTYPE html>
 <html lang="en" data-theme="night">
-  <head>
-    <%- include('partials/head', { title, route }) %>
-  </head>
-  <body>
-    <div id="app"></div>
+	<head>
+		<%- include('partials/head', { title, route }) %>
+	</head>
+	<body>
+		<div id="app"></div>
 
-    <!-- Inject initial state for client hydration -->
-    <script>
-      window.__INITIAL_STATE__ = <%- JSON.stringify(initialState) %>;
-      window.__CLIENT_CONFIG__ = <%- JSON.stringify(config) %>;
-      window.__ROUTE_DATA__ = <%- JSON.stringify({ route, monitor }) %>;
-    </script>
+		<!-- Inject initial state for client hydration -->
+		<script>
+			window.__INITIAL_STATE__ = <%- JSON.stringify(initialState) %>;
+			window.__CLIENT_CONFIG__ = <%- JSON.stringify(config) %>;
+			window.__ROUTE_DATA__ = <%- JSON.stringify({ route, monitor }) %>;
+		</script>
 
-    <%- include('partials/scripts', { config }) %>
-  </body>
+		<%- include('partials/scripts', { config }) %>
+	</body>
 </html>
 ```
 
@@ -231,19 +231,12 @@ export class TemplateService {
 
 <!-- Dynamic meta tags based on route -->
 <% if (route.includes('monitor')) { %>
-<meta
-  name="description"
-  content="Monitor <%= monitor %> - Desktop Background Manager"
-/>
+<meta name="description" content="Monitor <%= monitor %> - Desktop Background Manager" />
 <% } %>
 
 <!-- Preload critical resources -->
 <% if (preloadImages) { %> <% preloadImages.forEach(img => { %>
-<link
-  rel="preload"
-  href="/api/thumbnail?name=<%= encodeURIComponent(img) %>"
-  as="image"
-/>
+<link rel="preload" href="/api/thumbnail?name=<%= encodeURIComponent(img) %>" as="image" />
 <% }) %> <% } %>
 
 <link rel="stylesheet" href="/app/assets/index-BJb3gbpS.css" />
@@ -256,11 +249,11 @@ export class TemplateService {
 ```typescript
 // client/src/main.ts
 interface InitialData {
-  state: any;
-  config: any;
-  features: FeatureFlags;
-  clientType: ClientType;
-  route: { route: string; monitor?: string };
+	state: any;
+	config: any;
+	features: FeatureFlags;
+	clientType: ClientType;
+	route: { route: string; monitor?: string };
 }
 
 const initialData: InitialData = (window as any).__INITIAL_STATE__ || {};
@@ -270,14 +263,14 @@ const features = (window as any).__FEATURES__ || {};
 
 // Feature-aware app initialization
 const app = new App({
-  target: document.getElementById("app")!,
-  props: {
-    initialState: initialData.state,
-    config: clientConfig,
-    features: features,
-    clientType: initialData.clientType,
-    route: routeData,
-  },
+	target: document.getElementById('app')!,
+	props: {
+		initialState: initialData.state,
+		config: clientConfig,
+		features: features,
+		clientType: initialData.clientType,
+		route: routeData
+	}
 });
 ```
 
@@ -286,40 +279,38 @@ const app = new App({
 ```svelte
 <!-- client/src/App.svelte -->
 <script lang="ts">
-  export let features: FeatureFlags
-  export let clientType: ClientType
-  export let initialState: any
+	export let features: FeatureFlags;
+	export let clientType: ClientType;
+	export let initialState: any;
 </script>
 
 <main>
-  <!-- Always available: Image viewing -->
-  <ImageGallery images={initialState.images} />
+	<!-- Always available: Image viewing -->
+	<ImageGallery images={initialState.images} />
 
-  <!-- Demo mode: Show demo banner -->
-  {#if clientType === 'demo'}
-    <DemoBanner />
-  {/if}
+	<!-- Demo mode: Show demo banner -->
+	{#if clientType === 'demo'}
+		<DemoBanner />
+	{/if}
 
-  <!-- Feature-gated: Settings panel -->
-  {#if features.settingsSaving}
-    <SettingsPanel />
-  {:else}
-    <ReadOnlySettings />
-  {/if}
+	<!-- Feature-gated: Settings panel -->
+	{#if features.settingsSaving}
+		<SettingsPanel />
+	{:else}
+		<ReadOnlySettings />
+	{/if}
 
-  <!-- Feature-gated: Upload functionality -->
-  {#if features.userImageUpload}
-    <ImageUploader />
-  {:else}
-    <div class="demo-notice">
-      Upload disabled in demo mode
-    </div>
-  {/if}
+	<!-- Feature-gated: Upload functionality -->
+	{#if features.userImageUpload}
+		<ImageUploader />
+	{:else}
+		<div class="demo-notice">Upload disabled in demo mode</div>
+	{/if}
 
-  <!-- Always available: Real-time sync -->
-  {#if features.realtimeSync}
-    <RealtimeSync />
-  {/if}
+	<!-- Always available: Real-time sync -->
+	{#if features.realtimeSync}
+		<RealtimeSync />
+	{/if}
 </main>
 ```
 
@@ -363,16 +354,16 @@ const app = new App({
 
 ```typescript
 const DEPLOYMENT_CONFIG = {
-  development: {
-    electron: "http://localhost:5173/", // Vite dev server
-    demo: "http://localhost:8080/app?demo=true",
-    web: "http://localhost:8080/app",
-  },
-  production: {
-    electron: "file://./dist/index.html", // Local file system
-    demo: "https://yourdomain.com/demo",
-    web: "https://yourdomain.com/app",
-  },
+	development: {
+		electron: 'http://localhost:5173/', // Vite dev server
+		demo: 'http://localhost:8080/app?demo=true',
+		web: 'http://localhost:8080/app'
+	},
+	production: {
+		electron: 'file://./dist/index.html', // Local file system
+		demo: 'https://yourdomain.com/demo',
+		web: 'https://yourdomain.com/app'
+	}
 };
 ```
 
@@ -391,62 +382,62 @@ localhost:8080/app        → Full features (Electron mode)
 
 ```typescript
 interface ClientConfig {
-  clientType: ClientType;
-  apiEndpoints: {
-    images: string;
-    thumbnails: string;
-    settings?: string; // Only for full versions
-  };
-  features: FeatureFlags;
-  assets: {
-    presetImages?: string[]; // Demo mode only
-    allowedFormats: string[];
-  };
-  monitor: {
-    count: number;
-    resolution: Array<{ width: number; height: number }>;
-  };
-  limits: {
-    maxImages?: number; // Demo: limited, Full: unlimited
-    maxFileSize?: number;
-  };
+	clientType: ClientType;
+	apiEndpoints: {
+		images: string;
+		thumbnails: string;
+		settings?: string; // Only for full versions
+	};
+	features: FeatureFlags;
+	assets: {
+		presetImages?: string[]; // Demo mode only
+		allowedFormats: string[];
+	};
+	monitor: {
+		count: number;
+		resolution: Array<{ width: number; height: number }>;
+	};
+	limits: {
+		maxImages?: number; // Demo: limited, Full: unlimited
+		maxFileSize?: number;
+	};
 }
 
 function generateClientConfig(clientType: ClientType): ClientConfig {
-  const baseConfig = {
-    clientType,
-    apiEndpoints: {
-      images: "/api/images",
-      thumbnails: "/api/thumbnail",
-    },
-    features: FEATURE_SETS[clientType],
-  };
+	const baseConfig = {
+		clientType,
+		apiEndpoints: {
+			images: '/api/images',
+			thumbnails: '/api/thumbnail'
+		},
+		features: FEATURE_SETS[clientType]
+	};
 
-  if (clientType === ClientType.WEB_DEMO) {
-    return {
-      ...baseConfig,
-      assets: {
-        presetImages: DEMO_IMAGE_LIST,
-        allowedFormats: ["jpg", "png", "webp"],
-      },
-      limits: {
-        maxImages: 20, // Limited for demo
-        maxFileSize: 5 * 1024 * 1024, // 5MB limit
-      },
-    };
-  }
+	if (clientType === ClientType.WEB_DEMO) {
+		return {
+			...baseConfig,
+			assets: {
+				presetImages: DEMO_IMAGE_LIST,
+				allowedFormats: ['jpg', 'png', 'webp']
+			},
+			limits: {
+				maxImages: 20, // Limited for demo
+				maxFileSize: 5 * 1024 * 1024 // 5MB limit
+			}
+		};
+	}
 
-  return {
-    ...baseConfig,
-    apiEndpoints: {
-      ...baseConfig.apiEndpoints,
-      settings: "/api/settings", // Full version has settings
-    },
-    limits: {
-      maxImages: undefined, // Unlimited
-      maxFileSize: 50 * 1024 * 1024, // 50MB limit
-    },
-  };
+	return {
+		...baseConfig,
+		apiEndpoints: {
+			...baseConfig.apiEndpoints,
+			settings: '/api/settings' // Full version has settings
+		},
+		limits: {
+			maxImages: undefined, // Unlimited
+			maxFileSize: 50 * 1024 * 1024 // 50MB limit
+		}
+	};
 }
 ```
 

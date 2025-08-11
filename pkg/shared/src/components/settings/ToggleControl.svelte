@@ -46,7 +46,7 @@
 			<span class="label-text">{label}</span>
 		</label>
 		{#if isOverride}
-			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="text-xs h-8 px-3 mr-2" onclick={handleOverride}>
+			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="mr-2 h-8 px-3 text-xs" onclick={handleOverride}>
 				{isOverridden ? 'Clear' : 'Override'}
 			</Button>
 		{/if}

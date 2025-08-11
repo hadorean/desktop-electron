@@ -82,9 +82,7 @@ async function getDirectorySize(dirPath) {
 	try {
 		if (isWindows) {
 			// Use PowerShell on Windows for better performance with large directories
-			const { stdout } = await execAsync(
-				`powershell "(Get-ChildItem -Recurse -File '${dirPath}' | Measure-Object -Property Length -Sum).Sum"`
-			);
+			const { stdout } = await execAsync(`powershell "(Get-ChildItem -Recurse -File '${dirPath}' | Measure-Object -Property Length -Sum).Sum"`);
 			return parseInt(stdout.trim()) || 0;
 		} else {
 			const { stdout } = await execAsync(`du -sb "${dirPath}" | cut -f1`);
@@ -92,9 +90,7 @@ async function getDirectorySize(dirPath) {
 		}
 	} catch (error) {
 		if (CONFIG.verbose) {
-			console.log(
-				colorize(`Warning: Could not calculate size for ${dirPath}: ${error.message}`, 'yellow')
-			);
+			console.log(colorize(`Warning: Could not calculate size for ${dirPath}: ${error.message}`, 'yellow'));
 		}
 		return 0;
 	}
@@ -201,9 +197,7 @@ async function findDirectories(startPath, patterns = ['node_modules']) {
 			}
 		} catch (error) {
 			if (CONFIG.verbose) {
-				console.log(
-					colorize(`Warning: Could not read directory ${currentPath}: ${error.message}`, 'yellow')
-				);
+				console.log(colorize(`Warning: Could not read directory ${currentPath}: ${error.message}`, 'yellow'));
 			}
 		}
 	}
@@ -227,19 +221,13 @@ async function findPackageLockFiles(startPath) {
 
 				if (entry.isFile() && entry.name === 'package-lock.json') {
 					results.push(fullPath);
-				} else if (
-					entry.isDirectory() &&
-					entry.name !== 'node_modules' &&
-					!entry.name.startsWith('.')
-				) {
+				} else if (entry.isDirectory() && entry.name !== 'node_modules' && !entry.name.startsWith('.')) {
 					await traverse(fullPath);
 				}
 			}
 		} catch (error) {
 			if (CONFIG.verbose) {
-				console.log(
-					colorize(`Warning: Could not read directory ${currentPath}: ${error.message}`, 'yellow')
-				);
+				console.log(colorize(`Warning: Could not read directory ${currentPath}: ${error.message}`, 'yellow'));
 			}
 		}
 	}
@@ -286,9 +274,7 @@ async function cleanup() {
 			const size = CONFIG.dryRun || CONFIG.verbose ? await getDirectorySize(dir) : 0;
 
 			if (CONFIG.verbose || CONFIG.dryRun) {
-				console.log(
-					`  ${colorize('📁', 'blue')} ${relativePath} ${size > 0 ? colorize(`(${formatBytes(size)})`, 'cyan') : ''}`
-				);
+				console.log(`  ${colorize('📁', 'blue')} ${relativePath} ${size > 0 ? colorize(`(${formatBytes(size)})`, 'cyan') : ''}`);
 			}
 
 			if (!CONFIG.dryRun) {
@@ -345,9 +331,7 @@ async function cleanup() {
 			}
 		}
 	} else {
-		console.log(
-			colorize('\nPhase 2: Keeping package-lock.json files (--keep-lock flag)', 'yellow')
-		);
+		console.log(colorize('\nPhase 2: Keeping package-lock.json files (--keep-lock flag)', 'yellow'));
 	}
 
 	// Phase 3: Handle build artifacts (if --deep flag is used)
@@ -365,9 +349,7 @@ async function cleanup() {
 				const size = CONFIG.dryRun || CONFIG.verbose ? await getDirectorySize(dir) : 0;
 
 				if (CONFIG.verbose || CONFIG.dryRun) {
-					console.log(
-						`  ${colorize('🏗️', 'blue')} ${relativePath} ${size > 0 ? colorize(`(${formatBytes(size)})`, 'cyan') : ''}`
-					);
+					console.log(`  ${colorize('🏗️', 'blue')} ${relativePath} ${size > 0 ? colorize(`(${formatBytes(size)})`, 'cyan') : ''}`);
 				}
 
 				if (!CONFIG.dryRun) {
@@ -396,22 +378,14 @@ async function cleanup() {
 
 	console.log(colorize('\n📊 Cleanup Summary', 'cyan'));
 	console.log(colorize('==================', 'cyan'));
-	console.log(
-		`${colorize('node_modules removed:', 'white')} ${colorize(stats.nodeModulesRemoved, 'green')}`
-	);
-	console.log(
-		`${colorize('package-lock.json removed:', 'white')} ${colorize(stats.lockFilesRemoved, 'green')}`
-	);
+	console.log(`${colorize('node_modules removed:', 'white')} ${colorize(stats.nodeModulesRemoved, 'green')}`);
+	console.log(`${colorize('package-lock.json removed:', 'white')} ${colorize(stats.lockFilesRemoved, 'green')}`);
 
 	if (CONFIG.deep) {
-		console.log(
-			`${colorize('Build artifacts removed:', 'white')} ${colorize(stats.buildArtifactsRemoved, 'green')}`
-		);
+		console.log(`${colorize('Build artifacts removed:', 'white')} ${colorize(stats.buildArtifactsRemoved, 'green')}`);
 	}
 
-	console.log(
-		`${colorize('Total space freed:', 'white')} ${colorize(formatBytes(stats.totalSizeFreed), 'green')}`
-	);
+	console.log(`${colorize('Total space freed:', 'white')} ${colorize(formatBytes(stats.totalSizeFreed), 'green')}`);
 	console.log(`${colorize('Time taken:', 'white')} ${colorize(duration + 's', 'green')}`);
 
 	if (stats.errors.length > 0) {
@@ -420,9 +394,7 @@ async function cleanup() {
 	}
 
 	if (CONFIG.dryRun) {
-		console.log(
-			colorize('\n💡 This was a dry run. To actually delete files, run without --dry-run', 'yellow')
-		);
+		console.log(colorize('\n💡 This was a dry run. To actually delete files, run without --dry-run', 'yellow'));
 	} else {
 		console.log(colorize('\n✨ Cleanup completed successfully!', 'green'));
 		console.log(colorize('💡 Run "npm install" to reinstall dependencies when needed', 'blue'));

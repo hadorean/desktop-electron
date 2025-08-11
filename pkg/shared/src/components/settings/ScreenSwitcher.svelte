@@ -22,13 +22,11 @@
 		}
 	}
 
-
 	function toggleEditMode(): void {
 		editMode = !editMode;
 		renamingScreen = null;
 		showDeleteConfirm = null;
 	}
-
 
 	function confirmRename(): void {
 		if (renamingScreen && renameValue.trim() && renameValue !== renamingScreen) {
@@ -59,7 +57,6 @@
 	function cancelRename(): void {
 		renamingScreen = null;
 	}
-
 
 	function confirmDelete(): void {
 		if (showDeleteConfirm && $screenIds.length > 1) {

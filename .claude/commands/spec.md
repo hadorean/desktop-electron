@@ -1,4 +1,4 @@
-# ✅ Spec 
+# ✅ Spec
 
 Write specifications supporting the following feature, using the spec format described in docs/dev/spec.md and other supporting documents provided.
 

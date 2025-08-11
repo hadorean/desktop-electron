@@ -2,6 +2,7 @@ singleQuote: true
 semi: false
 printWidth: 160
 trailingComma: none
+endOfLine: lf
 plugins:
   - prettier-plugin-svelte
 overrides:

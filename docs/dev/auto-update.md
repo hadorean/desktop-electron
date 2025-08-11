@@ -23,7 +23,7 @@ To publish a new version:
 
    ```json
    {
-     "version": "1.0.1"
+   	"version": "1.0.1"
    }
    ```
 

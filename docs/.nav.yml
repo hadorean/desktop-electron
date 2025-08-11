@@ -17,7 +17,7 @@ nav:
   - 'Process':
       - 'Claude':
           - '💬 Commands': claude/commands/
-          
+
   - 'Notes':
       - '📋 Overview': memories/index.md
       - '2025-08': memories/2025-08/

@@ -50,5 +50,8 @@
 	"files.exclude": {
 		"**/node_modules": false,
 		"**/pkg/*/node_modules": true
-	}
+	},
+	"files.eol": "\n",
+	"files.insertFinalNewline": true,
+	"files.trimFinalNewlines": true
 }

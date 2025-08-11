@@ -7,18 +7,22 @@ This document outlines potential errors and edge cases for the image-related API
 ### Common Error Responses
 
 #### 400 Bad Request
+
 - Missing `name` parameter in query string
 - Invalid or empty image name
 
 #### 403 Forbidden
+
 - Path traversal attempts (e.g., `../../../sensitive-file`)
 - Attempts to access files outside the configured images directory
 
 #### 404 Not Found
+
 - Image file does not exist
 - Image file was deleted after being listed
 
 #### 500 Internal Server Error
+
 - File system permission issues
 - Disk I/O errors
 - Server configuration problems
@@ -26,22 +30,27 @@ This document outlines potential errors and edge cases for the image-related API
 ### Endpoint-Specific Errors
 
 #### GET /api/images
+
 **Potential Issues:**
+
 - Images directory doesn't exist or is inaccessible
 - Permission denied reading directory contents
 - Network drive disconnection (if images stored remotely)
 - Large directory causing memory issues
 
 **Error Response Example:**
+
 ```json
 {
-  "error": "Internal Server Error",
-  "message": "Failed to retrieve images list"
+	"error": "Internal Server Error",
+	"message": "Failed to retrieve images list"
 }
 ```
 
 #### GET /api/image?name={name}
+
 **Potential Issues:**
+
 - File not found (file deleted between listing and request)
 - File permissions changed
 - Corrupted image file
@@ -49,22 +58,25 @@ This document outlines potential errors and edge cases for the image-related API
 - File locked by another process
 
 **Error Response Examples:**
+
 ```json
 {
-  "error": "Not Found",
-  "message": "Image not found"
+	"error": "Not Found",
+	"message": "Image not found"
 }
 ```
 
 ```json
 {
-  "error": "Forbidden", 
-  "message": "Access denied to path outside images directory"
+	"error": "Forbidden",
+	"message": "Access denied to path outside images directory"
 }
 ```
 
 #### GET /api/thumbnail?name={name}
+
 **Potential Issues:**
+
 - Same as image endpoint (currently serving original images)
 - Future: Thumbnail generation failures
 - Future: Thumbnail cache corruption

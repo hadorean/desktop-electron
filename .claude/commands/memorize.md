@@ -6,29 +6,26 @@ This notes will be used to resume our conversation and get context about what we
 
 The notes should include, if applicable:
 
- - what we try to achieve
- - what we have done
- - mistakes we made
- - lessons we learned
- - what we need to do next
+- what we try to achieve
+- what we have done
+- mistakes we made
+- lessons we learned
+- what we need to do next
 
 ## Process
 
-- Create a file in ./docs/memories/YYYY-MM/YYYY-MM-DD-topic.md 
+- Create a file in ./docs/memories/YYYY-MM/YYYY-MM-DD-topic.md
 
 - Use the following format:
 
-	```markdown
-	# <title>
+  ```markdown
+  # <title>
 
-	Date: YYYY-MM-DD
+  Date: YYYY-MM-DD
 
-	<short-summary>
+  <short-summary>
 
-	<content>
-	```
+  <content>
+  ```
 
 - Title must be short and concise, prefixed with a matching icon
-
-
-

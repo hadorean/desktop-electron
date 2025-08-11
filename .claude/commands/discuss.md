@@ -6,13 +6,11 @@ Facilitate a structured project decision-making discussion for technical or desi
 
 1. **Ask for topic details:**
    "What topic or problem would you like to discuss? Please describe:
-
    - The issue/challenge we need to solve
    - Any context or constraints
    - The urgency/impact level"
 
 2. **Conduct structured discussion:**
-
    - Clarify the problem with follow-up questions
    - Research relevant options using available tools
    - Evaluate alternatives with pros/cons
@@ -25,7 +23,7 @@ Facilitate a structured project decision-making discussion for technical or desi
 ## Memory Document Format:
 
 ```markdown
-# [icon] [Topic Title] 
+# [icon] [Topic Title]
 
 [Date]
 
