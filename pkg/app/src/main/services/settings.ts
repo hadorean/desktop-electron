@@ -9,98 +9,98 @@ export type Settings = UISettings
 export type { SettingsButtonPosition } from '@heyketsu/shared/types'
 
 export class SettingsService {
-  private settings: ServerSettings | null = null
-  private settingsPath: string
-  private defaultSettings: ServerSettings = DEFAULT_SERVER_SETTINGS
+	private settings: ServerSettings | null = null
+	private settingsPath: string
+	private defaultSettings: ServerSettings = DEFAULT_SERVER_SETTINGS
 
-  constructor() {
-    this.settingsPath = join(app.getPath('userData'), 'settings.json')
-  }
+	constructor() {
+		this.settingsPath = join(app.getPath('userData'), 'settings.json')
+	}
 
-  /**
-   * Get current settings from memory, loading from file if not cached
-   */
-  async getSettings(): Promise<ServerSettings> {
-    if (this.settings === null) {
-      await this.loadFromFileSystem()
-    }
-    return this.settings || this.defaultSettings
-  }
+	/**
+	 * Get current settings from memory, loading from file if not cached
+	 */
+	async getSettings(): Promise<ServerSettings> {
+		if (this.settings === null) {
+			await this.loadFromFileSystem()
+		}
+		return this.settings || this.defaultSettings
+	}
 
-  /**
-   * Update settings and persist to file system
-   */
-  async updateSettings(newSettings: Partial<ServerSettings>, clientId: string): Promise<SettingsUpdateEvent> {
-    const currentSettings = await this.getSettings()
-    const updatedSettings = { ...currentSettings, ...newSettings }
+	/**
+	 * Update settings and persist to file system
+	 */
+	async updateSettings(newSettings: Partial<ServerSettings>, clientId: string): Promise<SettingsUpdateEvent> {
+		const currentSettings = await this.getSettings()
+		const updatedSettings = { ...currentSettings, ...newSettings }
 
-    // Update memory
-    this.settings = updatedSettings
+		// Update memory
+		this.settings = updatedSettings
 
-    // Persist to file system
-    await this.saveToFileSystem()
+		// Persist to file system
+		await this.saveToFileSystem()
 
-    return {
-      type: 'settings_update',
-      settings: updatedSettings,
-      timestamp: Date.now(),
-      clientId
-    }
-  }
+		return {
+			type: 'settings_update',
+			settings: updatedSettings,
+			timestamp: Date.now(),
+			clientId
+		}
+	}
 
-  /**
-   * Load settings from file system
-   */
-  private async loadFromFileSystem(): Promise<void> {
-    try {
-      const settingsData = await fs.readFile(this.settingsPath, 'utf-8')
-      const parsedSettings = JSON.parse(settingsData)
+	/**
+	 * Load settings from file system
+	 */
+	private async loadFromFileSystem(): Promise<void> {
+		try {
+			const settingsData = await fs.readFile(this.settingsPath, 'utf-8')
+			const parsedSettings = JSON.parse(settingsData)
 
-      // Merge with defaults to ensure all required properties exist
-      this.settings = { ...this.defaultSettings, ...parsedSettings }
+			// Merge with defaults to ensure all required properties exist
+			this.settings = { ...this.defaultSettings, ...parsedSettings }
 
-      console.log('Settings loaded from file system:', this.settingsPath)
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-        console.log('Settings file not found, using defaults')
-        this.settings = this.defaultSettings
-        await this.saveToFileSystem()
-      } else {
-        console.error('Error loading settings:', error)
-        this.settings = this.defaultSettings
-      }
-    }
-  }
+			console.log('Settings loaded from file system:', this.settingsPath)
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+				console.log('Settings file not found, using defaults')
+				this.settings = this.defaultSettings
+				await this.saveToFileSystem()
+			} else {
+				console.error('Error loading settings:', error)
+				this.settings = this.defaultSettings
+			}
+		}
+	}
 
-  /**
-   * Save current settings to file system
-   */
-  private async saveToFileSystem(): Promise<void> {
-    try {
-      const settingsJson = JSON.stringify(this.settings, null, 2)
-      await fs.writeFile(this.settingsPath, settingsJson, 'utf-8')
-      console.log('Settings saved to file system:', this.settingsPath)
-    } catch (error) {
-      console.error('Error saving settings:', error)
-      throw error
-    }
-  }
+	/**
+	 * Save current settings to file system
+	 */
+	private async saveToFileSystem(): Promise<void> {
+		try {
+			const settingsJson = JSON.stringify(this.settings, null, 2)
+			await fs.writeFile(this.settingsPath, settingsJson, 'utf-8')
+			console.log('Settings saved to file system:', this.settingsPath)
+		} catch (error) {
+			console.error('Error saving settings:', error)
+			throw error
+		}
+	}
 
-  /**
-   * Reset settings to defaults
-   */
-  async resetSettings(): Promise<ServerSettings> {
-    this.settings = { ...this.defaultSettings }
-    await this.saveToFileSystem()
-    return this.settings
-  }
+	/**
+	 * Reset settings to defaults
+	 */
+	async resetSettings(): Promise<ServerSettings> {
+		this.settings = { ...this.defaultSettings }
+		await this.saveToFileSystem()
+		return this.settings
+	}
 
-  /**
-   * Get settings file path for debugging
-   */
-  getSettingsPath(): string {
-    return this.settingsPath
-  }
+	/**
+	 * Get settings file path for debugging
+	 */
+	getSettingsPath(): string {
+		return this.settingsPath
+	}
 }
 
 export const settingsService = new SettingsService()

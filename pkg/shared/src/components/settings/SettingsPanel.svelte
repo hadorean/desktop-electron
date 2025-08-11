@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { settings, sharedSettings, localSettings, isLocalMode, currentScreen, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore';
-	import type { ImageInfo } from '../../services/api';
-	import ImageGrid from '$shared/components/settings/ImageGrid.svelte';
-	import SliderControl from './SliderControl.svelte';
-	import ToggleControl from './ToggleControl.svelte';
-	import ScreenSwitcher from './ScreenSwitcher.svelte';
-	import { Inspect } from '@hgrandry/dbg';
+	import { settings, sharedSettings, localSettings, isLocalMode, currentScreen, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore'
+	import type { ImageInfo } from '../../services/api'
+	import ImageGrid from '$shared/components/settings/ImageGrid.svelte'
+	import SliderControl from './SliderControl.svelte'
+	import ToggleControl from './ToggleControl.svelte'
+	import ScreenSwitcher from './ScreenSwitcher.svelte'
+	import { Inspect } from '@hgrandry/dbg'
 
 	// Props
-	export let expanded: boolean = false;
-	export let images: ImageInfo[] = [];
+	export let expanded: boolean = false
+	export let images: ImageInfo[] = []
 	//export let errorMessage: string = "";
-	export let settingsPanel: HTMLElement | null = null;
+	export let settingsPanel: HTMLElement | null = null
 
 	// Subscribe to settings store
 	$: {
@@ -20,7 +20,7 @@
 			updateSharedSettings((settings) => ({
 				...settings,
 				selectedImage: images[0]?.name || ''
-			}));
+			}))
 		}
 	}
 
@@ -29,24 +29,24 @@
 			if (value === null) {
 				// Remove from local settings
 				updateLocalSettings((current) => {
-					if (!current) return {};
+					if (!current) return {}
 					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					const { [key]: _removed, ...rest } = current;
-					return Object.keys(rest).length > 0 ? rest : {};
-				});
+					const { [key]: _removed, ...rest } = current
+					return Object.keys(rest).length > 0 ? rest : {}
+				})
 			} else {
 				// Update local settings
 				updateLocalSettings((current) => ({
 					...current,
 					[key]: value
-				}));
+				}))
 			}
 		} else {
 			// Update shared settings
 			updateSharedSettings((current) => ({
 				...current,
 				[key]: value
-			}));
+			}))
 		}
 	}
 </script>

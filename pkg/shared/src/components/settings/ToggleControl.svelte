@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Switch } from '../ui';
-	import { Button } from '../ui';
-	import { cn } from '../../lib/utils';
+	import { Switch } from '../ui'
+	import { Button } from '../ui'
+	import { cn } from '../../lib/utils'
 
 	const {
 		label,
@@ -11,33 +11,33 @@
 		isOverride = false,
 		overrideValue = null
 	} = $props<{
-		label: string;
-		checked: boolean | null;
-		onChange: (value: boolean | null) => void;
-		defaultValue?: boolean | null;
-		isOverride?: boolean;
-		overrideValue?: boolean | null;
-	}>();
+		label: string
+		checked: boolean | null
+		onChange: (value: boolean | null) => void
+		defaultValue?: boolean | null
+		isOverride?: boolean
+		overrideValue?: boolean | null
+	}>()
 
-	const isOverridden = $derived(isOverride && overrideValue !== null);
-	const isGhost = $derived(isOverride && !isOverridden);
+	const isOverridden = $derived(isOverride && overrideValue !== null)
+	const isGhost = $derived(isOverride && !isOverridden)
 
 	function handleOverride(): void {
 		if (!isOverridden) {
 			// When enabling override, use either the defaultValue or the current shared value
-			const newValue = defaultValue ?? checked ?? false;
-			onChange(newValue);
+			const newValue = defaultValue ?? checked ?? false
+			onChange(newValue)
 		} else {
 			// When disabling override, set to null to use shared value
-			onChange(null);
+			onChange(null)
 		}
 	}
 
 	function handleToggleChange(newChecked: boolean): void {
-		onChange(newChecked);
+		onChange(newChecked)
 	}
 
-	const displayChecked = $derived(isOverridden ? (overrideValue ?? false) : (checked ?? false));
+	const displayChecked = $derived(isOverridden ? (overrideValue ?? false) : (checked ?? false))
 </script>
 
 <div class="toggle-control">

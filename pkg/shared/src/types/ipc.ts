@@ -36,7 +36,7 @@ export const IpcEvents = {
 	CheckForUpdates: 'check-for-updates',
 	DownloadUpdate: 'download-update',
 	InstallUpdate: 'install-update'
-} as const;
+} as const
 
 // Type for main process events (handled by ipcMain)
 export type MainEvents =
@@ -57,11 +57,11 @@ export type MainEvents =
 	| typeof IpcEvents.GetDebugState
 	| typeof IpcEvents.CheckForUpdates
 	| typeof IpcEvents.DownloadUpdate
-	| typeof IpcEvents.InstallUpdate;
+	| typeof IpcEvents.InstallUpdate
 
 // Type for renderer process events (sent from main to renderer)
 export type RendererEvents =
 	| typeof IpcEvents.UpdateAvailable
 	| typeof IpcEvents.UpdateDownloadProgress
 	| typeof IpcEvents.UpdateDownloaded
-	| typeof IpcEvents.DebugStateChanged;
+	| typeof IpcEvents.DebugStateChanged

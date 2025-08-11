@@ -12,14 +12,14 @@ npm install ejs @types/ejs
 
 ```typescript
 // src/main/server.ts
-import express from 'express';
-import { join } from 'path';
+import express from 'express'
+import { join } from 'path'
 
 export class LocalServer {
 	private setupTemplateEngine(): void {
 		// Set EJS as template engine
-		this.server.set('view engine', 'ejs');
-		this.server.set('views', join(__dirname, 'templates'));
+		this.server.set('view engine', 'ejs')
+		this.server.set('views', join(__dirname, 'templates'))
 	}
 
 	private setupRoutes(): void {
@@ -34,10 +34,10 @@ export class LocalServer {
 					route: req.path,
 					query: req.query
 				}
-			};
+			}
 
-			res.render('app', data);
-		});
+			res.render('app', data)
+		})
 	}
 }
 ```
@@ -131,22 +131,22 @@ export enum ClientType {
 }
 
 export interface FeatureFlags {
-	settingsSaving: boolean;
-	userImageUpload: boolean;
-	localStoragePersistence: boolean;
-	fullImageLibrary: boolean;
-	realtimeSync: boolean;
+	settingsSaving: boolean
+	userImageUpload: boolean
+	localStoragePersistence: boolean
+	fullImageLibrary: boolean
+	realtimeSync: boolean
 }
 
 // src/main/services/client-detection.ts
 export function detectClientType(req: express.Request): ClientType {
-	const userAgent = req.get('User-Agent') || '';
-	const isElectron = userAgent.includes('Electron');
-	const isDemoMode = req.query.demo === 'true' || req.hostname !== 'localhost';
+	const userAgent = req.get('User-Agent') || ''
+	const isElectron = userAgent.includes('Electron')
+	const isDemoMode = req.query.demo === 'true' || req.hostname !== 'localhost'
 
-	if (isElectron) return ClientType.ELECTRON_FULL;
-	if (isDemoMode) return ClientType.WEB_DEMO;
-	return ClientType.WEB_FULL;
+	if (isElectron) return ClientType.ELECTRON_FULL
+	if (isDemoMode) return ClientType.WEB_DEMO
+	return ClientType.WEB_FULL
 }
 
 export const FEATURE_SETS: Record<ClientType, FeatureFlags> = {
@@ -171,7 +171,7 @@ export const FEATURE_SETS: Record<ClientType, FeatureFlags> = {
 		fullImageLibrary: true,
 		realtimeSync: true
 	}
-};
+}
 ```
 
 ### Step 2.2: Enhanced Route Handling
@@ -271,8 +271,8 @@ private getDemoImages(): any[] {
 
 ```typescript
 // client/src/main.ts
-const initialState = (window as any).__INITIAL_STATE__ || {};
-const clientConfig = (window as any).__CLIENT_CONFIG__ || {};
+const initialState = (window as any).__INITIAL_STATE__ || {}
+const clientConfig = (window as any).__CLIENT_CONFIG__ || {}
 
 const app = new App({
 	target: document.getElementById('app')!,
@@ -281,15 +281,15 @@ const app = new App({
 		features: clientConfig.features,
 		clientType: clientConfig.clientType
 	}
-});
+})
 ```
 
 ```svelte
 <!-- client/src/App.svelte -->
 <script lang="ts">
-	export let features: FeatureFlags;
-	export let clientType: string;
-	export let initialState: any;
+	export let features: FeatureFlags
+	export let clientType: string
+	export let initialState: any
 </script>
 
 <main>
@@ -352,36 +352,36 @@ npm install --save-dev concurrently nodemon chokidar
 
 ```typescript
 // src/main/dev-server.ts
-import { watch } from 'chokidar';
+import { watch } from 'chokidar'
 
 export class DevelopmentServer extends LocalServer {
-	private templateWatcher?: any;
+	private templateWatcher?: any
 
 	constructor() {
-		super();
+		super()
 		if (process.env.NODE_ENV === 'development') {
-			this.setupDevelopmentFeatures();
+			this.setupDevelopmentFeatures()
 		}
 	}
 
 	private setupDevelopmentFeatures(): void {
 		// Watch templates for changes
-		this.templateWatcher = watch('src/main/templates/**/*.ejs');
+		this.templateWatcher = watch('src/main/templates/**/*.ejs')
 		this.templateWatcher.on('change', (path: string) => {
-			console.log(`📝 Template changed: ${path}`);
+			console.log(`📝 Template changed: ${path}`)
 			// Clear require cache for templates
-			delete require.cache[require.resolve(path)];
-		});
+			delete require.cache[require.resolve(path)]
+		})
 
 		// Add development-specific routes
-		this.setupDevelopmentRoutes();
+		this.setupDevelopmentRoutes()
 	}
 
 	private setupDevelopmentRoutes(): void {
 		// Development info endpoint
 		this.server.get('/dev/info', (req, res) => {
-			const clientType = detectClientType(req);
-			const features = FEATURE_SETS[clientType];
+			const clientType = detectClientType(req)
+			const features = FEATURE_SETS[clientType]
 
 			res.json({
 				clientType,
@@ -391,8 +391,8 @@ export class DevelopmentServer extends LocalServer {
 					hostname: req.hostname,
 					query: req.query
 				}
-			});
-		});
+			})
+		})
 	}
 }
 ```

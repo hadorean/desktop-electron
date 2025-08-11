@@ -47,9 +47,9 @@ resolve: {
 
 ```typescript
 // Direct import from alias root
-import { SliderControl, ToggleControl } from '$shared';
+import { SliderControl, ToggleControl } from '$shared'
 
 // Subpath import
-import { apiService } from '$shared/services';
-import { settingsStore } from '$stores/settingsStore';
+import { apiService } from '$shared/services'
+import { settingsStore } from '$stores/settingsStore'
 ```

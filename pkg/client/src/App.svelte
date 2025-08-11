@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { api, type ImageInfo } from '$shared/services/api';
-	import { apiBaseUrl } from '$shared/stores/apiStore';
-	import { DebugMenu } from '@hgrandry/dbg';
-	import { settings, loadSettings, expandSettings } from '$shared/stores/settingsStore';
-	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore';
-	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator } from '@heyketsu/shared';
-	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout';
-	import { socketService } from '$shared/services/socket';
+	import { onMount, onDestroy } from 'svelte'
+	import { api, type ImageInfo } from '$shared/services/api'
+	import { apiBaseUrl } from '$shared/stores/apiStore'
+	import { DebugMenu } from '@hgrandry/dbg'
+	import { settings, loadSettings, expandSettings } from '$shared/stores/settingsStore'
+	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
+	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator } from '@heyketsu/shared'
+	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout'
+	import { socketService } from '$shared/services/socket'
 
-	let images: ImageInfo[] = [];
-	let showSettings: boolean = false;
-	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null;
-	let errorMessage: string = '';
-	let buttonHovered: boolean = false;
-	let settingsPanel: HTMLElement | null = null;
-	let settingsButton: HTMLElement | null = null;
+	let images: ImageInfo[] = []
+	let showSettings: boolean = false
+	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null
+	let errorMessage: string = ''
+	let buttonHovered: boolean = false
+	let settingsPanel: HTMLElement | null = null
+	let settingsButton: HTMLElement | null = null
 
 	// Function to fetch images
 	async function fetchImages(): Promise<void> {
 		try {
-			images = await api.getImages();
+			images = await api.getImages()
 			//console.log('Fetched images:', images);
 
 			// settings.subscribe((current) => {
@@ -32,113 +32,113 @@
 			//     }
 			// });
 		} catch (error: unknown) {
-			console.error('Error fetching images:', error);
-			errorMessage = `Error fetching images: ${error instanceof Error ? error.message : 'Unknown error'}`;
+			console.error('Error fetching images:', error)
+			errorMessage = `Error fetching images: ${error instanceof Error ? error.message : 'Unknown error'}`
 		}
 	}
 
 	// Function to handle API reconnection
 	async function handleReconnect(): Promise<void> {
 		try {
-			console.log('Reconnecting to API...');
-			errorMessage = '';
-			await fetchImages();
-			console.log('Reconnection successful');
+			console.log('Reconnecting to API...')
+			errorMessage = ''
+			await fetchImages()
+			console.log('Reconnection successful')
 		} catch (error: unknown) {
-			console.error('Reconnection failed:', error);
-			errorMessage = `Failed to connect to server at ${$apiBaseUrl || 'default URL'}. Please check the URL and try again.`;
+			console.error('Reconnection failed:', error)
+			errorMessage = `Failed to connect to server at ${$apiBaseUrl || 'default URL'}. Please check the URL and try again.`
 		}
 	}
 
 	// Initialize the app
 	onMount(() => {
-		(async () => {
+		;(async () => {
 			try {
 				// First fetch images
-				await fetchImages();
+				await fetchImages()
 
 				// Then load saved settings (after we have the images list)
-				errorMessage = loadSettings(images);
+				errorMessage = loadSettings(images)
 
 				// Add event listeners
-				window.addEventListener('reconnectApi', handleReconnect);
-				window.addEventListener('keydown', handleKeyDown);
-				document.addEventListener('mousedown', handleClickOutside);
+				window.addEventListener('reconnectApi', handleReconnect)
+				window.addEventListener('keydown', handleKeyDown)
+				document.addEventListener('mousedown', handleClickOutside)
 
 				// Setup socket listener for debug state changes
 				socketService.onDebugStateChanged((visible) => {
-					console.log('Client app: Received debug state change:', visible);
-					setDebugMenuVisible(visible);
-				});
+					console.log('Client app: Received debug state change:', visible)
+					setDebugMenuVisible(visible)
+				})
 
 				// Return cleanup function
 				return () => {
-					window.removeEventListener('reconnectApi', handleReconnect);
-					window.removeEventListener('keydown', handleKeyDown);
-					document.removeEventListener('mousedown', handleClickOutside);
-				};
+					window.removeEventListener('reconnectApi', handleReconnect)
+					window.removeEventListener('keydown', handleKeyDown)
+					document.removeEventListener('mousedown', handleClickOutside)
+				}
 			} catch (error: unknown) {
-				console.error('Error during initialization:', error);
-				errorMessage = `Failed to initialize: ${error instanceof Error ? error.message : 'Unknown error'}`;
+				console.error('Error during initialization:', error)
+				errorMessage = `Failed to initialize: ${error instanceof Error ? error.message : 'Unknown error'}`
 			}
-		})();
-	});
+		})()
+	})
 
 	// Function to handle key down events
 	function handleKeyDown(event: KeyboardEvent): void {
 		if (event.key === 'Escape') {
-			toggleSettings();
-			event.preventDefault();
+			toggleSettings()
+			event.preventDefault()
 		}
 	}
 
 	// Function to handle click outside events
 	function handleClickOutside(event: MouseEvent): void {
 		if ($expandSettings && settingsPanel && settingsButton) {
-			const target = event.target as Node;
-			const isClickInside = settingsPanel.contains(target) || settingsButton.contains(target);
+			const target = event.target as Node
+			const isClickInside = settingsPanel.contains(target) || settingsButton.contains(target)
 
 			if (!isClickInside) {
-				expandSettings.set(false);
+				expandSettings.set(false)
 			}
 		}
 	}
 
 	// Function to handle settings toggle
 	function toggleSettings(): void {
-		expandSettings.update((current) => !current);
+		expandSettings.update((current) => !current)
 	}
 
 	// Handle expandSettings changes with explicit subscription to avoid reactive loops
-	let unsubscribeExpandSettings: (() => void) | undefined;
+	let unsubscribeExpandSettings: (() => void) | undefined
 
 	onMount(() => {
 		// Subscribe to expandSettings changes
 		unsubscribeExpandSettings = expandSettings.subscribe((expanded) => {
 			if (expanded === false) {
 				settingsClosingTimeout = setTimeout(() => {
-					showSettings = false;
-				}, 500); // Match the duration of the CSS transition
+					showSettings = false
+				}, 500) // Match the duration of the CSS transition
 			} else {
-				showSettings = true;
+				showSettings = true
 				if (settingsClosingTimeout) {
-					clearTimeout(settingsClosingTimeout);
-					settingsClosingTimeout = null;
+					clearTimeout(settingsClosingTimeout)
+					settingsClosingTimeout = null
 				}
 			}
-		});
-	});
+		})
+	})
 
 	onDestroy(() => {
-		unsubscribeExpandSettings?.();
-	});
+		unsubscribeExpandSettings?.()
+	})
 
 	function handleButtonMouseEnter(): void {
-		buttonHovered = true;
+		buttonHovered = true
 	}
 
 	function handleButtonMouseLeave(): void {
-		buttonHovered = false;
+		buttonHovered = false
 	}
 </script>
 

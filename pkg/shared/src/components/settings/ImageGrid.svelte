@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { getImageUrl, type ImageInfo } from '../../services';
-	import { settings, updateSharedSettings } from '../../stores';
-	import { Button, Card, CardContent } from '../ui';
-	import { cn } from '../../lib/utils';
+	import { getImageUrl, type ImageInfo } from '../../services'
+	import { settings, updateSharedSettings } from '../../stores'
+	import { Button, Card, CardContent } from '../ui'
+	import { cn } from '../../lib/utils'
 
 	const {
 		images = [],
@@ -11,59 +11,59 @@
 		isOverride = false,
 		overrideValue = null
 	} = $props<{
-		images: ImageInfo[];
-		selectedImage: string;
-		onImageChange: (image: string | null) => void;
-		isOverride?: boolean;
-		overrideValue?: string | null;
-	}>();
+		images: ImageInfo[]
+		selectedImage: string
+		onImageChange: (image: string | null) => void
+		isOverride?: boolean
+		overrideValue?: string | null
+	}>()
 
-	const isOverridden = $derived(isOverride && overrideValue !== null);
-	const isGhost = $derived(isOverride && !isOverridden);
+	const isOverridden = $derived(isOverride && overrideValue !== null)
+	const isGhost = $derived(isOverride && !isOverridden)
 
 	// Function to get thumbnail URL
 	function getThumbnailUrl(imageName: string): string {
-		return getImageUrl(imageName, true); // Use thumbnail
+		return getImageUrl(imageName, true) // Use thumbnail
 	}
 
 	function handleImageClick(imageName: string): void {
 		if (isOverride && !isOverridden) {
 			// When enabling override in local mode, use the current value
-			onImageChange(imageName);
+			onImageChange(imageName)
 		} else {
-			onImageChange(imageName);
+			onImageChange(imageName)
 		}
 	}
 
 	function handleOverride(): void {
 		if (!isOverridden) {
 			// When enabling override, use the current value
-			onImageChange(selectedImage);
+			onImageChange(selectedImage)
 		} else {
 			// When disabling override, set to null to use shared value
-			onImageChange(null);
+			onImageChange(null)
 		}
 	}
 
 	function toggleFavorite(imageName: string, event: Event): void {
-		event.stopPropagation(); // Prevent triggering the image selection
+		event.stopPropagation() // Prevent triggering the image selection
 		updateSharedSettings((current) => ({
 			favorites: current.favorites.includes(imageName) ? current.favorites.filter((name: string) => name !== imageName) : [...current.favorites, imageName]
-		}));
+		}))
 	}
 
 	// Sort images to show favorites first
 	const sortedImages = $derived(
 		[...images].sort((a, b) => {
-			const aIsFavorite = $settings.favorites.includes(a.name);
-			const bIsFavorite = $settings.favorites.includes(b.name);
-			if (aIsFavorite && !bIsFavorite) return -1;
-			if (!aIsFavorite && bIsFavorite) return 1;
-			return 0;
+			const aIsFavorite = $settings.favorites.includes(a.name)
+			const bIsFavorite = $settings.favorites.includes(b.name)
+			if (aIsFavorite && !bIsFavorite) return -1
+			if (!aIsFavorite && bIsFavorite) return 1
+			return 0
 		})
-	);
+	)
 
-	const effectiveImage = $derived(isOverridden ? overrideValue : selectedImage);
+	const effectiveImage = $derived(isOverridden ? overrideValue : selectedImage)
 </script>
 
 <div class="image-grid-container">

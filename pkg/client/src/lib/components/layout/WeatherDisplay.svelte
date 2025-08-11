@@ -1,36 +1,36 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { api, type WeatherData } from '$shared/services/api';
-	import { Tween } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
+	import { onMount } from 'svelte'
+	import { api, type WeatherData } from '$shared/services/api'
+	import { Tween } from 'svelte/motion'
+	import { cubicOut } from 'svelte/easing'
 
-	let weather: WeatherData | null = null;
-	let currentTime: string = ''; // Current time in HH:MM format
-	let greeting: string = ''; // Time-based greeting
+	let weather: WeatherData | null = null
+	let currentTime: string = '' // Current time in HH:MM format
+	let greeting: string = '' // Time-based greeting
 	let opacity = new Tween(0, {
 		duration: 3000,
 		easing: cubicOut
-	});
+	})
 
 	// Function to fetch weather data
 	async function fetchWeather(): Promise<void> {
 		try {
-			weather = await api.getWeather();
+			weather = await api.getWeather()
 			if (weather) {
-				opacity.set(1);
+				opacity.set(1)
 			}
 		} catch (error: unknown) {
-			console.error('Error fetching weather:', error);
-			weather = null;
+			console.error('Error fetching weather:', error)
+			weather = null
 		}
 	}
 
 	// Function to update the current time and greeting
 	function updateTime(): void {
-		const now = new Date();
-		const hours = now.getHours().toString().padStart(2, '0');
-		const minutes = now.getMinutes().toString().padStart(2, '0');
-		currentTime = `${hours}:${minutes}`;
+		const now = new Date()
+		const hours = now.getHours().toString().padStart(2, '0')
+		const minutes = now.getMinutes().toString().padStart(2, '0')
+		currentTime = `${hours}:${minutes}`
 
 		// Format the date
 		// const options: Intl.DateTimeFormatOptions = {
@@ -40,29 +40,29 @@
 		// };
 
 		// Update greeting based on time of day
-		const hourNum = parseInt(hours);
+		const hourNum = parseInt(hours)
 		if (hourNum >= 5 && hourNum < 12) {
-			greeting = 'Good Morning';
+			greeting = 'Good Morning'
 		} else if (hourNum >= 12 && hourNum < 18) {
-			greeting = 'Good Afternoon';
+			greeting = 'Good Afternoon'
 		} else {
-			greeting = 'Good Evening';
+			greeting = 'Good Evening'
 		}
 	}
 
 	onMount(() => {
 		// Set up periodic weather updates
-		const weatherInterval = setInterval(fetchWeather, 5 * 60 * 1000); // Update every 5 minutes
-		const timeInterval = setInterval(updateTime, 1000);
+		const weatherInterval = setInterval(fetchWeather, 5 * 60 * 1000) // Update every 5 minutes
+		const timeInterval = setInterval(updateTime, 1000)
 
-		fetchWeather();
-		updateTime();
+		fetchWeather()
+		updateTime()
 
 		return () => {
-			clearInterval(weatherInterval);
-			clearInterval(timeInterval);
-		};
-	});
+			clearInterval(weatherInterval)
+			clearInterval(timeInterval)
+		}
+	})
 </script>
 
 {#if weather}

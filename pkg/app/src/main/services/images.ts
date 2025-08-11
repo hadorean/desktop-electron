@@ -3,146 +3,146 @@ import { watch } from 'fs'
 import { join } from 'path'
 
 export class ImageService {
-  private imagesPathValue = 'D:\\pictures\\wall'
-  private readonly SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']
-  private watcher: ReturnType<typeof watch> | null = null
-  private watcherInitialized = false
-  private cachedImages: string[] = []
-  private lastScanTime = 0
+	private imagesPathValue = 'D:\\pictures\\wall'
+	private readonly SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']
+	private watcher: ReturnType<typeof watch> | null = null
+	private watcherInitialized = false
+	private cachedImages: string[] = []
+	private lastScanTime = 0
 
-  /**
-   * Gets the images directory path
-   */
-  public get imagesPath(): string {
-    return this.imagesPathValue
-  }
+	/**
+	 * Gets the images directory path
+	 */
+	public get imagesPath(): string {
+		return this.imagesPathValue
+	}
 
-  /**
-   * Sets the images directory path and restarts the watcher if it's already running
-   */
-  public setImagesPath(path: string): void {
-    if (this.imagesPathValue !== path) {
-      this.imagesPathValue = path
-      if (this.watcherInitialized) {
-        this.stopWatcher()
-        this.startWatcher()
-      }
-    }
-  }
+	/**
+	 * Sets the images directory path and restarts the watcher if it's already running
+	 */
+	public setImagesPath(path: string): void {
+		if (this.imagesPathValue !== path) {
+			this.imagesPathValue = path
+			if (this.watcherInitialized) {
+				this.stopWatcher()
+				this.startWatcher()
+			}
+		}
+	}
 
-  /**
-   * Scans the images directory for supported image files
-   * @returns Array of relative image paths
-   */
-  public async scanForImages(): Promise<string[]> {
-    // Start watcher on first call
-    if (!this.watcherInitialized) {
-      this.startWatcher()
-    }
+	/**
+	 * Scans the images directory for supported image files
+	 * @returns Array of relative image paths
+	 */
+	public async scanForImages(): Promise<string[]> {
+		// Start watcher on first call
+		if (!this.watcherInitialized) {
+			this.startWatcher()
+		}
 
-    // Return cached results if available and recent (within 1 second)
-    const now = Date.now()
-    if (this.cachedImages.length > 0 && now - this.lastScanTime < 1000) {
-      return [...this.cachedImages]
-    }
+		// Return cached results if available and recent (within 1 second)
+		const now = Date.now()
+		if (this.cachedImages.length > 0 && now - this.lastScanTime < 1000) {
+			return [...this.cachedImages]
+		}
 
-    try {
-      console.log('Scanning for images in:', this.imagesPathValue)
-      const allFiles: string[] = []
+		try {
+			console.log('Scanning for images in:', this.imagesPathValue)
+			const allFiles: string[] = []
 
-      // Helper function to recursively scan directories
-      const scanDirectory = async (dirPath: string): Promise<void> => {
-        const items = await readdir(dirPath, { withFileTypes: true, recursive: false })
+			// Helper function to recursively scan directories
+			const scanDirectory = async (dirPath: string): Promise<void> => {
+				const items = await readdir(dirPath, { withFileTypes: true, recursive: false })
 
-        for (const item of items) {
-          const fullPath = join(dirPath, item.name)
+				for (const item of items) {
+					const fullPath = join(dirPath, item.name)
 
-          if (item.isDirectory()) {
-            // Recursively scan subdirectories
-            // await scanDirectory(fullPath)
-          } else if (item.isFile()) {
-            // Check if file has a supported image extension
-            const ext = item.name.toLowerCase().substring(item.name.lastIndexOf('.'))
-            if (this.SUPPORTED_EXTENSIONS.includes(ext)) {
-              // Store relative path from images directory
-              const relativePath = fullPath.replace(this.imagesPathValue, '').replace(/^[\\/]/, '')
-              allFiles.push(relativePath.replace(/\\/g, '/')) // Normalize path separators
-            }
-          }
-        }
-      }
+					if (item.isDirectory()) {
+						// Recursively scan subdirectories
+						// await scanDirectory(fullPath)
+					} else if (item.isFile()) {
+						// Check if file has a supported image extension
+						const ext = item.name.toLowerCase().substring(item.name.lastIndexOf('.'))
+						if (this.SUPPORTED_EXTENSIONS.includes(ext)) {
+							// Store relative path from images directory
+							const relativePath = fullPath.replace(this.imagesPathValue, '').replace(/^[\\/]/, '')
+							allFiles.push(relativePath.replace(/\\/g, '/')) // Normalize path separators
+						}
+					}
+				}
+			}
 
-      await scanDirectory(this.imagesPathValue)
-      this.cachedImages = allFiles.sort()
-      this.lastScanTime = now
-      return [...this.cachedImages]
-    } catch (error) {
-      console.error('Error scanning images directory:', error)
-      return []
-    }
-  }
+			await scanDirectory(this.imagesPathValue)
+			this.cachedImages = allFiles.sort()
+			this.lastScanTime = now
+			return [...this.cachedImages]
+		} catch (error) {
+			console.error('Error scanning images directory:', error)
+			return []
+		}
+	}
 
-  /**
-   * Starts the file watcher for the images directory
-   */
-  private startWatcher(): void {
-    if (this.watcher) {
-      this.stopWatcher()
-    }
+	/**
+	 * Starts the file watcher for the images directory
+	 */
+	private startWatcher(): void {
+		if (this.watcher) {
+			this.stopWatcher()
+		}
 
-    try {
-      console.log('Starting file watcher for:', this.imagesPathValue)
-      this.watcher = watch(this.imagesPathValue, { recursive: true }, (eventType, filename) => {
-        if (filename) {
-          console.log(`File watcher event: ${eventType} - ${filename}`)
-          // Clear cache to force rescan on next call
-          this.cachedImages = []
-          this.lastScanTime = 0
-        }
-      })
-      this.watcherInitialized = true
-    } catch (error) {
-      console.error('Error starting file watcher:', error)
-      this.watcherInitialized = false
-    }
-  }
+		try {
+			console.log('Starting file watcher for:', this.imagesPathValue)
+			this.watcher = watch(this.imagesPathValue, { recursive: true }, (eventType, filename) => {
+				if (filename) {
+					console.log(`File watcher event: ${eventType} - ${filename}`)
+					// Clear cache to force rescan on next call
+					this.cachedImages = []
+					this.lastScanTime = 0
+				}
+			})
+			this.watcherInitialized = true
+		} catch (error) {
+			console.error('Error starting file watcher:', error)
+			this.watcherInitialized = false
+		}
+	}
 
-  /**
-   * Stops the file watcher
-   */
-  private stopWatcher(): void {
-    if (this.watcher) {
-      try {
-        this.watcher.close()
-        console.log('File watcher stopped')
-      } catch (error) {
-        console.error('Error stopping file watcher:', error)
-      }
-      this.watcher = null
-    }
-    this.watcherInitialized = false
-  }
+	/**
+	 * Stops the file watcher
+	 */
+	private stopWatcher(): void {
+		if (this.watcher) {
+			try {
+				this.watcher.close()
+				console.log('File watcher stopped')
+			} catch (error) {
+				console.error('Error stopping file watcher:', error)
+			}
+			this.watcher = null
+		}
+		this.watcherInitialized = false
+	}
 
-  /**
-   * Gets the list of supported image extensions
-   */
-  public getSupportedExtensions(): string[] {
-    return [...this.SUPPORTED_EXTENSIONS]
-  }
+	/**
+	 * Gets the list of supported image extensions
+	 */
+	public getSupportedExtensions(): string[] {
+		return [...this.SUPPORTED_EXTENSIONS]
+	}
 
-  /**
-   * Gets the images directory path (deprecated, use imagesPath getter)
-   */
-  public getImagesPath(): string {
-    return this.imagesPathValue
-  }
+	/**
+	 * Gets the images directory path (deprecated, use imagesPath getter)
+	 */
+	public getImagesPath(): string {
+		return this.imagesPathValue
+	}
 
-  /**
-   * Cleanup method to stop the watcher when the service is no longer needed
-   */
-  public dispose(): void {
-    this.stopWatcher()
-  }
+	/**
+	 * Cleanup method to stop the watcher when the service is no longer needed
+	 */
+	public dispose(): void {
+		this.stopWatcher()
+	}
 }
 
 // Export singleton instance

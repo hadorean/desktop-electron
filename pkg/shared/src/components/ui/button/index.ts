@@ -1,5 +1,5 @@
-import Root from './button.svelte';
-import { type VariantProps, tv } from 'tailwind-variants';
+import Root from './button.svelte'
+import { type VariantProps, tv } from 'tailwind-variants'
 
 const buttonVariants = tv({
 	base: 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
@@ -23,10 +23,10 @@ const buttonVariants = tv({
 		variant: 'default',
 		size: 'default'
 	}
-});
+})
 
-type Variant = VariantProps<typeof buttonVariants>['variant'];
-type Size = VariantProps<typeof buttonVariants>['size'];
+type Variant = VariantProps<typeof buttonVariants>['variant']
+type Size = VariantProps<typeof buttonVariants>['size']
 
 export {
 	Root,
@@ -35,4 +35,4 @@ export {
 	buttonVariants,
 	type Variant,
 	type Size
-};
+}

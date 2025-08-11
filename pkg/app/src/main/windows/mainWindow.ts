@@ -11,120 +11,120 @@ let window: BrowserWindow | null = null
 let isQuitting = false
 
 export function createWindow(): void {
-  const transparent = true
+	const transparent = true
 
-  // Create the browser window.
-  window = new BrowserWindow({
-    width: 650,
-    height: 670,
-    show: false,
-    autoHideMenuBar: true,
-    resizable: !transparent,
-    frame: !transparent,
-    transparent: transparent,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      webSecurity: false,
-      allowRunningInsecureContent: true,
-      contextIsolation: true,
-      nodeIntegration: false,
-      webviewTag: true,
-      plugins: true
-    }
-  })
+	// Create the browser window.
+	window = new BrowserWindow({
+		width: 650,
+		height: 670,
+		show: false,
+		autoHideMenuBar: true,
+		resizable: !transparent,
+		frame: !transparent,
+		transparent: transparent,
+		...(process.platform === 'linux' ? { icon } : {}),
+		webPreferences: {
+			preload: join(__dirname, '../preload/index.js'),
+			sandbox: false,
+			webSecurity: false,
+			allowRunningInsecureContent: true,
+			contextIsolation: true,
+			nodeIntegration: false,
+			webviewTag: true,
+			plugins: true
+		}
+	})
 
-  window.on('ready-to-show', () => {
-    window?.show()
-  })
+	window.on('ready-to-show', () => {
+		window?.show()
+	})
 
-  window.once('ready-to-show', () => {
-    if (!window) return
-    const { width: winW } = window.getBounds()
-    const { workArea } = screen.getPrimaryDisplay() // respects taskbar/dock
-    const x = workArea.x + workArea.width - winW // bottom-right
-    const y = workArea.y / 2
-    window.setBounds({
-      x: x,
-      y: y,
-      width: winW,
-      height: workArea.height
-    })
-    window.setPosition(x, y)
-    window.show()
-  })
+	window.once('ready-to-show', () => {
+		if (!window) return
+		const { width: winW } = window.getBounds()
+		const { workArea } = screen.getPrimaryDisplay() // respects taskbar/dock
+		const x = workArea.x + workArea.width - winW // bottom-right
+		const y = workArea.y / 2
+		window.setBounds({
+			x: x,
+			y: y,
+			width: winW,
+			height: workArea.height
+		})
+		window.setPosition(x, y)
+		window.show()
+	})
 
-  // Check for updates when window is shown
-  window.on('show', () => {
-    if (!is.dev) {
-      console.log('Window shown - checking for updates...')
-      autoUpdater.checkForUpdates()
-    }
-  })
+	// Check for updates when window is shown
+	window.on('show', () => {
+		if (!is.dev) {
+			console.log('Window shown - checking for updates...')
+			autoUpdater.checkForUpdates()
+		}
+	})
 
-  window.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+	window.webContents.setWindowOpenHandler((details) => {
+		shell.openExternal(details.url)
+		return { action: 'deny' }
+	})
 
-  // Close to tray behavior
-  window.on('close', (event) => {
-    if (!isQuitting) {
-      event.preventDefault()
-      window?.hide()
-    }
-  })
+	// Close to tray behavior
+	window.on('close', (event) => {
+		if (!isQuitting) {
+			event.preventDefault()
+			window?.hide()
+		}
+	})
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    window.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    window.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+	// HMR for renderer base on electron-vite cli.
+	// Load the remote URL for development or the local html file for production.
+	if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+		window.loadURL(process.env['ELECTRON_RENDERER_URL'])
+	} else {
+		window.loadFile(join(__dirname, '../renderer/index.html'))
+	}
 }
 
 function getMainWindow(): BrowserWindow | null {
-  return window
+	return window
 }
 
 function setIsQuitting(quitting: boolean): void {
-  isQuitting = quitting
+	isQuitting = quitting
 }
 
 export function getIsQuitting(): boolean {
-  return isQuitting
+	return isQuitting
 }
 
 function showMainWindow(): void {
-  if (window && !window.isDestroyed()) {
-    window.show()
-    window.focus()
-  } else {
-    // If main window is destroyed, create a new one
-    createWindow()
-  }
+	if (window && !window.isDestroyed()) {
+		window.show()
+		window.focus()
+	} else {
+		// If main window is destroyed, create a new one
+		createWindow()
+	}
 }
 
 function hideMainWindow(): void {
-  if (window && !window.isDestroyed()) {
-    window.hide()
-  }
+	if (window && !window.isDestroyed()) {
+		window.hide()
+	}
 }
 
 function toggleMainWindow(): void {
-  if (window && !window.isDestroyed()) {
-    window.isVisible() ? hideMainWindow() : showMainWindow()
-  }
+	if (window && !window.isDestroyed()) {
+		window.isVisible() ? hideMainWindow() : showMainWindow()
+	}
 }
 
 export const mainWindow = {
-  show: showMainWindow,
-  hide: hideMainWindow,
-  toggle: toggleMainWindow,
-  get: getMainWindow,
-  setIsQuitting: (quitting: boolean) => setIsQuitting(quitting)
+	show: showMainWindow,
+	hide: hideMainWindow,
+	toggle: toggleMainWindow,
+	get: getMainWindow,
+	setIsQuitting: (quitting: boolean) => setIsQuitting(quitting)
 }
 
 export type MainWindow = typeof mainWindow

@@ -30,10 +30,10 @@ export const ApiRoutes = {
 	// Weather (used in api service)
 	Weather: '/api/weather',
 	WeatherForecast: '/weatherforecast'
-} as const;
+} as const
 
 // Type for API routes
-export type ApiRoute = (typeof ApiRoutes)[keyof typeof ApiRoutes];
+export type ApiRoute = (typeof ApiRoutes)[keyof typeof ApiRoutes]
 
 // Type for routes that accept GET requests
 export type GetRoutes =
@@ -50,14 +50,14 @@ export type GetRoutes =
 	| typeof ApiRoutes.AppDynamic
 	| typeof ApiRoutes.DevInfo
 	| typeof ApiRoutes.Weather
-	| typeof ApiRoutes.WeatherForecast;
+	| typeof ApiRoutes.WeatherForecast
 
 // Type for routes that accept POST requests
 export type PostRoutes =
 	| typeof ApiRoutes.ThumbnailsClearCache
 	| typeof ApiRoutes.UpdateSettings
 	| typeof ApiRoutes.DevClearCache
-	| typeof ApiRoutes.DevClientRebuilt;
+	| typeof ApiRoutes.DevClientRebuilt
 
 // Helper functions for building dynamic routes
 export const buildRoute = {
@@ -66,8 +66,8 @@ export const buildRoute = {
 	image: (name: string) => `/api/image?name=${encodeURIComponent(name)}`,
 	thumbnail: (name: string) => `/api/thumbnail?name=${encodeURIComponent(name)}`,
 	weather: (location: string) => `/api/weather/${encodeURIComponent(location)}`
-};
+}
 
 // Type-safe route helpers for Express server methods
-export type ExpressGetRoute = GetRoutes;
-export type ExpressPostRoute = PostRoutes;
+export type ExpressGetRoute = GetRoutes
+export type ExpressPostRoute = PostRoutes

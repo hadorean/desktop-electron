@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Slider } from '../ui';
-	import { Button } from '../ui';
-	import { cn } from '../../lib/utils';
+	import { Slider } from '../ui'
+	import { Button } from '../ui'
+	import { cn } from '../../lib/utils'
 
 	const {
 		label,
@@ -15,47 +15,47 @@
 		defaultValue = 0,
 		overrideValue = null
 	} = $props<{
-		label: string;
-		value: number | null;
-		min: number;
-		max: number;
-		step?: number;
-		onChange: (value: number | null) => void;
-		formatValue: (value: number) => string;
-		isOverride?: boolean;
-		defaultValue: number;
-		overrideValue?: number | null;
-	}>();
+		label: string
+		value: number | null
+		min: number
+		max: number
+		step?: number
+		onChange: (value: number | null) => void
+		formatValue: (value: number) => string
+		isOverride?: boolean
+		defaultValue: number
+		overrideValue?: number | null
+	}>()
 
-	const isOverridden = $derived(isOverride && overrideValue !== null);
-	const isGhost = $derived(isOverride && !isOverridden);
+	const isOverridden = $derived(isOverride && overrideValue !== null)
+	const isGhost = $derived(isOverride && !isOverridden)
 
 	function handleOverride(): void {
 		console.log(`[SliderControl ${label}] handleOverride called:`, {
 			isOverridden,
 			overrideValue
-		});
+		})
 		if (!isOverridden) {
 			// When enabling override, use either the defaultValue or the current shared value
-			const newValue = defaultValue ?? value ?? min;
-			onChange(newValue);
+			const newValue = defaultValue ?? value ?? min
+			onChange(newValue)
 		} else {
 			// When disabling override, set to null to use shared value
-			onChange(null);
+			onChange(null)
 		}
 	}
 
 	function handleValueChange(newValues: number[]): void {
-		const newValue = newValues[0];
+		const newValue = newValues[0]
 		console.log(`[SliderControl ${label}] handleValueChange called:`, {
 			newValue,
 			previous: value
-		});
-		onChange(newValue);
+		})
+		onChange(newValue)
 	}
 
-	const currentValue = $derived(value ?? defaultValue);
-	const displayValue = $derived(isOverridden ? (overrideValue ?? min) : currentValue);
+	const currentValue = $derived(value ?? defaultValue)
+	const displayValue = $derived(isOverridden ? (overrideValue ?? min) : currentValue)
 </script>
 
 <div class="slider-control">

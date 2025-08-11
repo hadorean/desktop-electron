@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { settings } from '../../stores/settingsStore';
+	import { settings } from '../../stores/settingsStore'
 
-	export let hideButton: boolean = false;
-	export let buttonHovered: boolean = false;
-	export let onToggle: () => void;
-	export let onMouseEnter: () => void;
-	export let onMouseLeave: () => void;
-	export let buttonRef: HTMLElement | null = null;
+	export let hideButton: boolean = false
+	export let buttonHovered: boolean = false
+	export let onToggle: () => void
+	export let onMouseEnter: () => void
+	export let onMouseLeave: () => void
+	export let buttonRef: HTMLElement | null = null
 
-	$: position = $settings.settingsButtonPosition;
+	$: position = $settings.settingsButtonPosition
 	$: positionClasses = {
 		'bottom-right': 'bottom-4 right-4',
 		'top-right': 'top-4 right-4',
 		'bottom-left': 'bottom-4 left-4',
 		'top-left': 'top-4 left-4'
-	}[position];
+	}[position]
 </script>
 
 <button

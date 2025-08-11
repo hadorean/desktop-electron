@@ -91,16 +91,16 @@ electron-app/
 ```typescript
 // Shared state interface
 export interface AppState {
-	theme: 'light' | 'dark';
-	settings: UserSettings;
+	theme: 'light' | 'dark'
+	settings: UserSettings
 	// ... other shared state
 }
 
 export interface SyncMessage {
-	type: 'state_update' | 'user_action';
-	payload: any;
-	timestamp: number;
-	clientId: string;
+	type: 'state_update' | 'user_action'
+	payload: any
+	timestamp: number
+	clientId: string
 }
 ```
 

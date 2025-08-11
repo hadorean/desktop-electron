@@ -1,72 +1,72 @@
 <script lang="ts">
-	import { currentScreen, screenIds, allSettings, isLocalMode } from '../../stores/settingsStore';
-	import { Button } from '../ui';
-	import { Tabs, TabsList, TabsTrigger } from '../ui';
+	import { currentScreen, screenIds, allSettings, isLocalMode } from '../../stores/settingsStore'
+	import { Button } from '../ui'
+	import { Tabs, TabsList, TabsTrigger } from '../ui'
 
-	let editMode = $state(false);
-	let renamingScreen = $state<string | null>(null);
-	let renameValue = $state('');
-	let showDeleteConfirm = $state<string | null>(null);
+	let editMode = $state(false)
+	let renamingScreen = $state<string | null>(null)
+	let renameValue = $state('')
+	let showDeleteConfirm = $state<string | null>(null)
 
 	// Reactive current tab value based on local mode and current screen
-	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared');
+	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared')
 
 	function handleTabChange(value: string): void {
 		if (!editMode) {
 			if (value === 'shared') {
-				isLocalMode.set(false);
+				isLocalMode.set(false)
 			} else {
-				currentScreen.set(value);
-				isLocalMode.set(true);
+				currentScreen.set(value)
+				isLocalMode.set(true)
 			}
 		}
 	}
 
 	function toggleEditMode(): void {
-		editMode = !editMode;
-		renamingScreen = null;
-		showDeleteConfirm = null;
+		editMode = !editMode
+		renamingScreen = null
+		showDeleteConfirm = null
 	}
 
 	function confirmRename(): void {
 		if (renamingScreen && renameValue.trim() && renameValue !== renamingScreen) {
 			// Update settings structure with new screen name
 			allSettings.update((settings) => {
-				const oldScreenSettings = settings.screens[renamingScreen!];
-				const newScreens = { ...settings.screens };
+				const oldScreenSettings = settings.screens[renamingScreen!]
+				const newScreens = { ...settings.screens }
 
 				// Remove old screen
-				delete newScreens[renamingScreen!];
+				delete newScreens[renamingScreen!]
 				// Add with new name
-				newScreens[renameValue.trim()] = oldScreenSettings || {};
+				newScreens[renameValue.trim()] = oldScreenSettings || {}
 
 				return {
 					...settings,
 					screens: newScreens
-				};
-			});
+				}
+			})
 
 			// Update current screen if it was the renamed one
 			if ($currentScreen === renamingScreen) {
-				currentScreen.set(renameValue.trim());
+				currentScreen.set(renameValue.trim())
 			}
 		}
-		renamingScreen = null;
+		renamingScreen = null
 	}
 
 	function cancelRename(): void {
-		renamingScreen = null;
+		renamingScreen = null
 	}
 
 	function confirmDelete(): void {
 		if (showDeleteConfirm && $screenIds.length > 1) {
-			const screenToDelete = showDeleteConfirm;
+			const screenToDelete = showDeleteConfirm
 
 			// Switch to another screen if deleting current screen
 			if ($currentScreen === screenToDelete) {
-				const otherScreen = $screenIds.find((id) => id !== screenToDelete);
+				const otherScreen = $screenIds.find((id) => id !== screenToDelete)
 				if (otherScreen) {
-					currentScreen.set(otherScreen);
+					currentScreen.set(otherScreen)
 				}
 			}
 
@@ -74,17 +74,17 @@
 			allSettings.update((settings) => ({
 				...settings,
 				screens: Object.fromEntries(Object.entries(settings.screens).filter(([key]) => key !== screenToDelete))
-			}));
+			}))
 		}
-		showDeleteConfirm = null;
+		showDeleteConfirm = null
 	}
 
 	function cancelDelete(): void {
-		showDeleteConfirm = null;
+		showDeleteConfirm = null
 	}
 
 	function addNewScreen(): void {
-		const newScreenName = `Screen ${$screenIds.length + 1}`;
+		const newScreenName = `Screen ${$screenIds.length + 1}`
 
 		// Add new screen to settings
 		allSettings.update((settings) => ({
@@ -93,22 +93,22 @@
 				...settings.screens,
 				[newScreenName]: {}
 			}
-		}));
+		}))
 
 		// Switch to new screen
-		currentScreen.set(newScreenName);
+		currentScreen.set(newScreenName)
 	}
 
 	function handleKeyDown(event: KeyboardEvent): void {
 		if (event.key === 'Enter') {
-			confirmRename();
+			confirmRename()
 		} else if (event.key === 'Escape') {
-			cancelRename();
+			cancelRename()
 		}
 	}
 
 	function focus(element: HTMLElement): void {
-		element.focus();
+		element.focus()
 	}
 </script>
 

@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { defineConfig } from 'vite'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 // Config for standalone web demo (no backend required)
 export default defineConfig({
@@ -12,4 +12,4 @@ export default defineConfig({
 	server: {
 		port: 3000
 	}
-});
+})

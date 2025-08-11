@@ -46,22 +46,22 @@ npm run dev  # Electron-vite handles both main process and renderer hot reload
 
 ```typescript
 // src/main/dev-server.ts
-import { createServer as createViteServer } from 'vite';
-import { watch } from 'chokidar';
+import { createServer as createViteServer } from 'vite'
+import { watch } from 'chokidar'
 
 export class DevelopmentServer extends LocalServer {
-	private viteServers: Map<ClientType, any> = new Map();
-	private templateWatcher?: any;
+	private viteServers: Map<ClientType, any> = new Map()
+	private templateWatcher?: any
 
 	async startDevelopment() {
 		// Start multiple Vite dev servers for different client types
-		await this.startViteServers();
+		await this.startViteServers()
 
 		// Watch templates for changes
-		this.watchTemplates();
+		this.watchTemplates()
 
 		// Start main Express server with proxy to Vite servers
-		await this.start();
+		await this.start()
 	}
 
 	private async startViteServers() {
@@ -69,7 +69,7 @@ export class DevelopmentServer extends LocalServer {
 			{ type: ClientType.ELECTRON_FULL, port: 5173 },
 			{ type: ClientType.WEB_DEMO, port: 5174 },
 			{ type: ClientType.WEB_FULL, port: 5175 }
-		];
+		]
 
 		for (const config of configs) {
 			const viteServer = await createViteServer({
@@ -79,70 +79,70 @@ export class DevelopmentServer extends LocalServer {
 					__CLIENT_TYPE__: JSON.stringify(config.type),
 					__FEATURES__: JSON.stringify(FEATURE_SETS[config.type])
 				}
-			});
+			})
 
-			await viteServer.listen();
-			this.viteServers.set(config.type, viteServer);
-			console.log(`🔥 Vite server (${config.type}) running on port ${config.port}`);
+			await viteServer.listen()
+			this.viteServers.set(config.type, viteServer)
+			console.log(`🔥 Vite server (${config.type}) running on port ${config.port}`)
 		}
 	}
 
 	private watchTemplates() {
-		this.templateWatcher = watch('src/main/templates/**/*.ejs');
+		this.templateWatcher = watch('src/main/templates/**/*.ejs')
 		this.templateWatcher.on('change', (path: string) => {
-			console.log(`📝 Template changed: ${path}`);
+			console.log(`📝 Template changed: ${path}`)
 			// Clear template cache for hot reload
-			this.clearTemplateCache();
-		});
+			this.clearTemplateCache()
+		})
 	}
 
 	private setupDevelopmentRoutes() {
 		// In development, proxy to appropriate Vite server based on client type
 		this.server.get('/app*', async (req, res) => {
-			const clientType = this.detectClientType(req);
-			const viteServer = this.viteServers.get(clientType);
+			const clientType = this.detectClientType(req)
+			const viteServer = this.viteServers.get(clientType)
 
 			if (viteServer) {
 				// Proxy to Vite dev server for hot reload
-				return this.proxyToVite(req, res, viteServer);
+				return this.proxyToVite(req, res, viteServer)
 			}
 
 			// Fallback to template rendering if Vite server not available
-			await this.renderTemplate(req, res, clientType);
-		});
+			await this.renderTemplate(req, res, clientType)
+		})
 	}
 
 	private async proxyToVite(req: any, res: any, viteServer: any) {
 		// Proxy request to Vite dev server while injecting dynamic data
-		const url = req.originalUrl.replace('/app', '');
+		const url = req.originalUrl.replace('/app', '')
 
 		try {
 			// Get template with dynamic data
-			const template = await this.getViteTemplate(viteServer, '/index.html');
-			const clientType = this.detectClientType(req);
-			const dynamicData = await this.getDynamicData(req, clientType);
+			const template = await this.getViteTemplate(viteServer, '/index.html')
+			const clientType = this.detectClientType(req)
+			const dynamicData = await this.getDynamicData(req, clientType)
 
 			// Inject data into Vite-served HTML
-			const html = this.injectDynamicData(template, dynamicData);
+			const html = this.injectDynamicData(template, dynamicData)
 
-			res.setHeader('Content-Type', 'text/html');
-			res.send(html);
+			res.setHeader('Content-Type', 'text/html')
+			res.send(html)
 		} catch (error) {
-			console.error('Vite proxy error:', error);
-			res.status(500).send('Development server error');
+			console.error('Vite proxy error:', error)
+			res.status(500).send('Development server error')
 		}
 	}
 
 	private async getViteTemplate(viteServer: any, url: string): Promise<string> {
 		// Get HTML from Vite with hot reload capabilities
-		const { transformIndexHtml } = viteServer.ssrLoadModule('/src/main.ts');
+		const { transformIndexHtml } = viteServer.ssrLoadModule('/src/main.ts')
 		return await viteServer.transformIndexHtml(
 			url,
 			'<div id="app"></div>', // Base template
 			{
 				/* Vite transform options */
 			}
-		);
+		)
 	}
 
 	private injectDynamicData(template: string, data: any): string {
@@ -155,7 +155,7 @@ export class DevelopmentServer extends LocalServer {
          window.__CLIENT_CONFIG__ = ${JSON.stringify(data.config)};
          window.__FEATURES__ = ${JSON.stringify(data.features)};
        </script>`
-		);
+		)
 	}
 }
 ```
@@ -224,9 +224,9 @@ http://localhost:5175  # Web build
 ```typescript
 // Debug mode: Show which client type and features are active
 if (import.meta.env.DEV) {
-	console.log('Client Type:', clientType);
-	console.log('Features:', features);
-	console.log('Initial State:', initialState);
+	console.log('Client Type:', clientType)
+	console.log('Features:', features)
+	console.log('Initial State:', initialState)
 }
 ```
 
@@ -252,7 +252,7 @@ const DEV_PORTS = {
 	ELECTRON: 5173,
 	DEMO: 5174,
 	WEB: 5175
-};
+}
 ```
 
 ### **Challenge: Template vs Vite Conflicts**
@@ -262,11 +262,11 @@ const DEV_PORTS = {
 ```typescript
 // Development: Vite handles assets, server injects data
 // Production: Server renders everything
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development'
 if (isDev) {
-	return proxyToViteWithDataInjection(req, res);
+	return proxyToViteWithDataInjection(req, res)
 } else {
-	return renderTemplate(req, res);
+	return renderTemplate(req, res)
 }
 ```
 

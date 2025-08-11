@@ -1,33 +1,33 @@
 <script lang="ts">
-	import { apiBaseUrl, apiConfigEnabled } from '../../stores/apiStore';
+	import { apiBaseUrl, apiConfigEnabled } from '../../stores/apiStore'
 
-	export let onApiUrlChange: (value: string) => void;
-	export let onReconnect: () => void;
+	export let onApiUrlChange: (value: string) => void
+	export let onReconnect: () => void
 
-	let localApiUrl = $apiBaseUrl;
-	let showApiConfig = $apiConfigEnabled;
-	let isReconnecting = false;
+	let localApiUrl = $apiBaseUrl
+	let showApiConfig = $apiConfigEnabled
+	let isReconnecting = false
 
 	function handleApiUrlChange(): void {
-		onApiUrlChange(localApiUrl);
-		apiBaseUrl.set(localApiUrl);
+		onApiUrlChange(localApiUrl)
+		apiBaseUrl.set(localApiUrl)
 	}
 
 	function handleApiConfigToggle(): void {
-		apiConfigEnabled.set(showApiConfig);
+		apiConfigEnabled.set(showApiConfig)
 		// Trigger reconnection in both cases
-		handleReconnect();
+		handleReconnect()
 	}
 
 	async function handleReconnect(): Promise<void> {
-		isReconnecting = true;
-		handleApiUrlChange();
-		onReconnect();
+		isReconnecting = true
+		handleApiUrlChange()
+		onReconnect()
 
 		// Reset reconnecting state after a short delay
 		setTimeout(() => {
-			isReconnecting = false;
-		}, 2000);
+			isReconnecting = false
+		}, 2000)
 	}
 </script>
 

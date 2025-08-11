@@ -28,13 +28,13 @@ enum ClientType {
 }
 
 function detectClientType(req: Request): ClientType {
-	const userAgent = req.get('User-Agent') || '';
-	const isElectron = userAgent.includes('Electron');
-	const isDemoMode = req.query.demo === 'true' || req.hostname !== 'localhost';
+	const userAgent = req.get('User-Agent') || ''
+	const isElectron = userAgent.includes('Electron')
+	const isDemoMode = req.query.demo === 'true' || req.hostname !== 'localhost'
 
-	if (isElectron) return ClientType.ELECTRON_FULL;
-	if (isDemoMode) return ClientType.WEB_DEMO;
-	return ClientType.WEB_FULL;
+	if (isElectron) return ClientType.ELECTRON_FULL
+	if (isDemoMode) return ClientType.WEB_DEMO
+	return ClientType.WEB_FULL
 }
 ```
 
@@ -42,12 +42,12 @@ function detectClientType(req: Request): ClientType {
 
 ```typescript
 interface FeatureFlags {
-	settingsSaving: boolean;
-	userImageUpload: boolean;
-	localStoragePersistence: boolean;
-	fullImageLibrary: boolean;
-	realtimeSync: boolean;
-	nativeIntegration: boolean;
+	settingsSaving: boolean
+	userImageUpload: boolean
+	localStoragePersistence: boolean
+	fullImageLibrary: boolean
+	realtimeSync: boolean
+	nativeIntegration: boolean
 }
 
 const FEATURE_SETS: Record<ClientType, FeatureFlags> = {
@@ -67,7 +67,7 @@ const FEATURE_SETS: Record<ClientType, FeatureFlags> = {
 		realtimeSync: true,
 		nativeIntegration: false
 	}
-};
+}
 ```
 
 ## Structural Changes Required
@@ -140,13 +140,13 @@ src/
 ```typescript
 // Dynamic client serving with feature-specific data
 app.get('/app*', async (req, res) => {
-	const clientType = detectClientType(req);
-	const features = FEATURE_SETS[clientType];
-	const routeData = await getRouteSpecificData(req.path, req.query, clientType);
-	const config = await generateClientConfig(req, clientType);
+	const clientType = detectClientType(req)
+	const features = FEATURE_SETS[clientType]
+	const routeData = await getRouteSpecificData(req.path, req.query, clientType)
+	const config = await generateClientConfig(req, clientType)
 
 	// Serve different client builds based on type
-	const clientDistPath = getClientDistPath(clientType);
+	const clientDistPath = getClientDistPath(clientType)
 
 	res.render('app', {
 		title: routeData.title,
@@ -158,27 +158,27 @@ app.get('/app*', async (req, res) => {
 		images: await getImagesList(clientType), // Different image sets
 		route: req.path,
 		assetsPath: `/app/${clientType}/assets/` // Different asset paths
-	});
-});
+	})
+})
 
 function getClientDistPath(clientType: ClientType): string {
 	switch (clientType) {
 		case ClientType.ELECTRON_FULL:
-			return 'client/electron-dist';
+			return 'client/electron-dist'
 		case ClientType.WEB_DEMO:
-			return 'client/demo-dist';
+			return 'client/demo-dist'
 		case ClientType.WEB_FULL:
-			return 'client/web-dist';
+			return 'client/web-dist'
 	}
 }
 
 async function getImagesList(clientType: ClientType): Promise<ImageItem[]> {
 	if (clientType === ClientType.WEB_DEMO) {
 		// Return curated preset images for demo
-		return DEMO_PRESET_IMAGES;
+		return DEMO_PRESET_IMAGES
 	}
 	// Return full user images for Electron/full web
-	return await scanForImages();
+	return await scanForImages()
 }
 ```
 
@@ -192,7 +192,7 @@ export class TemplateService {
 			initialState: await this.getInitialState(route, query),
 			config: await this.getClientConfig(),
 			preloadedData: await this.getPreloadedData(route)
-		};
+		}
 	}
 }
 ```
@@ -249,17 +249,17 @@ export class TemplateService {
 ```typescript
 // client/src/main.ts
 interface InitialData {
-	state: any;
-	config: any;
-	features: FeatureFlags;
-	clientType: ClientType;
-	route: { route: string; monitor?: string };
+	state: any
+	config: any
+	features: FeatureFlags
+	clientType: ClientType
+	route: { route: string; monitor?: string }
 }
 
-const initialData: InitialData = (window as any).__INITIAL_STATE__ || {};
-const clientConfig = (window as any).__CLIENT_CONFIG__ || {};
-const routeData = (window as any).__ROUTE_DATA__ || {};
-const features = (window as any).__FEATURES__ || {};
+const initialData: InitialData = (window as any).__INITIAL_STATE__ || {}
+const clientConfig = (window as any).__CLIENT_CONFIG__ || {}
+const routeData = (window as any).__ROUTE_DATA__ || {}
+const features = (window as any).__FEATURES__ || {}
 
 // Feature-aware app initialization
 const app = new App({
@@ -271,7 +271,7 @@ const app = new App({
 		clientType: initialData.clientType,
 		route: routeData
 	}
-});
+})
 ```
 
 **Feature-Gated Components:**
@@ -279,9 +279,9 @@ const app = new App({
 ```svelte
 <!-- client/src/App.svelte -->
 <script lang="ts">
-	export let features: FeatureFlags;
-	export let clientType: ClientType;
-	export let initialState: any;
+	export let features: FeatureFlags
+	export let clientType: ClientType
+	export let initialState: any
 </script>
 
 <main>
@@ -364,7 +364,7 @@ const DEPLOYMENT_CONFIG = {
 		demo: 'https://yourdomain.com/demo',
 		web: 'https://yourdomain.com/app'
 	}
-};
+}
 ```
 
 **Routing Strategy:**
@@ -382,25 +382,25 @@ localhost:8080/app        → Full features (Electron mode)
 
 ```typescript
 interface ClientConfig {
-	clientType: ClientType;
+	clientType: ClientType
 	apiEndpoints: {
-		images: string;
-		thumbnails: string;
-		settings?: string; // Only for full versions
-	};
-	features: FeatureFlags;
+		images: string
+		thumbnails: string
+		settings?: string // Only for full versions
+	}
+	features: FeatureFlags
 	assets: {
-		presetImages?: string[]; // Demo mode only
-		allowedFormats: string[];
-	};
+		presetImages?: string[] // Demo mode only
+		allowedFormats: string[]
+	}
 	monitor: {
-		count: number;
-		resolution: Array<{ width: number; height: number }>;
-	};
+		count: number
+		resolution: Array<{ width: number; height: number }>
+	}
 	limits: {
-		maxImages?: number; // Demo: limited, Full: unlimited
-		maxFileSize?: number;
-	};
+		maxImages?: number // Demo: limited, Full: unlimited
+		maxFileSize?: number
+	}
 }
 
 function generateClientConfig(clientType: ClientType): ClientConfig {
@@ -411,7 +411,7 @@ function generateClientConfig(clientType: ClientType): ClientConfig {
 			thumbnails: '/api/thumbnail'
 		},
 		features: FEATURE_SETS[clientType]
-	};
+	}
 
 	if (clientType === ClientType.WEB_DEMO) {
 		return {
@@ -424,7 +424,7 @@ function generateClientConfig(clientType: ClientType): ClientConfig {
 				maxImages: 20, // Limited for demo
 				maxFileSize: 5 * 1024 * 1024 // 5MB limit
 			}
-		};
+		}
 	}
 
 	return {
@@ -437,7 +437,7 @@ function generateClientConfig(clientType: ClientType): ClientConfig {
 			maxImages: undefined, // Unlimited
 			maxFileSize: 50 * 1024 * 1024 // 50MB limit
 		}
-	};
+	}
 }
 ```
 

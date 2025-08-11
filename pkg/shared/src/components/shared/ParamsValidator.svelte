@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { routeParams, hasValidParams } from '../../stores/routeStore';
+	import { routeParams, hasValidParams } from '../../stores/routeStore'
 </script>
 
 {#if $hasValidParams}

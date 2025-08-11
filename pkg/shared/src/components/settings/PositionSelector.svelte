@@ -1,42 +1,42 @@
 <script lang="ts">
-	import { settings, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore';
-	import type { SettingsButtonPosition } from '../../stores/settingsStore';
+	import { settings, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore'
+	import type { SettingsButtonPosition } from '../../stores/settingsStore'
 
 	const props = $props<{
-		disabled?: boolean;
-		isOverride?: boolean;
-		overrideValue?: string | null;
-		onOverride?: (newPosition: SettingsButtonPosition) => void;
-	}>();
+		disabled?: boolean
+		isOverride?: boolean
+		overrideValue?: string | null
+		onOverride?: (newPosition: SettingsButtonPosition) => void
+	}>()
 
-	const { disabled = false, isOverride = false, overrideValue, onOverride } = props;
+	const { disabled = false, isOverride = false, overrideValue, onOverride } = props
 
 	const positions = [
 		{ value: 'top-left', label: 'Top Left' },
 		{ value: 'top-right', label: 'Top Right' },
 		{ value: 'bottom-left', label: 'Bottom Left' },
 		{ value: 'bottom-right', label: 'Bottom Right' }
-	] as const;
+	] as const
 
-	const isOverridden = $derived(isOverride && overrideValue !== null);
-	const effectivePosition = $derived(isOverridden ? overrideValue : $settings.settingsButtonPosition);
+	const isOverridden = $derived(isOverride && overrideValue !== null)
+	const effectivePosition = $derived(isOverridden ? overrideValue : $settings.settingsButtonPosition)
 
 	function handlePositionChange(position: string): void {
 		if (isOverride && !isOverridden) {
 			// When enabling override in local mode, use the current value
 			updateLocalSettings(() => ({
 				settingsButtonPosition: position as SettingsButtonPosition
-			}));
+			}))
 		} else {
 			updateSharedSettings(() => ({
 				settingsButtonPosition: position as SettingsButtonPosition
-			}));
+			}))
 		}
 	}
 
 	function handleOverride(): void {
 		if (onOverride) {
-			onOverride();
+			onOverride()
 		}
 	}
 </script>

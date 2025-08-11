@@ -2,50 +2,50 @@ import { Tray, Menu, shell } from 'electron'
 import { AppContext } from '../services/context'
 
 export function createTray(context: AppContext): Tray {
-  const { app, icon, localServer: localServer, mainWindow, bg } = context
+	const { app, icon, localServer: localServer, mainWindow, bg } = context
 
-  const tray = new Tray(icon)
-  tray.setToolTip('Hey Ketsu')
+	const tray = new Tray(icon)
+	tray.setToolTip('Hey Ketsu')
 
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Show App',
-      click: () => {
-        mainWindow.show()
-      }
-    },
-    {
-      label: 'Open in Browser',
-      click: () => {
-        if (localServer.isServerRunning()) {
-          shell.openExternal(localServer.getUrl())
-        }
-      }
-    },
-    { type: 'separator' },
-    {
-      label: 'Quit',
-      click: () => {
-        console.log('Tray quit clicked - starting cleanup...')
-        mainWindow.setIsQuitting(true)
-        bg?.cleanup()
-        localServer.stop()
+	const contextMenu = Menu.buildFromTemplate([
+		{
+			label: 'Show App',
+			click: () => {
+				mainWindow.show()
+			}
+		},
+		{
+			label: 'Open in Browser',
+			click: () => {
+				if (localServer.isServerRunning()) {
+					shell.openExternal(localServer.getUrl())
+				}
+			}
+		},
+		{ type: 'separator' },
+		{
+			label: 'Quit',
+			click: () => {
+				console.log('Tray quit clicked - starting cleanup...')
+				mainWindow.setIsQuitting(true)
+				bg?.cleanup()
+				localServer.stop()
 
-        // Force quit after cleanup
-        setTimeout(() => {
-          console.log('Force quitting from tray...')
-          app.exit(0)
-        }, 1000)
-      }
-    }
-  ])
+				// Force quit after cleanup
+				setTimeout(() => {
+					console.log('Force quitting from tray...')
+					app.exit(0)
+				}, 1000)
+			}
+		}
+	])
 
-  tray.setContextMenu(contextMenu)
+	tray.setContextMenu(contextMenu)
 
-  // Double click tray icon to show window
-  tray.on('double-click', () => {
-    mainWindow.show()
-  })
+	// Double click tray icon to show window
+	tray.on('double-click', () => {
+		mainWindow.show()
+	})
 
-  return tray
+	return tray
 }

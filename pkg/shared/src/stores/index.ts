@@ -19,7 +19,7 @@ export {
 	getScreenSettings,
 	type Settings as StoreSettings,
 	type SettingsButtonPosition
-} from './settingsStore';
+} from './settingsStore'
 
 // Screen store
 export {
@@ -38,7 +38,7 @@ export {
 	getScreenStoreManager,
 	type RouteParams,
 	type ScreenAdapter
-} from './screenStore';
+} from './screenStore'
 
 // Debug store
-export { debugVisible, toggleDebugMenu, setDebugMenuVisible, loadDebugState } from './debugStore';
+export { debugVisible, toggleDebugMenu, setDebugMenuVisible, loadDebugState } from './debugStore'

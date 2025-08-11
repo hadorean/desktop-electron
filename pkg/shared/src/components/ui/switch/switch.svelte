@@ -1,27 +1,27 @@
 <script lang="ts">
-	import { cn } from '../../../lib/utils.js';
+	import { cn } from '../../../lib/utils.js'
 
 	interface Props {
-		class?: string;
-		checked?: boolean;
-		disabled?: boolean;
-		onCheckedChange?: (checked: boolean) => void;
-		id?: string;
+		class?: string
+		checked?: boolean
+		disabled?: boolean
+		onCheckedChange?: (checked: boolean) => void
+		id?: string
 	}
 
-	let { class: className, checked = $bindable(false), disabled = false, onCheckedChange, id, ...restProps }: Props = $props();
+	let { class: className, checked = $bindable(false), disabled = false, onCheckedChange, id, ...restProps }: Props = $props()
 
 	function handleClick(): void {
-		if (disabled) return;
-		checked = !checked;
-		onCheckedChange?.(checked);
+		if (disabled) return
+		checked = !checked
+		onCheckedChange?.(checked)
 	}
 
 	function handleKeydown(e: KeyboardEvent): void {
-		if (disabled) return;
+		if (disabled) return
 		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			handleClick();
+			e.preventDefault()
+			handleClick()
 		}
 	}
 </script>

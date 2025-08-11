@@ -1,46 +1,46 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { Tween } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
+	import { onMount, onDestroy } from 'svelte'
+	import { Tween } from 'svelte/motion'
+	import { cubicOut } from 'svelte/easing'
 
 	// Props
-	let currentTime: string = '';
-	let currentDate: string = '';
-	let interval: ReturnType<typeof setInterval> | undefined;
+	let currentTime: string = ''
+	let currentDate: string = ''
+	let interval: ReturnType<typeof setInterval> | undefined
 	let opacity = new Tween(0, {
 		duration: 3000,
 		easing: cubicOut
-	});
+	})
 
 	// Function to update the current time and greeting
 	function updateTime(): void {
-		const now = new Date();
-		const hours = now.getHours().toString().padStart(2, '0');
-		const minutes = now.getMinutes().toString().padStart(2, '0');
-		currentTime = `${hours}:${minutes}`;
+		const now = new Date()
+		const hours = now.getHours().toString().padStart(2, '0')
+		const minutes = now.getMinutes().toString().padStart(2, '0')
+		currentTime = `${hours}:${minutes}`
 
 		// Format the date
 		const options: Intl.DateTimeFormatOptions = {
 			weekday: 'long',
 			month: 'long',
 			day: 'numeric'
-		};
-		currentDate = now.toLocaleDateString('en-US', options);
+		}
+		currentDate = now.toLocaleDateString('en-US', options)
 	}
 
 	// Watch for showTimeDate changes
 	onMount(() => {
-		updateTime();
-		opacity.set(1);
-		interval = setInterval(updateTime, 1000);
-	});
+		updateTime()
+		opacity.set(1)
+		interval = setInterval(updateTime, 1000)
+	})
 
 	// Clean up on component destruction
 	onDestroy(() => {
 		if (interval) {
-			clearInterval(interval);
+			clearInterval(interval)
 		}
-	});
+	})
 </script>
 
 <div class="absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1 transform text-center text-white" style="opacity: {opacity.current};">

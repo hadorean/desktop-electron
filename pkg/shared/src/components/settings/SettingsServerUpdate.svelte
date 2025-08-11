@@ -1,74 +1,74 @@
 <script lang="ts">
-	import { allSettings, currentScreen } from '../../stores/settingsStore';
-	import { apiBaseUrl } from '../../stores/apiStore';
-	import { onMount, onDestroy } from 'svelte';
-	import { socketService } from '../../services/socket';
-	import { Inspect } from '@hgrandry/dbg';
-	import type { SettingsUpdateEvent } from '../../types';
+	import { allSettings, currentScreen } from '../../stores/settingsStore'
+	import { apiBaseUrl } from '../../stores/apiStore'
+	import { onMount, onDestroy } from 'svelte'
+	import { socketService } from '../../services/socket'
+	import { Inspect } from '@hgrandry/dbg'
+	import type { SettingsUpdateEvent } from '../../types'
 
-	let isConnected = false;
-	let updatingSettingsFromServer = false;
-	let initialSubscribeHandled = false;
-	let unsubscribeSettings: (() => void) | null = null;
+	let isConnected = false
+	let updatingSettingsFromServer = false
+	let initialSubscribeHandled = false
+	let unsubscribeSettings: (() => void) | null = null
 
 	onMount(() => {
 		// Setup Socket.IO connection status monitoring
 		socketService.onConnectionStatus((connected) => {
-			isConnected = connected;
-			console.log('Socket.IO connection status:', connected);
-		});
+			isConnected = connected
+			console.log('Socket.IO connection status:', connected)
+		})
 
 		// Setup settings update handler
 		socketService.onSettingsUpdate((event: SettingsUpdateEvent) => {
-			updatingSettingsFromServer = true;
+			updatingSettingsFromServer = true
 			try {
-				console.log('Applying settings from server:', event.settings);
-				const newSettings = event.settings;
+				console.log('Applying settings from server:', event.settings)
+				const newSettings = event.settings
 
 				// Check if current screen exists in server settings
-				const currentScreenId = $currentScreen;
+				const currentScreenId = $currentScreen
 				if (newSettings.screens && !newSettings.screens[currentScreenId]) {
 					// Add current screen to settings (empty object)
-					newSettings.screens[currentScreenId] = {};
-					updatingSettingsFromServer = false; // we want to update the server settings with the new screen
+					newSettings.screens[currentScreenId] = {}
+					updatingSettingsFromServer = false // we want to update the server settings with the new screen
 				}
 
-				allSettings.set(newSettings);
+				allSettings.set(newSettings)
 			} catch (error) {
-				console.error('Error updating settings from server:', error);
+				console.error('Error updating settings from server:', error)
 			}
-			updatingSettingsFromServer = false;
-		});
+			updatingSettingsFromServer = false
+		})
 
 		// Monitor API base URL changes and update socket connection
 		apiBaseUrl.subscribe((serverUrl) => {
 			if (serverUrl) {
-				socketService.updateServerUrl(serverUrl);
+				socketService.updateServerUrl(serverUrl)
 			}
-		});
+		})
 
 		// Subscribe to settings changes and send to server
 		unsubscribeSettings = allSettings.subscribe((value) => {
 			if (!initialSubscribeHandled) {
-				initialSubscribeHandled = true;
-				return; // Skip the initial subscribe callback
+				initialSubscribeHandled = true
+				return // Skip the initial subscribe callback
 			}
 
 			if (!updatingSettingsFromServer && socketService.getConnectionStatus()) {
-				console.log('Updating settings from client:', value);
+				console.log('Updating settings from client:', value)
 				// Use socket ID as client ID
-				const clientId = socketService.getSocketId();
-				socketService.updateSettings(value, clientId);
+				const clientId = socketService.getSocketId()
+				socketService.updateSettings(value, clientId)
 			}
-		});
-	});
+		})
+	})
 
 	onDestroy(() => {
 		// Clean up subscriptions
 		if (unsubscribeSettings) {
-			unsubscribeSettings();
+			unsubscribeSettings()
 		}
-	});
+	})
 </script>
 
 <Inspect>
