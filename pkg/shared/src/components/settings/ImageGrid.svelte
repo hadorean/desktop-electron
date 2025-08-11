@@ -56,7 +56,7 @@
 			const imageList = $images
 			const favorites = $settings.favorites
 			if (imageList.length === 0) return []
-			
+
 			return [...imageList].sort((a, b) => {
 				const aIsFavorite = favorites.includes(a.name)
 				const bIsFavorite = favorites.includes(b.name)

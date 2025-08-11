@@ -6,14 +6,14 @@
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
 	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator } from '@heyketsu/shared'
 	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout'
-	import { socketService, initializeImageChangeHandling, cleanupImageChangeHandling } from '$shared/services'
+	import { socketService, initializeImageChangeHandling } from '$shared/services'
 
 	let showSettings: boolean = false
 	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null
 	let buttonHovered: boolean = false
 	let settingsPanel: HTMLElement | null = null
 	let settingsButton: HTMLElement | null = null
-	
+
 	// Cleanup function for image change handling
 	let cleanupImageChanges: (() => void) | null = null
 

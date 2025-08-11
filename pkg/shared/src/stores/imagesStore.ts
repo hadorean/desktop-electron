@@ -38,7 +38,7 @@ const imagesStoreInternal = writable<ImagesStoreState>(initialState)
 export async function loadImages(): Promise<void> {
 	// Prevent validation cascades during loading
 	isLoadingImages = true
-	
+
 	// Set loading state
 	imagesStoreInternal.update((state) => ({
 		...state,

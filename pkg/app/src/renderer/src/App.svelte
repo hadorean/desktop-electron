@@ -2,7 +2,7 @@
 	import SettingsPanel from '$shared/components/settings/SettingsPanel.svelte'
 	import { effectiveApiUrl } from '$shared/stores/apiStore'
 	import { debugVisible, setDebugMenuVisible, loadImages, imagesError } from '$shared/stores'
-	import { socketService, initializeImageChangeHandling } from '$shared/services'
+	import { initializeImageChangeHandling } from '$shared/services'
 	import ErrorMessage from '$shared/components/settings/ErrorMessage.svelte'
 	import { Versions, AppVersion, AppHeader, ActionButtons, ServerInfo } from './components'
 	import { DebugMenu } from '@hgrandry/dbg'

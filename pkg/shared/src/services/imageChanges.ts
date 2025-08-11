@@ -7,11 +7,11 @@ import { loadImages, onImagesChanged, validateSelectedImages, getIsLoadingImages
 import { socketService } from './socket'
 
 // Type for image updated events (matches socket service signature)
-type ImageUpdatedEvent = { 
+type ImageUpdatedEvent = {
 	timestamp: number
 	reason: string
 	filename?: string
-	eventType?: string 
+	eventType?: string
 }
 
 /**
@@ -36,17 +36,17 @@ export function initializeImageChangeHandling(context: string): () => void {
 	}
 
 	// Setup socket listener for images updated events
-	const handleImagesUpdated = async (event: ImageUpdatedEvent) => {
+	const handleImagesUpdated = async (event: ImageUpdatedEvent): Promise<void> => {
 		console.log(`${context}: Received images updated event:`, event)
-		
+
 		// Deduplicate events with the same timestamp
 		if (event.timestamp <= lastProcessedEventTimestamp) {
 			console.log('🚫 Skipping duplicate event (already processed)')
 			return
 		}
-		
+
 		lastProcessedEventTimestamp = event.timestamp
-		
+
 		// Only refresh if it's a file change event
 		if (event.reason === 'file_change') {
 			console.log('🔄 Processing unique file change event')
@@ -55,7 +55,7 @@ export function initializeImageChangeHandling(context: string): () => void {
 	}
 
 	// Setup image change validation (skip during initial loading to prevent cascades)
-	const handleImagesChanged = (newImages: Array<{ name: string }>) => {
+	const handleImagesChanged = (newImages: Array<{ name: string }>): void => {
 		// Only validate if we're not currently loading to prevent validation cascades
 		if (!getIsLoadingImages()) {
 			const imageNames = newImages.map((img) => img.name)
