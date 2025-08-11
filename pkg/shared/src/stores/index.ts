@@ -24,25 +24,6 @@ export {
 	type SettingsButtonPosition
 } from './settingsStore'
 
-// Screen store
-export {
-	routeParams,
-	currentScreen as currentScreenStore,
-	hasValidParams,
-	defaultScreenId,
-	setRouteParams,
-	setCurrentScreen,
-	setCurrentUser,
-	getCurrentParams,
-	parseRouteParams,
-	getRouteUrl,
-	ScreenStoreManager,
-	initializeScreenStore,
-	getScreenStoreManager,
-	type RouteParams,
-	type ScreenAdapter
-} from './screenStore'
-
 // Debug store
 export { debugVisible, toggleDebugMenu, setDebugMenuVisible, loadDebugState } from './debugStore'
 
