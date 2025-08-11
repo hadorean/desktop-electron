@@ -26,7 +26,7 @@ publish-patch:
 	just publish
 
 build:
-	just rename_exe_prev
+	just move-prev-exe	
 	pnpm package:win
 
 build_run:
@@ -42,8 +42,8 @@ version version=default-version:
 publish:
 	node scripts/publish.js
 	
-rename_exe_prev:
-	node scripts/rename-exe-prev.js
+move-prev-exe:
+	node scripts/move-prev-exe.js
 
 delete-tags:
 	pnpm delete-tags
