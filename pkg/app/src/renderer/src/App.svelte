@@ -13,7 +13,7 @@
   let errorMessage: string = ''
 
   // Function to fetch images
-  async function fetchImages() {
+  async function fetchImages(): Promise<void> {
     try {
       images = await api.getImages()
       //console.log('Fetched images:', images);

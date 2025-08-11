@@ -3,17 +3,22 @@ import { autoUpdater, UpdateInfo } from 'electron-updater'
 import { MainWindow } from '../windows/mainWindow'
 import { IpcEvents, MainEvents, RendererEvents } from '@heyketsu/shared/types/ipc'
 
-export function setupAutoUpdate(mainWindow: MainWindow) {
+export function setupAutoUpdate(mainWindow: MainWindow): {
+  checkForUpdates: () => void
+  downloadUpdate: () => void
+  installUpdate: () => void
+  instance: typeof autoUpdater
+} {
   // Configure auto-updater
   autoUpdater.autoDownload = false
   autoUpdater.autoInstallOnAppQuit = true
 
   // Type-safe IPC wrappers
-  const handleIpc = (event: MainEvents, handler: (...args: any[]) => any) => {
+  const handleIpc = (event: MainEvents, handler: () => void): void => {
     ipcMain.handle(event, handler)
   }
 
-  const sendToRenderer = (event: RendererEvents, data: any) => {
+  const sendToRenderer = (event: RendererEvents, data: unknown): void => {
     const window = mainWindow.get()
     if (window) {
       window.webContents.send(event, data)

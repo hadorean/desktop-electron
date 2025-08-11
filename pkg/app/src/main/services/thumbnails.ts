@@ -97,10 +97,7 @@ export class ThumbnailService {
         const thumbnailPath = this.getThumbnailPath(imageName)
 
         // Skip if thumbnail exists and is fresh
-        if (
-          (await this.thumbnailExists(thumbnailPath)) &&
-          (await this.isThumbnailFresh(imagePath, thumbnailPath))
-        ) {
+        if ((await this.thumbnailExists(thumbnailPath)) && (await this.isThumbnailFresh(imagePath, thumbnailPath))) {
           skipped++
           continue
         }

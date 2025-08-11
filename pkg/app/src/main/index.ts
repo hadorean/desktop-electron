@@ -13,7 +13,7 @@ import { debugService } from './services/debug'
 const localServer = new LocalServer()
 const bg = new BackgroundManager()
 
-function setupApp() {
+function setupApp(): void {
   const context = {
     app,
     icon,

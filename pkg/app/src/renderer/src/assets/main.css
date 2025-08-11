@@ -28,7 +28,7 @@
     --ring: 188 94% 43%;
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 0 0% 7%;
     --foreground: 210 20% 98%;
@@ -54,11 +54,11 @@
 
 /* Force dark mode for shadcn-svelte components */
 html {
-	color-scheme: dark;
+  color-scheme: dark;
 }
 
 html body {
-	@apply dark;
+  @apply dark;
 }
 
 :root {

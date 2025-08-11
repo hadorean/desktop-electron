@@ -8,14 +8,15 @@
   let newVersionInfo: VersionInfo | null = null
   let showInfo = true
 
-  if (false) {
-    updateAvailable = true
-    newVersionInfo = {
-      version: '1.0.0',
-      releaseDate: new Date().toLocaleDateString(),
-      releaseNotes: 'This is a test release'
-    }
-  }
+  // Test data for development
+  // if (false) {
+  //   updateAvailable = true
+  //   newVersionInfo = {
+  //     version: '1.0.0',
+  //     releaseDate: new Date().toLocaleDateString(),
+  //     releaseNotes: 'This is a test release'
+  //   }
+  // }
 
   async function getAppVersion(): Promise<void> {
     try {
@@ -74,13 +75,7 @@
   {#if updateAvailable || updateDownloaded || updateProgress > 0}
     <div class="update-section">
       {#if updateAvailable && !updateDownloaded && updateProgress === 0}
-        <div
-          class="update-available"
-          role="button"
-          tabindex="0"
-          on:mouseenter={() => (showInfo = true)}
-          on:mouseleave={() => (showInfo = false)}
-        >
+        <div class="update-available" role="button" tabindex="0" on:mouseenter={() => (showInfo = true)} on:mouseleave={() => (showInfo = false)}>
           {#if showInfo && newVersionInfo && updateProgress === 0}
             <div class="update-info">
               <h3>Version: {newVersionInfo?.version}</h3>

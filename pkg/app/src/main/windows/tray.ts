@@ -1,10 +1,10 @@
 import { Tray, Menu, shell } from 'electron'
 import { AppContext } from '../services/context'
 
-export function createTray(context: AppContext) {
+export function createTray(context: AppContext): Tray {
   const { app, icon, localServer: localServer, mainWindow, bg } = context
 
-  const tray = new Tray(icon as any)
+  const tray = new Tray(icon)
   tray.setToolTip('Hey Ketsu')
 
   const contextMenu = Menu.buildFromTemplate([

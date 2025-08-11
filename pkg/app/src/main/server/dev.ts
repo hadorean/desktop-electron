@@ -28,9 +28,7 @@ export class DevelopmentManager {
     // In electron-vite, the main process is built to 'out' even in dev mode
     // Only consider it packaged if it's in app.asar (actual distribution package)
     const isPackaged = __dirname.includes('app.asar')
-    const isDev =
-      process.env.NODE_ENV === 'development' ||
-      (process.env.NODE_ENV !== 'production' && !isPackaged)
+    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
 
     console.log('🔍 Development mode check:')
     console.log('  NODE_ENV:', process.env.NODE_ENV)
@@ -65,9 +63,7 @@ export class DevelopmentManager {
         if (response.ok) {
           this.isRapidDev = true
           this.clientDevUrl = `http://localhost:${port}`
-          console.log(
-            `🚀 Rapid development mode detected - using client dev server at ${this.clientDevUrl}`
-          )
+          console.log(`🚀 Rapid development mode detected - using client dev server at ${this.clientDevUrl}`)
           return
         }
       } catch {
@@ -95,9 +91,7 @@ export class DevelopmentManager {
     // Development info endpoint
     this.server.get(ApiRoutes.DevInfo, (req, res) => {
       const isPackaged = __dirname.includes('app.asar')
-      const clientPath = isPackaged
-        ? join(__dirname, 'client')
-        : join(__dirname, '../../../client/dist')
+      const clientPath = isPackaged ? join(__dirname, 'client') : join(__dirname, '../../../client/dist')
 
       res.json({
         development: true,
@@ -155,9 +149,6 @@ export class DevelopmentManager {
    */
   public isDevelopmentMode(): boolean {
     const isPackaged = __dirname.includes('app.asar')
-    return (
-      process.env.NODE_ENV === 'development' ||
-      (process.env.NODE_ENV !== 'production' && !isPackaged)
-    )
+    return process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
   }
 }

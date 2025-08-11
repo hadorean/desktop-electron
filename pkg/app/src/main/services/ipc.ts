@@ -4,15 +4,15 @@ import { settingsService } from './settings'
 import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
 import { IpcEvents, MainEvents } from '@heyketsu/shared/types/ipc'
 
-export function setupIpc(options: AppContext) {
+export function setupIpc(options: AppContext): void {
   const { localServer, bg } = options
 
   // Type-safe wrappers for IPC
-  const handleIpc = (event: MainEvents, handler: (...args: any[]) => any) => {
+  const handleIpc = (event: MainEvents, handler: (...args: unknown[]) => unknown): void => {
     ipcMain.handle(event, handler)
   }
 
-  const onIpc = (event: MainEvents, handler: (...args: any[]) => void) => {
+  const onIpc = (event: MainEvents, handler: (...args: unknown[]) => void): void => {
     ipcMain.on(event, handler)
   }
 

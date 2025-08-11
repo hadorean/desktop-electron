@@ -57,7 +57,7 @@ class DebugService {
     }
   }
 
-  private sendToRenderer(event: RendererEvents, data: any): void {
+  private sendToRenderer(event: RendererEvents, data: unknown): void {
     if (this.mainWindow) {
       const win = this.mainWindow.get()
       if (win) {

@@ -9,7 +9,7 @@ import { scanForClientAssets } from './assets'
 import { SocketEvents } from '@heyketsu/shared/types/sockets'
 import { ApiRoutes } from '@heyketsu/shared/types/api'
 
-export function registerRoutes(localServer: LocalServer) {
+export function registerRoutes(localServer: LocalServer): void {
   const server = localServer.server
 
   // Health check endpoint
@@ -171,9 +171,7 @@ export function registerRoutes(localServer: LocalServer) {
       res.json({ message: 'Thumbnail cache cleared successfully' })
     } catch (error) {
       console.error('Error clearing thumbnail cache:', error)
-      res
-        .status(500)
-        .json({ error: 'Internal Server Error', message: 'Failed to clear thumbnail cache' })
+      res.status(500).json({ error: 'Internal Server Error', message: 'Failed to clear thumbnail cache' })
     }
   })
 
@@ -184,9 +182,7 @@ export function registerRoutes(localServer: LocalServer) {
       res.json({ settings, message: 'Settings retrieved successfully' })
     } catch (error) {
       console.error('Error getting settings:', error)
-      res
-        .status(500)
-        .json({ error: 'Internal Server Error', message: 'Failed to retrieve settings' })
+      res.status(500).json({ error: 'Internal Server Error', message: 'Failed to retrieve settings' })
     }
   })
 
@@ -195,9 +191,7 @@ export function registerRoutes(localServer: LocalServer) {
       const { settings, clientId = 'api-client' } = req.body
 
       if (!settings || typeof settings !== 'object') {
-        return res
-          .status(400)
-          .json({ error: 'Bad Request', message: 'Invalid settings data provided' })
+        return res.status(400).json({ error: 'Bad Request', message: 'Invalid settings data provided' })
       }
 
       const updateEvent = await settingsService.updateSettings(settings, clientId)
@@ -210,9 +204,7 @@ export function registerRoutes(localServer: LocalServer) {
       })
     } catch (error) {
       console.error('Error updating settings:', error)
-      return res
-        .status(500)
-        .json({ error: 'Internal Server Error', message: 'Failed to update settings' })
+      return res.status(500).json({ error: 'Internal Server Error', message: 'Failed to update settings' })
     }
   })
 
@@ -260,18 +252,14 @@ export function registerRoutes(localServer: LocalServer) {
   // Legacy static route for fallback
   server.get(ApiRoutes.AppStatic, (_req, res) => {
     const isPackaged = __dirname.includes('app.asar')
-    const clientPath = isPackaged
-      ? join(__dirname, 'client')
-      : join(__dirname, '../../../client/dist')
+    const clientPath = isPackaged ? join(__dirname, 'client') : join(__dirname, '../../../client/dist')
     res.sendFile(join(clientPath, 'index.html'))
   })
 
   // Handle any other /app/* routes (but not /app/assets/*)
   server.get(/^\/app\/(?!assets\/).*/, (_req, res) => {
     const isPackaged = __dirname.includes('app.asar')
-    const clientPath = isPackaged
-      ? join(__dirname, 'client')
-      : join(__dirname, '../../../client/dist')
+    const clientPath = isPackaged ? join(__dirname, 'client') : join(__dirname, '../../../client/dist')
     res.sendFile(join(clientPath, 'index.html'))
   })
 

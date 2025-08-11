@@ -12,9 +12,7 @@ export class BackgroundManager {
     console.log(`Setting up background windows for ${displays.length} monitor(s)`)
 
     displays.forEach((display, index) => {
-      console.log(
-        `Monitor ${index}: ${display.bounds.width}x${display.bounds.height} at (${display.bounds.x}, ${display.bounds.y})`
-      )
+      console.log(`Monitor ${index}: ${display.bounds.width}x${display.bounds.height} at (${display.bounds.x}, ${display.bounds.y})`)
 
       // Platform-specific window configuration
       const windowConfig: Electron.BrowserWindowConstructorOptions = {
@@ -206,9 +204,7 @@ export class BackgroundManager {
           forwardKeyboardInput: false, // Disable to prevent input interference
           forwardMouseInput: false // Disable to prevent input interference
         })
-        console.log(
-          `Made background window ${monitorId} non-interactive (re-attached to wallpaper)`
-        )
+        console.log(`Made background window ${monitorId} non-interactive (re-attached to wallpaper)`)
       } catch (error) {
         console.error(`Failed to make background window ${monitorId} non-interactive:`, error)
       }

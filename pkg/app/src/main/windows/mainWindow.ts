@@ -41,7 +41,7 @@ export function createWindow(): void {
 
   window.once('ready-to-show', () => {
     if (!window) return
-    const { width: winW, height: _winH } = window.getBounds()
+    const { width: winW } = window.getBounds()
     const { workArea } = screen.getPrimaryDisplay() // respects taskbar/dock
     const x = workArea.x + workArea.width - winW // bottom-right
     const y = workArea.y / 2

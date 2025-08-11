@@ -20,9 +20,7 @@ export class TemplateManager {
 
     // Detect if we're running from built/packaged app
     const isPackaged = __dirname.includes('app.asar')
-    const isDev =
-      process.env.NODE_ENV === 'development' ||
-      (process.env.NODE_ENV !== 'production' && !isPackaged)
+    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
 
     let templatesPath: string
     if (isDev) {
@@ -45,12 +43,8 @@ export class TemplateManager {
    */
   public setupHotReload(): void {
     const isPackaged = __dirname.includes('app.asar')
-    const isDev =
-      process.env.NODE_ENV === 'development' ||
-      (process.env.NODE_ENV !== 'production' && !isPackaged)
-    const templatesPath = isDev
-      ? join(process.cwd(), 'src/main/templates')
-      : join(__dirname, 'templates')
+    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
+    const templatesPath = isDev ? join(process.cwd(), 'src/main/templates') : join(__dirname, 'templates')
 
     // Watch templates for changes
     this.templateWatcher = watch(join(templatesPath, '**/*.ejs'), {
@@ -93,10 +87,7 @@ export class TemplateManager {
    */
   public isDevelopmentMode(): boolean {
     const isPackaged = __dirname.includes('app.asar')
-    return (
-      process.env.NODE_ENV === 'development' ||
-      (process.env.NODE_ENV !== 'production' && !isPackaged)
-    )
+    return process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !isPackaged)
   }
 
   /**

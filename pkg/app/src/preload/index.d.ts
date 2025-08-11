@@ -1,4 +1,6 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
+import type { ServerSettings, UISettings } from '@heyketsu/shared/types/settings'
+import type { UpdateInfo, ProgressInfo } from 'electron-updater'
 
 declare global {
   interface Window {
@@ -17,16 +19,16 @@ declare global {
       checkForUpdates: () => Promise<void>
       downloadUpdate: () => Promise<void>
       installUpdate: () => Promise<void>
-      onUpdateAvailable: (callback: (info: any) => void) => void
-      onUpdateDownloadProgress: (callback: (progressObj: any) => void) => void
-      onUpdateDownloaded: (callback: (info: any) => void) => void
+      onUpdateAvailable: (callback: (info: UpdateInfo) => void) => void
+      onUpdateDownloadProgress: (callback: (progressObj: ProgressInfo) => void) => void
+      onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => void
       // Settings APIs
-      getSettings: () => Promise<any>
-      updateSharedSettings: (settings: any) => Promise<any>
-      updateLocalSettings: (screenId: string, settings: any) => Promise<any>
-      isSettingsAvailable: () => Promise<any>
+      getSettings: () => Promise<{ success: boolean; data?: ServerSettings; error?: string }>
+      updateSharedSettings: (settings: Partial<UISettings>) => Promise<{ success: boolean; data?: ServerSettings; error?: string }>
+      updateLocalSettings: (screenId: string, settings: Partial<UISettings>) => Promise<{ success: boolean; data?: ServerSettings; error?: string }>
+      isSettingsAvailable: () => Promise<{ success: boolean; data: boolean }>
       // Debug menu APIs
-      getDebugState: () => Promise<any>
+      getDebugState: () => Promise<{ success: boolean; visible?: boolean; error?: string }>
       onDebugStateChanged: (callback: (visible: boolean) => void) => void
     }
   }

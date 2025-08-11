@@ -2,7 +2,7 @@ import { globalShortcut } from 'electron'
 import { MainWindow } from './mainWindow'
 import { getDebugMenuVisible, toggleDebugMenu } from '@heyketsu/shared/stores/debugStore'
 
-export function registerGlobalShortcuts(mainWindow: MainWindow) {
+export function registerGlobalShortcuts(mainWindow: MainWindow): void {
   // (Ctrl+B) to toggle main window
   try {
     globalShortcut.register('CommandOrControl+B', () => {
@@ -31,7 +31,7 @@ export function registerGlobalShortcuts(mainWindow: MainWindow) {
   }
 }
 
-export function unregisterGlobalShortcuts() {
+export function unregisterGlobalShortcuts(): void {
   try {
     globalShortcut.unregisterAll()
   } catch (err) {

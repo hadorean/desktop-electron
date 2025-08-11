@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { VersionInfo } from '@heyketsu/shared/types'
+import type { UISettings } from '@heyketsu/shared/types/settings'
+import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 import { IpcEvents } from '@heyketsu/shared/types/ipc'
 
 // Custom APIs for renderer
@@ -22,16 +24,16 @@ const api = {
   onUpdateAvailable: (callback: (info: VersionInfo) => void) => {
     ipcRenderer.on(IpcEvents.UpdateAvailable, (_, info) => callback(info))
   },
-  onUpdateDownloadProgress: (callback: (progressObj: any) => void) => {
+  onUpdateDownloadProgress: (callback: (progressObj: ProgressInfo) => void) => {
     ipcRenderer.on(IpcEvents.UpdateDownloadProgress, (_, progressObj) => callback(progressObj))
   },
-  onUpdateDownloaded: (callback: (info: any) => void) => {
+  onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => {
     ipcRenderer.on(IpcEvents.UpdateDownloaded, (_, info) => callback(info))
   },
   // Settings APIs
   getSettings: () => ipcRenderer.invoke(IpcEvents.SettingsGet),
-  updateSharedSettings: (settings: any) => ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
-  updateLocalSettings: (screenId: string, settings: any) => ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
+  updateSharedSettings: (settings: Partial<UISettings>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
+  updateLocalSettings: (screenId: string, settings: Partial<UISettings>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
   isSettingsAvailable: () => ipcRenderer.invoke(IpcEvents.SettingsIsAvailable),
   // Debug menu API
   getDebugState: () => ipcRenderer.invoke(IpcEvents.GetDebugState),

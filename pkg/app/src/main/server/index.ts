@@ -8,7 +8,7 @@ import { imageService } from '../services/images'
 import { SocketManager } from './sockets'
 import { TemplateManager } from './template'
 import { DevelopmentManager } from './dev'
-import { ServerEvents } from '@heyketsu/shared/types/sockets'
+import { ServerEvents, ServerEventMap } from '@heyketsu/shared/types/sockets'
 
 export class LocalServer {
   public server: express.Application
@@ -113,7 +113,7 @@ export class LocalServer {
     return this.isRunning
   }
 
-  public emit(event: ServerEvents, data: any): void {
+  public emit<T extends ServerEvents>(event: T, data: ServerEventMap[T]): void {
     this.sockets.emit(event, data)
   }
 

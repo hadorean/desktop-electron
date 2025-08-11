@@ -1,8 +1,8 @@
-import { Server as SocketIOServer } from 'socket.io'
+import { Server as SocketIOServer, Socket } from 'socket.io'
 import { createServer } from 'http'
 import { settingsService } from '../services/settings'
 import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
-import { SocketEvents, ServerEvents, ClientEvents } from '@heyketsu/shared/types/sockets'
+import { SocketEvents, ServerEvents, ClientEvents, ServerEventMap, ClientEventMap } from '@heyketsu/shared/types/sockets'
 
 export class SocketManager {
   private io: SocketIOServer
@@ -20,11 +20,7 @@ export class SocketManager {
   /**
    * Type-safe wrapper for handling client-to-server events
    */
-  private onClientEvent(
-    socket: any,
-    event: ClientEvents,
-    handler: (data: any) => void | Promise<void>
-  ): void {
+  private onClientEvent<T extends ClientEvents>(socket: Socket, event: T, handler: (data: ClientEventMap[T]) => void | Promise<void>): void {
     socket.on(event, handler)
   }
 
@@ -77,7 +73,7 @@ export class SocketManager {
   /**
    * Broadcast an event to all connected clients
    */
-  public emit(event: ServerEvents, data: any): void {
+  public emit<T extends ServerEvents>(event: T, data: ServerEventMap[T]): void {
     this.io.emit(event, data)
   }
 
