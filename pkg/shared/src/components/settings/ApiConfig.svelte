@@ -36,12 +36,7 @@
 <div class="form-control">
 	<label class="label cursor-pointer">
 		<span class="label-text text-lg font-semibold">API Configuration</span>
-		<input
-			type="checkbox"
-			class="toggle toggle-primary"
-			bind:checked={showApiConfig}
-			on:change={handleApiConfigToggle}
-		/>
+		<input type="checkbox" class="toggle toggle-primary" bind:checked={showApiConfig} on:change={handleApiConfigToggle} />
 	</label>
 </div>
 
@@ -51,13 +46,7 @@
 			<span class="label-text">API Server URL</span>
 		</label>
 		<div class="flex gap-2">
-			<input
-				id="api-url"
-				type="text"
-				class="input input-bordered w-full"
-				bind:value={localApiUrl}
-				on:input={handleApiUrlChange}
-			/>
+			<input id="api-url" type="text" class="input input-bordered w-full" bind:value={localApiUrl} on:input={handleApiUrlChange} />
 			<button class="btn btn-primary {isReconnecting ? 'loading' : ''}" on:click={handleReconnect}>
 				{isReconnecting ? 'Reconnecting...' : 'Reconnect'}
 			</button>

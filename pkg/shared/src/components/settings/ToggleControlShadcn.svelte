@@ -46,24 +46,11 @@
 			<span class="label-text">{label}</span>
 		</label>
 		{#if isOverride}
-			<Button
-				variant={isOverridden ? "default" : "ghost"}
-				size="sm"
-				class="text-xs h-8 px-3 mr-2"
-				onclick={handleOverride}
-			>
+			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="text-xs h-8 px-3 mr-2" onclick={handleOverride}>
 				{isOverridden ? 'Clear' : 'Override'}
 			</Button>
 		{/if}
-		<Switch
-			id={`toggle-${label}`}
-			checked={displayChecked}
-			onCheckedChange={handleToggleChange}
-			class={cn(
-				"flex-shrink-0",
-				isGhost && "ghost-toggle"
-			)}
-		/>
+		<Switch id={`toggle-${label}`} checked={displayChecked} onCheckedChange={handleToggleChange} class={cn('flex-shrink-0', isGhost && 'ghost-toggle')} />
 	</div>
 </div>
 
@@ -93,7 +80,6 @@
 		font-weight: 500;
 		color: hsl(var(--foreground));
 	}
-
 
 	/* Ghost mode styling */
 	:global(.ghost-toggle) {

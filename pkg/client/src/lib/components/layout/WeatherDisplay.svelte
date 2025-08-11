@@ -66,10 +66,7 @@
 </script>
 
 {#if weather}
-	<div
-		class="pointer-events-none fixed inset-x-0 top-1/2 flex flex-col items-center justify-center"
-		style="opacity: {opacity.current};"
-	>
+	<div class="pointer-events-none fixed inset-x-0 top-1/2 flex flex-col items-center justify-center" style="opacity: {opacity.current};">
 		<div class="text-shadow-lg mb-2 text-center text-4xl font-light text-white opacity-80">
 			{greeting}
 		</div>
@@ -80,9 +77,7 @@
 		</div>
 		<div class="text-shadow-lg flex items-center justify-center text-4xl text-white opacity-80">
 			<span class="mr-2">
-				{#if weather.current.condition.toLowerCase().includes('sunny') || weather.current.condition
-						.toLowerCase()
-						.includes('clear')}
+				{#if weather.current.condition.toLowerCase().includes('sunny') || weather.current.condition.toLowerCase().includes('clear')}
 					{#if parseInt(currentTime.split(':')[0]) >= 18 || parseInt(currentTime.split(':')[0]) < 6}
 						🌙
 					{:else}
@@ -90,19 +85,13 @@
 					{/if}
 				{:else if weather.current.condition.toLowerCase().includes('cloud')}
 					☁️
-				{:else if weather.current.condition
-					.toLowerCase()
-					.includes('rain') || weather.current.condition.toLowerCase().includes('shower')}
+				{:else if weather.current.condition.toLowerCase().includes('rain') || weather.current.condition.toLowerCase().includes('shower')}
 					🌧️
 				{:else if weather.current.condition.toLowerCase().includes('snow')}
 					❄️
-				{:else if weather.current.condition
-					.toLowerCase()
-					.includes('storm') || weather.current.condition.toLowerCase().includes('thunder')}
+				{:else if weather.current.condition.toLowerCase().includes('storm') || weather.current.condition.toLowerCase().includes('thunder')}
 					⛈️
-				{:else if weather.current.condition
-					.toLowerCase()
-					.includes('fog') || weather.current.condition.toLowerCase().includes('mist')}
+				{:else if weather.current.condition.toLowerCase().includes('fog') || weather.current.condition.toLowerCase().includes('mist')}
 					🌫️
 				{:else}
 					🌙

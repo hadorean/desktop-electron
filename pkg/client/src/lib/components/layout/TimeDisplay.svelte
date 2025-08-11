@@ -43,10 +43,7 @@
 	});
 </script>
 
-<div
-	class="absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1 transform text-center text-white"
-	style="opacity: {opacity.current};"
->
+<div class="absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1 transform text-center text-white" style="opacity: {opacity.current};">
 	<h1 class="text-shadow-lg mb-2 text-8xl font-thin">{currentTime}</h1>
 	<h2 class="text-shadow-lg mb-4 text-2xl font-light">{currentDate}</h2>
 </div>

@@ -38,7 +38,9 @@
 		"build": "tsc",
 		"dev": "tsc --watch",
 		"clean": "rimraf dist",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"lint": "eslint --cache .",
+		"svelte-check": "svelte-check --tsconfig tsconfig.json"
 	},
 	"peerDependencies": {
 		"socket.io": "^4.8.1",

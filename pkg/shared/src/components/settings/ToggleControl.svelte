@@ -51,10 +51,7 @@
 		<span class="label-text">{label}</span>
 	</label>
 	{#if isOverride}
-		<button
-			class="btn btn-xs {isOverridden ? 'btn-primary' : 'btn-ghost'} ml-auto mr-2"
-			onclick={handleOverride}
-		>
+		<button class="btn btn-xs {isOverridden ? 'btn-primary' : 'btn-ghost'} ml-auto mr-2" onclick={handleOverride}>
 			{isOverridden ? 'Clear' : 'Override'}
 		</button>
 	{/if}
@@ -94,7 +91,6 @@
 		border-color: hsl(var(--bc) / var(--tw-border-opacity));
 		background-color: transparent;
 		opacity: 0.3;
-		--togglehandleborder:
-			0 0 0 3px hsl(var(--bc)) inset, var(--handleoffsetcalculator) 0 0 3px hsl(var(--bc)) inset;
+		--togglehandleborder: 0 0 0 3px hsl(var(--bc)) inset, var(--handleoffsetcalculator) 0 0 3px hsl(var(--bc)) inset;
 	}
 </style>

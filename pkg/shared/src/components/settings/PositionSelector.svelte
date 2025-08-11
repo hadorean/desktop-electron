@@ -19,9 +19,7 @@
 	] as const;
 
 	const isOverridden = $derived(isOverride && overrideValue !== null);
-	const effectivePosition = $derived(
-		isOverridden ? overrideValue : $settings.settingsButtonPosition
-	);
+	const effectivePosition = $derived(isOverridden ? overrideValue : $settings.settingsButtonPosition);
 
 	function handlePositionChange(position: string) {
 		if (isOverride && !isOverridden) {
@@ -50,18 +48,12 @@
 			<span class="label-text">Settings Button Position</span>
 		</label>
 		{#if isOverride}
-			<button
-				class="btn btn-xs {isOverridden ? 'btn-primary' : 'btn-ghost'} ml-auto"
-				onclick={handleOverride}
-			>
+			<button class="btn btn-xs {isOverridden ? 'btn-primary' : 'btn-ghost'} ml-auto" onclick={handleOverride}>
 				{isOverridden ? 'Clear' : 'Override'}
 			</button>
 		{/if}
 	</div>
-	<div
-		class="bg-base-200 grid grid-cols-2 gap-2 rounded-lg bg-opacity-30 p-2"
-		class:ghost={isOverride && !isOverridden}
-	>
+	<div class="bg-base-200 grid grid-cols-2 gap-2 rounded-lg bg-opacity-30 p-2" class:ghost={isOverride && !isOverridden}>
 		{#each positions as position}
 			<button
 				class="btn btn-sm {effectivePosition === position.value ? 'btn-primary' : 'btn-ghost'}"

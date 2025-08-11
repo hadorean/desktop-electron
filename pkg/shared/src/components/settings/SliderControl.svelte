@@ -57,10 +57,7 @@
 		<span class="label-text">{label}</span>
 		<div class="row">
 			{#if isOverride}
-				<button
-					class="btn btn-xs {isOverridden ? 'btn-primary' : 'btn-ghost'}"
-					onclick={handleOverride}
-				>
+				<button class="btn btn-xs {isOverridden ? 'btn-primary' : 'btn-ghost'}" onclick={handleOverride}>
 					{isOverridden ? 'Clear' : 'Override'}
 				</button>
 			{/if}

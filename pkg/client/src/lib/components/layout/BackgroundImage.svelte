@@ -129,20 +129,10 @@
 		.join(' ')};"
 >
 	{#each imageStack as image}
-		<img
-			src={image.url}
-			alt="Background"
-			class="background-image"
-			style="opacity: {image.opacity};"
-		/>
+		<img src={image.url} alt="Background" class="background-image" style="opacity: {image.opacity};" />
 	{/each}
 	{#if activeImage}
-		<img
-			src={activeImage.url}
-			alt="Background"
-			class="background-image"
-			style="opacity: {activeImage.opacity};"
-		/>
+		<img src={activeImage.url} alt="Background" class="background-image" style="opacity: {activeImage.opacity};" />
 	{/if}
 </div>
 

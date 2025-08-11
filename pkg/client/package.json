@@ -11,7 +11,9 @@
 		"preview:demo": "vite preview --config vite.demo.config.ts",
 		"check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
 		"format": "prettier --write src --end-of-line lf",
-		"format:check": "prettier --check src --end-of-line lf"
+		"format:check": "prettier --check src --end-of-line lf",
+		"lint": "eslint --cache .",
+		"svelte-check": "svelte-check --tsconfig ./tsconfig.app.json"
 	},
 	"dependencies": {
 		"@heyketsu/shared": "file:../shared",

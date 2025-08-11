@@ -64,26 +64,11 @@
 		<span class="label-text">{label}</span>
 		<div class="slider-row">
 			{#if isOverride}
-				<Button
-					variant={isOverridden ? "default" : "ghost"}
-					size="sm"
-					class="override-btn text-xs h-8 px-3"
-					onclick={handleOverride}
-				>
+				<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-btn text-xs h-8 px-3" onclick={handleOverride}>
 					{isOverridden ? 'Clear' : 'Override'}
 				</Button>
 			{/if}
-			<Slider
-				value={[displayValue]}
-				{min}
-				{max}
-				{step}
-				onValueChange={handleValueChange}
-				class={cn(
-					"flex-1",
-					isGhost && "ghost-slider"
-				)}
-			/>
+			<Slider value={[displayValue]} {min} {max} {step} onValueChange={handleValueChange} class={cn('flex-1', isGhost && 'ghost-slider')} />
 			<span class="value-display">
 				{formatValue(displayValue)}
 			</span>

@@ -41,9 +41,4 @@ export {
 } from './screenStore';
 
 // Debug store
-export {
-	debugVisible,
-	toggleDebugMenu,
-	setDebugMenuVisible,
-	loadDebugState
-} from './debugStore';
+export { debugVisible, toggleDebugMenu, setDebugMenuVisible, loadDebugState } from './debugStore';

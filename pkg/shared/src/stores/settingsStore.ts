@@ -27,9 +27,7 @@ export const allSettings = writable<ServerSettings>(defaultServerSettings);
 
 // Create a derived store that returns the list of screen IDs
 export const screenIds = derived(allSettings, ($allSettings) =>
-	Array.from(
-		new Set([...Object.keys($allSettings.screens), get(currentScreen), get(routeParams).screenId])
-	).sort()
+	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreen), get(routeParams).screenId])).sort()
 );
 
 // Return the settings for a given screen id
@@ -147,14 +145,12 @@ export function loadSettings(images: { name: string }[]): string {
 				showScreenSwitcher: parsedSettings.showScreenSwitcher ?? defaultSettings.showScreenSwitcher,
 				favorites: parsedSettings.favorites ?? defaultSettings.favorites,
 				selectedImage:
-					parsedSettings.selectedImage &&
-					images.some((img) => img.name === parsedSettings.selectedImage)
+					parsedSettings.selectedImage && images.some((img) => img.name === parsedSettings.selectedImage)
 						? parsedSettings.selectedImage
 						: images.length > 0
 							? images[0].name
 							: '',
-				settingsButtonPosition:
-					parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
+				settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
 			}));
 		} else if (images.length > 0) {
 			updateSharedSettings((current) => ({
