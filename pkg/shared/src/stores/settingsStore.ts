@@ -1,12 +1,12 @@
 import { get, writable, derived } from 'svelte/store'
-import { type ScreenSettings, type UserSettings, getThemeScreenSettings, getThemeEditingSettings } from '../types'
-import { DefaultScreenSettings, DefaultUserSettings } from '../types'
+import { type ScreenSettings, type UserSettings, type DayNightMode, type DayNightScreenSettings, getThemeScreenSettings, getThemeEditingSettings } from '../types'
+import { DefaultScreenSettings, DefaultUserSettings, DefaultDayNightSettings } from '../types'
 
 const defaultScreenId = 'monitor1'
-const defaultTheme = 'day'
 
 export const currentScreen = writable(defaultScreenId)
-export const currentTheme = writable(defaultTheme)
+
+
 
 currentScreen.subscribe((screenId) => {
 	// Update the current screen in localStorage
@@ -26,6 +26,12 @@ let preventServerSync = false
 
 export const allSettings = writable<UserSettings>(defaultUserSettings)
 
+// Derived store for current theme from UserSettings
+export const currentTheme = derived(allSettings, (settings) => settings.currentTheme)
+
+// Derived store to check if current theme is night mode
+export const isNightMode = derived(currentTheme, (theme) => theme === 'night')
+
 export const screenIds = derived(allSettings, ($allSettings) =>
 	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreen), get(currentScreen)])).sort()
 )
@@ -34,12 +40,29 @@ export function setCurrentScreen(screenId: string): void {
 	currentScreen.set(screenId)
 }
 
-export function setCurrentTheme(theme: string): void {
-	currentTheme.set(theme)
+// Function to toggle day/night mode
+export function toggleDayNightMode(): void {
+	allSettings.update((settings) => ({
+		...settings,
+		currentTheme: settings.currentTheme === 'night' ? 'day' : 'night'
+	}))
 }
 
-export function getCurrentTheme(): string {
-	return get(currentTheme)
+export function setCurrentTheme(theme: DayNightMode): void {
+	allSettings.update((settings) => ({
+		...settings,
+		currentTheme: theme
+	}))
+}
+
+export function getCurrentTheme(): DayNightMode {
+	return get(allSettings).currentTheme
+}
+
+// Return the day/night settings for a given screen id
+export function getScreenDayNightSettings(id: string): DayNightScreenSettings {
+	const value = get(allSettings)
+	return value.screens[id] ?? DefaultDayNightSettings
 }
 
 // Return the settings for a given screen id
@@ -62,35 +85,19 @@ export const editingSettings = derived([allSettings, currentScreen, currentTheme
 	return isLocal ? getThemeEditingSettings(all.screens[screen], currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
 })
 
-// Create the shared settings store (synced with server)
-export const sharedSettings = derived([allSettings], ([all]) => ({
-	...all.shared
-}))
+export function updateSharedSettings(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
+	const theme = getCurrentTheme() as 'day' | 'night'
 
-// Create the local settings store (overrides)
-export const localSettings = derived([allSettings, currentScreen, currentTheme], ([all, screen, theme]) => {
-	const screenSettings = all.screens[screen]
-	if (!screenSettings) return {}
-	return screenSettings[theme as 'day' | 'night'] ?? {}
-})
-
-// Create the derived settings store that merges shared and local settings
-export const settings = derived([sharedSettings, localSettings], ([shared, local]) => ({
-	...shared,
-	...local
-}))
-
-export const hasLocalSettings = derived([localSettings], ([$local]) => {
-	return $local !== null
-})
-
-export function updateSharedSettings(settings: (current: ScreenSettings) => Partial<ScreenSettings>): void {
 	allSettings.update((value) => {
+		const currentSharedSettings = value.shared
+		const currentThemeSettings = getThemeEditingSettings(currentSharedSettings, theme)
+		const updatedSettings = settings(currentThemeSettings)
+
 		return {
 			...value,
 			shared: {
-				...value.shared,
-				...settings(value.shared)
+				...currentSharedSettings,
+				[theme]: updatedSettings
 			}
 		}
 	})
@@ -99,7 +106,7 @@ export function updateSharedSettings(settings: (current: ScreenSettings) => Part
 /**
  * Update shared settings without triggering server sync (for internal operations like validation)
  */
-export function updateSharedSettingsSilent(settings: (current: ScreenSettings) => Partial<ScreenSettings>): void {
+export function updateSharedSettingsSilent(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
 	preventServerSync = true
 	try {
 		updateSharedSettings(settings)
@@ -143,6 +150,62 @@ export function updateLocalSettingsSilent(settings: (current: Partial<ScreenSett
 		// Reset flag after a microtask to ensure all synchronous effects complete
 		Promise.resolve().then(() => {
 			preventServerSync = false
+		})
+	}
+}
+
+/**
+ * Update settings for the current context (shared or local screen+theme)
+ * This function handles the day/night logic and null checks automatically
+ */
+export function updateEditingSettings(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
+	if (get(isLocalMode)) {
+		// Update local screen settings for current theme
+		const screen = get(currentScreen) || defaultScreenId
+		const theme = getCurrentTheme() as 'day' | 'night'
+
+		allSettings.update((value) => {
+			const currentScreenSettings = value.screens[screen] ?? DefaultDayNightSettings
+			const currentThemeSettings = currentScreenSettings[theme] ?? {}
+			const updatedSettings = settings(currentThemeSettings)
+
+			// If night mode and no overrides exist, don't create night settings
+			if (theme === 'night' && currentScreenSettings.night === null && Object.keys(updatedSettings).length === 0) {
+				return value
+			}
+
+			return {
+				...value,
+				screens: {
+					...value.screens,
+					[screen]: {
+						...currentScreenSettings,
+						[theme]: updatedSettings
+					}
+				}
+			}
+		})
+	} else {
+		// Update shared settings for current theme
+		const theme = getCurrentTheme() as 'day' | 'night'
+
+		allSettings.update((value) => {
+			const currentSharedSettings = value.shared
+			const currentThemeSettings = currentSharedSettings[theme] ?? {}
+			const updatedSettings = settings(currentThemeSettings)
+
+			// If night mode and no overrides exist, don't create night settings
+			if (theme === 'night' && currentSharedSettings.night === null && Object.keys(updatedSettings).length === 0) {
+				return value
+			}
+
+			return {
+				...value,
+				shared: {
+					...currentSharedSettings,
+					[theme]: updatedSettings
+				}
+			}
 		})
 	}
 }
@@ -232,45 +295,10 @@ export function loadSettings(images: { name: string }[]): string {
 			updateLocalSettings(() => parsedLocalSettings)
 		}
 
-		// Subscribe to save changes
-		sharedSettings.subscribe((newValue) => {
-			saveSharedSettings(newValue)
-		})
-
-		localSettings.subscribe((newValue) => {
-			saveLocalSettings(newValue)
-		})
-
 		return ''
 	} catch (error) {
 		console.error('Error loading settings from localStorage:', error)
 		return `Error loading settings: ${error instanceof Error ? error.message : 'Unknown error'}`
-	}
-}
-
-// Save shared settings to localStorage
-function saveSharedSettings(currentSettings: ScreenSettings): string {
-	try {
-		localStorage.setItem('settings.shared', JSON.stringify(currentSettings))
-		return ''
-	} catch (error) {
-		console.error('Error saving shared settings:', error)
-		return `Error saving shared settings: ${error instanceof Error ? error.message : 'Unknown error'}`
-	}
-}
-
-// Save local settings to localStorage
-function saveLocalSettings(currentSettings: Partial<ScreenSettings> | null): string {
-	try {
-		if (currentSettings === null) {
-			localStorage.removeItem('settings.local')
-		} else {
-			localStorage.setItem('settings.local', JSON.stringify(currentSettings))
-		}
-		return ''
-	} catch (error) {
-		console.error('Error saving local settings:', error)
-		return `Error saving local settings: ${error instanceof Error ? error.message : 'Unknown error'}`
 	}
 }
 
@@ -286,31 +314,31 @@ export function resetSettings(): void {
  */
 export function validateSelectedImages(availableImages: string[]): boolean {
 	let hasChanges = false
-	const fallbackImage = availableImages.length > 0 ? availableImages[0] : ''
+	// const fallbackImage = availableImages.length > 0 ? availableImages[0] : ''
 
-	// Check shared settings
-	const currentSharedSettings = get(sharedSettings)
-	if (currentSharedSettings.selectedImage && !availableImages.includes(currentSharedSettings.selectedImage)) {
-		console.log(`📷 Shared selected image "${currentSharedSettings.selectedImage}" no longer exists, switching to "${fallbackImage}"`)
-		updateSharedSettingsSilent((settings) => ({
-			...settings,
-			selectedImage: fallbackImage
-		}))
-		hasChanges = true
-	}
+	// // Check shared settings
+	// const currentSharedSettings = get(sharedSettings)
+	// if (currentSharedSettings.selectedImage && !availableImages.includes(currentSharedSettings.selectedImage)) {
+	// 	console.log(`📷 Shared selected image "${currentSharedSettings.selectedImage}" no longer exists, switching to "${fallbackImage}"`)
+	// 	updateSharedSettingsSilent((settings) => ({
+	// 		...settings,
+	// 		selectedImage: fallbackImage
+	// 	}))
+	// 	hasChanges = true
+	// }
 
-	// Check local settings for current screen
-	const currentLocalSettings = get(localSettings)
-	if (currentLocalSettings?.selectedImage && !availableImages.includes(currentLocalSettings.selectedImage)) {
-		console.log(`📷 Local selected image "${currentLocalSettings.selectedImage}" no longer exists, clearing override`)
-		updateLocalSettingsSilent((current) => {
-			if (!current) return {}
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { selectedImage, ...rest } = current
-			return Object.keys(rest).length > 0 ? rest : {}
-		})
-		hasChanges = true
-	}
+	// // Check local settings for current screen
+	// const currentLocalSettings = get(localSettings)
+	// if (currentLocalSettings?.selectedImage && !availableImages.includes(currentLocalSettings.selectedImage)) {
+	// 	console.log(`📷 Local selected image "${currentLocalSettings.selectedImage}" no longer exists, clearing override`)
+	// 	updateLocalSettingsSilent((current) => {
+	// 		if (!current) return {}
+	// 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	// 		const { selectedImage, ...rest } = current
+	// 		return Object.keys(rest).length > 0 ? rest : {}
+	// 	})
+	// 	hasChanges = true
+	// }
 
 	// Check all local settings if we have access to them
 	try {

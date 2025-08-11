@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte'
 	import { DebugMenu } from '@hgrandry/dbg'
-	import { settings, expandSettings, loadImages, imagesError, getCurrentImages } from '$shared/stores'
+	import { screenSettings, expandSettings, loadImages, imagesError, getCurrentImages } from '$shared/stores'
 	import { loadSettings } from '$shared/stores/settingsStore'
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
 	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate } from '@heyketsu/shared'
@@ -130,16 +130,16 @@
 
 	<BackgroundImage />
 
-	{#if $settings.showTimeDate}
+	{#if $screenSettings.showTimeDate}
 		<TimeDisplay />
 	{/if}
 
-	{#if $settings.showWeather}
+	{#if $screenSettings.showWeather}
 		<WeatherDisplay />
 	{/if}
 
 	<SettingsButton
-		hideButton={$settings.hideButton}
+		hideButton={$screenSettings.hideButton}
 		{buttonHovered}
 		onToggle={toggleSettings}
 		onMouseEnter={handleButtonMouseEnter}

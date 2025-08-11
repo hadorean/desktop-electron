@@ -32,6 +32,7 @@ export function getThemeEditingSettings(settings: DayNightScreenSettings, theme:
 
 export interface UserSettings {
 	lastModified?: string // ISO 8601 timestamp
+	currentTheme: DayNightMode
 	shared: DayNightScreenSettings
 	screens: Record<string, DayNightScreenSettings>
 }
@@ -63,6 +64,7 @@ export const DefaultDayNightSettings: DayNightScreenSettings = {
 }
 
 export const DefaultUserSettings: UserSettings = {
+	currentTheme: 'day',
 	shared: DefaultDayNightSettings,
 	screens: {}
 }

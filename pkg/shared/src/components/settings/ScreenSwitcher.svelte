@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { currentScreen, screenIds, allSettings, isLocalMode } from '../../stores/settingsStore'
+	import { currentScreen, screenIds, allSettings, isLocalMode, isNightMode, toggleDayNightMode } from '../../stores/settingsStore'
+	import { DefaultDayNightSettings } from '../../types'
 	import { Button } from '../ui'
 	import { Tabs, TabsList, TabsTrigger } from '../ui'
 
@@ -91,7 +92,7 @@
 			...settings,
 			screens: {
 				...settings.screens,
-				[newScreenName]: { day: {}, night: {} }
+				[newScreenName]: DefaultDayNightSettings
 			}
 		}))
 
@@ -148,14 +149,25 @@
 				{/each}
 			</TabsList>
 
-			<!-- Edit controls -->
-			<div class="edit-controls">
+			<!-- Day/Night toggle controls -->
+			<div class="daynight-controls">
 				{#if editMode}
 					<Button variant="secondary" size="sm" onclick={addNewScreen} class="add-screen-btn">+ Add</Button>
 				{/if}
 
 				<Button variant={editMode ? 'default' : 'ghost'} size="sm" onclick={toggleEditMode} class="edit-toggle-btn">
 					{editMode ? '✓ Done' : '✏️'}
+				</Button>
+
+				<!-- Global Day/Night theme toggle (always visible) -->
+				<Button
+					variant="ghost"
+					size="sm"
+					onclick={() => toggleDayNightMode()}
+					class="daynight-toggle-btn global-theme"
+					title={$isNightMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
+				>
+					{$isNightMode ? '🌙' : '☀️'}
 				</Button>
 			</div>
 		</div>
@@ -217,7 +229,7 @@
 		box-shadow: 0 0 0 2px hsl(142 76% 36% / 0.3);
 	}
 
-	.edit-controls {
+	.daynight-controls {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -277,5 +289,25 @@
 		gap: 8px;
 		margin-top: 12px;
 		justify-content: center;
+	}
+
+	:global(.daynight-toggle-btn) {
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+		font-size: 1.2rem;
+		transition: all 0.3s ease;
+	}
+
+	:global(.daynight-toggle-btn:hover) {
+		transform: scale(1.1);
+	}
+
+	:global(.daynight-toggle-btn.global-theme) {
+		background: rgba(255, 255, 255, 0.1) !important;
+		border: 1px solid rgba(255, 255, 255, 0.2) !important;
+	}
+
+	:global(.daynight-toggle-btn.global-theme:hover) {
+		background: rgba(255, 255, 255, 0.2) !important;
+		border: 1px solid rgba(255, 255, 255, 0.3) !important;
 	}
 </style>

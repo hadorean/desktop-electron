@@ -6,21 +6,24 @@
 export {
 	allSettings,
 	currentScreen,
+	currentTheme,
+	isNightMode,
 	isLocalMode,
 	expandSettings,
 	screenIds,
-	sharedSettings,
-	localSettings,
-	settings,
-	hasLocalSettings,
+	screenSettings,
+	editingSettings,
 	updateSharedSettings,
 	updateSharedSettingsSilent,
 	updateLocalSettings,
 	updateLocalSettingsSilent,
+	updateEditingSettings,
 	shouldPreventServerSync,
 	resetSettings,
 	validateSelectedImages,
-	getScreenSettings
+	getScreenSettings,
+	getScreenDayNightSettings,
+	toggleDayNightMode
 } from './settingsStore'
 
 // Debug store

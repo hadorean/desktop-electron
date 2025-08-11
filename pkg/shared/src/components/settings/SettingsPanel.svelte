@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { settings, sharedSettings, localSettings, isLocalMode, currentScreen, updateSharedSettings, updateLocalSettings } from '../../stores'
+	import { editingSettings, screenSettings, isLocalMode, currentScreen, updateEditingSettings } from '../../stores'
 	import ImageGrid from '$shared/components/settings/ImageGrid.svelte'
 	import SliderControl from './SliderControl.svelte'
 	import ToggleControl from './ToggleControl.svelte'
@@ -11,30 +11,21 @@
 	//export let errorMessage: string = "";
 	export let settingsPanel: HTMLElement | null = null
 
-	function handleSettingChange<K extends keyof typeof $settings>(key: K, value: (typeof $settings)[K] | null): void {
-		if ($isLocalMode) {
+	function handleSettingChange<K extends keyof typeof $editingSettings>(key: K, value: (typeof $editingSettings)[K] | null): void {
+		updateEditingSettings((current) => {
 			if (value === null) {
-				// Remove from local settings
-				updateLocalSettings((current) => {
-					if (!current) return {}
-					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					const { [key]: _removed, ...rest } = current
-					return Object.keys(rest).length > 0 ? rest : {}
-				})
+				// Remove property (reset to default)
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const { [key]: _removed, ...rest } = current
+				return rest
 			} else {
-				// Update local settings
-				updateLocalSettings((current) => ({
+				// Update property
+				return {
 					...current,
 					[key]: value
-				}))
+				}
 			}
-		} else {
-			// Update shared settings
-			updateSharedSettings((current) => ({
-				...current,
-				[key]: value
-			}))
-		}
+		})
 	}
 </script>
 
@@ -55,103 +46,91 @@
 				<h3 class="mb-2 text-lg font-medium">Background Image</h3>
 				<!-- Display Options -->
 				<ImageGrid
-					selectedImage={$settings.selectedImage}
+					selectedImage={$screenSettings.selectedImage ?? ''}
 					isOverride={$isLocalMode}
-					overrideValue={$localSettings?.selectedImage}
+					overrideValue={$editingSettings.selectedImage}
 					onImageChange={(newImage: string | null) => handleSettingChange('selectedImage', newImage)}
 				/>
 
 				<SliderControl
 					label="Brightness"
-					value={$isLocalMode ? ($localSettings?.opacity ?? null) : $sharedSettings.opacity}
+					value={$editingSettings.opacity ?? null}
 					min={0}
 					max={1}
 					step={0.01}
 					onChange={(newOpacity: number | null) => handleSettingChange('opacity', newOpacity)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={$settings.opacity}
-					overrideValue={$localSettings?.opacity}
+					defaultValue={$screenSettings.opacity ?? 1}
+					overrideValue={$editingSettings.opacity}
 				/>
 
 				<SliderControl
 					label="Saturation"
-					value={$isLocalMode ? ($localSettings?.saturation ?? null) : $sharedSettings.saturation}
+					value={$editingSettings.saturation ?? null}
 					min={0}
 					max={2}
 					step={0.01}
 					onChange={(newSaturation: number | null) => handleSettingChange('saturation', newSaturation)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={$settings.saturation}
-					overrideValue={$localSettings?.saturation}
+					defaultValue={$screenSettings.saturation ?? 1}
+					overrideValue={$editingSettings.saturation}
 				/>
 
 				<SliderControl
 					label="Blur"
-					value={$isLocalMode ? ($localSettings?.blur ?? null) : $sharedSettings.blur}
+					value={$editingSettings.blur ?? null}
 					min={0}
 					max={50}
 					step={0.1}
 					onChange={(newBlur: number | null) => handleSettingChange('blur', newBlur)}
 					formatValue={(v: number) => `${v.toFixed(1)}px`}
 					isOverride={$isLocalMode}
-					defaultValue={$settings.blur}
-					overrideValue={$localSettings?.blur}
+					defaultValue={$screenSettings.blur ?? 0}
+					overrideValue={$editingSettings.blur}
 				/>
 
 				<SliderControl
 					label="Transition Time"
-					value={$isLocalMode ? ($localSettings?.transitionTime ?? null) : $sharedSettings.transitionTime}
+					value={$editingSettings.transitionTime ?? null}
 					min={0}
 					max={10}
 					step={0.1}
 					onChange={(newTransitionTime: number | null) => handleSettingChange('transitionTime', newTransitionTime)}
 					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
-					defaultValue={$settings.transitionTime}
-					overrideValue={$localSettings?.transitionTime}
+					defaultValue={$screenSettings.transitionTime ?? 1}
+					overrideValue={$editingSettings.transitionTime}
 				/>
 			</div>
 
 			<ToggleControl
 				label="Time and date"
-				checked={$isLocalMode ? ($localSettings?.showTimeDate ?? $settings.showTimeDate) : $sharedSettings.showTimeDate}
+				checked={$editingSettings.showTimeDate ?? $screenSettings.showTimeDate ?? true}
 				onChange={(newShowTimeDate: boolean | null) => handleSettingChange('showTimeDate', newShowTimeDate)}
 				isOverride={$isLocalMode}
-				overrideValue={$localSettings?.showTimeDate}
-				defaultValue={$settings.showTimeDate}
+				overrideValue={$editingSettings.showTimeDate}
+				defaultValue={$screenSettings.showTimeDate ?? true}
 			/>
 
 			<ToggleControl
 				label="Weather"
-				checked={$isLocalMode ? ($localSettings?.showWeather ?? $settings.showWeather) : $sharedSettings.showWeather}
+				checked={$editingSettings.showWeather ?? $screenSettings.showWeather ?? false}
 				onChange={(newShowWeather: boolean | null) => handleSettingChange('showWeather', newShowWeather)}
 				isOverride={$isLocalMode}
-				overrideValue={$localSettings?.showWeather}
-				defaultValue={$settings.showWeather}
+				overrideValue={$editingSettings.showWeather}
+				defaultValue={$screenSettings.showWeather ?? false}
 			/>
 
 			<ToggleControl
 				label="Auto-hide settings button"
-				checked={$isLocalMode ? ($localSettings?.hideButton ?? $settings.hideButton) : $sharedSettings.hideButton}
+				checked={$editingSettings.hideButton ?? $screenSettings.hideButton ?? false}
 				onChange={(newHideButton: boolean | null) => handleSettingChange('hideButton', newHideButton)}
 				isOverride={$isLocalMode}
-				overrideValue={$localSettings?.hideButton}
-				defaultValue={$settings.hideButton}
+				overrideValue={$editingSettings.hideButton}
+				defaultValue={$screenSettings.hideButton ?? false}
 			/>
-
-			<!--<PositionSelector
-                isOverride={$isLocalMode}
-                overrideValue={$localSettings?.settingsButtonPosition ?? null}
-                onOverride={(newPosition) =>
-                    handleSettingChange("settingsButtonPosition", newPosition)}
-            />-->
-
-			<!-- <ApiConfig
-                onApiUrlChange={apiBaseUrl.set}
-                onReconnect={handleReconnect}
-            />-->
 		</div>
 	</div>
 </div>

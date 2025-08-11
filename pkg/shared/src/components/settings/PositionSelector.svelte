@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { settings, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore'
+	import { screenSettings, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore'
 	import type { SettingsButtonPosition } from '../../types/settings'
 
 	const props = $props<{
@@ -19,7 +19,7 @@
 	] as const
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
-	const effectivePosition = $derived(isOverridden ? overrideValue : $settings.settingsButtonPosition)
+	const effectivePosition = $derived(isOverridden ? overrideValue : $screenSettings.settingsButtonPosition)
 
 	function handlePositionChange(position: string): void {
 		if (isOverride && !isOverridden) {

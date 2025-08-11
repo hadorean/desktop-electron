@@ -11,6 +11,8 @@
 		disabled?: boolean
 		onclick?: (event: MouseEvent) => void
 		children?: Snippet
+		title?: string
+		[key: string]: unknown
 	}
 
 	let { class: className, variant = 'default', size = 'default', disabled = false, onclick, children, ...restProps }: Props = $props()

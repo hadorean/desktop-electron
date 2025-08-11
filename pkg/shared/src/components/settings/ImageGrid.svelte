@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getImageUrl } from '../../services'
-	import { settings, updateSharedSettings, images, imagesLoading, imagesError } from '../../stores'
+	import { screenSettings, updateSharedSettings, images, imagesLoading, imagesError } from '../../stores'
 	import { Button, Card, CardContent } from '../ui'
 	import { cn } from '../../lib/utils'
 
@@ -45,16 +45,19 @@
 
 	function toggleFavorite(imageName: string, event: Event): void {
 		event.stopPropagation() // Prevent triggering the image selection
-		updateSharedSettings((current) => ({
-			favorites: current.favorites.includes(imageName) ? current.favorites.filter((name: string) => name !== imageName) : [...current.favorites, imageName]
-		}))
+		updateSharedSettings((current) => {
+			const currentFavorites = current.favorites ?? []
+			return {
+				favorites: currentFavorites.includes(imageName) ? currentFavorites.filter((name: string) => name !== imageName) : [...currentFavorites, imageName]
+			}
+		})
 	}
 
 	// Sort images to show favorites first - use derived to minimize recalculation
 	const sortedImages = $derived(
 		(() => {
 			const imageList = $images
-			const favorites = $settings.favorites
+			const favorites = $screenSettings.favorites ?? []
 			if (imageList.length === 0) return []
 
 			return [...imageList].sort((a, b) => {
@@ -147,12 +150,12 @@
 									<button
 										class={cn(
 											'absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-black/20 text-sm backdrop-blur-sm transition-colors duration-200 hover:bg-black/40',
-											$settings.favorites.includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
+											($screenSettings.favorites ?? []).includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
 										)}
 										onclick={(e: Event) => toggleFavorite(image.name, e)}
-										title={$settings.favorites.includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
+										title={($screenSettings.favorites ?? []).includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
 									>
-										{#if $settings.favorites.includes(image.name)}
+										{#if ($screenSettings.favorites ?? []).includes(image.name)}
 											★
 										{:else}
 											☆

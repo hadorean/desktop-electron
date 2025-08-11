@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { settings } from '../../stores/settingsStore'
+	import { screenSettings } from '../../stores/settingsStore'
 
 	export let hideButton: boolean = false
 	export let buttonHovered: boolean = false
@@ -8,7 +8,7 @@
 	export let onMouseLeave: () => void
 	export let buttonRef: HTMLElement | null = null
 
-	$: position = $settings.settingsButtonPosition
+	$: position = $screenSettings.settingsButtonPosition ?? 'bottom-right'
 	$: positionClasses = {
 		'bottom-right': 'bottom-4 right-4',
 		'top-right': 'top-4 right-4',

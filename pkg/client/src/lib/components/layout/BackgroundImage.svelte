@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { settings } from '$shared/stores/settingsStore'
+	import { screenSettings } from '$shared/stores/settingsStore'
 	import { getImageUrl } from '$shared/services/api'
 	import { Tween, Easing } from '@tweenjs/tween.js'
 
@@ -18,13 +18,14 @@
 
 	// Subscribe to settings store for image changes
 	$: {
-		const imageUrl = getImageUrl($settings.selectedImage)
+		const selectedImage = $screenSettings.selectedImage ?? ''
+		const imageUrl = getImageUrl(selectedImage)
 		if (imageUrl !== currentImageUrl) {
 			currentImageUrl = imageUrl
 			startTransition()
 		}
 
-		imageScale = 1 + $settings.blur * 0.003
+		imageScale = 1 + ($screenSettings.blur ?? 0) * 0.003
 	}
 
 	function startTransition(): void {
@@ -37,7 +38,7 @@
 			previousImage.tween?.stop()
 
 			previousImage.tween = new Tween({ opacity: previousImage.opacity })
-				.to({ opacity: 0 }, $settings.transitionTime * 1000)
+				.to({ opacity: 0 }, ($screenSettings.transitionTime ?? 1) * 1000)
 				.easing(Easing.Quadratic.Out)
 				.onUpdate((value) => {
 					if (previousImage) {
@@ -61,7 +62,7 @@
 		}
 
 		activeImage.tween = new Tween({ opacity: 0 })
-			.to({ opacity: 1 }, $settings.transitionTime * 1000)
+			.to({ opacity: 1 }, ($screenSettings.transitionTime ?? 1) * 1000)
 			.easing(Easing.Quadratic.Out)
 			.onUpdate((value) => {
 				if (activeImage) {
@@ -106,8 +107,8 @@
 	}
 
 	onMount(() => {
-		if ($settings.selectedImage) {
-			currentImageUrl = getImageUrl($settings.selectedImage)
+		if ($screenSettings.selectedImage) {
+			currentImageUrl = getImageUrl($screenSettings.selectedImage)
 			startTransition()
 		}
 
@@ -121,9 +122,9 @@
 
 <div
 	class="background-container"
-	style="scale: {imageScale}; opacity: {$settings.opacity}; filter: {[
-		$settings.blur > 0 ? `blur(${$settings.blur}px)` : null,
-		`saturate(${$settings.saturation})`
+	style="scale: {imageScale}; opacity: {$screenSettings.opacity ?? 1}; filter: {[
+		($screenSettings.blur ?? 0) > 0 ? `blur(${$screenSettings.blur}px)` : null,
+		`saturate(${$screenSettings.saturation ?? 1})`
 	]
 		.filter(Boolean)
 		.join(' ')};"
