@@ -62,3 +62,15 @@ effectiveApiUrl.subscribe((url) => {
 		socketService.reinitialize()
 	}
 })
+
+// Initialize screen settings from server data (defer until settings are loaded)
+if (typeof window !== 'undefined') {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const serverData = (window as any).__SERVER_DATA__
+	if (serverData?.screenId) {
+		console.log('🖥️  Screen ID detected from server:', serverData.screenId)
+		// Store the screen ID to be used after settings load
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		;(window as any).__INITIAL_SCREEN_ID__ = serverData.screenId
+	}
+}

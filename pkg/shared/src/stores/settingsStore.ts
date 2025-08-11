@@ -58,6 +58,7 @@ export const screenIds = derived(allSettings, ($allSettings) =>
 )
 
 export function setCurrentScreen(screenId: string): void {
+	console.log('Setting current screen to', screenId)
 	currentScreen.set(screenId)
 }
 
@@ -538,6 +539,21 @@ export function loadSettings(images: { name: string }[]): string {
 		if (savedLocalSettings) {
 			const parsedLocalSettings = JSON.parse(savedLocalSettings)
 			updateLocalSettings(() => parsedLocalSettings)
+		}
+
+		// Initialize screen from server data if available (after settings are loaded)
+		if (typeof window !== 'undefined') {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const initialScreenId = (window as any).__INITIAL_SCREEN_ID__
+			if (initialScreenId) {
+				console.log('🖥️  Applying initial screen after settings loaded:', initialScreenId)
+				setCurrentScreen(initialScreenId)
+				isLocalMode.set(true)
+				console.log('🖥️  Screen initialized:', initialScreenId, 'local mode: true')
+				// Clean up
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				delete (window as any).__INITIAL_SCREEN_ID__
+			}
 		}
 
 		return ''
