@@ -23,6 +23,18 @@ The project uses a monorepo structure with three main packages:
 
 ## Development Commands
 
+## Planning and execution
+
+When exiting plan mode, always do this first:
+ - Write the plan in docs/memories/YYYY-MM/YYYY-MM-DD-topic.md
+ - Set the date after the doc title: Date: YYYY-MM-DD
+ - create a branch feature/<topic>
+
+During execution:
+ - Commit regularly (each phase)
+ - Use 'pnpm typecheck', 'pnpm format' and 'pnpm lint' to detect and address issues before commiting
+ - Use 'pnpm dev' if you need to run the app.
+
 ### Primary Development
 
 ```bash
