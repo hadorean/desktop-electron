@@ -4,7 +4,7 @@
 	import { settings, expandSettings, loadImages, imagesError, getCurrentImages } from '$shared/stores'
 	import { loadSettings } from '$shared/stores/settingsStore'
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
-	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator } from '@heyketsu/shared'
+	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate } from '@heyketsu/shared'
 	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout'
 	import { socketService, initializeImageChangeHandling } from '$shared/services'
 
@@ -126,36 +126,34 @@
 <div class="full-page-container">
 	<DebugMenu visible={$debugVisible} open={true} />
 
-	<ParamsValidator>
-		<SettingsServerUpdate />
+	<SettingsServerUpdate />
 
-		<BackgroundImage />
+	<BackgroundImage />
 
-		{#if $settings.showTimeDate}
-			<TimeDisplay />
+	{#if $settings.showTimeDate}
+		<TimeDisplay />
+	{/if}
+
+	{#if $settings.showWeather}
+		<WeatherDisplay />
+	{/if}
+
+	<SettingsButton
+		hideButton={$settings.hideButton}
+		{buttonHovered}
+		onToggle={toggleSettings}
+		onMouseEnter={handleButtonMouseEnter}
+		onMouseLeave={handleButtonMouseLeave}
+		bind:buttonRef={settingsButton}
+	/>
+
+	<ErrorMessage message={$imagesError || ''} />
+
+	<div id="settings-drawer" class:open={showSettings && $expandSettings}>
+		{#if showSettings}
+			<SettingsPanel bind:settingsPanel expanded={$expandSettings} />
 		{/if}
-
-		{#if $settings.showWeather}
-			<WeatherDisplay />
-		{/if}
-
-		<SettingsButton
-			hideButton={$settings.hideButton}
-			{buttonHovered}
-			onToggle={toggleSettings}
-			onMouseEnter={handleButtonMouseEnter}
-			onMouseLeave={handleButtonMouseLeave}
-			bind:buttonRef={settingsButton}
-		/>
-
-		<ErrorMessage message={$imagesError || ''} />
-
-		<div id="settings-drawer" class:open={showSettings && $expandSettings}>
-			{#if showSettings}
-				<SettingsPanel bind:settingsPanel expanded={$expandSettings} />
-			{/if}
-		</div>
-	</ParamsValidator>
+	</div>
 </div>
 
 <style>

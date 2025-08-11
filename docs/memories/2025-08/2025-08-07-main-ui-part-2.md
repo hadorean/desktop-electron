@@ -26,7 +26,7 @@ Create a unified architecture where both client and app renderer use identical s
 - **Move `api.ts` service** to `pkg/shared/src/services/api.ts`
 - **Move `socket.ts` service** to `pkg/shared/src/services/socket.ts`
 - **Move `settingsStore.ts`** to shared with Socket.IO integration
-- **Move/rename `routeStore.ts`** to `screenStore.ts` in shared
+- **Move/rename `screenStore.ts`** to `screenStore.ts` in shared
 - Remove HTTP-specific and IPC adapters (unified Socket.IO approach)
 - Add URL injection mechanism for different environments
 

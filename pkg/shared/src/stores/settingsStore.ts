@@ -1,11 +1,8 @@
 import { get, writable, derived } from 'svelte/store'
-import { routeParams, defaultScreenId } from './routeStore'
+
+const defaultScreenId = 'monitor1'
 
 export const currentScreen = writable(defaultScreenId)
-
-routeParams.subscribe((params) => {
-	currentScreen.set(params.screenId)
-})
 
 currentScreen.subscribe((screenId) => {
 	// Update the current screen in localStorage
@@ -29,8 +26,12 @@ export const allSettings = writable<UserSettings>(defaultUserSettings)
 
 // Create a derived store that returns the list of screen IDs
 export const screenIds = derived(allSettings, ($allSettings) =>
-	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreen), get(routeParams).screenId])).sort()
+	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreen), get(currentScreen)])).sort()
 )
+
+export function setCurrentScreen(screenId: string): void {
+	currentScreen.set(screenId)
+}
 
 // Return the settings for a given screen id
 export function getScreenSettings(id: string): Partial<ScreenSettings> | undefined {
@@ -326,17 +327,3 @@ export function validateSelectedImages(availableImages: string[]): boolean {
 
 	return hasChanges
 }
-
-// // Update a specific setting
-// export function updateSetting<K extends keyof typeof defaultSettings>(
-//   key: K,
-//   value: typeof defaultSettings[K]
-// ): void {
-//   //console.log('Updating setting:', key, value);
-
-//   settings.update(current => ({
-//     ...current,
-//     [key]: value
-//   }));
-
-// }
