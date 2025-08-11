@@ -87,7 +87,7 @@
 								isGhost && 'ghost-thumbnail'
 							)}
 							onclick={() => handleImageClick(image.name)}
-							onkeydown={(e) => e.key === 'Enter' && handleImageClick(image.name)}
+							onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleImageClick(image.name)}
 							tabindex="0"
 							role="button"
 							aria-pressed={effectiveImage === image.name}
@@ -105,7 +105,7 @@
 										'absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-black/20 text-sm backdrop-blur-sm transition-colors duration-200 hover:bg-black/40',
 										$settings.favorites.includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
 									)}
-									onclick={(e) => toggleFavorite(image.name, e)}
+									onclick={(e: Event) => toggleFavorite(image.name, e)}
 									title={$settings.favorites.includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
 								>
 									{#if $settings.favorites.includes(image.name)}
