@@ -80,9 +80,9 @@
 			<div class="grid max-h-[280px] grid-cols-4 gap-2 overflow-y-auto overflow-x-hidden pr-2">
 				{#each sortedImages as image}
 					<div class="card-container aspect-square p-1">
-						<Card
+						<div
 							class={cn(
-								'image-thumbnail-card group cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-102 h-full w-full',
+								'image-thumbnail-card hover:scale-102 bg-card text-card-foreground group h-full w-full cursor-pointer rounded-lg border shadow-sm transition-all duration-200 hover:shadow-lg',
 								effectiveImage === image.name && 'ring-primary shadow-primary/20 shadow-lg ring-2',
 								isGhost && 'ghost-thumbnail'
 							)}
@@ -93,30 +93,30 @@
 							aria-pressed={effectiveImage === image.name}
 							title={image.name}
 						>
-						<CardContent class="relative aspect-square p-0">
-							<img
-								src={getThumbnailUrl(image.name)}
-								alt={image.name}
-								class="h-full w-full rounded-md object-cover transition-all duration-200 group-hover:brightness-110"
-								loading="lazy"
-							/>
-							<button
-								class={cn(
-									'absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-black/20 text-sm backdrop-blur-sm transition-colors duration-200 hover:bg-black/40',
-									$settings.favorites.includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
-								)}
-								onclick={(e) => toggleFavorite(image.name, e)}
-								title={$settings.favorites.includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
-							>
-								{#if $settings.favorites.includes(image.name)}
-									★
-								{:else}
-									☆
-								{/if}
-							</button>
-						</CardContent>
-					</Card>
-				</div>
+							<CardContent class="relative aspect-square p-0">
+								<img
+									src={getThumbnailUrl(image.name)}
+									alt={image.name}
+									class="h-full w-full rounded-md object-cover transition-all duration-200 group-hover:brightness-110"
+									loading="lazy"
+								/>
+								<button
+									class={cn(
+										'absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-black/20 text-sm backdrop-blur-sm transition-colors duration-200 hover:bg-black/40',
+										$settings.favorites.includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
+									)}
+									onclick={(e) => toggleFavorite(image.name, e)}
+									title={$settings.favorites.includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
+								>
+									{#if $settings.favorites.includes(image.name)}
+										★
+									{:else}
+										☆
+									{/if}
+								</button>
+							</CardContent>
+						</div>
+					</div>
 				{/each}
 			</div>
 		</CardContent>
