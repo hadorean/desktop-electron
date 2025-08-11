@@ -2,8 +2,8 @@
 	import { settings, sharedSettings, localSettings, isLocalMode, currentScreen, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore';
 	import type { ImageInfo } from '../../services/api';
 	import ImageGrid from '$shared/components/settings/ImageGrid.svelte';
-	import SliderControlShadcn from './SliderControlShadcn.svelte';
-	import ToggleControlShadcn from './ToggleControlShadcn.svelte';
+	import SliderControl from './SliderControl.svelte';
+	import ToggleControl from './ToggleControl.svelte';
 	import ScreenSwitcher from './ScreenSwitcher.svelte';
 	import { Inspect } from '@hgrandry/dbg';
 
@@ -75,7 +75,7 @@
 					onImageChange={(newImage: string | null) => handleSettingChange('selectedImage', newImage)}
 				/>
 
-				<SliderControlShadcn
+				<SliderControl
 					label="Brightness"
 					value={$isLocalMode ? ($localSettings?.opacity ?? null) : $sharedSettings.opacity}
 					min={0}
@@ -88,7 +88,7 @@
 					overrideValue={$localSettings?.opacity}
 				/>
 
-				<SliderControlShadcn
+				<SliderControl
 					label="Saturation"
 					value={$isLocalMode ? ($localSettings?.saturation ?? null) : $sharedSettings.saturation}
 					min={0}
@@ -101,7 +101,7 @@
 					overrideValue={$localSettings?.saturation}
 				/>
 
-				<SliderControlShadcn
+				<SliderControl
 					label="Blur"
 					value={$isLocalMode ? ($localSettings?.blur ?? null) : $sharedSettings.blur}
 					min={0}
@@ -114,7 +114,7 @@
 					overrideValue={$localSettings?.blur}
 				/>
 
-				<SliderControlShadcn
+				<SliderControl
 					label="Transition Time"
 					value={$isLocalMode ? ($localSettings?.transitionTime ?? null) : $sharedSettings.transitionTime}
 					min={0}
@@ -128,7 +128,7 @@
 				/>
 			</div>
 
-			<ToggleControlShadcn
+			<ToggleControl
 				label="Time and date"
 				checked={$isLocalMode ? ($localSettings?.showTimeDate ?? $settings.showTimeDate) : $sharedSettings.showTimeDate}
 				onChange={(newShowTimeDate: boolean | null) => handleSettingChange('showTimeDate', newShowTimeDate)}
@@ -137,7 +137,7 @@
 				defaultValue={$settings.showTimeDate}
 			/>
 
-			<ToggleControlShadcn
+			<ToggleControl
 				label="Weather"
 				checked={$isLocalMode ? ($localSettings?.showWeather ?? $settings.showWeather) : $sharedSettings.showWeather}
 				onChange={(newShowWeather: boolean | null) => handleSettingChange('showWeather', newShowWeather)}
@@ -146,7 +146,7 @@
 				defaultValue={$settings.showWeather}
 			/>
 
-			<ToggleControlShadcn
+			<ToggleControl
 				label="Auto-hide settings button"
 				checked={$isLocalMode ? ($localSettings?.hideButton ?? $settings.hideButton) : $sharedSettings.hideButton}
 				onChange={(newHideButton: boolean | null) => handleSettingChange('hideButton', newHideButton)}

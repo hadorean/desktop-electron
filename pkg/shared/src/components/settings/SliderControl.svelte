@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { Slider } from '../ui';
+	import { Button } from '../ui';
+	import { cn } from '../../lib/utils';
+
 	const {
 		label,
 		value,
@@ -24,6 +28,7 @@
 	}>();
 
 	const isOverridden = $derived(isOverride && overrideValue !== null);
+	const isGhost = $derived(isOverride && !isOverridden);
 
 	function handleOverride(): void {
 		console.log(`[SliderControl ${label}] handleOverride called:`, {
@@ -40,56 +45,55 @@
 		}
 	}
 
-	function handleChange(event: Event): void {
-		const target = event.target as HTMLInputElement;
-		const newValue = parseFloat(target.value);
-		console.log(`[SliderControl ${label}] handleChange called:`, {
+	function handleValueChange(newValues: number[]): void {
+		const newValue = newValues[0];
+		console.log(`[SliderControl ${label}] handleValueChange called:`, {
 			newValue,
 			previous: value
 		});
 		onChange(newValue);
 	}
+
+	const currentValue = $derived(value ?? defaultValue);
+	const displayValue = $derived(isOverridden ? (overrideValue ?? min) : currentValue);
 </script>
 
-<div class="slider form-control">
-	<label class="label">
+<div class="slider-control">
+	<label class="slider-label">
 		<span class="label-text">{label}</span>
-		<div class="row">
+		<div class="slider-row">
 			{#if isOverride}
-				<button class="btn btn-xs {isOverridden ? 'btn-primary' : 'btn-ghost'}" onclick={handleOverride}>
+				<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-btn text-xs h-8 px-3" onclick={handleOverride}>
 					{isOverridden ? 'Clear' : 'Override'}
-				</button>
+				</Button>
 			{/if}
-			<input
-				type="range"
-				class="range range-primary"
-				{min}
-				{max}
-				{step}
-				value={value ?? defaultValue}
-				oninput={handleChange}
-				class:ghost={isOverride && !isOverridden}
-			/>
-			<span class="w-12 text-right">
-				{#if isOverridden}
-					{formatValue(overrideValue ?? min)}
-				{:else}
-					{formatValue(value ?? defaultValue)}
-				{/if}
+			<Slider value={[displayValue]} {min} {max} {step} onValueChange={handleValueChange} class={cn('flex-1', isGhost && 'ghost-slider')} />
+			<span class="value-display">
+				{formatValue(displayValue)}
 			</span>
 		</div>
 	</label>
 </div>
 
 <style>
-	.label {
+	.slider-control {
+		width: 100%;
+	}
+
+	.slider-label {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.5rem;
 	}
 
-	.row {
+	.label-text {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: hsl(var(--foreground));
+	}
+
+	.slider-row {
 		display: flex;
 		width: 100%;
 		flex-direction: row;
@@ -98,58 +102,37 @@
 		gap: 0.5rem;
 	}
 
-	.range {
-		width: 100%;
+	.value-display {
+		min-width: 3rem;
+		text-align: right;
+		font-size: 0.875rem;
+		color: hsl(var(--muted-foreground));
 	}
 
-	input[type='range'] {
-		--size: 16px;
-		--ghost-color-bg: rgba(46, 46, 46, 0.2);
-		--ghost-color-track-bg: rgba(127, 127, 127, 0);
-		--ghost-border: 1px solid rgba(127, 127, 127, 0.288);
+	/* Ghost mode styling */
+	:global(.ghost-slider) {
+		opacity: 0.5;
+		transition: opacity 0.2s ease;
 	}
 
-	input[type='range'].range-primary {
-		height: var(--size) !important;
+	:global(.ghost-slider:hover) {
+		opacity: 0.7;
 	}
 
-	input[type='range'].ghost.range-primary {
-		--range-shdw: 0%;
+	/* Ghost styling for slider track and fill */
+	:global(.ghost-slider .bg-secondary) {
+		background-color: transparent !important;
+		border: 1px solid hsl(var(--border)) !important;
 	}
 
-	input[type='range']::-moz-range-thumb {
-		height: var(--size) !important;
-		width: var(--size) !important;
-		border: none !important;
-		outline: none !important;
-		background: none !important;
+	:global(.ghost-slider .bg-primary) {
+		background-color: transparent !important;
+		border: 1px solid hsl(var(--border)) !important;
 	}
 
-	input[type='range']::-webkit-slider-thumb {
-		height: var(--size) !important;
-		width: var(--size) !important;
-	}
-
-	input[type='range'].ghost::-webkit-slider-thumb {
-		background-color: var(--ghost-color-bg) !important;
-		border: var(--ghost-border) !important;
-	}
-
-	input[type='range'].ghost::-moz-range-thumb {
-		background-color: var(--ghost-color-bg) !important;
-		border: var(--ghost-border) !important;
-		border: var(--ghost-border) !important;
-		height: calc(var(--size) * 0.9) !important;
-		width: calc(var(--size) * 0.9) !important;
-	}
-
-	input[type='range'].ghost::-webkit-slider-runnable-track {
-		background-color: var(--ghost-color-track-bg) !important;
-		border: var(--ghost-border) !important;
-	}
-
-	input[type='range'].ghost.range-primary::-moz-range-track {
-		background-color: var(--ghost-color-track-bg) !important;
-		border: var(--ghost-border) !important;
+	/* Ghost styling for slider thumb */
+	:global(.ghost-slider .bg-background) {
+		background-color: transparent !important;
+		border: 1px solid hsl(var(--border)) !important;
 	}
 </style>
