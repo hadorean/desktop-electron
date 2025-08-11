@@ -1,5 +1,6 @@
 // Settings type definitions
 
+export type DayNightMode = 'day' | 'night'
 export type SettingsButtonPosition = 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left'
 
 export interface ScreenSettings {
@@ -16,10 +17,23 @@ export interface ScreenSettings {
 	settingsButtonPosition: SettingsButtonPosition
 }
 
+export interface DayNightScreenSettings {
+	day: Partial<ScreenSettings>
+	night: Partial<ScreenSettings> | null
+}
+
+export function getThemeScreenSettings(settings: DayNightScreenSettings, theme: DayNightMode): Partial<ScreenSettings> {
+	return theme === 'day' || settings.night === null ? settings.day : { ...settings.day, ...settings.night }
+}
+
+export function getThemeEditingSettings(settings: DayNightScreenSettings, theme: DayNightMode): Partial<ScreenSettings> {
+	return theme === 'day' ? settings.day : (settings.night ?? {})
+}
+
 export interface UserSettings {
 	lastModified?: string // ISO 8601 timestamp
-	shared: ScreenSettings
-	screens: Record<string, Partial<ScreenSettings>>
+	shared: DayNightScreenSettings
+	screens: Record<string, DayNightScreenSettings>
 }
 
 export interface SettingsUpdateEvent {
@@ -43,7 +57,12 @@ export const DefaultScreenSettings: ScreenSettings = {
 	settingsButtonPosition: 'bottom-right'
 }
 
+export const DefaultDayNightSettings: DayNightScreenSettings = {
+	day: {},
+	night: null
+}
+
 export const DefaultUserSettings: UserSettings = {
-	shared: DefaultScreenSettings,
+	shared: DefaultDayNightSettings,
 	screens: {}
 }
