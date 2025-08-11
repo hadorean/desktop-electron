@@ -72,7 +72,7 @@
 					selectedImage={$settings.selectedImage}
 					isOverride={$isLocalMode}
 					overrideValue={$localSettings?.selectedImage}
-					onImageChange={(newImage: string) => handleSettingChange('selectedImage', newImage)}
+					onImageChange={(newImage: string | null) => handleSettingChange('selectedImage', newImage)}
 				/>
 
 				<SliderControlShadcn

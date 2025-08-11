@@ -3,6 +3,7 @@ import { AppContext } from './context'
 import { settingsService } from './settings'
 import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
 import { IpcEvents, MainEvents } from '@heyketsu/shared/types/ipc'
+import type { UISettings } from '@heyketsu/shared/types/settings'
 
 export function setupIpc(options: AppContext): void {
   const { localServer, bg } = options
@@ -34,7 +35,8 @@ export function setupIpc(options: AppContext): void {
   })
 
   // IPC handlers for background management
-  handleIpc(IpcEvents.ReloadBackground, (_, monitorId: number) => {
+  handleIpc(IpcEvents.ReloadBackground, (...args: unknown[]) => {
+    const monitorId = args[1] as number
     bg?.reloadBackground(monitorId)
   })
 
@@ -43,7 +45,8 @@ export function setupIpc(options: AppContext): void {
   })
 
   // IPC handlers for background interactivity
-  handleIpc(IpcEvents.MakeBackgroundInteractive, (_, monitorId: number) => {
+  handleIpc(IpcEvents.MakeBackgroundInteractive, (...args: unknown[]) => {
+    const monitorId = args[1] as number
     bg?.makeInteractive(monitorId)
   })
 
@@ -51,7 +54,8 @@ export function setupIpc(options: AppContext): void {
     bg?.makeAllInteractive()
   })
 
-  handleIpc(IpcEvents.MakeBackgroundNonInteractive, (_, monitorId: number) => {
+  handleIpc(IpcEvents.MakeBackgroundNonInteractive, (...args: unknown[]) => {
+    const monitorId = args[1] as number
     bg?.makeNonInteractive(monitorId)
   })
 
@@ -70,8 +74,9 @@ export function setupIpc(options: AppContext): void {
     }
   })
 
-  handleIpc(IpcEvents.SettingsUpdateShared, async (_, settings) => {
+  handleIpc(IpcEvents.SettingsUpdateShared, async (...args: unknown[]) => {
     try {
+      const settings = args[1] as Partial<UISettings>
       const currentSettings = await settingsService.getSettings()
       const updatedSettings = {
         shared: {
@@ -87,8 +92,10 @@ export function setupIpc(options: AppContext): void {
     }
   })
 
-  handleIpc(IpcEvents.SettingsUpdateLocal, async (_, screenId, settings) => {
+  handleIpc(IpcEvents.SettingsUpdateLocal, async (...args: unknown[]) => {
     try {
+      const screenId = args[1] as string
+      const settings = args[2] as Partial<UISettings>
       const currentSettings = await settingsService.getSettings()
       const updatedSettings = {
         screens: {

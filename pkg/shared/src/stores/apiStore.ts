@@ -8,7 +8,8 @@ export const apiConfigEnabled = writable(false);
 const getInitialApiUrl = (): string => {
 	if (typeof window !== 'undefined') {
 		// First check if server provided URL via template injection
-		const serverData = (window as unknown).__SERVER_DATA__;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const serverData = (window as any).__SERVER_DATA__;
 		if (serverData?.serverUrl) {
 			console.log('🔌 Using server-provided URL:', serverData.serverUrl);
 			return serverData.serverUrl;

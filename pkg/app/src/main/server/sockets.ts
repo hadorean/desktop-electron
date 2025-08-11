@@ -21,7 +21,8 @@ export class SocketManager {
    * Type-safe wrapper for handling client-to-server events
    */
   private onClientEvent<T extends ClientEvents>(socket: Socket, event: T, handler: (data: ClientEventMap[T]) => void | Promise<void>): void {
-    socket.on(event, handler)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    socket.on(event, handler as any)
   }
 
   private setupSocketHandlers(): void {
