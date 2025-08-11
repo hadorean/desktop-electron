@@ -3,11 +3,12 @@
 		"composite": true,
 		"target": "ES2022",
 		"module": "ESNext",
+		"baseUrl": ".", // Added to ensure proper module resolution
+		"skipLibCheck": true, // Moved here to ensure it applies to all type checks
 		"moduleResolution": "node",
 		"isolatedModules": true,
 		"noEmit": false,
 		"strict": true,
-		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
@@ -16,9 +17,9 @@
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"lib": ["ES2022", "DOM"],
-		"types": ["node"],
+		"types": ["node", "svelte"],
 		"paths": {
-			"$stores/*": ["./src/stores/*"]
+			"$stores/*": ["./src/stores/*", "node_modules/*", "src/types/*"]
 		}
 	},
 	"include": ["src/**/*.ts", "src/**/*.js", "src/**/*.d.ts", "src/**/*.svelte"],
