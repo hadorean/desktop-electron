@@ -214,6 +214,77 @@ export function resetSettings(): void {
 	//localSettings.set(null);
 }
 
+/**
+ * Validate and fix selected images when the image list changes
+ * Returns true if any settings were changed
+ */
+export function validateSelectedImages(availableImages: string[]): boolean {
+	let hasChanges = false
+	const fallbackImage = availableImages.length > 0 ? availableImages[0] : ''
+
+	// Check shared settings
+	const currentSharedSettings = get(sharedSettings)
+	if (currentSharedSettings.selectedImage && !availableImages.includes(currentSharedSettings.selectedImage)) {
+		console.log(`📷 Shared selected image "${currentSharedSettings.selectedImage}" no longer exists, switching to "${fallbackImage}"`)
+		updateSharedSettings((settings) => ({
+			...settings,
+			selectedImage: fallbackImage
+		}))
+		hasChanges = true
+	}
+
+	// Check local settings for current screen
+	const currentLocalSettings = get(localSettings)
+	if (currentLocalSettings?.selectedImage && !availableImages.includes(currentLocalSettings.selectedImage)) {
+		console.log(`📷 Local selected image "${currentLocalSettings.selectedImage}" no longer exists, clearing override`)
+		updateLocalSettings((current) => {
+			if (!current) return {}
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { selectedImage, ...rest } = current
+			return Object.keys(rest).length > 0 ? rest : {}
+		})
+		hasChanges = true
+	}
+
+	// Check all local settings if we have access to them
+	try {
+		const allLocalSettingsString = localStorage.getItem('settings.local')
+		if (allLocalSettingsString) {
+			const allLocalSettings = JSON.parse(allLocalSettingsString)
+			let localSettingsChanged = false
+
+			for (const screenId in allLocalSettings) {
+				const screenSettings = allLocalSettings[screenId]
+				if (screenSettings.selectedImage && !availableImages.includes(screenSettings.selectedImage)) {
+					console.log(`📷 Screen "${screenId}" selected image "${screenSettings.selectedImage}" no longer exists, clearing override`)
+					delete screenSettings.selectedImage
+					if (Object.keys(screenSettings).length === 0) {
+						delete allLocalSettings[screenId]
+					}
+					localSettingsChanged = true
+				}
+			}
+
+			if (localSettingsChanged) {
+				if (Object.keys(allLocalSettings).length === 0) {
+					localStorage.removeItem('settings.local')
+				} else {
+					localStorage.setItem('settings.local', JSON.stringify(allLocalSettings))
+				}
+
+				// Trigger a re-read of settings by updating allSettings
+				allSettings.set(allLocalSettings)
+
+				hasChanges = true
+			}
+		}
+	} catch (error) {
+		console.error('Error validating local settings:', error)
+	}
+
+	return hasChanges
+}
+
 // // Update a specific setting
 // export function updateSetting<K extends keyof typeof defaultSettings>(
 //   key: K,

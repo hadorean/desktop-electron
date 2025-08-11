@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte'
 	import { DebugMenu } from '@hgrandry/dbg'
-	import { settings, expandSettings, loadImages, imagesError, getCurrentImages } from '$shared/stores'
+	import { settings, expandSettings, loadImages, imagesError, getCurrentImages, onImagesChanged, validateSelectedImages } from '$shared/stores'
 	import { loadSettings } from '$shared/stores/settingsStore'
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
 	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator } from '@heyketsu/shared'
@@ -51,6 +51,12 @@
 					console.log('Client app: Received images updated event:', event)
 					// Refresh the images store
 					await loadImages()
+				})
+
+				// Setup image change validation
+				onImagesChanged((newImages) => {
+					const imageNames = newImages.map((img) => img.name)
+					validateSelectedImages(imageNames)
 				})
 
 				// Return cleanup function

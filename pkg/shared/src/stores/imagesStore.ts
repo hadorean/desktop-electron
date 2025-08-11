@@ -12,6 +12,12 @@ interface ImagesStoreState {
 	lastUpdated: number | null
 }
 
+// Callback type for image change notifications
+type ImageChangeCallback = (newImages: ImageInfo[], previousImages: ImageInfo[]) => void
+
+// Array to store callbacks
+const imageChangeCallbacks: ImageChangeCallback[] = []
+
 // Initial state
 const initialState: ImagesStoreState = {
 	images: [],
@@ -36,6 +42,7 @@ export async function loadImages(): Promise<void> {
 
 	try {
 		const images = await api.getImages()
+		const previousImages = getCurrentImages()
 
 		imagesStoreInternal.update((state) => ({
 			...state,
@@ -46,6 +53,9 @@ export async function loadImages(): Promise<void> {
 		}))
 
 		console.log(`📷 Loaded ${images.length} images into store`)
+
+		// Notify callbacks of image changes
+		notifyImageChangeCallbacks(images, previousImages)
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : 'Unknown error loading images'
 
@@ -113,3 +123,47 @@ export function isImagesLoading(): boolean {
  * Check if images store is empty
  */
 export const hasImages = derived(images, ($images) => $images.length > 0)
+
+/**
+ * Register a callback to be notified when images change
+ */
+export function onImagesChanged(callback: ImageChangeCallback): () => void {
+	imageChangeCallbacks.push(callback)
+
+	// Return unsubscribe function
+	return () => {
+		const index = imageChangeCallbacks.indexOf(callback)
+		if (index > -1) {
+			imageChangeCallbacks.splice(index, 1)
+		}
+	}
+}
+
+/**
+ * Notify all registered callbacks about image changes
+ */
+function notifyImageChangeCallbacks(newImages: ImageInfo[], previousImages: ImageInfo[]): void {
+	imageChangeCallbacks.forEach((callback) => {
+		try {
+			callback(newImages, previousImages)
+		} catch (error) {
+			console.error('📷 Error in image change callback:', error)
+		}
+	})
+}
+
+/**
+ * Get fallback image name (first available image or empty string)
+ */
+export function getFallbackImageName(): string {
+	const currentImages = getCurrentImages()
+	return currentImages.length > 0 ? currentImages[0].name : ''
+}
+
+/**
+ * Check if an image name exists in the current images list
+ */
+export function imageExists(imageName: string): boolean {
+	if (!imageName) return false
+	return getCurrentImages().some((img) => img.name === imageName)
+}

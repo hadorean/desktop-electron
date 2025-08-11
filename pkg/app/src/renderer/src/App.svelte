@@ -1,7 +1,8 @@
 <script lang="ts">
 	import SettingsPanel from '$shared/components/settings/SettingsPanel.svelte'
 	import { effectiveApiUrl } from '$shared/stores/apiStore'
-	import { debugVisible, setDebugMenuVisible, loadImages, imagesError } from '$shared/stores'
+	import { debugVisible, setDebugMenuVisible, loadImages, imagesError, onImagesChanged } from '$shared/stores'
+	import { validateSelectedImages } from '$shared/stores'
 	import { socketService } from '$shared/services/socket'
 	import ErrorMessage from '$shared/components/settings/ErrorMessage.svelte'
 	import { Versions, AppVersion, AppHeader, ActionButtons, ServerInfo } from './components'
@@ -29,6 +30,12 @@
 			console.log('Desktop app: Received images updated event:', event)
 			// Refresh the images store
 			await loadImages()
+		})
+
+		// Setup image change validation
+		onImagesChanged((newImages) => {
+			const imageNames = newImages.map((img) => img.name)
+			validateSelectedImages(imageNames)
 		})
 	})
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { settings, sharedSettings, localSettings, isLocalMode, currentScreen, updateSharedSettings, updateLocalSettings, images } from '../../stores'
+	import { settings, sharedSettings, localSettings, isLocalMode, currentScreen, updateSharedSettings, updateLocalSettings } from '../../stores'
 	import ImageGrid from '$shared/components/settings/ImageGrid.svelte'
 	import SliderControl from './SliderControl.svelte'
 	import ToggleControl from './ToggleControl.svelte'
@@ -10,17 +10,6 @@
 	export let expanded: boolean = false
 	//export let errorMessage: string = "";
 	export let settingsPanel: HTMLElement | null = null
-
-	// Subscribe to settings store
-	$: {
-		if ($settings.selectedImage && !$images.some((img) => img.name === $settings.selectedImage)) {
-			// If the selected image no longer exists in the images list, reset it
-			updateSharedSettings((settings) => ({
-				...settings,
-				selectedImage: $images[0]?.name || ''
-			}))
-		}
-	}
 
 	function handleSettingChange<K extends keyof typeof $settings>(key: K, value: (typeof $settings)[K] | null): void {
 		if ($isLocalMode) {

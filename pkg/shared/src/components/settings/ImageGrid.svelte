@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getImageUrl } from '../../services'
-	import { settings, updateSharedSettings, images } from '../../stores'
+	import { settings, updateSharedSettings, images, imagesLoading, imagesError } from '../../stores'
 	import { Button, Card, CardContent } from '../ui'
 	import { cn } from '../../lib/utils'
 
@@ -75,48 +75,89 @@
 
 	<Card class={cn('image-grid-card', isGhost && 'ghost-image-grid')}>
 		<CardContent class="p-2">
-			<div class="grid max-h-[280px] grid-cols-4 gap-2 overflow-y-auto overflow-x-hidden pr-2">
-				{#each sortedImages as image (image.name)}
-					<div class="card-container aspect-square p-1">
-						<div
-							class={cn(
-								'image-thumbnail-card hover:scale-102 bg-card text-card-foreground group h-full w-full cursor-pointer rounded-lg border shadow-sm transition-all duration-200 hover:shadow-lg',
-								effectiveImage === image.name && 'ring-primary shadow-primary/20 shadow-lg ring-2',
-								isGhost && 'ghost-thumbnail'
-							)}
-							onclick={() => handleImageClick(image.name)}
-							onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleImageClick(image.name)}
-							tabindex="0"
-							role="button"
-							aria-pressed={effectiveImage === image.name}
-							title={image.name}
-						>
-							<CardContent class="relative aspect-square p-0">
-								<img
-									src={getThumbnailUrl(image.name)}
-									alt={image.name}
-									class="h-full w-full rounded-md object-cover transition-all duration-200 group-hover:brightness-110"
-									loading="lazy"
-								/>
-								<button
-									class={cn(
-										'absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-black/20 text-sm backdrop-blur-sm transition-colors duration-200 hover:bg-black/40',
-										$settings.favorites.includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
-									)}
-									onclick={(e: Event) => toggleFavorite(image.name, e)}
-									title={$settings.favorites.includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
-								>
-									{#if $settings.favorites.includes(image.name)}
-										★
-									{:else}
-										☆
-									{/if}
-								</button>
-							</CardContent>
-						</div>
+			{#if $imagesLoading}
+				<!-- Loading state -->
+				<div class="text-muted-foreground flex h-[120px] items-center justify-center text-center">
+					<div>
+						<div class="mb-2 text-4xl opacity-50">⏳</div>
+						<div class="text-sm">Loading images...</div>
 					</div>
-				{/each}
-			</div>
+				</div>
+			{:else if $imagesError}
+				<!-- Error state -->
+				<div class="text-destructive flex h-[120px] items-center justify-center text-center">
+					<div>
+						<div class="mb-2 text-4xl opacity-50">⚠️</div>
+						<div class="text-sm">Failed to load images</div>
+						<div class="text-xs opacity-70">{$imagesError}</div>
+					</div>
+				</div>
+			{:else if sortedImages.length === 0}
+				<!-- Empty state -->
+				<div class="text-muted-foreground flex h-[120px] items-center justify-center text-center">
+					<div>
+						<div class="mb-2 text-4xl opacity-50">📁</div>
+						<div class="text-sm">No images found</div>
+						<div class="text-xs opacity-70">Add images to your wallpapers folder</div>
+					</div>
+				</div>
+			{:else}
+				<div class="grid max-h-[280px] grid-cols-4 gap-2 overflow-y-auto overflow-x-hidden pr-2">
+					{#each sortedImages as image (image.name)}
+						<div class="card-container aspect-square p-1">
+							<div
+								class={cn(
+									'image-thumbnail-card hover:scale-102 bg-card text-card-foreground group h-full w-full cursor-pointer rounded-lg border shadow-sm transition-all duration-200 hover:shadow-lg',
+									effectiveImage === image.name && 'ring-primary shadow-primary/20 shadow-lg ring-2',
+									isGhost && 'ghost-thumbnail'
+								)}
+								onclick={() => handleImageClick(image.name)}
+								onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleImageClick(image.name)}
+								tabindex="0"
+								role="button"
+								aria-pressed={effectiveImage === image.name}
+								title={image.name}
+							>
+								<CardContent class="relative aspect-square p-0">
+									<img
+										src={getThumbnailUrl(image.name)}
+										alt={image.name}
+										class="h-full w-full rounded-md object-cover transition-all duration-200 group-hover:brightness-110"
+										loading="lazy"
+										onerror={(e) => {
+											const target = e.target as HTMLImageElement
+											target.style.display = 'none'
+											const fallback = target.nextElementSibling as HTMLElement
+											if (fallback) fallback.style.display = 'flex'
+										}}
+									/>
+									<!-- Fallback for missing thumbnails -->
+									<div class="bg-muted text-muted-foreground hidden h-full w-full items-center justify-center rounded-md">
+										<div class="text-center">
+											<div class="mb-1 text-2xl opacity-50">🖼️</div>
+											<div class="text-xs">Loading...</div>
+										</div>
+									</div>
+									<button
+										class={cn(
+											'absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-black/20 text-sm backdrop-blur-sm transition-colors duration-200 hover:bg-black/40',
+											$settings.favorites.includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
+										)}
+										onclick={(e: Event) => toggleFavorite(image.name, e)}
+										title={$settings.favorites.includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
+									>
+										{#if $settings.favorites.includes(image.name)}
+											★
+										{:else}
+											☆
+										{/if}
+									</button>
+								</CardContent>
+							</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
 		</CardContent>
 	</Card>
 </div>

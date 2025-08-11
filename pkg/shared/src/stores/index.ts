@@ -16,6 +16,7 @@ export {
 	updateSharedSettings,
 	updateLocalSettings,
 	resetSettings,
+	validateSelectedImages,
 	getScreenSettings,
 	type Settings as StoreSettings,
 	type SettingsButtonPosition
@@ -56,5 +57,8 @@ export {
 	clearImages,
 	updateImages,
 	getCurrentImages,
-	isImagesLoading
+	isImagesLoading,
+	onImagesChanged,
+	getFallbackImageName,
+	imageExists
 } from './imagesStore'
