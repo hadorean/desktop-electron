@@ -8,6 +8,30 @@ dev:
 	clear
 	pnpm dev
 
+# all, shared, client, app
+check what="all": 
+	clear
+	pnpm format --log-level=warn
+	pnpm typecheck:ts
+	just check-{{what}}
+	
+check-all:
+	just check-shared
+	just check-client
+	just check-app
+
+check-shared:
+	pnpm typecheck:shared
+	pnpm lint:shared
+
+check-client:
+	pnpm typecheck:client
+	pnpm lint:client
+
+check-app:
+	pnpm typecheck:app
+	pnpm lint:app
+
 # Run the mkdocs server
 doc:
 	python -m mkdocs serve
