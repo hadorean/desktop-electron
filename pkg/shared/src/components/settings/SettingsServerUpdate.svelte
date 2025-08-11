@@ -29,7 +29,7 @@
 				const currentScreenId = $currentScreen
 				if (newSettings.screens && !newSettings.screens[currentScreenId]) {
 					// Add current screen to settings (empty object)
-					newSettings.screens[currentScreenId] = {}
+					newSettings.screens[currentScreenId] = { day: {}, night: {} }
 					updatingSettingsFromServer = false // we want to update the server settings with the new screen
 				}
 

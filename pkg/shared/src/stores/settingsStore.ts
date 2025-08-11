@@ -1,5 +1,5 @@
 import { get, writable, derived } from 'svelte/store'
-import type { ScreenSettings, UserSettings } from '../types'
+import { type ScreenSettings, type UserSettings, getThemeScreenSettings, getThemeEditingSettings } from '../types'
 import { DefaultScreenSettings, DefaultUserSettings } from '../types'
 
 const defaultScreenId = 'monitor1'
@@ -14,15 +14,18 @@ currentScreen.subscribe((screenId) => {
 })
 
 const defaultSettings: ScreenSettings = DefaultScreenSettings
-
 const defaultUserSettings: UserSettings = DefaultUserSettings
+
+export const isLocalMode = writable(false)
+
+// Settings panel expansion state
+export const expandSettings = writable(false)
 
 // Flag to prevent server sync during internal operations
 let preventServerSync = false
 
 export const allSettings = writable<UserSettings>(defaultUserSettings)
 
-// Create a derived store that returns the list of screen IDs
 export const screenIds = derived(allSettings, ($allSettings) =>
 	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreen), get(currentScreen)])).sort()
 )
@@ -31,11 +34,33 @@ export function setCurrentScreen(screenId: string): void {
 	currentScreen.set(screenId)
 }
 
+export function setCurrentTheme(theme: string): void {
+	currentTheme.set(theme)
+}
+
+export function getCurrentTheme(): string {
+	return get(currentTheme)
+}
+
 // Return the settings for a given screen id
 export function getScreenSettings(id: string): Partial<ScreenSettings> | undefined {
 	const value = get(allSettings)
-	return value.screens[id] ?? {}
+	const theme = getCurrentTheme() as 'day' | 'night'
+	return value.screens[id]?.[theme] ?? {}
 }
+
+// Settings to use to render the current screen image
+export const screenSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
+	const currentTheme = theme as 'day' | 'night'
+	const themeShared = getThemeScreenSettings(all.shared, currentTheme)
+	return isLocal ? { ...themeShared, ...getThemeScreenSettings(all.screens[screen], currentTheme) } : themeShared
+})
+
+// Settings to use in the settings panel
+export const editingSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
+	const currentTheme = theme as 'day' | 'night'
+	return isLocal ? getThemeEditingSettings(all.screens[screen], currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
+})
 
 // Create the shared settings store (synced with server)
 export const sharedSettings = derived([allSettings], ([all]) => ({
@@ -43,9 +68,21 @@ export const sharedSettings = derived([allSettings], ([all]) => ({
 }))
 
 // Create the local settings store (overrides)
-export const localSettings = derived([allSettings, currentScreen], ([all, screen]) => ({
-	...(all.screens[screen] ?? {})
+export const localSettings = derived([allSettings, currentScreen, currentTheme], ([all, screen, theme]) => {
+	const screenSettings = all.screens[screen]
+	if (!screenSettings) return {}
+	return screenSettings[theme as 'day' | 'night'] ?? {}
+})
+
+// Create the derived settings store that merges shared and local settings
+export const settings = derived([sharedSettings, localSettings], ([shared, local]) => ({
+	...shared,
+	...local
 }))
+
+export const hasLocalSettings = derived([localSettings], ([$local]) => {
+	return $local !== null
+})
 
 export function updateSharedSettings(settings: (current: ScreenSettings) => Partial<ScreenSettings>): void {
 	allSettings.update((value) => {
@@ -77,13 +114,19 @@ export function updateSharedSettingsSilent(settings: (current: ScreenSettings) =
 export function updateLocalSettings(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
 	allSettings.update((value) => {
 		const screen = get(currentScreen) || defaultScreenId
-		const currentSettings = value.screens[screen] ?? {}
-		const updatedSettings = settings(currentSettings)
+		const theme = getCurrentTheme() as 'day' | 'night'
+		const currentScreenSettings = value.screens[screen] ?? { day: {}, night: {} }
+		const currentThemeSettings = currentScreenSettings[theme] ?? {}
+		const updatedThemeSettings = settings(currentThemeSettings)
+
 		return {
 			...value,
 			screens: {
 				...value.screens,
-				[screen]: updatedSettings
+				[screen]: {
+					...currentScreenSettings,
+					[theme]: updatedThemeSettings
+				}
 			}
 		}
 	})
@@ -110,21 +153,6 @@ export function updateLocalSettingsSilent(settings: (current: Partial<ScreenSett
 export function shouldPreventServerSync(): boolean {
 	return preventServerSync
 }
-
-// Create the derived settings store that merges shared and local settings
-export const settings = derived([sharedSettings, localSettings], ([shared, local]) => ({
-	...shared,
-	...local
-}))
-
-export const hasLocalSettings = derived([localSettings], ([$local]) => {
-	return $local !== null
-})
-
-export const isLocalMode = writable(false)
-
-// Settings panel expansion state
-export const expandSettings = writable(false)
 
 // let updatingLocally = true;
 

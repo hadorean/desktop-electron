@@ -91,7 +91,7 @@
 			...settings,
 			screens: {
 				...settings.screens,
-				[newScreenName]: {}
+				[newScreenName]: { day: {}, night: {} }
 			}
 		}))
 
