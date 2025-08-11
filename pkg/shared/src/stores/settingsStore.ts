@@ -1,19 +1,17 @@
 import { get, writable, derived } from 'svelte/store'
+import type { ScreenSettings, UserSettings } from '../types'
+import { DefaultScreenSettings, DefaultUserSettings } from '../types'
 
 const defaultScreenId = 'monitor1'
+const defaultTheme = 'day'
 
 export const currentScreen = writable(defaultScreenId)
+export const currentTheme = writable(defaultTheme)
 
 currentScreen.subscribe((screenId) => {
 	// Update the current screen in localStorage
 	localStorage.setItem('currentScreen', screenId)
 })
-
-import type { ScreenSettings, UserSettings, SettingsButtonPosition } from '../types'
-import { DefaultScreenSettings, DefaultUserSettings } from '../types'
-
-// Legacy aliases for backward compatibility
-export type { SettingsButtonPosition }
 
 const defaultSettings: ScreenSettings = DefaultScreenSettings
 

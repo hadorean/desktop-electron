@@ -1,12 +1,8 @@
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import { app } from 'electron'
-import type { ScreenSettings, UserSettings, SettingsUpdateEvent } from '@heyketsu/shared/types'
+import type { UserSettings, SettingsUpdateEvent } from '@heyketsu/shared/types'
 import { DefaultUserSettings } from '@heyketsu/shared/types/settings'
-
-// Legacy aliases for backward compatibility
-export type Settings = ScreenSettings
-export type { SettingsButtonPosition } from '@heyketsu/shared/types'
 
 export class SettingsService {
 	private settings: UserSettings | null = null

@@ -20,8 +20,7 @@ export {
 	shouldPreventServerSync,
 	resetSettings,
 	validateSelectedImages,
-	getScreenSettings,
-	type SettingsButtonPosition
+	getScreenSettings
 } from './settingsStore'
 
 // Debug store
