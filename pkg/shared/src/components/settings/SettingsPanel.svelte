@@ -155,15 +155,6 @@
 				defaultValue={$settings.hideButton}
 			/>
 
-			<ToggleControlShadcn
-				label="Show screen switcher"
-				checked={$isLocalMode ? ($localSettings?.showScreenSwitcher ?? $settings.showScreenSwitcher) : $sharedSettings.showScreenSwitcher}
-				onChange={(newShowScreenSwitcher: boolean | null) => handleSettingChange('showScreenSwitcher', newShowScreenSwitcher)}
-				isOverride={$isLocalMode}
-				overrideValue={$localSettings?.showScreenSwitcher}
-				defaultValue={$settings.showScreenSwitcher}
-			/>
-
 			<!--<PositionSelector
                 isOverride={$isLocalMode}
                 overrideValue={$localSettings?.settingsButtonPosition ?? null}
@@ -197,7 +188,6 @@
 		backdrop-filter: blur(10px);
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 		transition: opacity 0.3s cubic-bezier(0.9, 0.14, 1, 0.75);
-
 		opacity: 0;
 	}
 
