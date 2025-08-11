@@ -10,6 +10,8 @@ export class ImageService extends EventEmitter {
 	private watcherInitialized = false
 	private cachedImages: string[] = []
 	private lastScanTime = 0
+	private debounceTimer: NodeJS.Timeout | null = null
+	private readonly DEBOUNCE_DELAY = 2000 // ms to wait for additional events
 
 	constructor() {
 		super()
@@ -100,16 +102,26 @@ export class ImageService extends EventEmitter {
 			this.watcher = watch(this.imagesPathValue, { recursive: true }, (eventType, filename) => {
 				if (filename) {
 					console.log(`File watcher event: ${eventType} - ${filename}`)
+
 					// Clear cache to force rescan on next call
 					this.cachedImages = []
 					this.lastScanTime = 0
 
-					// Emit event for listeners (Phase 2)
-					this.emit('imagesChanged', {
-						eventType,
-						filename,
-						timestamp: Date.now()
-					})
+					// Debounce: clear existing timer and set new one
+					if (this.debounceTimer) {
+						clearTimeout(this.debounceTimer)
+					}
+
+					this.debounceTimer = setTimeout(() => {
+						console.log('📷 File changes settled, emitting imagesChanged event')
+						// Emit single event after debounce period
+						this.emit('imagesChanged', {
+							eventType: 'batch_change',
+							filename: 'multiple',
+							timestamp: Date.now()
+						})
+						this.debounceTimer = null
+					}, this.DEBOUNCE_DELAY)
 				}
 			})
 			this.watcherInitialized = true
@@ -123,6 +135,12 @@ export class ImageService extends EventEmitter {
 	 * Stops the file watcher
 	 */
 	private stopWatcher(): void {
+		// Clear any pending debounce timer
+		if (this.debounceTimer) {
+			clearTimeout(this.debounceTimer)
+			this.debounceTimer = null
+		}
+
 		if (this.watcher) {
 			try {
 				this.watcher.close()
@@ -167,6 +185,11 @@ export class ImageService extends EventEmitter {
 	 * Cleanup method to stop the watcher when the service is no longer needed
 	 */
 	public dispose(): void {
+		// Clear any pending debounce timer
+		if (this.debounceTimer) {
+			clearTimeout(this.debounceTimer)
+			this.debounceTimer = null
+		}
 		this.stopWatcher()
 		this.removeAllListeners()
 	}

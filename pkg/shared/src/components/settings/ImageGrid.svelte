@@ -50,15 +50,21 @@
 		}))
 	}
 
-	// Sort images to show favorites first
+	// Sort images to show favorites first - use derived to minimize recalculation
 	const sortedImages = $derived(
-		[...$images].sort((a, b) => {
-			const aIsFavorite = $settings.favorites.includes(a.name)
-			const bIsFavorite = $settings.favorites.includes(b.name)
-			if (aIsFavorite && !bIsFavorite) return -1
-			if (!aIsFavorite && bIsFavorite) return 1
-			return 0
-		})
+		(() => {
+			const imageList = $images
+			const favorites = $settings.favorites
+			if (imageList.length === 0) return []
+			
+			return [...imageList].sort((a, b) => {
+				const aIsFavorite = favorites.includes(a.name)
+				const bIsFavorite = favorites.includes(b.name)
+				if (aIsFavorite && !bIsFavorite) return -1
+				if (!aIsFavorite && bIsFavorite) return 1
+				return 0
+			})
+		})()
 	)
 
 	const effectiveImage = $derived(isOverridden ? overrideValue : selectedImage)

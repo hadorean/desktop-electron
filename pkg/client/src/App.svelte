@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte'
 	import { DebugMenu } from '@hgrandry/dbg'
-	import { settings, expandSettings, loadImages, imagesError, getCurrentImages, onImagesChanged, validateSelectedImages } from '$shared/stores'
+	import { settings, expandSettings, loadImages, imagesError, getCurrentImages, onImagesChanged, validateSelectedImages, getIsLoadingImages } from '$shared/stores'
 	import { loadSettings } from '$shared/stores/settingsStore'
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
 	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator } from '@heyketsu/shared'
@@ -13,6 +13,9 @@
 	let buttonHovered: boolean = false
 	let settingsPanel: HTMLElement | null = null
 	let settingsButton: HTMLElement | null = null
+	
+	// Track processed events to prevent duplicates
+	let lastProcessedEventTimestamp = 0
 
 	// Function to handle API reconnection
 	async function handleReconnect(): Promise<void> {
@@ -49,14 +52,29 @@
 				// Setup socket listener for images updated events
 				socketService.onImagesUpdated(async (event) => {
 					console.log('Client app: Received images updated event:', event)
-					// Refresh the images store
-					await loadImages()
+					
+					// Deduplicate events with the same timestamp
+					if (event.timestamp <= lastProcessedEventTimestamp) {
+						console.log('🚫 Skipping duplicate event (already processed)')
+						return
+					}
+					
+					lastProcessedEventTimestamp = event.timestamp
+					
+					// Only refresh if it's a file change event
+					if (event.reason === 'file_change') {
+						console.log('🔄 Processing unique file change event')
+						await loadImages()
+					}
 				})
 
-				// Setup image change validation
+				// Setup image change validation (skip during initial loading to prevent cascades)
 				onImagesChanged((newImages) => {
-					const imageNames = newImages.map((img) => img.name)
-					validateSelectedImages(imageNames)
+					// Only validate if we're not currently loading to prevent validation cascades
+					if (!getIsLoadingImages()) {
+						const imageNames = newImages.map((img) => img.name)
+						validateSelectedImages(imageNames)
+					}
 				})
 
 				// Return cleanup function

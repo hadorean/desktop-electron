@@ -14,7 +14,10 @@ export {
 	settings,
 	hasLocalSettings,
 	updateSharedSettings,
+	updateSharedSettingsSilent,
 	updateLocalSettings,
+	updateLocalSettingsSilent,
+	shouldPreventServerSync,
 	resetSettings,
 	validateSelectedImages,
 	getScreenSettings,
@@ -60,5 +63,6 @@ export {
 	isImagesLoading,
 	onImagesChanged,
 	getFallbackImageName,
-	imageExists
+	imageExists,
+	getIsLoadingImages
 } from './imagesStore'

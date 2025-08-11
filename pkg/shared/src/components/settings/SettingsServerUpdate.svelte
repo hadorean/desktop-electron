@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { allSettings, currentScreen } from '../../stores/settingsStore'
+	import { allSettings, currentScreen, shouldPreventServerSync } from '../../stores/settingsStore'
 	import { apiBaseUrl } from '../../stores/apiStore'
 	import { onMount, onDestroy } from 'svelte'
 	import { socketService } from '../../services/socket'
@@ -52,6 +52,12 @@
 			if (!initialSubscribeHandled) {
 				initialSubscribeHandled = true
 				return // Skip the initial subscribe callback
+			}
+
+			// Check if server sync should be prevented (e.g., during validation operations)
+			if (shouldPreventServerSync()) {
+				console.log('🚫 Skipping server sync (silent update)')
+				return
 			}
 
 			if (!updatingSettingsFromServer && socketService.getConnectionStatus()) {

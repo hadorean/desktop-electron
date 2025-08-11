@@ -23,6 +23,9 @@ const defaultSettings: Settings = DEFAULT_UI_SETTINGS
 
 const defaultServerSettings: ServerSettings = DEFAULT_SERVER_SETTINGS
 
+// Flag to prevent server sync during internal operations
+let preventServerSync = false
+
 export const allSettings = writable<ServerSettings>(defaultServerSettings)
 
 // Create a derived store that returns the list of screen IDs
@@ -58,6 +61,21 @@ export function updateSharedSettings(settings: (current: Settings) => Partial<Se
 	})
 }
 
+/**
+ * Update shared settings without triggering server sync (for internal operations like validation)
+ */
+export function updateSharedSettingsSilent(settings: (current: Settings) => Partial<Settings>): void {
+	preventServerSync = true
+	try {
+		updateSharedSettings(settings)
+	} finally {
+		// Reset flag after a microtask to ensure all synchronous effects complete
+		Promise.resolve().then(() => {
+			preventServerSync = false
+		})
+	}
+}
+
 export function updateLocalSettings(settings: (current: Partial<Settings>) => Partial<Settings>): void {
 	allSettings.update((value) => {
 		const screen = get(currentScreen) || defaultScreenId
@@ -71,6 +89,28 @@ export function updateLocalSettings(settings: (current: Partial<Settings>) => Pa
 			}
 		}
 	})
+}
+
+/**
+ * Update local settings without triggering server sync (for internal operations like validation)
+ */
+export function updateLocalSettingsSilent(settings: (current: Partial<Settings>) => Partial<Settings>): void {
+	preventServerSync = true
+	try {
+		updateLocalSettings(settings)
+	} finally {
+		// Reset flag after a microtask to ensure all synchronous effects complete
+		Promise.resolve().then(() => {
+			preventServerSync = false
+		})
+	}
+}
+
+/**
+ * Check if server sync should be prevented (for SettingsServerUpdate component)
+ */
+export function shouldPreventServerSync(): boolean {
+	return preventServerSync
 }
 
 // Create the derived settings store that merges shared and local settings
@@ -226,7 +266,7 @@ export function validateSelectedImages(availableImages: string[]): boolean {
 	const currentSharedSettings = get(sharedSettings)
 	if (currentSharedSettings.selectedImage && !availableImages.includes(currentSharedSettings.selectedImage)) {
 		console.log(`📷 Shared selected image "${currentSharedSettings.selectedImage}" no longer exists, switching to "${fallbackImage}"`)
-		updateSharedSettings((settings) => ({
+		updateSharedSettingsSilent((settings) => ({
 			...settings,
 			selectedImage: fallbackImage
 		}))
@@ -237,7 +277,7 @@ export function validateSelectedImages(availableImages: string[]): boolean {
 	const currentLocalSettings = get(localSettings)
 	if (currentLocalSettings?.selectedImage && !availableImages.includes(currentLocalSettings.selectedImage)) {
 		console.log(`📷 Local selected image "${currentLocalSettings.selectedImage}" no longer exists, clearing override`)
-		updateLocalSettings((current) => {
+		updateLocalSettingsSilent((current) => {
 			if (!current) return {}
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { selectedImage, ...rest } = current
@@ -272,8 +312,11 @@ export function validateSelectedImages(availableImages: string[]): boolean {
 					localStorage.setItem('settings.local', JSON.stringify(allLocalSettings))
 				}
 
-				// Trigger a re-read of settings by updating allSettings
-				allSettings.set(allLocalSettings)
+				// Trigger a re-read of local settings only by updating allSettings screens
+				allSettings.update((current) => ({
+					...current,
+					screens: allLocalSettings
+				}))
 
 				hasChanges = true
 			}

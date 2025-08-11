@@ -18,6 +18,9 @@ type ImageChangeCallback = (newImages: ImageInfo[], previousImages: ImageInfo[])
 // Array to store callbacks
 const imageChangeCallbacks: ImageChangeCallback[] = []
 
+// Flag to prevent validation cascades during loading
+let isLoadingImages = false
+
 // Initial state
 const initialState: ImagesStoreState = {
 	images: [],
@@ -33,6 +36,9 @@ const imagesStoreInternal = writable<ImagesStoreState>(initialState)
  * Load images from the API
  */
 export async function loadImages(): Promise<void> {
+	// Prevent validation cascades during loading
+	isLoadingImages = true
+	
 	// Set loading state
 	imagesStoreInternal.update((state) => ({
 		...state,
@@ -54,6 +60,9 @@ export async function loadImages(): Promise<void> {
 
 		console.log(`📷 Loaded ${images.length} images into store`)
 
+		// Reset loading flag before notifying callbacks
+		isLoadingImages = false
+
 		// Notify callbacks of image changes
 		notifyImageChangeCallbacks(images, previousImages)
 	} catch (error) {
@@ -64,6 +73,9 @@ export async function loadImages(): Promise<void> {
 			isLoading: false,
 			error: errorMessage
 		}))
+
+		// Reset loading flag on error too
+		isLoadingImages = false
 
 		console.error('📷 Error loading images:', error)
 	}
@@ -166,4 +178,11 @@ export function getFallbackImageName(): string {
 export function imageExists(imageName: string): boolean {
 	if (!imageName) return false
 	return getCurrentImages().some((img) => img.name === imageName)
+}
+
+/**
+ * Check if we're currently loading images (to prevent validation cascades)
+ */
+export function getIsLoadingImages(): boolean {
+	return isLoadingImages
 }

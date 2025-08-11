@@ -1,7 +1,7 @@
 <script lang="ts">
 	import SettingsPanel from '$shared/components/settings/SettingsPanel.svelte'
 	import { effectiveApiUrl } from '$shared/stores/apiStore'
-	import { debugVisible, setDebugMenuVisible, loadImages, imagesError, onImagesChanged } from '$shared/stores'
+	import { debugVisible, setDebugMenuVisible, loadImages, imagesError, onImagesChanged, getIsLoadingImages } from '$shared/stores'
 	import { validateSelectedImages } from '$shared/stores'
 	import { socketService } from '$shared/services/socket'
 	import ErrorMessage from '$shared/components/settings/ErrorMessage.svelte'
@@ -10,6 +10,9 @@
 	import { onMount } from 'svelte'
 	import SettingsServerUpdate from '$shared/components/settings/SettingsServerUpdate.svelte'
 	const disabled = true
+	
+	// Track processed events to prevent duplicates
+	let lastProcessedEventTimestamp = 0
 
 	onMount(async () => {
 		effectiveApiUrl.set('http://localhost:8080')
@@ -28,14 +31,29 @@
 		// Setup socket listener for images updated events
 		socketService.onImagesUpdated(async (event) => {
 			console.log('Desktop app: Received images updated event:', event)
-			// Refresh the images store
-			await loadImages()
+			
+			// Deduplicate events with the same timestamp
+			if (event.timestamp <= lastProcessedEventTimestamp) {
+				console.log('🚫 Skipping duplicate event (already processed)')
+				return
+			}
+			
+			lastProcessedEventTimestamp = event.timestamp
+			
+			// Only refresh if it's a file change event
+			if (event.reason === 'file_change') {
+				console.log('🔄 Processing unique file change event')
+				await loadImages()
+			}
 		})
 
-		// Setup image change validation
+		// Setup image change validation (skip during initial loading to prevent cascades)
 		onImagesChanged((newImages) => {
-			const imageNames = newImages.map((img) => img.name)
-			validateSelectedImages(imageNames)
+			// Only validate if we're not currently loading to prevent validation cascades
+			if (!getIsLoadingImages()) {
+				const imageNames = newImages.map((img) => img.name)
+				validateSelectedImages(imageNames)
+			}
 		})
 	})
 </script>
