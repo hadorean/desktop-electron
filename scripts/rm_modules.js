@@ -219,7 +219,7 @@ async function findPackageLockFiles(startPath) {
 			for (const entry of entries) {
 				const fullPath = path.join(currentPath, entry.name)
 
-				if (entry.isFile() && entry.name === 'package-lock.json') {
+				if (entry.isFile() && (entry.name === 'package-lock.json' || entry.name === 'pnpm-lock.yaml' || entry.name === 'yarn.lock')) {
 					results.push(fullPath)
 				} else if (entry.isDirectory() && entry.name !== 'node_modules' && !entry.name.startsWith('.')) {
 					await traverse(fullPath)
