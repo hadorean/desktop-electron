@@ -1,17 +1,53 @@
 import { readdir } from 'fs/promises'
+import { watch } from 'fs'
 import { join } from 'path'
 
 export class ImageService {
-  public readonly IMAGES_PATH = 'D:\\pictures\\wall'
+  private imagesPathValue = 'D:\\pictures\\wall'
   private readonly SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']
+  private watcher: ReturnType<typeof watch> | null = null
+  private watcherInitialized = false
+  private cachedImages: string[] = []
+  private lastScanTime = 0
+
+  /**
+   * Gets the images directory path
+   */
+  public get imagesPath(): string {
+    return this.imagesPathValue
+  }
+
+  /**
+   * Sets the images directory path and restarts the watcher if it's already running
+   */
+  public setImagesPath(path: string): void {
+    if (this.imagesPathValue !== path) {
+      this.imagesPathValue = path
+      if (this.watcherInitialized) {
+        this.stopWatcher()
+        this.startWatcher()
+      }
+    }
+  }
 
   /**
    * Scans the images directory for supported image files
    * @returns Array of relative image paths
    */
   public async scanForImages(): Promise<string[]> {
+    // Start watcher on first call
+    if (!this.watcherInitialized) {
+      this.startWatcher()
+    }
+
+    // Return cached results if available and recent (within 1 second)
+    const now = Date.now()
+    if (this.cachedImages.length > 0 && now - this.lastScanTime < 1000) {
+      return [...this.cachedImages]
+    }
+
     try {
-      console.log('Scanning for images in:', this.IMAGES_PATH)
+      console.log('Scanning for images in:', this.imagesPathValue)
       const allFiles: string[] = []
 
       // Helper function to recursively scan directories
@@ -29,19 +65,62 @@ export class ImageService {
             const ext = item.name.toLowerCase().substring(item.name.lastIndexOf('.'))
             if (this.SUPPORTED_EXTENSIONS.includes(ext)) {
               // Store relative path from images directory
-              const relativePath = fullPath.replace(this.IMAGES_PATH, '').replace(/^[\\/]/, '')
+              const relativePath = fullPath.replace(this.imagesPathValue, '').replace(/^[\\/]/, '')
               allFiles.push(relativePath.replace(/\\/g, '/')) // Normalize path separators
             }
           }
         }
       }
 
-      await scanDirectory(this.IMAGES_PATH)
-      return allFiles.sort()
+      await scanDirectory(this.imagesPathValue)
+      this.cachedImages = allFiles.sort()
+      this.lastScanTime = now
+      return [...this.cachedImages]
     } catch (error) {
       console.error('Error scanning images directory:', error)
       return []
     }
+  }
+
+  /**
+   * Starts the file watcher for the images directory
+   */
+  private startWatcher(): void {
+    if (this.watcher) {
+      this.stopWatcher()
+    }
+
+    try {
+      console.log('Starting file watcher for:', this.imagesPathValue)
+      this.watcher = watch(this.imagesPathValue, { recursive: true }, (eventType, filename) => {
+        if (filename) {
+          console.log(`File watcher event: ${eventType} - ${filename}`)
+          // Clear cache to force rescan on next call
+          this.cachedImages = []
+          this.lastScanTime = 0
+        }
+      })
+      this.watcherInitialized = true
+    } catch (error) {
+      console.error('Error starting file watcher:', error)
+      this.watcherInitialized = false
+    }
+  }
+
+  /**
+   * Stops the file watcher
+   */
+  private stopWatcher(): void {
+    if (this.watcher) {
+      try {
+        this.watcher.close()
+        console.log('File watcher stopped')
+      } catch (error) {
+        console.error('Error stopping file watcher:', error)
+      }
+      this.watcher = null
+    }
+    this.watcherInitialized = false
   }
 
   /**
@@ -52,10 +131,17 @@ export class ImageService {
   }
 
   /**
-   * Gets the images directory path
+   * Gets the images directory path (deprecated, use imagesPath getter)
    */
   public getImagesPath(): string {
-    return this.IMAGES_PATH
+    return this.imagesPathValue
+  }
+
+  /**
+   * Cleanup method to stop the watcher when the service is no longer needed
+   */
+  public dispose(): void {
+    this.stopWatcher()
   }
 }
 

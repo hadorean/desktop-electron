@@ -200,7 +200,7 @@
 		transform: none !important;
 		/* Keep the sizing and styling */
 		min-width: 450px;
-		max-width: 120vw;
+		max-width: 600px;
 		width: auto;
 	}
 
