@@ -27,6 +27,7 @@ export class LocalServer {
 		this.dev = new DevelopmentManager(this)
 		this.setupMiddleware()
 		registerRoutes(this)
+		this.setupImageWatcher()
 	}
 
 	private setupMiddleware(): void {
@@ -91,6 +92,15 @@ export class LocalServer {
 		} catch (error) {
 			console.error('Error starting background thumbnail generation:', error)
 		}
+	}
+
+	private setupImageWatcher(): void {
+		// Listen for file changes from the image service
+		imageService.onImagesChanged((data) => {
+			console.log(`📷 Images changed: ${data.eventType} - ${data.filename}`)
+			// Broadcast to all connected clients
+			this.sockets.broadcastImagesUpdated('file_change', data.filename, data.eventType)
+		})
 	}
 
 	public stop(): void {

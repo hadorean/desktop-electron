@@ -79,6 +79,19 @@ export class SocketManager {
 	}
 
 	/**
+	 * Broadcast images updated event to all clients
+	 */
+	public broadcastImagesUpdated(reason: 'file_change' | 'manual_refresh' | 'startup', filename?: string, eventType?: string): void {
+		console.log(`🔌 Broadcasting images updated: ${reason} ${filename ? `(${filename})` : ''}`)
+		this.emit(SocketEvents.ImagesUpdated, {
+			timestamp: Date.now(),
+			reason,
+			filename,
+			eventType
+		})
+	}
+
+	/**
 	 * Get the number of connected clients
 	 */
 	public getConnectedClientsCount(): number {

@@ -1,17 +1,15 @@
 <script lang="ts">
-	import { getImageUrl, type ImageInfo } from '../../services'
-	import { settings, updateSharedSettings } from '../../stores'
+	import { getImageUrl } from '../../services'
+	import { settings, updateSharedSettings, images } from '../../stores'
 	import { Button, Card, CardContent } from '../ui'
 	import { cn } from '../../lib/utils'
 
 	const {
-		images = [],
 		selectedImage = '',
 		onImageChange,
 		isOverride = false,
 		overrideValue = null
 	} = $props<{
-		images: ImageInfo[]
 		selectedImage: string
 		onImageChange: (image: string | null) => void
 		isOverride?: boolean
@@ -54,7 +52,7 @@
 
 	// Sort images to show favorites first
 	const sortedImages = $derived(
-		[...images].sort((a, b) => {
+		[...$images].sort((a, b) => {
 			const aIsFavorite = $settings.favorites.includes(a.name)
 			const bIsFavorite = $settings.favorites.includes(b.name)
 			if (aIsFavorite && !bIsFavorite) return -1

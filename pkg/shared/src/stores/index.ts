@@ -42,3 +42,19 @@ export {
 
 // Debug store
 export { debugVisible, toggleDebugMenu, setDebugMenuVisible, loadDebugState } from './debugStore'
+
+// Images store
+export {
+	images,
+	imagesLoading,
+	imagesError,
+	imagesLastUpdated,
+	imagesState,
+	hasImages,
+	loadImages,
+	refreshImages,
+	clearImages,
+	updateImages,
+	getCurrentImages,
+	isImagesLoading
+} from './imagesStore'

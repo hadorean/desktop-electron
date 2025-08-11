@@ -1,52 +1,27 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte'
-	import { api, type ImageInfo } from '$shared/services/api'
-	import { apiBaseUrl } from '$shared/stores/apiStore'
 	import { DebugMenu } from '@hgrandry/dbg'
-	import { settings, loadSettings, expandSettings } from '$shared/stores/settingsStore'
+	import { settings, expandSettings, loadImages, imagesError, getCurrentImages } from '$shared/stores'
+	import { loadSettings } from '$shared/stores/settingsStore'
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
 	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator } from '@heyketsu/shared'
 	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout'
 	import { socketService } from '$shared/services/socket'
 
-	let images: ImageInfo[] = []
 	let showSettings: boolean = false
 	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null
-	let errorMessage: string = ''
 	let buttonHovered: boolean = false
 	let settingsPanel: HTMLElement | null = null
 	let settingsButton: HTMLElement | null = null
-
-	// Function to fetch images
-	async function fetchImages(): Promise<void> {
-		try {
-			images = await api.getImages()
-			//console.log('Fetched images:', images);
-
-			// settings.subscribe((current) => {
-			//     if (!current?.selectedImage && images.length > 0) {
-			//         sharedSettings.set({
-			//             ...current,
-			//             selectedImage: images[0].name,
-			//         });
-			//     }
-			// });
-		} catch (error: unknown) {
-			console.error('Error fetching images:', error)
-			errorMessage = `Error fetching images: ${error instanceof Error ? error.message : 'Unknown error'}`
-		}
-	}
 
 	// Function to handle API reconnection
 	async function handleReconnect(): Promise<void> {
 		try {
 			console.log('Reconnecting to API...')
-			errorMessage = ''
-			await fetchImages()
+			await loadImages()
 			console.log('Reconnection successful')
 		} catch (error: unknown) {
 			console.error('Reconnection failed:', error)
-			errorMessage = `Failed to connect to server at ${$apiBaseUrl || 'default URL'}. Please check the URL and try again.`
 		}
 	}
 
@@ -54,11 +29,11 @@
 	onMount(() => {
 		;(async () => {
 			try {
-				// First fetch images
-				await fetchImages()
+				// First load images using the store
+				await loadImages()
 
 				// Then load saved settings (after we have the images list)
-				errorMessage = loadSettings(images)
+				loadSettings(getCurrentImages())
 
 				// Add event listeners
 				window.addEventListener('reconnectApi', handleReconnect)
@@ -71,6 +46,13 @@
 					setDebugMenuVisible(visible)
 				})
 
+				// Setup socket listener for images updated events
+				socketService.onImagesUpdated(async (event) => {
+					console.log('Client app: Received images updated event:', event)
+					// Refresh the images store
+					await loadImages()
+				})
+
 				// Return cleanup function
 				return () => {
 					window.removeEventListener('reconnectApi', handleReconnect)
@@ -79,7 +61,6 @@
 				}
 			} catch (error: unknown) {
 				console.error('Error during initialization:', error)
-				errorMessage = `Failed to initialize: ${error instanceof Error ? error.message : 'Unknown error'}`
 			}
 		})()
 	})
@@ -167,11 +148,11 @@
 			bind:buttonRef={settingsButton}
 		/>
 
-		<ErrorMessage message={errorMessage} />
+		<ErrorMessage message={$imagesError || ''} />
 
 		<div id="settings-drawer" class:open={showSettings && $expandSettings}>
 			{#if showSettings}
-				<SettingsPanel bind:settingsPanel expanded={$expandSettings} {images} />
+				<SettingsPanel bind:settingsPanel expanded={$expandSettings} />
 			{/if}
 		</div>
 	</ParamsValidator>

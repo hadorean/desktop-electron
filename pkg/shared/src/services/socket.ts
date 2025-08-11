@@ -22,6 +22,7 @@ export class SocketService {
 	private onSettingsUpdateCallback: ((event: SettingsUpdateEvent) => void) | null = null
 	private onConnectionStatusCallback: ((connected: boolean) => void) | null = null
 	private onDebugStateChangedCallback: ((visible: boolean) => void) | null = null
+	private onImagesUpdatedCallback: ((event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void) | null = null
 
 	constructor() {
 		// Don't initialize immediately - wait for stores to be ready
@@ -91,6 +92,12 @@ export class SocketService {
 		this.socket.on(SocketEvents.DebugStateChanged, (data: { visible: boolean }) => {
 			console.log('🔌 Received debug state change event:', data.visible)
 			this.onDebugStateChangedCallback?.(data.visible)
+		})
+
+		// Handle images updated events
+		this.socket.on(SocketEvents.ImagesUpdated, (data: { timestamp: number; reason: string; filename?: string; eventType?: string }) => {
+			console.log('🔌 Received images updated event:', data)
+			this.onImagesUpdatedCallback?.(data)
 		})
 	}
 
@@ -170,6 +177,13 @@ export class SocketService {
 	 */
 	public onDebugStateChanged(callback: (visible: boolean) => void): void {
 		this.onDebugStateChangedCallback = callback
+	}
+
+	/**
+	 * Set callback for images updated events
+	 */
+	public onImagesUpdated(callback: (event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void): void {
+		this.onImagesUpdatedCallback = callback
 	}
 
 	/**

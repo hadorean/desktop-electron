@@ -1,14 +1,19 @@
 import { readdir } from 'fs/promises'
 import { watch } from 'fs'
 import { join } from 'path'
+import { EventEmitter } from 'events'
 
-export class ImageService {
+export class ImageService extends EventEmitter {
 	private imagesPathValue = 'D:\\pictures\\wall'
 	private readonly SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']
 	private watcher: ReturnType<typeof watch> | null = null
 	private watcherInitialized = false
 	private cachedImages: string[] = []
 	private lastScanTime = 0
+
+	constructor() {
+		super()
+	}
 
 	/**
 	 * Gets the images directory path
@@ -98,6 +103,13 @@ export class ImageService {
 					// Clear cache to force rescan on next call
 					this.cachedImages = []
 					this.lastScanTime = 0
+
+					// Emit event for listeners (Phase 2)
+					this.emit('imagesChanged', {
+						eventType,
+						filename,
+						timestamp: Date.now()
+					})
 				}
 			})
 			this.watcherInitialized = true
@@ -138,10 +150,25 @@ export class ImageService {
 	}
 
 	/**
+	 * Add listener for images changed events
+	 */
+	public onImagesChanged(callback: (data: { eventType: string; filename: string; timestamp: number }) => void): void {
+		this.on('imagesChanged', callback)
+	}
+
+	/**
+	 * Remove listener for images changed events
+	 */
+	public offImagesChanged(callback: (data: { eventType: string; filename: string; timestamp: number }) => void): void {
+		this.off('imagesChanged', callback)
+	}
+
+	/**
 	 * Cleanup method to stop the watcher when the service is no longer needed
 	 */
 	public dispose(): void {
 		this.stopWatcher()
+		this.removeAllListeners()
 	}
 }
 
