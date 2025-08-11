@@ -3,10 +3,10 @@
 	import { Button } from '../ui';
 	import { Tabs, TabsList, TabsTrigger } from '../ui';
 
-	let editMode = false;
-	let renamingScreen: string | null = null;
-	let renameValue = '';
-	let showDeleteConfirm: string | null = null;
+	let editMode = $state(false);
+	let renamingScreen = $state<string | null>(null);
+	let renameValue = $state('');
+	let showDeleteConfirm = $state<string | null>(null);
 
 	// Reactive current tab value based on local mode and current screen
 	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared');
@@ -100,9 +100,7 @@
 			// Remove from settings
 			allSettings.update((settings) => ({
 				...settings,
-				screens: Object.fromEntries(
-					Object.entries(settings.screens).filter(([key]) => key !== screenToDelete)
-				)
+				screens: Object.fromEntries(Object.entries(settings.screens).filter(([key]) => key !== screenToDelete))
 			}));
 		}
 		showDeleteConfirm = null;
@@ -141,31 +139,8 @@
 	}
 </script>
 
-<!-- Screen switcher container -->
-<div class="screen-switcher-container" role="navigation" aria-label="Screen switcher">
-	<Tabs value={currentTab} onValueChange={handleTabChange}>
-		<div class="tabs-wrapper">
-			<TabsList class="screen-tabs-list">
-				<!-- Shared settings tab -->
-				<TabsTrigger value="shared" class="screen-tab shared-tab">
-					🌐 Shared
-				</TabsTrigger>
-
-				{#each $screenIds as screenId}
-					{#if renamingScreen === screenId}
-						<input
-							class="screen-rename-input"
-							bind:value={renameValue}
-							on:keydown={handleKeyDown}
-							on:blur={confirmRename}
-							use:focus
-						/>
-					{:else}
-						<TabsTrigger
-							value={screenId}
-							disabled={editMode}
-							class="screen-tab"
-							onclick={(e) => {
+<!-- Previous tab logic
+	onclick={(e) => {
 								if (editMode) {
 									e.preventDefault();
 									startRename(screenId);
@@ -176,7 +151,21 @@
 									showDelete(screenId, e);
 								}
 							}}
-						>
+-->
+
+<!-- Screen switcher container -->
+<div class="screen-switcher-container" role="navigation" aria-label="Screen switcher">
+	<Tabs value={currentTab} onValueChange={handleTabChange}>
+		<div class="tabs-wrapper">
+			<TabsList class="screen-tabs-list">
+				<!-- Shared settings tab -->
+				<TabsTrigger value="shared" class="screen-tab shared-tab">🌐 Shared</TabsTrigger>
+
+				{#each $screenIds as screenId}
+					{#if renamingScreen === screenId}
+						<input class="screen-rename-input" bind:value={renameValue} onkeydown={handleKeyDown} onblur={confirmRename} use:focus />
+					{:else}
+						<TabsTrigger value={screenId} disabled={editMode} class="screen-tab">
 							{screenId}
 							{#if editMode}
 								<span class="edit-icon">✏️</span>
@@ -189,22 +178,10 @@
 			<!-- Edit controls -->
 			<div class="edit-controls">
 				{#if editMode}
-					<Button
-						variant="secondary"
-						size="sm"
-						onclick={addNewScreen}
-						class="add-screen-btn"
-					>
-						+ Add
-					</Button>
+					<Button variant="secondary" size="sm" onclick={addNewScreen} class="add-screen-btn">+ Add</Button>
 				{/if}
 
-				<Button
-					variant={editMode ? "default" : "ghost"}
-					size="sm"
-					onclick={toggleEditMode}
-					class="edit-toggle-btn"
-				>
+				<Button variant={editMode ? 'default' : 'ghost'} size="sm" onclick={toggleEditMode} class="edit-toggle-btn">
 					{editMode ? '✓ Done' : '✏️'}
 				</Button>
 			</div>
@@ -217,12 +194,8 @@
 			<div class="delete-dialog">
 				<p>Delete "{showDeleteConfirm}"?</p>
 				<div class="delete-actions">
-					<Button variant="destructive" size="sm" onclick={confirmDelete}>
-						Delete
-					</Button>
-					<Button variant="secondary" size="sm" onclick={cancelDelete}>
-						Cancel
-					</Button>
+					<Button variant="destructive" size="sm" onclick={confirmDelete}>Delete</Button>
+					<Button variant="secondary" size="sm" onclick={cancelDelete}>Cancel</Button>
 				</div>
 			</div>
 		</div>
@@ -260,13 +233,13 @@
 		border-radius: 8px !important;
 	}
 
-	:global(.screen-tab[data-state="active"]) {
+	:global(.screen-tab[data-state='active']) {
 		background: hsl(var(--primary)) !important;
 		color: hsl(var(--primary-foreground)) !important;
 		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.3);
 	}
 
-	:global(.screen-tab.shared-tab[data-state="active"]) {
+	:global(.screen-tab.shared-tab[data-state='active']) {
 		background: hsl(142 76% 36%) !important; /* Green for shared */
 		box-shadow: 0 0 0 2px hsl(142 76% 36% / 0.3);
 	}
