@@ -6,7 +6,7 @@ import { SocketEvents, ClientEvents } from '../types';
 
 export interface SettingsUpdatedResponse {
 	success: boolean;
-	settings?: any;
+	settings?: unknown;
 	timestamp?: number;
 	error?: string;
 }
@@ -126,7 +126,7 @@ export class SocketService {
 	/**
 	 * Type-safe emit for client-to-server events
 	 */
-	private emitToServer(event: ClientEvents, data: any): void {
+	private emitToServer(event: ClientEvents, data: unknown): void {
 		if (!this.isConnected || !this.socket) {
 			console.warn('🔌 Cannot send event - not connected');
 			return;
@@ -137,7 +137,7 @@ export class SocketService {
 	/**
 	 * Send settings update to server
 	 */
-	public updateSettings(settings: any, clientId?: string): void {
+	public updateSettings(settings: unknown, clientId?: string): void {
 		if (!this.isConnected || !this.socket) {
 			console.warn('🔌 Cannot send settings update - not connected');
 			return;

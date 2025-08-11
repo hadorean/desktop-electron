@@ -8,7 +8,7 @@ import { ApiRoutes, buildRoute } from '../types/api';
 /**
  * Creates API request options with proper headers
  */
-function createRequestOptions(method: string, body?: any): RequestInit {
+function createRequestOptions(method: string, body?: unknown): RequestInit {
 	const options: RequestInit = {
 		method,
 		headers: {
@@ -154,7 +154,7 @@ export const api = {
 	/**
 	 * Custom API call
 	 */
-	call: async <T>(endpoint: string, method = 'GET', body?: any): Promise<T> => {
+	call: async <T>(endpoint: string, method = 'GET', body?: unknown): Promise<T> => {
 		const url = buildUrl(endpoint);
 		return fetchWithErrorHandling<T>(url, createRequestOptions(method, body));
 	},
@@ -172,7 +172,7 @@ export const api = {
 					});
 
 					location = `${position.coords.latitude},${position.coords.longitude}`;
-				} catch (locError) {
+				} catch {
 					console.warn('Unable to get location, using IP-based location');
 				}
 			}

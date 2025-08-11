@@ -11,13 +11,13 @@
 
 	let { class: className, checked = $bindable(false), disabled = false, onCheckedChange, id, ...restProps }: Props = $props();
 
-	function handleClick() {
+	function handleClick(): void {
 		if (disabled) return;
 		checked = !checked;
 		onCheckedChange?.(checked);
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
+	function handleKeydown(e: KeyboardEvent): void {
 		if (disabled) return;
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();

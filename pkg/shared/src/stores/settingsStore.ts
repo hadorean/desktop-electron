@@ -46,7 +46,7 @@ export const localSettings = derived([allSettings, currentScreen], ([all, screen
 	...(all.screens[screen] ?? {})
 }));
 
-export function updateSharedSettings(settings: (current: Settings) => Partial<Settings>) {
+export function updateSharedSettings(settings: (current: Settings) => Partial<Settings>): void {
 	allSettings.update((value) => {
 		return {
 			...value,
@@ -58,7 +58,7 @@ export function updateSharedSettings(settings: (current: Settings) => Partial<Se
 	});
 }
 
-export function updateLocalSettings(settings: (current: Partial<Settings>) => Partial<Settings>) {
+export function updateLocalSettings(settings: (current: Partial<Settings>) => Partial<Settings>): void {
 	allSettings.update((value) => {
 		const screen = get(currentScreen) || defaultScreenId;
 		const currentSettings = value.screens[screen] ?? {};
@@ -133,7 +133,7 @@ export function loadSettings(images: { name: string }[]): string {
 		const savedSharedSettings = localStorage.getItem('settings.shared');
 		if (savedSharedSettings) {
 			const parsedSettings = JSON.parse(savedSharedSettings);
-			updateSharedSettings((_) => ({
+			updateSharedSettings(() => ({
 				...defaultSettings,
 				opacity: parsedSettings.opacity ?? defaultSettings.opacity,
 				blur: parsedSettings.blur ?? defaultSettings.blur,
@@ -163,7 +163,7 @@ export function loadSettings(images: { name: string }[]): string {
 		const savedLocalSettings = localStorage.getItem('settings.local');
 		if (savedLocalSettings) {
 			const parsedLocalSettings = JSON.parse(savedLocalSettings);
-			updateLocalSettings((_) => parsedLocalSettings);
+			updateLocalSettings(() => parsedLocalSettings);
 		}
 
 		// Subscribe to save changes
@@ -210,7 +210,7 @@ function saveLocalSettings(currentSettings: Partial<Settings> | null): string {
 
 // Reset settings to defaults
 export function resetSettings(): void {
-	updateSharedSettings((_) => defaultSettings);
+	updateSharedSettings(() => defaultSettings);
 	//localSettings.set(null);
 }
 

@@ -13,7 +13,7 @@
 	});
 
 	// Function to fetch weather data
-	async function fetchWeather() {
+	async function fetchWeather(): Promise<void> {
 		try {
 			weather = await api.getWeather();
 			if (weather) {
@@ -26,18 +26,18 @@
 	}
 
 	// Function to update the current time and greeting
-	function updateTime() {
+	function updateTime(): void {
 		const now = new Date();
 		const hours = now.getHours().toString().padStart(2, '0');
 		const minutes = now.getMinutes().toString().padStart(2, '0');
 		currentTime = `${hours}:${minutes}`;
 
 		// Format the date
-		const options: Intl.DateTimeFormatOptions = {
-			weekday: 'long',
-			month: 'long',
-			day: 'numeric'
-		};
+		// const options: Intl.DateTimeFormatOptions = {
+		// 	weekday: 'long',
+		// 	month: 'long',
+		// 	day: 'numeric'
+		// };
 
 		// Update greeting based on time of day
 		const hourNum = parseInt(hours);

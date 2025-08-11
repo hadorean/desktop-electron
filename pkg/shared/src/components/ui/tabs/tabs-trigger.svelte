@@ -2,12 +2,6 @@
 	import { Tabs as TabsPrimitive } from 'bits-ui';
 	import { cn } from '../../../lib/utils.js';
 
-	interface Props {
-		class?: string;
-		value: string;
-		disabled?: boolean;
-	}
-
 	let { class: className, value, disabled = false, ...restProps }: TabsPrimitive.TriggerProps = $props();
 </script>
 

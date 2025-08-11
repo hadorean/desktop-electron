@@ -22,11 +22,11 @@
 	const isGhost = $derived(isOverride && !isOverridden);
 
 	// Function to get thumbnail URL
-	function getThumbnailUrl(imageName: string) {
+	function getThumbnailUrl(imageName: string): string {
 		return getImageUrl(imageName, true); // Use thumbnail
 	}
 
-	function handleImageClick(imageName: string) {
+	function handleImageClick(imageName: string): void {
 		if (isOverride && !isOverridden) {
 			// When enabling override in local mode, use the current value
 			onImageChange(imageName);
@@ -35,7 +35,7 @@
 		}
 	}
 
-	function handleOverride() {
+	function handleOverride(): void {
 		if (!isOverridden) {
 			// When enabling override, use the current value
 			onImageChange(selectedImage);
@@ -45,7 +45,7 @@
 		}
 	}
 
-	function toggleFavorite(imageName: string, event: Event) {
+	function toggleFavorite(imageName: string, event: Event): void {
 		event.stopPropagation(); // Prevent triggering the image selection
 		updateSharedSettings((current) => ({
 			favorites: current.favorites.includes(imageName) ? current.favorites.filter((name: string) => name !== imageName) : [...current.favorites, imageName]
@@ -78,7 +78,7 @@
 	<Card class={cn('image-grid-card', isGhost && 'ghost-image-grid')}>
 		<CardContent class="p-2">
 			<div class="grid max-h-[280px] grid-cols-4 gap-2 overflow-y-auto overflow-x-hidden pr-2">
-				{#each sortedImages as image}
+				{#each sortedImages as image (image.name)}
 					<div class="card-container aspect-square p-1">
 						<div
 							class={cn(

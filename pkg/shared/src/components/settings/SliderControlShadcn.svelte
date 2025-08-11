@@ -27,11 +27,10 @@
 		overrideValue?: number | null;
 	}>();
 
-	let renderCount = $state(0);
 	const isOverridden = $derived(isOverride && overrideValue !== null);
 	const isGhost = $derived(isOverride && !isOverridden);
 
-	function handleOverride() {
+	function handleOverride(): void {
 		console.log(`[SliderControl ${label}] handleOverride called:`, {
 			isOverridden,
 			overrideValue
@@ -46,7 +45,7 @@
 		}
 	}
 
-	function handleValueChange(newValues: number[]) {
+	function handleValueChange(newValues: number[]): void {
 		const newValue = newValues[0];
 		console.log(`[SliderControl ${label}] handleValueChange called:`, {
 			newValue,

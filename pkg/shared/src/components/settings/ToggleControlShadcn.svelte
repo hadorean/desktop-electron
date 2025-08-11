@@ -22,7 +22,7 @@
 	const isOverridden = $derived(isOverride && overrideValue !== null);
 	const isGhost = $derived(isOverride && !isOverridden);
 
-	function handleOverride() {
+	function handleOverride(): void {
 		if (!isOverridden) {
 			// When enabling override, use either the defaultValue or the current shared value
 			const newValue = defaultValue ?? checked ?? false;
@@ -33,7 +33,7 @@
 		}
 	}
 
-	function handleToggleChange(newChecked: boolean) {
+	function handleToggleChange(newChecked: boolean): void {
 		onChange(newChecked);
 	}
 

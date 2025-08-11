@@ -2,10 +2,6 @@
 	import { Tabs as TabsPrimitive } from 'bits-ui';
 	import { cn } from '../../../lib/utils.js';
 
-	interface Props {
-		class?: string;
-	}
-
 	let { ref = $bindable(null), class: className, ...restProps }: TabsPrimitive.ListProps = $props();
 </script>
 

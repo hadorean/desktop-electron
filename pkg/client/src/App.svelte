@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { api, type ImageInfo } from '$shared/services/api';
 	import { apiBaseUrl } from '$shared/stores/apiStore';
 	import { DebugMenu } from '@hgrandry/dbg';
 	import { settings, loadSettings, expandSettings } from '$shared/stores/settingsStore';
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore';
-	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator, ScreenSwitcher } from '@heyketsu/shared';
+	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate, ParamsValidator } from '@heyketsu/shared';
 	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout';
 	import { socketService } from '$shared/services/socket';
 
@@ -16,10 +16,9 @@
 	let buttonHovered: boolean = false;
 	let settingsPanel: HTMLElement | null = null;
 	let settingsButton: HTMLElement | null = null;
-	let settingsLoaded: boolean = false;
 
 	// Function to fetch images
-	async function fetchImages() {
+	async function fetchImages(): Promise<void> {
 		try {
 			images = await api.getImages();
 			//console.log('Fetched images:', images);
@@ -39,7 +38,7 @@
 	}
 
 	// Function to handle API reconnection
-	async function handleReconnect() {
+	async function handleReconnect(): Promise<void> {
 		try {
 			console.log('Reconnecting to API...');
 			errorMessage = '';
@@ -60,9 +59,6 @@
 
 				// Then load saved settings (after we have the images list)
 				errorMessage = loadSettings(images);
-
-				// Mark settings as loaded to enable reactive updates
-				settingsLoaded = true;
 
 				// Add event listeners
 				window.addEventListener('reconnectApi', handleReconnect);
@@ -89,7 +85,7 @@
 	});
 
 	// Function to handle key down events
-	function handleKeyDown(event: KeyboardEvent) {
+	function handleKeyDown(event: KeyboardEvent): void {
 		if (event.key === 'Escape') {
 			toggleSettings();
 			event.preventDefault();
@@ -97,7 +93,7 @@
 	}
 
 	// Function to handle click outside events
-	function handleClickOutside(event: MouseEvent) {
+	function handleClickOutside(event: MouseEvent): void {
 		if ($expandSettings && settingsPanel && settingsButton) {
 			const target = event.target as Node;
 			const isClickInside = settingsPanel.contains(target) || settingsButton.contains(target);
@@ -109,28 +105,39 @@
 	}
 
 	// Function to handle settings toggle
-	function toggleSettings() {
+	function toggleSettings(): void {
 		expandSettings.update((current) => !current);
 	}
 
-	// Reactive block to handle settings state changes
-	$: if ($expandSettings === false) {
-		settingsClosingTimeout = setTimeout(() => {
-			showSettings = false;
-		}, 500); // Match the duration of the CSS transition
-	} else {
-		showSettings = true;
-		if (settingsClosingTimeout) {
-			clearTimeout(settingsClosingTimeout);
-			settingsClosingTimeout = null;
-		}
-	}
+	// Handle expandSettings changes with explicit subscription to avoid reactive loops
+	let unsubscribeExpandSettings: (() => void) | undefined;
 
-	function handleButtonMouseEnter() {
+	onMount(() => {
+		// Subscribe to expandSettings changes
+		unsubscribeExpandSettings = expandSettings.subscribe((expanded) => {
+			if (expanded === false) {
+				settingsClosingTimeout = setTimeout(() => {
+					showSettings = false;
+				}, 500); // Match the duration of the CSS transition
+			} else {
+				showSettings = true;
+				if (settingsClosingTimeout) {
+					clearTimeout(settingsClosingTimeout);
+					settingsClosingTimeout = null;
+				}
+			}
+		});
+	});
+
+	onDestroy(() => {
+		unsubscribeExpandSettings?.();
+	});
+
+	function handleButtonMouseEnter(): void {
 		buttonHovered = true;
 	}
 
-	function handleButtonMouseLeave() {
+	function handleButtonMouseLeave(): void {
 		buttonHovered = false;
 	}
 </script>

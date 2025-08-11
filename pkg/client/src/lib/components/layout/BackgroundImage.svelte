@@ -27,7 +27,7 @@
 		imageScale = 1 + $settings.blur * 0.003;
 	}
 
-	function startTransition() {
+	function startTransition(): void {
 		if (!currentImageUrl) return;
 
 		// If we have an active image, move it to the stack and start fading it out
@@ -79,7 +79,7 @@
 		}
 	}
 
-	function animate(time: number) {
+	function animate(time: number): void {
 		let hasActiveTweens = false;
 
 		// Update active image tween
@@ -128,7 +128,7 @@
 		.filter(Boolean)
 		.join(' ')};"
 >
-	{#each imageStack as image}
+	{#each imageStack as image (image.url)}
 		<img src={image.url} alt="Background" class="background-image" style="opacity: {image.opacity};" />
 	{/each}
 	{#if activeImage}

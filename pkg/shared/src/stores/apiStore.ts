@@ -5,10 +5,10 @@ import { socketService } from '../services/socket';
 export const apiConfigEnabled = writable(false);
 
 // Get the initial value from server data, localStorage, or environment variable
-const getInitialApiUrl = () => {
+const getInitialApiUrl = (): string => {
 	if (typeof window !== 'undefined') {
 		// First check if server provided URL via template injection
-		const serverData = (window as any).__SERVER_DATA__;
+		const serverData = (window as unknown).__SERVER_DATA__;
 		if (serverData?.serverUrl) {
 			console.log('🔌 Using server-provided URL:', serverData.serverUrl);
 			return serverData.serverUrl;

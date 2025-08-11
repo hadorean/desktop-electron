@@ -11,7 +11,7 @@
 	// Reactive current tab value based on local mode and current screen
 	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared');
 
-	function handleTabChange(value: string) {
+	function handleTabChange(value: string): void {
 		if (!editMode) {
 			if (value === 'shared') {
 				isLocalMode.set(false);
@@ -22,31 +22,15 @@
 		}
 	}
 
-	function switchToScreen(screenId: string) {
-		if (!editMode) {
-			currentScreen.set(screenId);
-			isLocalMode.set(true); // Always set to local mode when switching to a specific screen
-		}
-	}
 
-	function switchToShared() {
-		if (!editMode) {
-			isLocalMode.set(false); // Switch to shared settings mode
-		}
-	}
-
-	function toggleEditMode() {
+	function toggleEditMode(): void {
 		editMode = !editMode;
 		renamingScreen = null;
 		showDeleteConfirm = null;
 	}
 
-	function startRename(screenId: string) {
-		renamingScreen = screenId;
-		renameValue = screenId;
-	}
 
-	function confirmRename() {
+	function confirmRename(): void {
 		if (renamingScreen && renameValue.trim() && renameValue !== renamingScreen) {
 			// Update settings structure with new screen name
 			allSettings.update((settings) => {
@@ -72,20 +56,12 @@
 		renamingScreen = null;
 	}
 
-	function cancelRename() {
+	function cancelRename(): void {
 		renamingScreen = null;
 	}
 
-	function showDelete(screenId: string, event: MouseEvent) {
-		event.preventDefault();
-		event.stopPropagation();
-		if ($screenIds.length > 1) {
-			// Only allow delete if more than one screen
-			showDeleteConfirm = screenId;
-		}
-	}
 
-	function confirmDelete() {
+	function confirmDelete(): void {
 		if (showDeleteConfirm && $screenIds.length > 1) {
 			const screenToDelete = showDeleteConfirm;
 
@@ -106,11 +82,11 @@
 		showDeleteConfirm = null;
 	}
 
-	function cancelDelete() {
+	function cancelDelete(): void {
 		showDeleteConfirm = null;
 	}
 
-	function addNewScreen() {
+	function addNewScreen(): void {
 		const newScreenName = `Screen ${$screenIds.length + 1}`;
 
 		// Add new screen to settings
@@ -126,7 +102,7 @@
 		currentScreen.set(newScreenName);
 	}
 
-	function handleKeyDown(event: KeyboardEvent) {
+	function handleKeyDown(event: KeyboardEvent): void {
 		if (event.key === 'Enter') {
 			confirmRename();
 		} else if (event.key === 'Escape') {
@@ -134,7 +110,7 @@
 		}
 	}
 
-	function focus(element: HTMLElement) {
+	function focus(element: HTMLElement): void {
 		element.focus();
 	}
 </script>
@@ -161,7 +137,7 @@
 				<!-- Shared settings tab -->
 				<TabsTrigger value="shared" class="screen-tab shared-tab">🌐 Shared</TabsTrigger>
 
-				{#each $screenIds as screenId}
+				{#each $screenIds as screenId (screenId)}
 					{#if renamingScreen === screenId}
 						<input class="screen-rename-input" bind:value={renameValue} onkeydown={handleKeyDown} onblur={confirmRename} use:focus />
 					{:else}

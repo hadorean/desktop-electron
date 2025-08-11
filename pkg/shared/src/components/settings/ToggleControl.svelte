@@ -19,7 +19,7 @@
 
 	let inputRef: HTMLInputElement | null = null;
 
-	function handleOverride() {
+	function handleOverride(): void {
 		// console.log(`[ToggleControl ${label}] handleOverride called:`, {
 		//   isOverridden,
 		//   overrideValue
@@ -34,7 +34,7 @@
 		}
 	}
 
-	function handleChange(e: Event) {
+	function handleChange(): void {
 		const newValue = inputRef?.checked;
 		// console.log(`[ToggleControl ${label}] handleChange called:`, {
 		//   newValue,

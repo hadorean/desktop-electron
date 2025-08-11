@@ -18,6 +18,7 @@ export default tseslint.config(
 		files: ['**/*.svelte'],
 		rules: {
 			'svelte/no-unused-svelte-ignore': 'off'
+			// '@typescript-eslint/explicit-function-return-type': 'off'
 		}
 	},
 	eslintConfigPrettier

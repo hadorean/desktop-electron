@@ -6,14 +6,14 @@
 	// Props
 	let currentTime: string = '';
 	let currentDate: string = '';
-	let interval: NodeJS.Timeout | undefined;
+	let interval: ReturnType<typeof setInterval> | undefined;
 	let opacity = new Tween(0, {
 		duration: 3000,
 		easing: cubicOut
 	});
 
 	// Function to update the current time and greeting
-	function updateTime() {
+	function updateTime(): void {
 		const now = new Date();
 		const hours = now.getHours().toString().padStart(2, '0');
 		const minutes = now.getMinutes().toString().padStart(2, '0');

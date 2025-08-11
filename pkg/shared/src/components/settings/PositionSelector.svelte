@@ -21,21 +21,20 @@
 	const isOverridden = $derived(isOverride && overrideValue !== null);
 	const effectivePosition = $derived(isOverridden ? overrideValue : $settings.settingsButtonPosition);
 
-	function handlePositionChange(position: string) {
+	function handlePositionChange(position: string): void {
 		if (isOverride && !isOverridden) {
 			// When enabling override in local mode, use the current value
-			updateLocalSettings((current) => ({
-				...current,
+			updateLocalSettings(() => ({
 				settingsButtonPosition: position as SettingsButtonPosition
 			}));
 		} else {
-			updateSharedSettings((current) => ({
+			updateSharedSettings(() => ({
 				settingsButtonPosition: position as SettingsButtonPosition
 			}));
 		}
 	}
 
-	function handleOverride() {
+	function handleOverride(): void {
 		if (onOverride) {
 			onOverride();
 		}
@@ -54,7 +53,7 @@
 		{/if}
 	</div>
 	<div class="bg-base-200 grid grid-cols-2 gap-2 rounded-lg bg-opacity-30 p-2" class:ghost={isOverride && !isOverridden}>
-		{#each positions as position}
+		{#each positions as position (position.value)}
 			<button
 				class="btn btn-sm {effectivePosition === position.value ? 'btn-primary' : 'btn-ghost'}"
 				onclick={() => handlePositionChange(position.value)}

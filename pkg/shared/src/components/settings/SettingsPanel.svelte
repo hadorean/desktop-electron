@@ -2,7 +2,6 @@
 	import { settings, sharedSettings, localSettings, isLocalMode, currentScreen, updateSharedSettings, updateLocalSettings } from '../../stores/settingsStore';
 	import type { ImageInfo } from '../../services/api';
 	import ImageGrid from '$shared/components/settings/ImageGrid.svelte';
-	import { SliderControl, ToggleControl } from './';
 	import SliderControlShadcn from './SliderControlShadcn.svelte';
 	import ToggleControlShadcn from './ToggleControlShadcn.svelte';
 	import ScreenSwitcher from './ScreenSwitcher.svelte';
@@ -13,7 +12,6 @@
 	export let images: ImageInfo[] = [];
 	//export let errorMessage: string = "";
 	export let settingsPanel: HTMLElement | null = null;
-	let isReconnecting = false;
 
 	// Subscribe to settings store
 	$: {
@@ -26,13 +24,14 @@
 		}
 	}
 
-	function handleSettingChange<K extends keyof typeof $settings>(key: K, value: (typeof $settings)[K] | null) {
+	function handleSettingChange<K extends keyof typeof $settings>(key: K, value: (typeof $settings)[K] | null): void {
 		if ($isLocalMode) {
 			if (value === null) {
 				// Remove from local settings
 				updateLocalSettings((current) => {
 					if (!current) return {};
-					const { [key]: _, ...rest } = current;
+					// eslint-disable-next-line @typescript-eslint/no-unused-vars
+					const { [key]: _removed, ...rest } = current;
 					return Object.keys(rest).length > 0 ? rest : {};
 				});
 			} else {
@@ -49,17 +48,6 @@
 				[key]: value
 			}));
 		}
-	}
-
-	async function handleReconnect() {
-		isReconnecting = true;
-		const event = new CustomEvent('reconnectApi');
-		window.dispatchEvent(event);
-
-		// Reset reconnecting state after a short delay
-		setTimeout(() => {
-			isReconnecting = false;
-		}, 2000);
 	}
 </script>
 

@@ -8,18 +8,18 @@
 	let showApiConfig = $apiConfigEnabled;
 	let isReconnecting = false;
 
-	function handleApiUrlChange() {
+	function handleApiUrlChange(): void {
 		onApiUrlChange(localApiUrl);
 		apiBaseUrl.set(localApiUrl);
 	}
 
-	function handleApiConfigToggle() {
+	function handleApiConfigToggle(): void {
 		apiConfigEnabled.set(showApiConfig);
 		// Trigger reconnection in both cases
 		handleReconnect();
 	}
 
-	async function handleReconnect() {
+	async function handleReconnect(): Promise<void> {
 		isReconnecting = true;
 		handleApiUrlChange();
 		onReconnect();
