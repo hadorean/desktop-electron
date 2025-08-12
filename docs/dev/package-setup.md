@@ -5,7 +5,6 @@
 Aliases in both packages:
 
 - @heyketsu/shared → ../shared/src (for clean imports)
-- $shared → ../shared/src (alternative syntax)
 
 ## Build process:
 

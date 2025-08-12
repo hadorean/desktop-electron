@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { api, type WeatherData } from '@heyketsu/shared/services'
 	import { onMount } from 'svelte'
-	import { api, type WeatherData } from '$shared/services/api'
-	import { Tween } from 'svelte/motion'
 	import { cubicOut } from 'svelte/easing'
+	import { Tween } from 'svelte/motion'
 
 	let weather: WeatherData | null = null
 	let currentTime: string = '' // Current time in HH:MM format

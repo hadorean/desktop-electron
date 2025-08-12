@@ -17,8 +17,6 @@
 		"skipLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
-			"$shared": ["../shared/src"],
-			"$shared/*": ["../shared/src/*"],
 			"@heyketsu/shared": ["../shared/src"],
 			"@heyketsu/shared/*": ["../shared/src/*"],
 			"$stores/*": ["./src/lib/stores/*"]

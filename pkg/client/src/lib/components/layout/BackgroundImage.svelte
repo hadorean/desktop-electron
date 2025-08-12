@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { getImageUrl } from '@heyketsu/shared/services'
+	import { screenSettings } from '@heyketsu/shared/stores/settingsStore'
+	import { Easing, Tween } from '@tweenjs/tween.js'
 	import { onMount } from 'svelte'
-	import { screenSettings } from '$shared/stores/settingsStore'
-	import { getImageUrl } from '$shared/services/api'
-	import { Tween, Easing } from '@tweenjs/tween.js'
 
 	interface ImageState {
 		url: string

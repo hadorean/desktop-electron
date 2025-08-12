@@ -20,7 +20,6 @@
 		"moduleResolution": "bundler",
 		"baseUrl": ".",
 		"paths": {
-			"$shared/*": ["../shared/src/*"],
 			"@heyketsu/shared": ["../shared/src"],
 			"@heyketsu/shared/*": ["../shared/src/*"]
 		}

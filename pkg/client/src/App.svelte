@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte'
+	import { ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate } from '@heyketsu/shared/components'
+	import { initializeImageChangeHandling, socketService } from '@heyketsu/shared/services'
+	import { expandSettings, getCurrentImages, imagesError, loadImages, screenSettings } from '@heyketsu/shared/stores'
+	import { debugVisible, setDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
+	import { loadSettings } from '@heyketsu/shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
-	import { screenSettings, expandSettings, loadImages, imagesError, getCurrentImages } from '$shared/stores'
-	import { loadSettings } from '$shared/stores/settingsStore'
-	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
-	import { SettingsPanel, SettingsButton, ErrorMessage, SettingsServerUpdate } from '@heyketsu/shared'
-	import { TimeDisplay, WeatherDisplay, BackgroundImage } from './lib/components/layout'
-	import { socketService, initializeImageChangeHandling } from '$shared/services'
+	import { onDestroy, onMount } from 'svelte'
+	import { BackgroundImage, TimeDisplay, WeatherDisplay } from './lib/components/layout'
 
 	let showSettings: boolean = false
 	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null

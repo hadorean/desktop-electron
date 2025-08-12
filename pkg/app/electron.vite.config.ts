@@ -1,6 +1,6 @@
-import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import { copyFileSync, mkdirSync, existsSync, readdirSync } from 'fs'
+import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 import { join, resolve } from 'path'
 
 // Custom plugin to copy templates and client assets after build
@@ -71,7 +71,6 @@ export default defineConfig({
 		plugins: [svelte()],
 		resolve: {
 			alias: {
-				$shared: resolve(__dirname, '../shared/src'),
 				'@heyketsu/shared': resolve(__dirname, '../shared/src')
 			}
 		}

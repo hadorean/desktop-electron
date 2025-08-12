@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { editingSettings, screenSettings, isLocalMode, currentScreen, updateEditingSettings, inTransition } from '../../stores'
-	import ImageGrid from '$shared/components/settings/ImageGrid.svelte'
+	import { Inspect } from '@hgrandry/dbg'
+	import { currentScreen, editingSettings, inTransition, isLocalMode, screenSettings, updateEditingSettings } from '../../stores'
+	import ImageGrid from './ImageGrid.svelte'
+	import ScreenSwitcher from './ScreenSwitcher.svelte'
 	import SliderControl from './SliderControl.svelte'
 	import ToggleControl from './ToggleControl.svelte'
-	import ScreenSwitcher from './ScreenSwitcher.svelte'
-	import { Inspect } from '@hgrandry/dbg'
 
 	// Props
 	export let expanded: boolean = false
