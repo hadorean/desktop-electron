@@ -61,5 +61,28 @@
 		border: 1px solid rgb(58, 58, 58);
 		border-radius: 10px;
 		height: 100vh;
+		-webkit-app-region: drag;
+	}
+
+	/* Make interactive elements non-draggable, but keep labels draggable */
+	.transparent :global(button),
+	.transparent :global(input),
+	.transparent :global(select),
+	.transparent :global(textarea),
+	.transparent :global(.slider),
+	.transparent :global(.settings-panel),
+	.transparent :global(.debug-menu) {
+		-webkit-app-region: no-drag;
+	}
+
+	/* Explicitly make text elements draggable */
+	.transparent :global(label),
+	.transparent :global(h1),
+	.transparent :global(h2),
+	.transparent :global(h3),
+	.transparent :global(h4),
+	.transparent :global(h5),
+	.transparent :global(h6) {
+		-webkit-app-region: drag;
 	}
 </style>
