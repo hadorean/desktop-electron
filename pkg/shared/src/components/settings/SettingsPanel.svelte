@@ -144,23 +144,18 @@
 
 <style>
 	.settings-panel {
-		position: fixed;
-		top: 50%;
-		right: 10px;
-		transform: translate(0, -50%);
-		background-color: rgba(0, 0, 0, 0.4);
 		padding: 2rem;
-		border-radius: 1rem;
 		color: white;
 		min-width: 450px;
 		max-width: 120vw;
 		max-height: 90vh;
 		overflow-y: auto;
 		z-index: 1000;
-		backdrop-filter: blur(10px);
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 		transition: opacity 0.3s cubic-bezier(0.9, 0.14, 1, 0.75);
 		opacity: 0;
+		backdrop-filter: blur(10px);
+		border-radius: 1rem;
 	}
 
 	.settings-panel.expanded {

@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { currentScreen, screenIds, allSettings, isLocalMode, isNightMode, toggleDayNightMode } from '../../stores/settingsStore'
+	import { allSettings, currentScreen, isLocalMode, isNightMode, screenIds, toggleDayNightMode } from '../../stores/settingsStore'
 	import { DefaultDayNightSettings } from '../../types'
-	import { Button } from '../ui'
-	import { Tabs, TabsList, TabsTrigger } from '../ui'
+	import { Button, Tabs, TabsList, TabsTrigger } from '../ui'
 
 	let editMode = $state(false)
 	let renamingScreen = $state<string | null>(null)
@@ -133,7 +132,7 @@
 		<div class="tabs-wrapper">
 			<TabsList class="screen-tabs-list">
 				<!-- Shared settings tab -->
-				<TabsTrigger value="shared" class="screen-tab shared-tab">🌐 Shared</TabsTrigger>
+				<TabsTrigger value="shared" class="screen-tab shared-tab">Shared</TabsTrigger>
 
 				{#each $screenIds as screenId (screenId)}
 					{#if renamingScreen === screenId}

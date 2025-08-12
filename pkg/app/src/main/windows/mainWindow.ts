@@ -1,7 +1,7 @@
-import { BrowserWindow, screen, shell } from 'electron'
-import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
+import { BrowserWindow, screen, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
+import { join } from 'path'
 import icon from '../../../resources/icon.png?asset'
 
 // Store reference to main window
@@ -11,12 +11,12 @@ let window: BrowserWindow | null = null
 let isQuitting = false
 
 export function createWindow(): void {
-	const transparent = true
+	const transparent = false
 
 	// Create the browser window.
 	window = new BrowserWindow({
 		width: 650,
-		height: 670,
+		height: 1120,
 		show: false,
 		autoHideMenuBar: true,
 		resizable: !transparent,
@@ -35,21 +35,25 @@ export function createWindow(): void {
 		}
 	})
 
+	window.on('resize', () => {
+		console.log('Window resized', window?.getBounds())
+	})
+
 	window.on('ready-to-show', () => {
 		window?.show()
 	})
 
 	window.once('ready-to-show', () => {
 		if (!window) return
-		const { width: winW } = window.getBounds()
+		const { width: winW, height: winH } = window.getBounds()
 		const { workArea } = screen.getPrimaryDisplay() // respects taskbar/dock
-		const x = workArea.x + workArea.width - winW // bottom-right
-		const y = workArea.y / 2
+		const x = workArea.x + workArea.width - winW // align to the right
+		const y = workArea.y + (workArea.height - winH) / 2 // center vertically
 		window.setBounds({
 			x: x,
 			y: y,
 			width: winW,
-			height: workArea.height
+			height: winH
 		})
 		window.setPosition(x, y)
 		window.show()

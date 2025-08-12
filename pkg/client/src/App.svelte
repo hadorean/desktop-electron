@@ -164,6 +164,8 @@
 		width: auto;
 		transform: translate(100%, -50%);
 		transition: transform 0.3s cubic-bezier(0.35, 1.04, 0.58, 1);
+		background-color: rgba(0, 0, 0, 0.4);
+		border-radius: 1rem;
 	}
 
 	#settings-drawer.open {
