@@ -2,6 +2,7 @@
 	import { ErrorMessage, SettingsPanel, SettingsServerUpdate } from '$shared'
 	import { initializeImageChangeHandling } from '$shared/services'
 	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '$shared/stores'
+	import { toggleDayNightMode } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { ActionButtons, AppHeader, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
@@ -35,7 +36,6 @@
 			if (window.electron?.ipcRenderer) {
 				window.electron.ipcRenderer.on('toggle-day-night-mode', async () => {
 					try {
-						const { toggleDayNightMode } = await import('$shared/stores/settingsStore')
 						toggleDayNightMode()
 					} catch (error) {
 						console.error('Failed to toggle day/night mode in renderer:', error)
