@@ -44,7 +44,7 @@ export class BackgroundManager {
 			const backgroundWindow = new BrowserWindow(windowConfig)
 
 			// Load the background webview
-			const monitorUrl = index === 0 ? 'monitor1' : 'monitor2'
+			const monitorUrl = `monitor${index + 1}`
 			const backgroundUrl = `${this.serverUrl}/app/${monitorUrl}`
 			console.log(`Loading background for monitor ${index}: ${backgroundUrl}`)
 

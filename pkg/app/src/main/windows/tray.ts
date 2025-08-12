@@ -1,8 +1,8 @@
-import { Tray, Menu, shell } from 'electron'
-import { AppContext } from '../services/context'
+import { Menu, shell, Tray } from 'electron'
+import { AppContext } from '../services/app'
 
-export function createTray(context: AppContext): Tray {
-	const { app, icon, localServer: localServer, mainWindow, bg } = context
+export function setupTray(context: AppContext): Tray {
+	const { app, icon, localServer, mainWindow, bg } = context
 
 	const tray = new Tray(icon)
 	tray.setToolTip('Hey Ketsu')

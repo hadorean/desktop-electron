@@ -2,7 +2,7 @@ import { getDebugMenuVisible } from '$shared/stores/debugStore'
 import { IpcEvents, MainEvents } from '$shared/types/ipc'
 import type { ScreenSettings } from '$shared/types/settings'
 import { app, ipcMain } from 'electron'
-import { AppContext } from './context'
+import { AppContext } from './app'
 import { settingsService } from './settings'
 
 export function setupIpc(options: AppContext): void {
