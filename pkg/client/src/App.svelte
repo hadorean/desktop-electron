@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate } from '$shared/components'
+	import { BackgroundImage, ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate, TimeDisplay, WeatherDisplay } from '$shared/components'
 	import { initializeImageChangeHandling, socketService } from '$shared/services'
 	import { expandSettings, getCurrentImages, imagesError, loadImages, screenSettings } from '$shared/stores'
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
 	import { loadSettings } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
-	import { BackgroundImage, TimeDisplay, WeatherDisplay } from './lib/components/layout'
 
 	let showSettings: boolean = false
 	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null

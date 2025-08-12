@@ -17,7 +17,6 @@
 	},
 	"dependencies": {
 		"@heyketsu/shared": "file:../shared",
-		"@tweenjs/tween.js": "^25.0.0",
 		"socket.io-client": "^4.8.1"
 	}
 }

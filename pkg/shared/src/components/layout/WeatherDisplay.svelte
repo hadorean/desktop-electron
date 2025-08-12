@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { api, type WeatherData } from '$shared/services'
 	import { onMount } from 'svelte'
 	import { cubicOut } from 'svelte/easing'
 	import { Tween } from 'svelte/motion'
+	import { api, type WeatherData } from '../../services'
 
 	let weather: WeatherData | null = null
 	let currentTime: string = '' // Current time in HH:MM format

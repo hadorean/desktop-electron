@@ -32,7 +32,8 @@
 	"dependencies": {
 		"@hgrandry/dbg": "0.1.10",
 		"bits-ui": "^2.9.2",
-		"tailwind-variants": "^2.1.0"
+		"tailwind-variants": "^2.1.0",
+		"@tweenjs/tween.js": "^25.0.0"
 	},
 	"devDependencies": {
 		"@electron-toolkit/eslint-config-prettier": "^3.0.0",
