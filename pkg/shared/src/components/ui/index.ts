@@ -8,3 +8,5 @@ export { default as Switch } from './switch/switch.svelte'
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
 
 export { Card, CardHeader, CardTitle, CardContent } from './card'
+
+export { Carousel, CarouselContent, CarouselItem } from './carousel'

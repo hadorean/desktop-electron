@@ -4,10 +4,11 @@
 	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '$shared/stores'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
-	import { ActionButtons, AppHeader, AppVersion, CustomHeader, ServerInfo, Versions } from './components'
+	import { ActionButtons, AppHeader, CustomHeader, ServerInfo, Versions, PageContainer, OptionsScreen, OptionsButton, BackButton } from './components'
 
 	const disabled = true
 	let transparentWindow = $state(false)
+	let pageContainer: PageContainer
 
 	onMount(async () => {
 		effectiveApiUrl.set('http://localhost:8080')
@@ -37,21 +38,37 @@
 	})
 </script>
 
-<div class:transparent={transparentWindow}>
+<div class:transparent={transparentWindow} class="flex h-full flex-col">
 	{#if transparentWindow}
 		<CustomHeader />
 	{/if}
-	<SettingsPanel expanded={true} transparent={transparentWindow} />
-	<SettingsServerUpdate />
-	<AppVersion />
-	<ActionButtons />
-	<ErrorMessage message={$imagesError || ''} />
 
-	{#if !disabled}
-		<AppHeader />
-		<ServerInfo />
-		<Versions />
-	{/if}
+	<PageContainer bind:this={pageContainer} transparent={transparentWindow} class="flex-1">
+		{#snippet settingsContent({ currentPage, goToOptions, goToSettings })}
+			<div class="settings-container">
+				<SettingsPanel expanded={true} transparent={transparentWindow} />
+				<SettingsServerUpdate />
+				<ActionButtons />
+				<ErrorMessage message={$imagesError || ''} />
+
+				{#if !disabled}
+					<AppHeader />
+					<ServerInfo />
+					<Versions />
+				{/if}
+
+				<!-- Options Button - only show on settings page -->
+				{#if currentPage === 0}
+					<OptionsButton onclick={goToOptions} />
+				{/if}
+			</div>
+		{/snippet}
+
+		{#snippet optionsContent({ currentPage, goToOptions, goToSettings })}
+			<OptionsScreen transparent={transparentWindow} onBack={goToSettings} />
+		{/snippet}
+	</PageContainer>
+
 	<DebugMenu visible={$debugVisible} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} />
 </div>
 
@@ -85,5 +102,14 @@
 	.transparent :global(h5),
 	.transparent :global(h6) {
 		-webkit-app-region: drag;
+	}
+
+	.settings-container {
+		height: 100%;
+		width: 100%;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		position: relative;
 	}
 </style>

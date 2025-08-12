@@ -144,10 +144,9 @@
 
 <style>
 	.settings-panel {
-		padding: 2rem;
+		padding: min(2rem, 5vw);
 		color: white;
-		min-width: 450px;
-		max-width: 120vw;
+		max-width: 100%;
 		max-height: 90vh;
 		overflow-y: auto;
 		z-index: 1000;
@@ -156,6 +155,7 @@
 		opacity: 0;
 		backdrop-filter: blur(10px);
 		border-radius: 1rem;
+		box-sizing: border-box;
 	}
 
 	.settings-panel.transparent {
@@ -168,8 +168,9 @@
 	}
 
 	.settings-content {
-		max-width: 600px;
+		max-width: min(600px, 100%);
 		margin: 0 auto;
+		width: 100%;
 	}
 
 	.setting-section {

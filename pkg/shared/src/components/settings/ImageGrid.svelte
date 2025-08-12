@@ -111,7 +111,7 @@
 					</div>
 				</div>
 			{:else}
-				<div class="grid max-h-[280px] grid-cols-4 gap-2 overflow-y-auto overflow-x-hidden pr-2">
+				<div class="image-grid">
 					{#each sortedImages as image (image.name)}
 						<div class="card-container aspect-square p-1">
 							<div
@@ -174,6 +174,16 @@
 <style>
 	.image-grid-container {
 		width: 100%;
+	}
+
+	.image-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+		gap: 0.5rem;
+		max-height: 280px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		padding-right: 0.5rem;
 	}
 
 	.card-container {
