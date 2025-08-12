@@ -62,6 +62,7 @@ build_run:
 # To auto-bump current version: publish patch | minor | major
 version version=default-version:
 	node scripts/version.js {{version}}
+	just squash-last-two
 
 publish:
 	node scripts/publish.js
