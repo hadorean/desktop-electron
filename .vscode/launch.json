@@ -77,12 +77,7 @@
 	"compounds": [
 		{
 			"name": "Debug Full Dev Environment",
-			"configurations": [
-				"Start Shared (TypeScript)", 
-				"Start Client (Vite)", 
-				"Debug Electron Main Process", 
-				"Debug Renderer Process"
-			],
+			"configurations": ["Start Shared (TypeScript)", "Start Client (Vite)", "Debug Electron Main Process", "Debug Renderer Process"],
 			"presentation": {
 				"order": 1
 			},

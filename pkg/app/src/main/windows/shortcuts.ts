@@ -32,7 +32,7 @@ export function setupShortcuts(mainWindow: MainWindow): void {
 			try {
 				const win = mainWindow.get()
 				if (!win || !win.isFocused()) return
-				
+
 				// Send message directly to renderer process
 				win.webContents.send('toggle-day-night-mode')
 			} catch (error) {

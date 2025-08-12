@@ -17,9 +17,9 @@ check what="all":
 	
 check-all:
 	just check-shared
-	just check-client
 	just check-app
-
+	just check-client
+	
 check-shared:
 	pnpm typecheck:shared
 
@@ -36,8 +36,8 @@ lint what="all":
 	
 lint-all:
 	just lint-shared
-	just lint-client
 	just lint-app
+	just lint-client
 
 lint-shared:
 	pnpm lint:shared
