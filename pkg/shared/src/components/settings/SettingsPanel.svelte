@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte'
 	import { Inspect } from '@hgrandry/dbg'
 	import { currentScreen, editingSettings, inTransition, isLocalMode, screenSettings, updateEditingSettings } from '../../stores'
 	import ImageGrid from './ImageGrid.svelte'
@@ -11,6 +12,32 @@
 	//export let errorMessage: string = "";
 	export let settingsPanel: HTMLElement | null = null
 	export let transparent: boolean = false
+
+	// Reference to ScreenSwitcher component
+	let screenSwitcher: ScreenSwitcher
+
+	// Document-level keyboard handler for Tab key
+	function handleDocumentKeyDown(event: KeyboardEvent): void {
+		// Only handle Tab when settings panel is expanded and visible
+		if (event.key === 'Tab' && expanded && settingsPanel) {
+			event.preventDefault()
+			
+			// Switch screens based on direction
+			const direction = event.shiftKey ? 'backward' : 'forward'
+			screenSwitcher?.switchToNextScreen(direction)
+		}
+	}
+
+	onMount(() => {
+		// Add document-level event listener when component mounts
+		document.addEventListener('keydown', handleDocumentKeyDown)
+		
+		// Clean up event listener when component unmounts
+		return () => {
+			document.removeEventListener('keydown', handleDocumentKeyDown)
+		}
+	})
+
 	function handleSettingChange<K extends keyof typeof $editingSettings>(key: K, value: (typeof $editingSettings)[K] | null): void {
 		updateEditingSettings((current) => {
 			if (value === null) {
@@ -30,7 +57,7 @@
 </script>
 
 <div class="settings-panel" bind:this={settingsPanel} class:expanded class:transparent>
-	<ScreenSwitcher />
+	<ScreenSwitcher bind:this={screenSwitcher} />
 	<div class="settings-content">
 		<Inspect>
 			{#if $isLocalMode}

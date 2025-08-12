@@ -110,6 +110,27 @@
 	function focus(element: HTMLElement): void {
 		element.focus()
 	}
+
+	// Export function to be called from SettingsPanel
+	export function switchToNextScreen(direction: 'forward' | 'backward' = 'forward'): void {
+		if (editMode || renamingScreen) return
+
+		// Get all available tabs: shared + screen IDs
+		const allTabs = ['shared', ...$screenIds]
+		const currentIndex = allTabs.indexOf(currentTab)
+		
+		// Calculate next index (cycle through)
+		let nextIndex: number
+		if (direction === 'backward') {
+			nextIndex = currentIndex <= 0 ? allTabs.length - 1 : currentIndex - 1
+		} else {
+			nextIndex = currentIndex >= allTabs.length - 1 ? 0 : currentIndex + 1
+		}
+
+		// Switch to next tab
+		const nextTab = allTabs[nextIndex]
+		handleTabChange(nextTab)
+	}
 </script>
 
 <!-- Previous tab logic
@@ -127,7 +148,7 @@
 -->
 
 <!-- Screen switcher container -->
-<div class="screen-switcher-container" role="navigation" aria-label="Screen switcher">
+<div class="screen-switcher-container" role="tablist" aria-label="Screen switcher">
 	<Tabs value={currentTab} onValueChange={handleTabChange}>
 		<div class="tabs-wrapper">
 			<TabsList class="screen-tabs-list">
@@ -192,7 +213,14 @@
 		align-items: center;
 		justify-content: center;
 		margin-bottom: 1rem;
+		outline: none;
+		border-radius: 0.5rem;
 	}
+
+	/* .screen-switcher-container:focus-visible {
+		outline: 2px solid hsl(var(--primary));
+		outline-offset: 2px;
+	} */
 
 	.tabs-wrapper {
 		display: flex;
