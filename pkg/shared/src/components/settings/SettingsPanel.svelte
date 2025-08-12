@@ -10,7 +10,7 @@
 	export let expanded: boolean = false
 	//export let errorMessage: string = "";
 	export let settingsPanel: HTMLElement | null = null
-
+	export let transparent: boolean = false
 	function handleSettingChange<K extends keyof typeof $editingSettings>(key: K, value: (typeof $editingSettings)[K] | null): void {
 		updateEditingSettings((current) => {
 			if (value === null) {
@@ -29,7 +29,7 @@
 	}
 </script>
 
-<div class="settings-panel" bind:this={settingsPanel} class:expanded>
+<div class="settings-panel" bind:this={settingsPanel} class:expanded class:transparent>
 	<ScreenSwitcher />
 	<div class="settings-content">
 		<Inspect>
@@ -156,6 +156,10 @@
 		opacity: 0;
 		backdrop-filter: blur(10px);
 		border-radius: 1rem;
+	}
+
+	.settings-panel.transparent {
+		backdrop-filter: none;
 	}
 
 	.settings-panel.expanded {

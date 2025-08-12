@@ -39,7 +39,13 @@ const api = {
 	getDebugState: () => ipcRenderer.invoke(IpcEvents.GetDebugState),
 	onDebugStateChanged: (callback: (visible: boolean) => void) => {
 		ipcRenderer.on(IpcEvents.DebugStateChanged, (_, visible) => callback(visible))
-	}
+	},
+	// Window control APIs
+	minimizeWindow: () => ipcRenderer.invoke(IpcEvents.MinimizeWindow),
+	maximizeWindow: () => ipcRenderer.invoke(IpcEvents.MaximizeWindow),
+	closeWindow: () => ipcRenderer.invoke(IpcEvents.CloseWindow),
+	// Window configuration API
+	getWindowConfig: () => ipcRenderer.invoke(IpcEvents.GetWindowConfig)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

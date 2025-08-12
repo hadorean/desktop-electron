@@ -2,6 +2,8 @@ import { getDebugMenuVisible } from '$shared/stores/debugStore'
 import { IpcEvents, MainEvents } from '$shared/types/ipc'
 import type { ScreenSettings } from '$shared/types/settings'
 import { app, ipcMain } from 'electron'
+import { appConfig } from '../config'
+import { mainWindow } from '../windows/mainWindow'
 import { AppContext } from './app'
 import { settingsService } from './settings'
 
@@ -132,5 +134,30 @@ export function setupIpc(options: AppContext): void {
 			console.error('IPC get-debug-state error:', error)
 			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
 		}
+	})
+
+	// Window control
+	handleIpc(IpcEvents.MinimizeWindow, () => {
+		mainWindow.get()?.minimize()
+	})
+
+	handleIpc(IpcEvents.MaximizeWindow, () => {
+		const window = mainWindow.get()
+		if (window) {
+			if (window.isMaximized()) {
+				window.unmaximize()
+			} else {
+				window.maximize()
+			}
+		}
+	})
+
+	handleIpc(IpcEvents.CloseWindow, () => {
+		mainWindow.get()?.close()
+	})
+
+	// Window configuration
+	handleIpc(IpcEvents.GetWindowConfig, () => {
+		return appConfig
 	})
 }

@@ -35,7 +35,13 @@ export const IpcEvents = {
 	// Auto-update (renderer → main)
 	CheckForUpdates: 'check-for-updates',
 	DownloadUpdate: 'download-update',
-	InstallUpdate: 'install-update'
+	InstallUpdate: 'install-update',
+
+	// Window control
+	MinimizeWindow: 'minimize-window',
+	MaximizeWindow: 'maximize-window',
+	CloseWindow: 'close-window',
+	GetWindowConfig: 'get-window-config'
 } as const
 
 // Type for main process events (handled by ipcMain)
@@ -58,6 +64,10 @@ export type MainEvents =
 	| typeof IpcEvents.CheckForUpdates
 	| typeof IpcEvents.DownloadUpdate
 	| typeof IpcEvents.InstallUpdate
+	| typeof IpcEvents.MinimizeWindow
+	| typeof IpcEvents.MaximizeWindow
+	| typeof IpcEvents.CloseWindow
+	| typeof IpcEvents.GetWindowConfig
 
 // Type for renderer process events (sent from main to renderer)
 export type RendererEvents =

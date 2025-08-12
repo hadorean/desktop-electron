@@ -3,6 +3,7 @@ import { BrowserWindow, screen, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { join } from 'path'
 import icon from '../../../resources/icon.png?asset'
+import { appConfig } from '../config'
 
 // Store reference to main window
 let window: BrowserWindow | null = null
@@ -11,7 +12,8 @@ let window: BrowserWindow | null = null
 let isQuitting = false
 
 export function createWindow(): void {
-	const transparent = false
+	const transparent = appConfig.window.transparent
+	console.log('Creating window with transparent:', transparent)
 
 	// Create the browser window.
 	window = new BrowserWindow({
@@ -19,9 +21,20 @@ export function createWindow(): void {
 		height: 1120,
 		show: false,
 		autoHideMenuBar: true,
-		resizable: !transparent,
+		resizable: true,
 		frame: !transparent,
 		transparent: transparent,
+		backgroundColor: '#00000000',
+		roundedCorners: true,
+		hasShadow: !transparent,
+		titleBarStyle: transparent ? 'hidden' : 'default',
+		titleBarOverlay: !transparent,
+		title: transparent ? '' : 'Hey',
+		skipTaskbar: !transparent,
+		thickFrame: !transparent,
+		minimizable: true,
+		maximizable: true,
+		closable: true,
 		...(process.platform === 'linux' ? { icon } : {}),
 		webPreferences: {
 			preload: join(__dirname, '../preload/index.js'),

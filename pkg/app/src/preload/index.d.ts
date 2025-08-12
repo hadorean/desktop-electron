@@ -1,4 +1,4 @@
-import type { ScreenSettings, UserSettings } from '$shared/types/settings'
+import type { AppConfig, ScreenSettings, UserSettings } from '$shared/types/settings'
 import { ElectronAPI } from '@electron-toolkit/preload'
 import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 
@@ -30,6 +30,12 @@ declare global {
 			// Debug menu APIs
 			getDebugState: () => Promise<{ success: boolean; visible?: boolean; error?: string }>
 			onDebugStateChanged: (callback: (visible: boolean) => void) => void
+			// Window control APIs
+			minimizeWindow: () => Promise<void>
+			maximizeWindow: () => Promise<void>
+			closeWindow: () => Promise<void>
+			// Window configuration API
+			getWindowConfig: () => Promise<AppConfig>
 		}
 	}
 }

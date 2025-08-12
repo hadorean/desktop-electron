@@ -45,7 +45,6 @@ export class LocalServer {
 		const clientPath = this.dev.getClientPath()
 
 		this.server.use('/app/assets', express.static(join(clientPath, 'assets')))
-		this.server.use('/app/vite.svg', express.static(join(clientPath, 'vite.svg')))
 		this.server.use('/app/favicon.ico', express.static(join(clientPath, 'favicon.ico')))
 		console.log('📁 Client assets path:', join(clientPath, 'assets'))
 		console.log('📁 Is packaged (middleware):', this.dev.isDevelopmentMode() ? false : true)

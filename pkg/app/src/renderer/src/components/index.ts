@@ -1,5 +1,6 @@
 export { default as ActionButtons } from './ActionButtons.svelte'
 export { default as AppHeader } from './AppHeader.svelte'
 export { default as AppVersion } from './AppVersion.svelte'
+export { default as CustomHeader } from './CustomHeader.svelte'
 export { default as ServerInfo } from './ServerInfo.svelte'
 export { default as Versions } from './Versions.svelte'
