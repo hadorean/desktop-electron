@@ -45,7 +45,8 @@ const api = {
 	maximizeWindow: () => ipcRenderer.invoke(IpcEvents.MaximizeWindow),
 	closeWindow: () => ipcRenderer.invoke(IpcEvents.CloseWindow),
 	// Window configuration API
-	getWindowConfig: () => ipcRenderer.invoke(IpcEvents.GetWindowConfig)
+	getWindowConfig: () => ipcRenderer.invoke(IpcEvents.GetWindowConfig),
+	recreateMainWindow: () => ipcRenderer.invoke(IpcEvents.RecreateMainWindow)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

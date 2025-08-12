@@ -136,12 +136,18 @@ function toggleMainWindow(): void {
 	}
 }
 
+export function recreateMainWindow(): void {
+	window?.destroy()
+	createWindow()
+}
+
 export const mainWindow = {
 	show: showMainWindow,
 	hide: hideMainWindow,
 	toggle: toggleMainWindow,
 	get: getMainWindow,
-	setIsQuitting: (quitting: boolean) => setIsQuitting(quitting)
+	setIsQuitting: (quitting: boolean) => setIsQuitting(quitting),
+	recreate: recreateMainWindow
 }
 
 export type MainWindow = typeof mainWindow

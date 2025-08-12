@@ -36,6 +36,7 @@ declare global {
 			closeWindow: () => Promise<void>
 			// Window configuration API
 			getWindowConfig: () => Promise<AppConfig>
+			recreateMainWindow: () => Promise<void>
 		}
 	}
 }

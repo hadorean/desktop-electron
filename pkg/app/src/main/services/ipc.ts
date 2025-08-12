@@ -160,4 +160,8 @@ export function setupIpc(options: AppContext): void {
 	handleIpc(IpcEvents.GetWindowConfig, () => {
 		return appConfig
 	})
+
+	handleIpc(IpcEvents.RecreateMainWindow, () => {
+		mainWindow.recreate()
+	})
 }

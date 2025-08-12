@@ -39,6 +39,11 @@
 			console.error('Failed to check for updates:', error)
 		}
 	}
+
+	async function recreateMainWindow(): Promise<void> {
+		await window.api.recreateMainWindow()
+		console.log('Recreated window')
+	}
 </script>
 
 <Inspect>
@@ -47,6 +52,7 @@
 	<Button name="Make Interactive" onclick={makeAllInteractive} />
 	<Button name="Make Non-Interactive" onclick={makeAllNonInteractive} />
 	<Button name="Check for Updates" onclick={checkForUpdates} />
+	<Button name="Recreate Window" onclick={recreateMainWindow} />
 	<a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
 </Inspect>
 
