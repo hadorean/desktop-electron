@@ -26,6 +26,19 @@ export function setupShortcuts(mainWindow: MainWindow): void {
 				console.error('Failed to toggle debug menu:', error)
 			}
 		})
+
+		// (Ctrl+N) to toggle day/night mode
+		globalShortcut.register('CommandOrControl+N', () => {
+			try {
+				const win = mainWindow.get()
+				if (!win || !win.isFocused()) return
+				
+				// Send message directly to renderer process
+				win.webContents.send('toggle-day-night-mode')
+			} catch (error) {
+				console.error('Failed to toggle day/night mode:', error)
+			}
+		})
 	} catch (err) {
 		console.error('Failed to register global shortcuts:', err)
 	}

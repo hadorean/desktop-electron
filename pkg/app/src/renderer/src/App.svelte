@@ -30,6 +30,18 @@
 				console.log('Desktop app: Received debug state change:', visible)
 				setDebugMenuVisible(visible)
 			})
+
+			// Setup IPC listener for day/night mode toggle
+			if (window.electron?.ipcRenderer) {
+				window.electron.ipcRenderer.on('toggle-day-night-mode', async () => {
+					try {
+						const { toggleDayNightMode } = await import('$shared/stores/settingsStore')
+						toggleDayNightMode()
+					} catch (error) {
+						console.error('Failed to toggle day/night mode in renderer:', error)
+					}
+				})
+			}
 		}
 
 		// Setup image change handling (deduplication, socket events, validation)
