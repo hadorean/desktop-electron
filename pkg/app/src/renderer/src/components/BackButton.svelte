@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { Button } from '$shared/components/ui'
-
 	interface Props {
 		onclick?: () => void
 		class?: string

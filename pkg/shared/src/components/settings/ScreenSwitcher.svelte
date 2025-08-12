@@ -118,7 +118,7 @@
 		// Get all available tabs: shared + screen IDs
 		const allTabs = ['shared', ...$screenIds]
 		const currentIndex = allTabs.indexOf(currentTab)
-		
+
 		// Calculate next index (cycle through)
 		let nextIndex: number
 		if (direction === 'backward') {

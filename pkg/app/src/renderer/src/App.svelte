@@ -4,11 +4,10 @@
 	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '$shared/stores'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
-	import { ActionButtons, AppHeader, CustomHeader, ServerInfo, Versions, PageContainer, OptionsScreen, OptionsButton, BackButton } from './components'
+	import { ActionButtons, AppHeader, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
 
 	const disabled = true
 	let transparentWindow = $state(false)
-	let pageContainer: PageContainer
 
 	onMount(async () => {
 		effectiveApiUrl.set('http://localhost:8080')
@@ -43,8 +42,8 @@
 		<CustomHeader />
 	{/if}
 
-	<PageContainer bind:this={pageContainer} transparent={transparentWindow} class="flex-1">
-		{#snippet settingsContent({ currentPage, goToOptions, goToSettings })}
+	<PageContainer transparent={transparentWindow} class="flex-1">
+		{#snippet settingsContent({ currentPage, goToOptions })}
 			<div class="settings-container">
 				<SettingsPanel expanded={true} transparent={transparentWindow} />
 				<SettingsServerUpdate />
@@ -64,7 +63,7 @@
 			</div>
 		{/snippet}
 
-		{#snippet optionsContent({ currentPage, goToOptions, goToSettings })}
+		{#snippet optionsContent({ goToSettings })}
 			<OptionsScreen transparent={transparentWindow} onBack={goToSettings} />
 		{/snippet}
 	</PageContainer>

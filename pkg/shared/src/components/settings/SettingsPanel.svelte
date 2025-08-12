@@ -21,7 +21,7 @@
 		// Only handle Tab when settings panel is expanded and visible
 		if (event.key === 'Tab' && expanded && settingsPanel) {
 			event.preventDefault()
-			
+
 			// Switch screens based on direction
 			const direction = event.shiftKey ? 'backward' : 'forward'
 			screenSwitcher?.switchToNextScreen(direction)
@@ -31,7 +31,7 @@
 	onMount(() => {
 		// Add document-level event listener when component mounts
 		document.addEventListener('keydown', handleDocumentKeyDown)
-		
+
 		// Clean up event listener when component unmounts
 		return () => {
 			document.removeEventListener('keydown', handleDocumentKeyDown)

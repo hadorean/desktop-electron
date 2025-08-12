@@ -22,14 +22,30 @@ check-all:
 
 check-shared:
 	pnpm typecheck:shared
-	pnpm lint:shared
 
 check-client:
 	pnpm typecheck:client
-	pnpm lint:client
 
 check-app:
 	pnpm typecheck:app
+
+	# all, shared, client, app
+lint what="all": 
+	clear
+	just lint-{{what}}
+	
+lint-all:
+	just lint-shared
+	just lint-client
+	just lint-app
+
+lint-shared:
+	pnpm lint:shared
+
+lint-client:
+	pnpm lint:client
+
+lint-app:
 	pnpm lint:app
 
 # Run the mkdocs server
