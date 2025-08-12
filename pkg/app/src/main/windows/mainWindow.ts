@@ -94,6 +94,13 @@ export function createWindow(): void {
 		}
 	})
 
+	// Hide window when it loses focus
+	window.on('blur', () => {
+		if (!isQuitting && window && !window.isDestroyed()) {
+			// window.hide()
+		}
+	})
+
 	// HMR for renderer base on electron-vite cli.
 	// Load the remote URL for development or the local html file for production.
 	if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
