@@ -310,7 +310,7 @@ export function getScreenSettings(id: string): Partial<ScreenSettings> | undefin
 export const baseScreenSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
 	const currentTheme = theme as 'day' | 'night'
 	const themeShared = getThemeScreenSettings(all.shared, currentTheme)
-	return isLocal ? { ...themeShared, ...getThemeScreenSettings(all.screens[screen], currentTheme) } : themeShared
+	return isLocal ? { ...themeShared, ...getThemeScreenSettings(all.screens[screen] ?? DefaultDayNightSettings, currentTheme) } : themeShared
 })
 
 // Settings to use to render the current screen image (includes transitions for UI)
@@ -322,7 +322,7 @@ export const screenSettings = derived([baseScreenSettings, inTransition, transit
 // Base editing settings without transitions (for syncing to other clients)
 export const baseEditingSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
 	const currentTheme = theme as 'day' | 'night'
-	return isLocal ? getThemeEditingSettings(all.screens[screen], currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
+	return isLocal ? getThemeEditingSettings(all.screens[screen] ?? DefaultDayNightSettings, currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
 })
 
 // Settings to use in the settings panel (includes transitions for UI display)

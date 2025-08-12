@@ -22,11 +22,17 @@ export interface DayNightScreenSettings {
 	night: Partial<ScreenSettings> | null
 }
 
-export function getThemeScreenSettings(settings: DayNightScreenSettings, theme: DayNightMode): Partial<ScreenSettings> {
+export function getThemeScreenSettings(settings: DayNightScreenSettings | undefined, theme: DayNightMode): Partial<ScreenSettings> {
+	if (!settings) {
+		return DefaultDayNightSettings.day
+	}
 	return theme === 'day' || settings.night === null ? settings.day : { ...settings.day, ...settings.night }
 }
 
-export function getThemeEditingSettings(settings: DayNightScreenSettings, theme: DayNightMode): Partial<ScreenSettings> {
+export function getThemeEditingSettings(settings: DayNightScreenSettings | undefined, theme: DayNightMode): Partial<ScreenSettings> {
+	if (!settings) {
+		return {}
+	}
 	return theme === 'day' ? settings.day : (settings.night ?? {})
 }
 
