@@ -19,3 +19,13 @@ node_modules/
 
 # Environment files
 .env*
+
+# Prettier files
+.prettierignore
+.prettierrc
+.prettierrc.json
+.prettierrc.yaml
+.prettierrc.yml
+.prettierrc.jsonc
+.prettierrc.json5
+.prettierrc.jsonc
