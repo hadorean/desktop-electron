@@ -1,8 +1,8 @@
-import { Server as SocketIOServer, Socket } from 'socket.io'
+import { getDebugMenuVisible } from '$shared/stores/debugStore'
+import { ClientEventMap, ClientEvents, ServerEventMap, ServerEvents, SocketEvents } from '$shared/types/sockets'
 import { createServer } from 'http'
+import { Socket, Server as SocketIOServer } from 'socket.io'
 import { settingsService } from '../services/settings'
-import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
-import { SocketEvents, ServerEvents, ClientEvents, ServerEventMap, ClientEventMap } from '@heyketsu/shared/types/sockets'
 
 export class SocketManager {
 	private io: SocketIOServer

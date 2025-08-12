@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getImageUrl } from '@heyketsu/shared/services'
-	import { screenSettings } from '@heyketsu/shared/stores/settingsStore'
+	import { getImageUrl } from '$shared/services'
+	import { screenSettings } from '$shared/stores/settingsStore'
 	import { Easing, Tween } from '@tweenjs/tween.js'
 	import { onMount } from 'svelte'
 

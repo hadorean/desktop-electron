@@ -1,14 +1,14 @@
-import express from 'express'
+import { ServerEventMap, ServerEvents } from '$shared/types/sockets'
 import cors from 'cors'
-import { join } from 'path'
+import express from 'express'
 import { createServer } from 'http'
-import { registerRoutes } from './routes'
-import { thumbnailService } from '../services/thumbnails'
+import { join } from 'path'
 import { imageService } from '../services/images'
+import { thumbnailService } from '../services/thumbnails'
+import { DevelopmentManager } from './dev'
+import { registerRoutes } from './routes'
 import { SocketManager } from './sockets'
 import { TemplateManager } from './template'
-import { DevelopmentManager } from './dev'
-import { ServerEvents, ServerEventMap } from '@heyketsu/shared/types/sockets'
 
 export class LocalServer {
 	public server: express.Application

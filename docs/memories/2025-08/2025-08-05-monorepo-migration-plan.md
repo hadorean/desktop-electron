@@ -187,7 +187,7 @@
 
 - **Shared Package**: `tsc --watch` compiles TypeScript changes in real-time
 - **File Watcher**: Debounced chokidar watcher detects dist changes
-- **Auto-Copy**: Shared files copied to `pkg/app/node_modules/@heyketsu/shared`
+- **Auto-Copy**: Shared files copied to `pkg/app/node_modules/$shared`
 - **HMR Chain**: Changes propagate through Electron and Client dev servers
 
 ### Development Workflow

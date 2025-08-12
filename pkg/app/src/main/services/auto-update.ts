@@ -1,7 +1,7 @@
+import { IpcEvents, MainEvents, RendererEvents } from '$shared/types/ipc'
 import { ipcMain } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
 import { MainWindow } from '../windows/mainWindow'
-import { IpcEvents, MainEvents, RendererEvents } from '@heyketsu/shared/types/ipc'
 
 export function setupAutoUpdate(mainWindow: MainWindow): {
 	checkForUpdates: () => void

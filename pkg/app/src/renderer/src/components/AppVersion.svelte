@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { VersionInfo } from '@heyketsu/shared/types'
+	import type { VersionInfo } from '$shared/types'
 
 	let appVersion = ''
 	let updateAvailable = false

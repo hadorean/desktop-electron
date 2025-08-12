@@ -1,13 +1,13 @@
-import { join } from 'path'
+import { ApiRoutes } from '$shared/types/api'
+import { SocketEvents } from '$shared/types/sockets'
 import { constants } from 'fs'
 import { access } from 'fs/promises'
+import { join } from 'path'
 import { type LocalServer } from '.'
-import { thumbnailService } from '../services/thumbnails'
-import { settingsService } from '../services/settings'
 import { imageService } from '../services/images'
+import { settingsService } from '../services/settings'
+import { thumbnailService } from '../services/thumbnails'
 import { scanForClientAssets } from './assets'
-import { SocketEvents } from '@heyketsu/shared/types/sockets'
-import { ApiRoutes } from '@heyketsu/shared/types/api'
 
 export function registerRoutes(localServer: LocalServer): void {
 	const server = localServer.server

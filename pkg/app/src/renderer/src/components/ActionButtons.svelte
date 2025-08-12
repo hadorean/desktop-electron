@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button, Inspect } from '@hgrandry/dbg'
-	import { IpcEvents } from '@heyketsu/shared/types/ipc'
+	import { IpcEvents } from '$shared/types/ipc'
 
 	const ipcHandle = (): void => window.electron.ipcRenderer.send(IpcEvents.Ping)
 

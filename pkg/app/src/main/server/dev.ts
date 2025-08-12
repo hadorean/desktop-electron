@@ -1,9 +1,9 @@
+import { ApiRoutes } from '$shared/types/api'
 import express from 'express'
 import { join } from 'path'
-import { TemplateManager } from './template'
-import { SocketManager } from './sockets'
 import { LocalServer } from '.'
-import { ApiRoutes } from '@heyketsu/shared/types/api'
+import { SocketManager } from './sockets'
+import { TemplateManager } from './template'
 
 export class DevelopmentManager {
 	private localServer: LocalServer

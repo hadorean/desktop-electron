@@ -1,9 +1,9 @@
+import { debugVisible } from '$shared/stores/debugStore'
+import { IpcEvents, RendererEvents } from '$shared/types/ipc'
+import { SocketEvents } from '$shared/types/sockets'
 import { app } from 'electron'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { debugVisible } from '@heyketsu/shared/stores/debugStore'
-import { SocketEvents } from '@heyketsu/shared/types/sockets'
-import { IpcEvents, RendererEvents } from '@heyketsu/shared/types/ipc'
 import type { LocalServer } from '../server'
 import type { MainWindow } from '../windows/mainWindow'
 

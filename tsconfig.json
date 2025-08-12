@@ -11,8 +11,8 @@
 		"noEmit": true,
 		"baseUrl": ".",
 		"paths": {
-			"@heyketsu/shared": ["./pkg/shared/src"],
-			"@heyketsu/shared/*": ["./pkg/shared/src/*"]
+			"$shared": ["./pkg/shared/src"],
+			"$shared/*": ["./pkg/shared/src/*"]
 		}
 	},
 	"include": [

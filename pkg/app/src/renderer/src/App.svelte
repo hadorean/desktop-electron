@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { ErrorMessage, SettingsPanel, SettingsServerUpdate } from '@heyketsu/shared'
-	import { initializeImageChangeHandling } from '@heyketsu/shared/services'
-	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '@heyketsu/shared/stores'
+	import { ErrorMessage, SettingsPanel, SettingsServerUpdate } from '$shared'
+	import { initializeImageChangeHandling } from '$shared/services'
+	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '$shared/stores'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { ActionButtons, AppHeader, AppVersion, ServerInfo, Versions } from './components'

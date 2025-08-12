@@ -1,8 +1,8 @@
+import type { SettingsUpdateEvent, UserSettings } from '$shared/types'
+import { DefaultUserSettings } from '$shared/types/settings'
+import { app } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
-import { app } from 'electron'
-import type { UserSettings, SettingsUpdateEvent } from '@heyketsu/shared/types'
-import { DefaultUserSettings } from '@heyketsu/shared/types/settings'
 
 export class SettingsService {
 	private settings: UserSettings | null = null

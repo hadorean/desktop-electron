@@ -7,10 +7,10 @@ Milestone-Based Implementation
 Goal: Test if we can use file:../shared reference in app without breaking anything
 Steps:
 
-1. Temporarily test app with "@heyketsu/shared": "file:../shared" in package.json
+1. Temporarily test app with "$shared": "file:../shared" in package.json
 2. Keep copy-shared.js as backup (don't delete yet)
 3. Test build and runtime - ensure app still works
-4. Verify imports - check all @heyketsu/shared imports resolve correctly
+4. Verify imports - check all $shared imports resolve correctly
    Success Criteria: App builds and runs normally with direct shared reference
 
 ## Milestone 2: Create Basic Communication Adapter Interface

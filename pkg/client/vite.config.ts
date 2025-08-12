@@ -12,7 +12,7 @@ export default defineConfig({
 	base: '/app/', // This sets the base path for the application
 	resolve: {
 		alias: {
-			'@heyketsu/shared': path.resolve(__dirname, '../shared/src'),
+			$shared: path.resolve(__dirname, '../shared/src'),
 			$stores: path.resolve(__dirname, './src/lib/stores')
 		}
 	}

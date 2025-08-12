@@ -1,9 +1,9 @@
-import { ipcMain, app } from 'electron'
+import { getDebugMenuVisible } from '$shared/stores/debugStore'
+import { IpcEvents, MainEvents } from '$shared/types/ipc'
+import type { ScreenSettings } from '$shared/types/settings'
+import { app, ipcMain } from 'electron'
 import { AppContext } from './context'
 import { settingsService } from './settings'
-import { getDebugMenuVisible } from '@heyketsu/shared/stores/debugStore'
-import { IpcEvents, MainEvents } from '@heyketsu/shared/types/ipc'
-import type { ScreenSettings } from '@heyketsu/shared/types/settings'
 
 export function setupIpc(options: AppContext): void {
 	const { localServer, bg } = options

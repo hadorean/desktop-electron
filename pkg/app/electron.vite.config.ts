@@ -55,7 +55,7 @@ export default defineConfig({
 		plugins: [externalizeDepsPlugin(), copyAssetsPlugin()],
 		resolve: {
 			alias: {
-				'@heyketsu/shared': resolve(__dirname, '../shared/src')
+				$shared: resolve(__dirname, '../shared/src')
 			}
 		}
 	},
@@ -63,7 +63,7 @@ export default defineConfig({
 		plugins: [externalizeDepsPlugin()],
 		resolve: {
 			alias: {
-				'@heyketsu/shared': resolve(__dirname, '../shared/src')
+				$shared: resolve(__dirname, '../shared/src')
 			}
 		}
 	},
@@ -71,7 +71,7 @@ export default defineConfig({
 		plugins: [svelte()],
 		resolve: {
 			alias: {
-				'@heyketsu/shared': resolve(__dirname, '../shared/src')
+				$shared: resolve(__dirname, '../shared/src')
 			}
 		}
 	}

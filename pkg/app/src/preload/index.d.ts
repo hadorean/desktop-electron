@@ -1,6 +1,6 @@
+import type { ScreenSettings, UserSettings } from '$shared/types/settings'
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { UserSettings, ScreenSettings } from '@heyketsu/shared/types/settings'
-import type { UpdateInfo, ProgressInfo } from 'electron-updater'
+import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 
 declare global {
 	interface Window {

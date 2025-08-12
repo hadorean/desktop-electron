@@ -1,4 +1,4 @@
-// Main exports for @heyketsu/shared package
+// Main exports for $shared package
 export * from './types'
 export * from './utils'
 

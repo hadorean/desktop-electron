@@ -1,14 +1,14 @@
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow } from 'electron'
-import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './windows/shortcuts'
-import { setupIpc } from './services/ipc'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { setupAutoUpdate } from './services/auto-update'
 import icon from '../../resources/icon.png?asset'
-import { createTray } from './windows/tray'
 import { LocalServer } from './server'
+import { setupAutoUpdate } from './services/auto-update'
+import { debugService } from './services/debug'
+import { setupIpc } from './services/ipc'
 import { BackgroundManager } from './windows/backgrounds'
 import { createWindow, mainWindow } from './windows/mainWindow'
-import { debugService } from './services/debug'
+import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './windows/shortcuts'
+import { createTray } from './windows/tray'
 
 const localServer = new LocalServer()
 const bg = new BackgroundManager()

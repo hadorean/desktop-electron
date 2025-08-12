@@ -1,9 +1,9 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import type { VersionInfo } from '$shared/types'
+import { IpcEvents } from '$shared/types/ipc'
+import type { ScreenSettings } from '$shared/types/settings'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { VersionInfo } from '@heyketsu/shared/types'
-import type { ScreenSettings } from '@heyketsu/shared/types/settings'
+import { contextBridge, ipcRenderer } from 'electron'
 import type { ProgressInfo, UpdateInfo } from 'electron-updater'
-import { IpcEvents } from '@heyketsu/shared/types/ipc'
 
 // Custom APIs for renderer
 const api = {

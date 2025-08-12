@@ -9,7 +9,7 @@ Quick reference for setting up import aliases in Svelte + TypeScript projects to
 ```typescript
 resolve: {
   alias: {
-    '@heyketsu/shared': path.resolve(__dirname, '../shared/src'),
+    '$shared': path.resolve(__dirname, '../shared/src'),
     $stores: path.resolve(__dirname, './src/lib/stores')
   }
 }
@@ -22,8 +22,8 @@ resolve: {
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@heyketsu/shared": ["../shared/src"], // Direct import: from '@heyketsu/shared'
-			"@heyketsu/shared/*": ["../shared/src/*"], // Subpath: from '@heyketsu/shared/components'
+			"$shared": ["../shared/src"], // Direct import: from '$shared'
+			"$shared/*": ["../shared/src/*"], // Subpath: from '$shared/components'
 			"$stores/*": ["./src/lib/stores/*"]
 		}
 	},
@@ -39,7 +39,7 @@ resolve: {
 ## Key Points
 
 - **Vite alias**: Handles build-time resolution
-- **TypeScript paths**: Both direct (`@heyketsu/shared`) and wildcard (`@heyketsu/shared/*`) patterns needed
+- **TypeScript paths**: Both direct (`$shared`) and wildcard (`$shared/*`) patterns needed
 - **Include pattern**: Must include shared package files for TypeScript to recognize them
 - **VS Code**: Restart TypeScript server after changes (`Ctrl+Shift+P` → "TypeScript: Restart TS Server")
 
@@ -47,9 +47,9 @@ resolve: {
 
 ```typescript
 // Direct import from alias root
-import { SliderControl, ToggleControl } from '@heyketsu/shared'
+import { SliderControl, ToggleControl } from '$shared'
 
 // Subpath import
-import { apiService } from '@heyketsu/shared/services'
+import { apiService } from '$shared/services'
 import { settingsStore } from '$stores/settingsStore'
 ```

@@ -1,6 +1,6 @@
+import { getDebugMenuVisible, toggleDebugMenu } from '$shared/stores/debugStore'
 import { globalShortcut } from 'electron'
 import { MainWindow } from './mainWindow'
-import { getDebugMenuVisible, toggleDebugMenu } from '@heyketsu/shared/stores/debugStore'
 
 export function registerGlobalShortcuts(mainWindow: MainWindow): void {
 	// (Ctrl+B) to toggle main window
