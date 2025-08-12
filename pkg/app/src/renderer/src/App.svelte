@@ -57,8 +57,9 @@
 
 <style>
 	.transparent {
-		background-color: rgba(22, 22, 22, 0.9);
-		border: 1px solid rgb(58, 58, 58);
+		--opacity: 0.5;
+		background-color: rgba(22, 22, 22, var(--opacity));
+		border: 1px solid rgba(58, 58, 58, var(--opacity));
 		border-radius: 10px;
 		height: 100vh;
 		-webkit-app-region: drag;

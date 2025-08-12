@@ -28,13 +28,13 @@
 	</div>
 	<div class="header-right">
 		<button class="header-button minimize-btn" onclick={minimizeWindow}>
-			<span>─</span>
+			<span style="font-size: 12px;">─</span>
 		</button>
 		<button class="header-button maximize-btn" onclick={maximizeWindow}>
-			<span>□</span>
+			<span style="font-size: 18px; transform: translateY(-1px);">□</span>
 		</button>
 		<button class="header-button close-btn" onclick={closeWindow}>
-			<span>×</span>
+			<span style="font-size: 12px; transform: translateY(1px);">✕</span>
 		</button>
 	</div>
 </div>
@@ -89,11 +89,15 @@
 		justify-content: center;
 		font-size: 16px;
 		font-weight: bold;
-		transition: background-color 0.2s ease;
+		transition:
+			background-color 0.2s ease,
+			opacity 0.2s ease;
+		opacity: 0.5;
 	}
 
 	.header-button:hover {
 		background: rgba(255, 255, 255, 0.1);
+		opacity: 1;
 	}
 
 	.close-btn:hover {
