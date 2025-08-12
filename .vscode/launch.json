@@ -1,9 +1,35 @@
 {
 	"version": "0.2.0",
-	"default": "Debug All",
+	"default": "Debug Full Dev Environment",
 	"configurations": [
 		{
-			"name": "Debug Main Process",
+			"name": "Start Shared (TypeScript)",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": ["dev:shared"],
+			"cwd": "${workspaceRoot}",
+			"console": "integratedTerminal",
+			"presentation": {
+				"group": "dev",
+				"order": 1
+			}
+		},
+		{
+			"name": "Start Client (Vite)",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": ["dev:client"],
+			"cwd": "${workspaceRoot}",
+			"console": "integratedTerminal",
+			"presentation": {
+				"group": "dev",
+				"order": 2
+			}
+		},
+		{
+			"name": "Debug Electron Main Process",
 			"type": "node",
 			"request": "launch",
 			"cwd": "${workspaceRoot}/pkg/app",
@@ -13,7 +39,12 @@
 			},
 			"runtimeArgs": ["dev", "--sourcemap"],
 			"env": {
-				"REMOTE_DEBUGGING_PORT": "9222"
+				"REMOTE_DEBUGGING_PORT": "9222",
+				"NODE_ENV": "development"
+			},
+			"presentation": {
+				"group": "debug",
+				"order": 1
 			}
 		},
 		{
@@ -24,26 +55,46 @@
 			"webRoot": "${workspaceFolder}/pkg/app/src/renderer",
 			"timeout": 60000,
 			"presentation": {
+				"group": "debug",
+				"order": 2,
 				"hidden": true
 			}
 		},
 		{
-			"name": "Start Full Dev Environment",
+			"name": "Start Full Dev Environment (Terminal)",
 			"type": "node",
 			"request": "launch",
 			"runtimeExecutable": "pnpm",
 			"runtimeArgs": ["dev"],
 			"cwd": "${workspaceRoot}",
-			"console": "integratedTerminal"
+			"console": "integratedTerminal",
+			"presentation": {
+				"group": "simple",
+				"order": 1
+			}
 		}
 	],
 	"compounds": [
 		{
-			"name": "Debug All",
-			"configurations": ["Debug Main Process", "Debug Renderer Process"],
+			"name": "Debug Full Dev Environment",
+			"configurations": [
+				"Start Shared (TypeScript)", 
+				"Start Client (Vite)", 
+				"Debug Electron Main Process", 
+				"Debug Renderer Process"
+			],
 			"presentation": {
 				"order": 1
-			}
+			},
+			"stopAll": true
+		},
+		{
+			"name": "Debug Electron Only",
+			"configurations": ["Debug Electron Main Process", "Debug Renderer Process"],
+			"presentation": {
+				"order": 2
+			},
+			"stopAll": true
 		}
 	]
 }
