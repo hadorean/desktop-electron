@@ -50,7 +50,7 @@ export function createWindow(): void {
 	})
 
 	window.on('resize', () => {
-		console.log('Window resized', window?.getBounds())
+		//console.log('Window resized', window?.getBounds())
 	})
 
 	window.on('ready-to-show', () => {
