@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { ErrorMessage, SettingsPanel, SettingsServerUpdate } from '$shared'
+	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
 	import { initializeImageChangeHandling } from '$shared/services'
 	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '$shared/stores'
 	import { toggleDayNightMode } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
-	import { ActionButtons, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
+	import { ActionButtons, CustomHeader, OptionsButton, OptionsScreen, ServerInfo, Versions } from './components'
+	import SimplePageContainer from './components/SimplePageContainer.svelte'
+	import { currentPage, gotoPage } from './stores/pageStore'
 
 	const disabled = true
 	let transparentWindow = $state(false)
@@ -46,18 +48,53 @@
 
 		// Setup image change handling (deduplication, socket events, validation)
 		initializeImageChangeHandling('Desktop app')
+
+		// Add click debugging (only when body has debug class)
+		document.addEventListener(
+			'click',
+			(event) => {
+				if (document.body.classList.contains('debug')) {
+					console.log('🐛 DEBUG Click event:', {
+						target: event.target,
+						tagName: (event.target as Element)?.tagName,
+						className: (event.target as Element)?.className,
+						id: (event.target as Element)?.id,
+						coordinates: { x: event.clientX, y: event.clientY }
+					})
+				}
+			},
+			true
+		)
 	})
 </script>
+
+<KeyboardShortcuts
+	shortcuts={[
+		{
+			key: 'Escape',
+			action: () => {
+				if ($currentPage === 'main') {
+					gotoPage('options')
+				} else {
+					gotoPage('main')
+				}
+			}
+		}
+	]}
+/>
 
 <div class:transparent={transparentWindow} class="flex h-full flex-col">
 	{#if transparentWindow}
 		<CustomHeader />
 	{/if}
 
-	<PageContainer transparent={transparentWindow} class="flex-1">
-		{#snippet settingsContent({ currentPage, gotoPage })}
+	<SimplePageContainer transparent={transparentWindow} class="flex-1">
+		{#snippet settingsContent()}
 			<div class="settings-container">
 				<SettingsPanel expanded={true} transparent={transparentWindow} />
+				<SettingsServerUpdate />
+				<ActionButtons />
+				<ErrorMessage message={$imagesError || ''} />
 
 				{#if !disabled}
 					<ServerInfo />
@@ -65,24 +102,18 @@
 				{/if}
 
 				<!-- Options Button - only show on settings page -->
-				{#if currentPage === 0}
+				{#if $currentPage === 'main'}
 					<OptionsButton onclick={() => gotoPage('options')} />
 				{/if}
-
-				<!-- Keyboard shortcuts - always active but conditional logic inside -->
 			</div>
 		{/snippet}
 
-		{#snippet optionsContent({ gotoPage })}
+		{#snippet optionsContent()}
 			<OptionsScreen transparent={transparentWindow} onBack={() => gotoPage('main')} />
 		{/snippet}
-	</PageContainer>
+	</SimplePageContainer>
 
 	<DebugMenu visible={$debugVisible} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} />
-
-	<SettingsServerUpdate />
-	<ActionButtons />
-	<ErrorMessage message={$imagesError || ''} />
 </div>
 
 <style>
@@ -124,5 +155,52 @@
 		display: flex;
 		flex-direction: column;
 		position: relative;
+	}
+
+	/* Debug styles - only active when body has 'debug' class */
+	:global(body.debug button) {
+		border: 2px solid red !important;
+		background: rgba(255, 0, 0, 0.1) !important;
+	}
+
+	:global(body.debug .settings-container) {
+		border: 3px solid yellow !important;
+	}
+
+	:global(body.debug .page-container) {
+		border: 3px solid blue !important;
+	}
+
+	:global(body.debug .carousel) {
+		border: 2px solid green !important;
+	}
+
+	:global(body.debug .carousel-content) {
+		border: 2px solid purple !important;
+	}
+
+	:global(body.debug .carousel-item) {
+		border: 2px solid orange !important;
+	}
+
+	/* Highlight any elements with pointer-events: none */
+	:global(body.debug *[style*='pointer-events: none']) {
+		background: rgba(255, 255, 0, 0.3) !important;
+		border: 2px dashed black !important;
+	}
+
+	/* Debug info overlay when debug mode is active */
+	:global(body.debug::before) {
+		content: '🐛 DEBUG MODE ACTIVE - Layout borders visible';
+		position: fixed;
+		top: 10px;
+		right: 10px;
+		background: rgba(0, 0, 0, 0.8);
+		color: white;
+		padding: 5px 10px;
+		border-radius: 4px;
+		font-size: 12px;
+		z-index: 9999;
+		pointer-events: none;
 	}
 </style>

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { KeyboardShortcuts } from '$shared'
 	import { Carousel, CarouselContent, CarouselItem } from '$shared/components/ui'
 	import type { Snippet } from 'svelte'
+	import { currentPage as currentPageStore, gotoPage } from '../stores/pageStore'
 
 	interface Props {
 		settingsContent?: Snippet<[{ currentPage: number; gotoPage: (page: Page) => void }]>
@@ -12,29 +12,23 @@
 
 	let { settingsContent, optionsContent, class: className = '', ...restProps }: Props = $props()
 
-	// Page navigation state
-	let currentPage = $state(0) // 0 = settings, 1 = options
-
 	type Page = 'main' | 'options'
 	const pages: Page[] = ['main', 'options']
 
-	export function gotoPage(page: Page): void {
-		currentPage = pages.indexOf(page)
-		handlePageChange(currentPage)
-	}
-
-	export function getCurrentPage(): number {
-		return currentPage
-	}
+	// Convert store page to carousel index
+	let currentPageIndex = $derived(pages.indexOf($currentPageStore))
 
 	// Fade animation state
 	let isTransitioning = $state(false)
 
 	function handlePageChange(newIndex: number): void {
-		if (newIndex === currentPage) return
+		if (newIndex === currentPageIndex) return
 
 		isTransitioning = true
-		currentPage = newIndex // Update immediately for button visibility
+
+		// Update store with new page
+		const newPage = pages[newIndex] || 'main'
+		gotoPage(newPage)
 
 		// Start fade out
 		setTimeout(() => {
@@ -46,32 +40,18 @@
 	}
 </script>
 
-<KeyboardShortcuts
-	shortcuts={[
-		{
-			key: 'Escape',
-			action: () => {
-				if (currentPage === 0) {
-					gotoPage('options')
-				} else {
-					gotoPage('main')
-				}
-			}
-		}
-	]}
-/>
 
 <div class="page-container {className}" class:transitioning={isTransitioning} {...restProps}>
-	<Carousel class="carousel-full" currentIndex={currentPage} onIndexChange={handlePageChange}>
-		<CarouselContent currentIndex={currentPage}>
+	<Carousel class="carousel-full" currentIndex={currentPageIndex} onIndexChange={handlePageChange}>
+		<CarouselContent currentIndex={currentPageIndex}>
 			<!-- Settings Page -->
 			<CarouselItem>
-				{@render settingsContent?.({ currentPage, gotoPage })}
+				{@render settingsContent?.({ currentPage: currentPageIndex, gotoPage })}
 			</CarouselItem>
 
 			<!-- Options Page -->
 			<CarouselItem>
-				{@render optionsContent?.({ currentPage, gotoPage })}
+				{@render optionsContent?.({ currentPage: currentPageIndex, gotoPage })}
 			</CarouselItem>
 		</CarouselContent>
 	</Carousel>
