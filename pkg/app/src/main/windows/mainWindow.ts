@@ -28,7 +28,7 @@ export function createWindow(): void {
 		roundedCorners: true,
 		hasShadow: !transparent,
 		titleBarStyle: transparent ? 'hidden' : 'default',
-		titleBarOverlay: !transparent,
+		titleBarOverlay: false,
 		title: transparent ? '' : 'Hey',
 		skipTaskbar: !transparent,
 		thickFrame: !transparent,
@@ -61,7 +61,7 @@ export function createWindow(): void {
 		if (!window) return
 		const { width: winW, height: winH } = window.getBounds()
 		const { workArea } = screen.getPrimaryDisplay() // respects taskbar/dock
-		const x = workArea.x + workArea.width - winW // align to the right
+		const x = workArea.x + workArea.width - winW - 10 // align to the right
 		const y = workArea.y + (workArea.height - winH) / 2 // center vertically
 		window.setBounds({
 			x: x,
@@ -97,7 +97,7 @@ export function createWindow(): void {
 	// Hide window when it loses focus
 	window.on('blur', () => {
 		if (!isQuitting && window && !window.isDestroyed()) {
-			// window.hide()
+			ensureTitleBarIsHidden()
 		}
 	})
 
@@ -108,6 +108,27 @@ export function createWindow(): void {
 	} else {
 		window.loadFile(join(__dirname, '../renderer/index.html'))
 	}
+}
+
+let delta = 1
+
+// Dirty tricky to prevent the titlebar of a transparent window from appearing when window loose focus
+// Title bar is still visible for a fraction of a second
+function ensureTitleBarIsHidden() {
+	if (!appConfig.window.transparent) return
+	setTimeout(() => {
+		delta *= -1
+		if (window && !window.isDestroyed()) {
+			// Resizing the window reapply the titlebar style
+			const { x, y, width: winW, height: winH } = window.getBounds()
+			window?.setBounds({
+				x: x,
+				y: y,
+				width: winW,
+				height: winH + delta
+			})
+		}
+	}, 1)
 }
 
 function getMainWindow(): BrowserWindow | null {
