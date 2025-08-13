@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { KeyboardShortcuts } from '$shared'
 	import { Button, Card, CardContent, CardHeader, CardTitle } from '$shared/components/ui'
+	import { onMount } from 'svelte'
 	import cogIcon from '../assets/cog.svg?url'
 	import AppVersion from './AppVersion.svelte'
 	import BackButton from './BackButton.svelte'
-	import { onMount } from 'svelte'
 
 	interface Props {
 		transparent?: boolean
@@ -93,8 +92,6 @@
 		}, 1000) // Save after 1 second of inactivity
 	}
 </script>
-
-<KeyboardShortcuts shortcuts={[{ key: 'Escape', action: onBack }]} />
 
 <div class="options-screen {className}" {...restProps}>
 	<!-- Back Button -->

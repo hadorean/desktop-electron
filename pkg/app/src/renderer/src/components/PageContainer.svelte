@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { KeyboardShortcuts } from '$shared'
 	import { Carousel, CarouselContent, CarouselItem } from '$shared/components/ui'
 	import type { Snippet } from 'svelte'
 
 	interface Props {
-		settingsContent?: Snippet<[{ currentPage: number; goToOptions: () => void; goToSettings: () => void }]>
-		optionsContent?: Snippet<[{ currentPage: number; goToOptions: () => void; goToSettings: () => void }]>
+		settingsContent?: Snippet<[{ currentPage: number; gotoPage: (page: Page) => void }]>
+		optionsContent?: Snippet<[{ currentPage: number; gotoPage: (page: Page) => void }]>
 		transparent?: boolean
 		class?: string
 	}
@@ -14,13 +15,12 @@
 	// Page navigation state
 	let currentPage = $state(0) // 0 = settings, 1 = options
 
-	// Navigation functions
-	export function goToSettings(): void {
-		handlePageChange(0)
-	}
+	type Page = 'main' | 'options'
+	const pages: Page[] = ['main', 'options']
 
-	export function goToOptions(): void {
-		handlePageChange(1)
+	export function gotoPage(page: Page): void {
+		currentPage = pages.indexOf(page)
+		handlePageChange(currentPage)
 	}
 
 	export function getCurrentPage(): number {
@@ -46,17 +46,32 @@
 	}
 </script>
 
+<KeyboardShortcuts
+	shortcuts={[
+		{
+			key: 'Escape',
+			action: () => {
+				if (currentPage === 0) {
+					gotoPage('options')
+				} else {
+					gotoPage('main')
+				}
+			}
+		}
+	]}
+/>
+
 <div class="page-container {className}" class:transitioning={isTransitioning} {...restProps}>
 	<Carousel class="carousel-full" currentIndex={currentPage} onIndexChange={handlePageChange}>
 		<CarouselContent currentIndex={currentPage}>
 			<!-- Settings Page -->
 			<CarouselItem>
-				{@render settingsContent?.({ currentPage, goToOptions, goToSettings })}
+				{@render settingsContent?.({ currentPage, gotoPage })}
 			</CarouselItem>
 
 			<!-- Options Page -->
 			<CarouselItem>
-				{@render optionsContent?.({ currentPage, goToOptions, goToSettings })}
+				{@render optionsContent?.({ currentPage, gotoPage })}
 			</CarouselItem>
 		</CarouselContent>
 	</Carousel>

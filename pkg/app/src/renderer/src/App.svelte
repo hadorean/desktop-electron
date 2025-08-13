@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
+	import { ErrorMessage, SettingsPanel, SettingsServerUpdate } from '$shared'
 	import { initializeImageChangeHandling } from '$shared/services'
 	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '$shared/stores'
 	import { toggleDayNightMode } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
-	import { ActionButtons, AppHeader, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
+	import { ActionButtons, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
 
 	const disabled = true
 	let transparentWindow = $state(false)
@@ -55,33 +55,34 @@
 	{/if}
 
 	<PageContainer transparent={transparentWindow} class="flex-1">
-		{#snippet settingsContent({ currentPage, goToOptions })}
+		{#snippet settingsContent({ currentPage, gotoPage })}
 			<div class="settings-container">
 				<SettingsPanel expanded={true} transparent={transparentWindow} />
-				<SettingsServerUpdate />
-				<ActionButtons />
-				<ErrorMessage message={$imagesError || ''} />
 
 				{#if !disabled}
-					<AppHeader />
 					<ServerInfo />
 					<Versions />
 				{/if}
 
 				<!-- Options Button - only show on settings page -->
 				{#if currentPage === 0}
-					<OptionsButton onclick={goToOptions} />
-					<KeyboardShortcuts shortcuts={[{ key: 'Escape', action: goToOptions }]} />
+					<OptionsButton onclick={() => gotoPage('options')} />
 				{/if}
+
+				<!-- Keyboard shortcuts - always active but conditional logic inside -->
 			</div>
 		{/snippet}
 
-		{#snippet optionsContent({ goToSettings })}
-			<OptionsScreen transparent={transparentWindow} onBack={goToSettings} />
+		{#snippet optionsContent({ gotoPage })}
+			<OptionsScreen transparent={transparentWindow} onBack={() => gotoPage('main')} />
 		{/snippet}
 	</PageContainer>
 
 	<DebugMenu visible={$debugVisible} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} />
+
+	<SettingsServerUpdate />
+	<ActionButtons />
+	<ErrorMessage message={$imagesError || ''} />
 </div>
 
 <style>
