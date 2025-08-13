@@ -1,6 +1,6 @@
 import { mount } from 'svelte'
 
-import './assets/main.css'
+import '$shared/styles/app.css'
 import '@hgrandry/dbg/styles.css'
 
 import App from './App.svelte'
