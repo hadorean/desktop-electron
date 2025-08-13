@@ -42,7 +42,10 @@ export const IpcEvents = {
 	MaximizeWindow: 'maximize-window',
 	CloseWindow: 'close-window',
 	GetWindowConfig: 'get-window-config',
-	RecreateMainWindow: 'recreate-main-window'
+	RecreateMainWindow: 'recreate-main-window',
+
+	// File System
+	ShowOpenDialog: 'show-open-dialog'
 } as const
 
 // Type for main process events (handled by ipcMain)
@@ -70,6 +73,7 @@ export type MainEvents =
 	| typeof IpcEvents.CloseWindow
 	| typeof IpcEvents.GetWindowConfig
 	| typeof IpcEvents.RecreateMainWindow
+	| typeof IpcEvents.ShowOpenDialog
 
 // Type for renderer process events (sent from main to renderer)
 export type RendererEvents =

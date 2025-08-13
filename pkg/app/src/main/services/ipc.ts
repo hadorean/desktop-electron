@@ -1,7 +1,7 @@
 import { getDebugMenuVisible } from '$shared/stores/debugStore'
 import { IpcEvents, MainEvents } from '$shared/types/ipc'
 import type { ScreenSettings } from '$shared/types/settings'
-import { app, ipcMain } from 'electron'
+import { app, dialog, ipcMain } from 'electron'
 import { appConfig } from '../config'
 import { mainWindow } from '../windows/mainWindow'
 import { AppContext } from './app'
@@ -163,5 +163,22 @@ export function setupIpc(options: AppContext): void {
 
 	handleIpc(IpcEvents.RecreateMainWindow, () => {
 		mainWindow.recreate()
+	})
+
+	// File System
+	handleIpc(IpcEvents.ShowOpenDialog, async (...args: unknown[]) => {
+		try {
+			const options = (args[1] as Electron.OpenDialogOptions) || {}
+			const window = mainWindow.get()
+			const dialogOptions: Electron.OpenDialogOptions = {
+				properties: ['openDirectory'],
+				...options
+			}
+			const result = window ? await dialog.showOpenDialog(window, dialogOptions) : await dialog.showOpenDialog(dialogOptions)
+			return { success: true, data: result }
+		} catch (error) {
+			console.error('IPC show-open-dialog error:', error)
+			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+		}
 	})
 }

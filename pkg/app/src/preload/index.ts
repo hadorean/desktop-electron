@@ -46,7 +46,9 @@ const api = {
 	closeWindow: () => ipcRenderer.invoke(IpcEvents.CloseWindow),
 	// Window configuration API
 	getWindowConfig: () => ipcRenderer.invoke(IpcEvents.GetWindowConfig),
-	recreateMainWindow: () => ipcRenderer.invoke(IpcEvents.RecreateMainWindow)
+	recreateMainWindow: () => ipcRenderer.invoke(IpcEvents.RecreateMainWindow),
+	// File System API
+	showOpenDialog: (options?: Electron.OpenDialogOptions) => ipcRenderer.invoke(IpcEvents.ShowOpenDialog, options)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
