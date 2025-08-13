@@ -1,7 +1,7 @@
 /**
  * Reactive store for managing user options across the application
  */
-import { writable, derived, get } from 'svelte/store'
+import { derived, get, writable } from 'svelte/store'
 import { DefaultUserOptions, type UserOptions } from '../types'
 
 // Internal store state
@@ -38,10 +38,12 @@ const userOptionsStoreInternal = writable<UserOptionsStoreState>(initialState)
 /**
  * Load options from external source (will be called by service)
  */
-export function loadUserOptions(options: UserOptions): void {
-	// Prevent sync cascades during loading
+export function loadUserOptions(options: UserOptions, skipPreventSync = false): void {
+	// Prevent sync cascades during loading, unless this is an update operation
 	isLoadingOptions = true
-	preventServerSync = true
+	if (!skipPreventSync) {
+		preventServerSync = true
+	}
 
 	const previousOptions = getCurrentUserOptions()
 
@@ -53,14 +55,15 @@ export function loadUserOptions(options: UserOptions): void {
 		lastUpdated: Date.now()
 	}))
 
-	console.log('🔧 User options loaded into store:', options)
 
 	// Reset flags after loading
 	isLoadingOptions = false
 	// Use setTimeout to ensure all synchronous updates complete before allowing sync
-	setTimeout(() => {
-		preventServerSync = false
-	}, 0)
+	if (!skipPreventSync) {
+		setTimeout(() => {
+			preventServerSync = false
+		}, 0)
+	}
 
 	// Notify callbacks of options changes
 	notifyOptionsChangeCallbacks(options, previousOptions)
@@ -84,7 +87,6 @@ export function updateUserOptions(updater: (current: UserOptions) => UserOptions
 	})
 
 	const newOptions = getCurrentUserOptions()
-	console.log('🔧 User options updated:', newOptions)
 
 	// Notify callbacks of options changes
 	notifyOptionsChangeCallbacks(newOptions, previousOptions)
@@ -217,3 +219,37 @@ export function updateImageDirectory(directory: string): void {
 		imageDirectory: directory
 	}))
 }
+
+// Export object with all functions for convenient importing
+export const userOptionsStore = {
+	// Core functions
+	loadUserOptions,
+	updateUserOptions,
+	updateUserOptionsSilent,
+	setUserOptionsLoading,
+	setUserOptionsError,
+	clearUserOptions,
+
+	// Getter functions
+	getCurrentUserOptions,
+	getCurrentImageDirectory,
+	isUserOptionsLoading,
+	shouldPreventUserOptionsSync,
+	getIsLoadingUserOptions,
+
+	// Callback management
+	onUserOptionsChanged,
+
+	// Specific update functions
+	updateImageDirectory,
+
+	// Stores
+	userOptions,
+	userOptionsLoading,
+	userOptionsError,
+	userOptionsLastUpdated,
+	imageDirectory,
+	userOptionsState
+}
+
+export type UserOptionsStore = typeof userOptionsStore

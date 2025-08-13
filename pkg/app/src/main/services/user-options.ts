@@ -28,11 +28,18 @@ export class UserOptionsService {
 
 		// Subscribe to store changes for automatic persistence and socket broadcasting
 		userOptions.subscribe((options) => {
+			console.log('🔧 UserOptionsService subscription triggered with options:', options)
+			console.log('🔧 shouldPreventUserOptionsSync():', shouldPreventUserOptionsSync())
+			console.log('🔧 this.hasInitialized:', this.hasInitialized)
+
 			// Skip persistence during initial load and internal operations
 			if (!shouldPreventUserOptionsSync() && this.hasInitialized) {
+				console.log('🔧 UserOptionsService: Auto-saving options to file system')
 				this.saveToFileSystem(options).catch((error) => {
 					console.error('Failed to save user options:', error)
 				})
+			} else {
+				console.log('🔧 UserOptionsService: Skipping auto-save (preventSync:', shouldPreventUserOptionsSync(), 'initialized:', this.hasInitialized, ')')
 			}
 
 			// Broadcast image directory changes to clients
@@ -70,7 +77,8 @@ export class UserOptionsService {
 		const updatedOptions = { ...currentOptions, ...newOptions }
 
 		// Update store (this will trigger auto-save via subscription)
-		loadUserOptions(updatedOptions)
+		// Skip prevent sync since this is an intentional update operation
+		loadUserOptions(updatedOptions, true)
 
 		return {
 			type: 'user_options_update',
