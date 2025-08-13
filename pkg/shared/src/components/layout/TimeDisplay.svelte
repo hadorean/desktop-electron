@@ -43,13 +43,32 @@
 	})
 </script>
 
-<div class="absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1 transform text-center text-white" style="opacity: {opacity.current};">
-	<h1 class="text-shadow-lg mb-2 text-8xl font-thin">{currentTime}</h1>
-	<h2 class="text-shadow-lg mb-4 text-2xl font-light">{currentDate}</h2>
+<div class="time-display" style="opacity: {opacity.current};">
+	<h1 class="time">{currentTime}</h1>
+	<h2 class="date">{currentDate}</h2>
 </div>
 
 <style>
-	.text-shadow-lg {
+	.time-display {
+		position: absolute;
+		left: 50%;
+		top: 25%;
+		transform: translate(-50%, -50%);
+		text-align: center;
+		color: var(--text-primary);
+	}
+
+	.time {
+		font-size: 8rem;
+		font-weight: 100;
+		margin-bottom: 0.5rem;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	.date {
+		font-size: 2rem;
+		font-weight: 300;
+		margin-bottom: 1rem;
 		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 	}
 </style>

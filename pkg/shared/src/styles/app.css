@@ -81,6 +81,7 @@
 }
 
 /* === DARK THEME === */
+:root.dark,
 .dark {
 	/* Backgrounds */
 	--background: #0f172a; /* Slate 900 - main dark background */

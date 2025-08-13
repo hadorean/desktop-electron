@@ -66,17 +66,17 @@
 </script>
 
 {#if weather}
-	<div class="pointer-events-none fixed inset-x-0 top-1/2 flex flex-col items-center justify-center" style="opacity: {opacity.current};">
-		<div class="text-shadow-lg mb-2 text-center text-4xl font-light text-white opacity-80">
+	<div class="weather-display" style="opacity: {opacity.current};">
+		<div class="greeting">
 			{greeting}
 		</div>
-		<div class="text-shadow-lg mb-4 text-center text-2xl font-light text-white opacity-80">
+		<div class="weather-info">
 			It is currently {weather.current.temperature}°
 			<br />with a high of {weather.forecast.temperature}° today.
 			<br />{weather.current.condition}.
 		</div>
-		<div class="text-shadow-lg flex items-center justify-center text-4xl text-white opacity-80">
-			<span class="mr-2">
+		<div class="weather-temp">
+			<span class="weather-icon">
 				{#if weather.current.condition.toLowerCase().includes('sunny') || weather.current.condition.toLowerCase().includes('clear')}
 					{#if parseInt(currentTime.split(':')[0]) >= 18 || parseInt(currentTime.split(':')[0]) < 6}
 						🌙
@@ -103,4 +103,45 @@
 {/if}
 
 <style>
+	.weather-display {
+		pointer-events: none;
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 50%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		color: var(--text-primary);
+		opacity: 0.8;
+	}
+
+	.greeting {
+		margin-bottom: 0.5rem;
+		text-align: center;
+		font-size: 4rem;
+		font-weight: 300;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	.weather-info {
+		margin-bottom: 1rem;
+		text-align: center;
+		font-size: 2rem;
+		font-weight: 300;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	.weather-temp {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 4rem;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	.weather-icon {
+		margin-right: 0.5rem;
+	}
 </style>

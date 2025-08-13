@@ -18,7 +18,7 @@
 </script>
 
 <button
-	class="btn btn-circle absolute text-white {hideButton && !buttonHovered ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 {positionClasses}"
+	class="settings-btn {hideButton && !buttonHovered ? 'hidden' : 'visible'} {positionClasses}"
 	on:click={onToggle}
 	on:mouseenter={onMouseEnter}
 	on:mouseleave={onMouseLeave}
@@ -37,16 +37,44 @@
 </button>
 
 <style>
-	:global(.btn-circle) {
-		outline: none !important;
-		box-shadow: none !important;
-		border: none !important;
-		background: none !important;
+	.settings-btn {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		color: var(--text-primary);
+		background: none;
+		border: none;
+		outline: none;
+		cursor: pointer;
+		transition: opacity 0.3s ease;
 	}
 
-	:global(.btn-circle:focus) {
-		outline: none !important;
-		box-shadow: none !important;
-		border: none !important;
+	.settings-btn:focus {
+		outline: none;
+		box-shadow: none;
+		border: none;
 	}
+
+	.settings-btn.hidden {
+		opacity: 0;
+	}
+
+	.settings-btn.visible {
+		opacity: 1;
+	}
+
+	.settings-btn svg {
+		width: 24px;
+		height: 24px;
+	}
+
+	/* Tailwind positioning classes */
+	:global(.bottom-right) { bottom: 1rem; right: 1rem; }
+	:global(.top-right) { top: 1rem; right: 1rem; }
+	:global(.bottom-left) { bottom: 1rem; left: 1rem; }
+	:global(.top-left) { top: 1rem; left: 1rem; }
 </style>
