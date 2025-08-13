@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Slider } from '../ui'
 	import { Button } from '../ui'
-	import { cn } from '../../lib/utils'
 
 	const {
 		label,
@@ -69,7 +68,13 @@
 		<span class="label-text">{label}</span>
 		<div class="slider-row">
 			{#if isOverride}
-				<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-btn h-8 px-3 text-xs" onclick={handleOverride} {disabled}>
+				<Button 
+					variant={isOverridden ? 'default' : 'ghost'} 
+					size="sm" 
+					class="override-btn" 
+					onclick={handleOverride} 
+					{disabled}
+				>
 					{isOverridden ? 'Clear' : 'Override'}
 				</Button>
 			{/if}
@@ -79,7 +84,7 @@
 				{max}
 				{step}
 				onValueChange={handleValueChange}
-				class={cn('flex-1', isGhost && 'ghost-slider', disabled && 'disabled-slider')}
+				class="slider-control-input {isGhost ? 'ghost-slider' : ''} {disabled ? 'disabled-slider' : ''}"
 				{disabled}
 			/>
 			<span class="value-display">
@@ -104,7 +109,7 @@
 	.label-text {
 		font-size: 0.875rem;
 		font-weight: 500;
-		color: var(--foreground);
+		color: var(--text-primary);
 	}
 
 	.slider-row {
@@ -120,7 +125,20 @@
 		min-width: 3rem;
 		text-align: right;
 		font-size: 0.875rem;
-		color: var(--muted-foreground);
+		color: var(--text-secondary);
+	}
+
+	/* Override button styling */
+	:global(.override-btn) {
+		height: 2rem;
+		padding: 0 0.75rem;
+		font-size: 0.75rem;
+		line-height: 1;
+	}
+
+	/* Slider control input styling */
+	:global(.slider-control-input) {
+		flex: 1;
 	}
 
 	/* Ghost mode styling */
@@ -148,6 +166,11 @@
 	:global(.ghost-slider .slider-thumb) {
 		background-color: transparent !important;
 		border: 1px solid var(--border) !important;
+		box-shadow: none !important;
+	}
+
+	:global(.ghost-slider .slider-thumb:hover) {
+		background-color: var(--surface-hover) !important;
 	}
 
 	/* Disabled styling */

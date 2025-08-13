@@ -133,20 +133,6 @@
 	}
 </script>
 
-<!-- Previous tab logic
-	onclick={(e) => {
-								if (editMode) {
-									e.preventDefault();
-									startRename(screenId);
-								}
-							}}
-							oncontextmenu={(e) => {
-								if (editMode) {
-									showDelete(screenId, e);
-								}
-							}}
--->
-
 <!-- Screen switcher container -->
 <div class="screen-switcher-container" role="tablist" aria-label="Screen switcher">
 	<Tabs value={currentTab} onValueChange={handleTabChange}>

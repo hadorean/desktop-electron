@@ -9,3 +9,6 @@ export * from './services'
 
 // Stores and Store Adapters
 export * from './stores'
+
+// Assets (Icons, etc.)
+export * from './assets'

@@ -17,7 +17,7 @@ export function createWindow(): void {
 
 	// Create the browser window.
 	window = new BrowserWindow({
-		width: 650,
+		width: 600,
 		height: 1120,
 		show: false,
 		autoHideMenuBar: true,

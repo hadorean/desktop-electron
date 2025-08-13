@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
 	import { Inspect } from '@hgrandry/dbg'
+	import { onMount } from 'svelte'
 	import { currentScreen, editingSettings, inTransition, isLocalMode, screenSettings, updateEditingSettings } from '../../stores'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
@@ -67,10 +67,10 @@
 			{/if}
 		</Inspect>
 
-		<div class="space-y-6">
+		<div class="settings-groups">
 			<!-- Image Selection -->
 			<div class="setting-section">
-				<h3 class="mb-2 text-lg font-medium">Background Image</h3>
+				<h3 class="section-title">Background Image</h3>
 				<!-- Display Options -->
 				<ImageGrid
 					selectedImage={$screenSettings.selectedImage ?? ''}
@@ -172,7 +172,7 @@
 <style>
 	.settings-panel {
 		padding: min(2rem, 5vw);
-		color: white;
+		color: var(--text-primary);
 		max-width: 100%;
 		max-height: 90vh;
 		overflow-y: auto;
@@ -181,7 +181,7 @@
 		transition: opacity 0.3s cubic-bezier(0.9, 0.14, 1, 0.75);
 		opacity: 0;
 		backdrop-filter: blur(10px);
-		border-radius: 1rem;
+		border-radius: var(--radius-xl);
 		box-sizing: border-box;
 	}
 
@@ -200,11 +200,24 @@
 		width: 100%;
 	}
 
+	.settings-groups {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
 	.setting-section {
-		margin-bottom: 2rem;
+		margin-bottom: 0.5rem;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+	}
+
+	.section-title {
+		margin-bottom: 0.5rem;
+		font-size: 1.125rem;
+		font-weight: 500;
+		color: var(--text-primary);
 	}
 
 	/* Scrollbar styling */
@@ -213,16 +226,16 @@
 	}
 
 	.settings-panel::-webkit-scrollbar-track {
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 4px;
+		background: var(--surface-hover);
+		border-radius: var(--radius-sm);
 	}
 
 	.settings-panel::-webkit-scrollbar-thumb {
-		background: rgba(255, 255, 255, 0.3);
-		border-radius: 4px;
+		background: var(--border-hover);
+		border-radius: var(--radius-sm);
 	}
 
 	.settings-panel::-webkit-scrollbar-thumb:hover {
-		background: rgba(255, 255, 255, 0.4);
+		background: var(--text-muted);
 	}
 </style>

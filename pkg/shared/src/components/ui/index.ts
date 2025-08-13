@@ -10,3 +10,5 @@ export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
 export { Card, CardHeader, CardTitle, CardContent } from './card'
 
 export { Carousel, CarouselContent, CarouselItem } from './carousel'
+
+export { default as Icon } from './Icon.svelte'
