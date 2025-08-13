@@ -5,8 +5,7 @@
 	import { toggleDayNightMode } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
-	import { ActionButtons, CustomHeader, OptionsButton, OptionsScreen, ServerInfo, Versions } from './components'
-	import SimplePageContainer from './components/SimplePageContainer.svelte'
+	import { ActionButtons, AppVersion, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
 	import { currentPage, gotoPage } from './stores/pageStore'
 
 	const disabled = true
@@ -88,7 +87,7 @@
 		<CustomHeader />
 	{/if}
 
-	<SimplePageContainer transparent={transparentWindow} class="flex-1">
+	<PageContainer transparent={transparentWindow} class="flex-1">
 		{#snippet settingsContent()}
 			<div class="settings-container">
 				<SettingsPanel expanded={true} transparent={transparentWindow} />
@@ -103,7 +102,10 @@
 
 				<!-- Options Button - only show on settings page -->
 				{#if $currentPage === 'main'}
-					<OptionsButton onclick={() => gotoPage('options')} />
+					<footer>
+						<AppVersion />
+						<OptionsButton onclick={() => gotoPage('options')} />
+					</footer>
 				{/if}
 			</div>
 		{/snippet}
@@ -111,7 +113,7 @@
 		{#snippet optionsContent()}
 			<OptionsScreen transparent={transparentWindow} onBack={() => gotoPage('main')} />
 		{/snippet}
-	</SimplePageContainer>
+	</PageContainer>
 
 	<DebugMenu visible={$debugVisible} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} />
 </div>
@@ -123,29 +125,6 @@
 		border: 1px solid rgba(58, 58, 58, var(--opacity));
 		border-radius: 10px;
 		height: 100vh;
-		-webkit-app-region: drag;
-	}
-
-	/* Make interactive elements non-draggable, but keep labels draggable */
-	.transparent :global(button),
-	.transparent :global(input),
-	.transparent :global(select),
-	.transparent :global(textarea),
-	.transparent :global(.slider),
-	.transparent :global(.settings-panel),
-	.transparent :global(.debug-menu) {
-		-webkit-app-region: no-drag;
-	}
-
-	/* Explicitly make text elements draggable */
-	.transparent :global(label),
-	.transparent :global(h1),
-	.transparent :global(h2),
-	.transparent :global(h3),
-	.transparent :global(h4),
-	.transparent :global(h5),
-	.transparent :global(h6) {
-		-webkit-app-region: drag;
 	}
 
 	.settings-container {
@@ -157,50 +136,14 @@
 		position: relative;
 	}
 
-	/* Debug styles - only active when body has 'debug' class */
-	:global(body.debug button) {
-		border: 2px solid red !important;
-		background: rgba(255, 0, 0, 0.1) !important;
-	}
-
-	:global(body.debug .settings-container) {
-		border: 3px solid yellow !important;
-	}
-
-	:global(body.debug .page-container) {
-		border: 3px solid blue !important;
-	}
-
-	:global(body.debug .carousel) {
-		border: 2px solid green !important;
-	}
-
-	:global(body.debug .carousel-content) {
-		border: 2px solid purple !important;
-	}
-
-	:global(body.debug .carousel-item) {
-		border: 2px solid orange !important;
-	}
-
-	/* Highlight any elements with pointer-events: none */
-	:global(body.debug *[style*='pointer-events: none']) {
-		background: rgba(255, 255, 0, 0.3) !important;
-		border: 2px dashed black !important;
-	}
-
-	/* Debug info overlay when debug mode is active */
-	:global(body.debug::before) {
-		content: '🐛 DEBUG MODE ACTIVE - Layout borders visible';
-		position: fixed;
-		top: 10px;
-		right: 10px;
-		background: rgba(0, 0, 0, 0.8);
-		color: white;
-		padding: 5px 10px;
-		border-radius: 4px;
-		font-size: 12px;
-		z-index: 9999;
-		pointer-events: none;
+	footer {
+		position: absolute;
+		bottom: 1rem;
+		left: 1rem;
+		right: 1.5rem;
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		align-items: center;
 	}
 </style>

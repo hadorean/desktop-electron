@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { WarningCircleIcon, XMarkIcon, Cog6ToothIcon } from '../../assets/icons'
+	import { BackArrowIcon, Cog6ToothIcon, WarningCircleIcon, XMarkIcon } from '../../assets/icons'
 
-	export let name: 'warning-circle' | 'x-mark' | 'cog-6-tooth'
+	export let name: 'warning-circle' | 'x-mark' | 'cog' | 'back-arrow'
 	export let size: 'sm' | 'md' | 'lg' = 'md'
 	export let className: string = ''
 
 	const icons = {
 		'warning-circle': WarningCircleIcon,
 		'x-mark': XMarkIcon,
-		'cog-6-tooth': Cog6ToothIcon
+		cog: Cog6ToothIcon,
+		'back-arrow': BackArrowIcon
 	}
 
 	const sizes = {
@@ -21,11 +22,7 @@
 	$: iconSize = sizes[size]
 </script>
 
-<div 
-	class="icon {className}" 
-	style="width: {iconSize}; height: {iconSize};"
-	{...$$restProps}
->
+<div class="icon {className}" style="width: {iconSize}; height: {iconSize};" {...$$restProps}>
 	{@html iconSvg}
 </div>
 

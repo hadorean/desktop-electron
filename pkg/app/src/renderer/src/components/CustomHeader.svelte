@@ -47,7 +47,6 @@
 		justify-content: space-between;
 		padding: 0 15px;
 		z-index: 9999; /* Higher z-index to prevent white header from showing */
-		-webkit-app-region: drag; /* Make header draggable */
 		padding: 0.5rem;
 		margin-bottom: 1rem;
 	}

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { cn } from '../../../lib/utils.js'
 	import type { Snippet } from 'svelte'
 
 	let {
@@ -13,6 +12,16 @@
 	}>()
 </script>
 
-<div class={cn('bg-card text-card-foreground rounded-lg border shadow-sm', className)} {...restProps}>
+<div class="card {className || ''}" {...restProps}>
 	{@render children?.()}
 </div>
+
+<style>
+	.card {
+		background-color: var(--card);
+		color: var(--card-foreground);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--border);
+		box-shadow: var(--shadow-sm);
+	}
+</style>

@@ -172,6 +172,7 @@
 		transition: transform 0.3s cubic-bezier(0.35, 1.04, 0.58, 1);
 		background-color: rgba(0, 0, 0, 0.4);
 		border-radius: 1rem;
+		padding: 1rem 0.5rem 2rem 0.5rem;
 	}
 
 	#settings-drawer.open {

@@ -1,4 +1,4 @@
-import '$shared/styles/app.css'
+import '$shared/assets/app.css'
 import '@hgrandry/dbg/styles.css'
 import { mount } from 'svelte'
 import App from './App.svelte'

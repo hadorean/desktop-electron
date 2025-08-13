@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { cn } from '../../../lib/utils.js'
 	import type { Snippet } from 'svelte'
 
 	let {
@@ -13,6 +12,15 @@
 	}>()
 </script>
 
-<div class={cn('flex flex-col space-y-1.5 p-6', className)} {...restProps}>
+<div class="card-header {className || ''}" {...restProps}>
 	{@render children?.()}
 </div>
+
+<style>
+	.card-header {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+		padding: 1.5rem;
+	}
+</style>

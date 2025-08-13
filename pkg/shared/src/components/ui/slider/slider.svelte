@@ -135,6 +135,7 @@
 		cursor: pointer;
 		border-radius: 50%;
 		box-shadow: var(--shadow-lg);
+		pointer-events: none; /* Allow clicks to pass through to the input underneath */
 	}
 
 	.slider-thumb:hover {

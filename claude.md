@@ -35,6 +35,18 @@ During execution:
  - Use 'pnpm typecheck', 'pnpm format' and 'pnpm lint' to detect and address issues before commiting
  - Use 'pnpm dev' if you need to run the app.
 
+## Coding style
+
+- Use stores as single source of truth for state management
+
+
+
+### Styling
+
+- No tailwind, use meaningfull class names and css
+- Use global css variables for theming
+- Use shadcn-svelte components
+
 ### Primary Development
 
 ```bash

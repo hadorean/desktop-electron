@@ -2,7 +2,6 @@
 	import { getImageUrl } from '../../services'
 	import { screenSettings, updateSharedSettings, images, imagesLoading, imagesError } from '../../stores'
 	import { Button, Card, CardContent } from '../ui'
-	import { cn } from '../../lib/utils'
 
 	const {
 		selectedImage = '',
@@ -74,52 +73,48 @@
 </script>
 
 <div class="image-grid-container">
-	<div class="mb-2 flex items-center justify-between">
+	<div class="header-section">
 		{#if isOverride}
-			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" onclick={handleOverride} class="ml-auto h-8 px-3 text-xs">
+			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" onclick={handleOverride} class="override-button">
 				{isOverridden ? 'Clear' : 'Override'}
 			</Button>
 		{/if}
 	</div>
 
-	<Card class={cn('image-grid-card', isGhost && 'ghost-image-grid')}>
-		<CardContent class="p-2">
+	<Card class="image-grid-card {isGhost ? 'ghost-image-grid' : ''}">
+		<CardContent class="grid-card-content">
 			{#if $imagesLoading}
 				<!-- Loading state -->
-				<div class="text-muted-foreground flex h-[120px] items-center justify-center text-center">
-					<div>
-						<div class="mb-2 text-4xl opacity-50">⏳</div>
-						<div class="text-sm">Loading images...</div>
+				<div class="state-container">
+					<div class="state-content">
+						<div class="state-icon">⏳</div>
+						<div class="state-message">Loading images...</div>
 					</div>
 				</div>
 			{:else if $imagesError}
 				<!-- Error state -->
-				<div class="text-destructive flex h-[120px] items-center justify-center text-center">
-					<div>
-						<div class="mb-2 text-4xl opacity-50">⚠️</div>
-						<div class="text-sm">Failed to load images</div>
-						<div class="text-xs opacity-70">{$imagesError}</div>
+				<div class="state-container error">
+					<div class="state-content">
+						<div class="state-icon">⚠️</div>
+						<div class="state-message">Failed to load images</div>
+						<div class="state-detail">{$imagesError}</div>
 					</div>
 				</div>
 			{:else if sortedImages.length === 0}
 				<!-- Empty state -->
-				<div class="text-muted-foreground flex h-[120px] items-center justify-center text-center">
-					<div>
-						<div class="mb-2 text-4xl opacity-50">📁</div>
-						<div class="text-sm">No images found</div>
-						<div class="text-xs opacity-70">Add images to your wallpapers folder</div>
+				<div class="state-container">
+					<div class="state-content">
+						<div class="state-icon">📁</div>
+						<div class="state-message">No images found</div>
+						<div class="state-detail">Add images to your wallpapers folder</div>
 					</div>
 				</div>
 			{:else}
 				<div class="image-grid">
 					{#each sortedImages as image (image.name)}
-						<div class="card-container aspect-square p-1">
+						<div class="card-container">
 							<div
-								class={cn(
-									'image-thumbnail-card hover:scale-102 bg-card text-card-foreground group h-full w-full cursor-pointer rounded-lg border shadow-sm transition-all duration-200 hover:shadow-lg',
-									effectiveImage === image.name && 'ring-primary shadow-primary/20 shadow-lg ring-2',
-									isGhost && 'ghost-thumbnail'
-								)}
+								class="image-thumbnail-card group {effectiveImage === image.name ? 'selected' : ''} {isGhost ? 'ghost-thumbnail' : ''}"
 								onclick={() => handleImageClick(image.name)}
 								onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleImageClick(image.name)}
 								tabindex="0"
@@ -127,11 +122,11 @@
 								aria-pressed={effectiveImage === image.name}
 								title={image.name}
 							>
-								<CardContent class="relative aspect-square p-0">
+								<CardContent class="thumbnail-content">
 									<img
 										src={getThumbnailUrl(image.name)}
 										alt={image.name}
-										class="h-full w-full rounded-md object-cover transition-all duration-200 group-hover:brightness-110"
+										class="thumbnail-image"
 										loading="lazy"
 										onerror={(e) => {
 											const target = e.target as HTMLImageElement
@@ -141,17 +136,14 @@
 										}}
 									/>
 									<!-- Fallback for missing thumbnails -->
-									<div class="bg-muted text-muted-foreground hidden h-full w-full items-center justify-center rounded-md">
-										<div class="text-center">
-											<div class="mb-1 text-2xl opacity-50">🖼️</div>
-											<div class="text-xs">Loading...</div>
+									<div class="image-fallback">
+										<div class="fallback-content">
+											<div class="fallback-icon">🖼️</div>
+											<div class="fallback-text">Loading...</div>
 										</div>
 									</div>
 									<button
-										class={cn(
-											'absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-black/20 text-sm backdrop-blur-sm transition-colors duration-200 hover:bg-black/40',
-											($screenSettings.favorites ?? []).includes(image.name) ? 'text-yellow-400 opacity-100' : 'text-white opacity-20 hover:opacity-80'
-										)}
+										class="favorite-button {($screenSettings.favorites ?? []).includes(image.name) ? 'is-favorite' : ''}"
 										onclick={(e: Event) => toggleFavorite(image.name, e)}
 										title={($screenSettings.favorites ?? []).includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
 									>
@@ -176,6 +168,59 @@
 		width: 100%;
 	}
 
+	.header-section {
+		margin-bottom: 0.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	:global(.override-button) {
+		margin-left: auto;
+		height: 2rem;
+		padding: 0 0.75rem;
+		font-size: 0.75rem;
+	}
+
+	:global(.grid-card-content) {
+		padding: 0.5rem !important;
+	}
+
+	.state-container {
+		color: var(--text-muted);
+		display: flex;
+		height: 120px;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+
+	.state-container.error {
+		color: var(--danger);
+	}
+
+	.state-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.state-icon {
+		margin-bottom: 0.5rem;
+		font-size: 2.25rem;
+		opacity: 0.5;
+	}
+
+	.state-message {
+		font-size: 0.875rem;
+	}
+
+	.state-detail {
+		font-size: 0.75rem;
+		opacity: 0.7;
+	}
+
 	.image-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -187,11 +232,105 @@
 	}
 
 	.card-container {
-		display: flex;
+		aspect-ratio: 1;
+		padding: 0.25rem;
+	}
+
+	.image-thumbnail-card {
+		height: 100%;
+		width: 100%;
+		cursor: pointer;
+		border-radius: var(--radius-lg);
+		background-color: var(--card);
+		border: 1px solid transparent;
+		box-shadow: var(--shadow-sm);
+		transition: all 0.2s ease;
+		overflow: hidden;
+		position: relative;
+	}
+
+	.image-thumbnail-card:hover {
+		transform: scale(1.02);
+		box-shadow: var(--shadow-lg);
+	}
+
+	.image-thumbnail-card.selected {
+		box-shadow: var(--shadow-lg), 0 0 0 2px var(--primary);
+	}
+
+	:global(.thumbnail-content) {
+		position: relative;
+		aspect-ratio: 1;
+		padding: 0 !important;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.thumbnail-image {
+		height: 100%;
+		width: 100%;
+		border-radius: calc(var(--radius-lg) - 1px);
+		object-fit: cover;
+		transition: all 0.2s ease;
+	}
+
+	.group:hover .thumbnail-image {
+		filter: brightness(1.1);
+	}
+
+	.image-fallback {
+		background-color: var(--surface-hover);
+		color: var(--text-muted);
+		display: none;
+		height: 100%;
+		width: 100%;
 		align-items: center;
 		justify-content: center;
-		overflow: hidden;
-		border-radius: 0.5rem; /* Match card border radius */
+		border-radius: calc(var(--radius-lg) - 1px);
+	}
+
+	.fallback-content {
+		text-align: center;
+	}
+
+	.fallback-icon {
+		margin-bottom: 0.25rem;
+		font-size: 1.5rem;
+		opacity: 0.5;
+	}
+
+	.fallback-text {
+		font-size: 0.75rem;
+	}
+
+	.favorite-button {
+		position: absolute;
+		right: 0.25rem;
+		top: 0.25rem;
+		display: flex;
+		height: 1.5rem;
+		width: 1.5rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		border: none;
+		background-color: rgba(0, 0, 0, 0.2);
+		color: white;
+		font-size: 0.875rem;
+		backdrop-filter: blur(4px);
+		transition: all 0.2s ease;
+		opacity: 0.2;
+		cursor: pointer;
+	}
+
+	.favorite-button:hover {
+		background-color: rgba(0, 0, 0, 0.4);
+		opacity: 0.8;
+	}
+
+	.favorite-button.is-favorite {
+		color: #fbbf24;
+		opacity: 1;
 	}
 
 	:global(.image-grid-card) {
@@ -200,17 +339,12 @@
 		border: 1px solid hsl(var(--border) / 0.3) !important;
 	}
 
-	:global(.image-thumbnail-card) {
+	.image-thumbnail-card {
 		background: hsl(var(--card) / 0.8) !important;
 		border: 1px solid hsl(var(--border) / 0.3) !important;
-		aspect-ratio: 1;
-		overflow: hidden;
 	}
 
-	/* Custom subtle scale hover effect */
-	:global(.hover\:scale-102:hover) {
-		transform: scale(1.02);
-	}
+	/* Scale hover effect is now handled by .image-thumbnail-card:hover */
 
 	/* Ghost mode styling */
 	:global(.ghost-image-grid) {
@@ -222,13 +356,13 @@
 		opacity: 0.7 !important;
 	}
 
-	:global(.ghost-thumbnail) {
+	.ghost-thumbnail {
 		opacity: 0.6 !important;
 		border: 1px solid hsl(var(--border) / 0.5) !important;
 		background: transparent !important;
 	}
 
-	:global(.ghost-thumbnail:hover) {
+	.ghost-thumbnail:hover {
 		opacity: 0.8 !important;
 	}
 

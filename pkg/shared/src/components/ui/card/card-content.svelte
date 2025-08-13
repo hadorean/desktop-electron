@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { cn } from '../../../lib/utils.js'
-
 	let {
 		class: className,
 		children,
@@ -12,6 +10,13 @@
 	}>()
 </script>
 
-<div class={cn('p-6 pt-0', className)} {...restProps}>
+<div class="card-content {className || ''}" {...restProps}>
 	{@render children?.()}
 </div>
+
+<style>
+	.card-content {
+		padding: 1.5rem;
+		padding-top: 0;
+	}
+</style>

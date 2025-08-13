@@ -26,7 +26,7 @@
 	bind:this={buttonRef}
 	aria-label="Settings"
 >
-	<Icon name="cog-6-tooth" size="md" />
+	<Icon name="cog" size="md" />
 </button>
 
 <style>
@@ -60,10 +60,21 @@
 		opacity: 1;
 	}
 
-
 	/* Tailwind positioning classes */
-	:global(.bottom-right) { bottom: 1rem; right: 1rem; }
-	:global(.top-right) { top: 1rem; right: 1rem; }
-	:global(.bottom-left) { bottom: 1rem; left: 1rem; }
-	:global(.top-left) { top: 1rem; left: 1rem; }
+	:global(.bottom-right) {
+		bottom: 1rem;
+		right: 1rem;
+	}
+	:global(.top-right) {
+		top: 1rem;
+		right: 1rem;
+	}
+	:global(.bottom-left) {
+		bottom: 1rem;
+		left: 1rem;
+	}
+	:global(.top-left) {
+		top: 1rem;
+		left: 1rem;
+	}
 </style>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { cn } from '../../../lib/utils.js'
 	import type { Snippet } from 'svelte'
 
 	let {
@@ -13,6 +12,16 @@
 	}>()
 </script>
 
-<h3 class={cn('text-2xl font-semibold leading-none tracking-tight', className)} {...restProps}>
+<h3 class="card-title {className || ''}" {...restProps}>
 	{@render children?.()}
 </h3>
+
+<style>
+	.card-title {
+		font-size: 1.5rem;
+		font-weight: 600;
+		line-height: 1;
+		letter-spacing: -0.025em;
+		color: var(--card-foreground);
+	}
+</style>

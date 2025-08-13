@@ -1,75 +1,111 @@
 <script lang="ts">
-	import { Carousel, CarouselContent, CarouselItem } from '$shared/components/ui'
 	import type { Snippet } from 'svelte'
-	import { currentPage as currentPageStore, gotoPage } from '../stores/pageStore'
+	import { quartOut } from 'svelte/easing'
+	import { currentPage as currentPageStore } from '../stores/pageStore'
 
 	interface Props {
-		settingsContent?: Snippet<[{ currentPage: number; gotoPage: (page: Page) => void }]>
-		optionsContent?: Snippet<[{ currentPage: number; gotoPage: (page: Page) => void }]>
+		settingsContent?: Snippet
+		optionsContent?: Snippet
 		transparent?: boolean
 		class?: string
+		duration?: number
+		easing?: (t: number) => number
 	}
 
-	let { settingsContent, optionsContent, class: className = '', ...restProps }: Props = $props()
+	let { settingsContent, optionsContent, class: className = '', duration = 300, easing = quartOut, ...restProps }: Props = $props()
 
-	type Page = 'main' | 'options'
-	const pages: Page[] = ['main', 'options']
+	// Track previous page to determine slide direction
+	let previousPage = $state<string | null>(null)
 
-	// Convert store page to carousel index
-	let currentPageIndex = $derived(pages.indexOf($currentPageStore))
+	$effect(() => {
+		if (previousPage !== null && previousPage !== $currentPageStore) {
+			// Page changed
+		}
+		previousPage = $currentPageStore
+	})
 
-	// Fade animation state
-	let isTransitioning = $state(false)
+	// Custom slide transition that moves full width + fade
+	function slideTransition(node: Element, { direction, duration = 500 }: { direction: 'from-left' | 'from-right'; duration?: number }) {
+		const style = getComputedStyle(node)
+		const opacity = +style.opacity
+		const width = node.clientWidth
 
-	function handlePageChange(newIndex: number): void {
-		if (newIndex === currentPageIndex) return
+		// If coming from right, start off-screen to the right (+width)
+		// If coming from left, start off-screen to the left (-width)
+		const startX = direction === 'from-right' ? width : -width
 
-		isTransitioning = true
+		return {
+			duration,
+			easing, // More dramatic easing with slight overshoot
+			css: (t: number) => {
+				const x = startX * (1 - t)
+				const fadeOpacity = opacity * t
+				return `
+					transform: translateX(${x}px);
+					opacity: ${fadeOpacity};
+				`
+			}
+		}
+	}
 
-		// Update store with new page
-		const newPage = pages[newIndex] || 'main'
-		gotoPage(newPage)
+	// Exit transition - slide out in opposite direction
+	function slideOutTransition(node: Element, { direction, duration = 400 }: { direction: 'to-left' | 'to-right'; duration?: number }) {
+		const style = getComputedStyle(node)
+		const opacity = +style.opacity
+		const width = node.clientWidth
 
-		// Start fade out
-		setTimeout(() => {
-			// Fade back in
-			setTimeout(() => {
-				isTransitioning = false
-			}, 150)
-		}, 150)
+		// If going to left, end off-screen to the left (-width)
+		// If going to right, end off-screen to the right (+width)
+		const endX = direction === 'to-left' ? -width : width
+
+		return {
+			duration,
+			easing, // Smooth deceleration for exit
+			css: (t: number) => {
+				const x = endX * (1 - t)
+				const fadeOpacity = opacity * t
+				return `
+					transform: translateX(${x}px);
+					opacity: ${fadeOpacity};
+				`
+			}
+		}
 	}
 </script>
 
-<div class="page-container {className}" class:transitioning={isTransitioning} {...restProps}>
-	<Carousel class="carousel-full" currentIndex={currentPageIndex} onIndexChange={handlePageChange}>
-		<CarouselContent currentIndex={currentPageIndex}>
-			<!-- Settings Page -->
-			<CarouselItem>
-				{@render settingsContent?.({ currentPage: currentPageIndex, gotoPage })}
-			</CarouselItem>
-
-			<!-- Options Page -->
-			<CarouselItem>
-				{@render optionsContent?.({ currentPage: currentPageIndex, gotoPage })}
-			</CarouselItem>
-		</CarouselContent>
-	</Carousel>
+<div class="simple-page-container {className}" {...restProps}>
+	{#if $currentPageStore === 'main'}
+		<div
+			class="page-content"
+			in:slideTransition={{ direction: 'from-left', duration: duration }}
+			out:slideOutTransition={{ direction: 'to-left', duration: duration }}
+		>
+			{@render settingsContent?.()}
+		</div>
+	{:else if $currentPageStore === 'options'}
+		<div
+			class="page-content"
+			in:slideTransition={{ direction: 'from-right', duration: duration }}
+			out:slideOutTransition={{ direction: 'to-right', duration: duration }}
+		>
+			{@render optionsContent?.()}
+		</div>
+	{/if}
 </div>
 
 <style>
-	.page-container {
+	.simple-page-container {
 		position: relative;
 		height: 100%;
 		width: 100%;
-		transition: opacity 0.15s ease;
+		overflow: hidden; /* Prevent scrollbars during slide animation */
 	}
 
-	.page-container.transitioning {
-		opacity: 0.5;
-	}
-
-	:global(.carousel-full) {
+	.page-content {
 		height: 100%;
 		width: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
 	}
 </style>

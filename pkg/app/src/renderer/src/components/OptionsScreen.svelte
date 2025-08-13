@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { Button, Card, CardContent, CardHeader, CardTitle } from '$shared/components/ui'
+	import { Button, Card, CardContent, CardHeader, Icon } from '$shared/components/ui'
 	import { onMount } from 'svelte'
-	import cogIcon from '../assets/cog.svg?url'
-	import AppVersion from './AppVersion.svelte'
 	import BackButton from './BackButton.svelte'
 
 	interface Props {
@@ -95,42 +93,46 @@
 
 <div class="options-screen {className}" {...restProps}>
 	<!-- Back Button -->
-	{#if onBack}
-		<BackButton onclick={onBack} />
-	{/if}
+	<div class="header">
+		{#if onBack}
+			<BackButton onclick={onBack} />
+		{/if}
+	</div>
 
 	<!-- Header -->
-	<div class="mb-8 text-center">
-		<div class="mb-4 flex items-center justify-center gap-3">
-			<img src={cogIcon} alt="Settings" class="cog-icon" />
-			<h1 class="text-4xl font-bold text-white">Options</h1>
+	<div class="options-header">
+		<div class="title-section">
+			<div class="option-icon">
+				<Icon name="cog" size="lg" />
+			</div>
+			<h1 class="options-title">Options</h1>
 		</div>
-		<p class="text-gray-400">Configure application settings</p>
+		<p class="options-description">Configure application settings</p>
 	</div>
 
 	<!-- Options Content -->
 	<div class="options-content">
 		<Card class="mb-6">
 			<CardHeader>
-				<CardTitle>Image Folder</CardTitle>
+				<h1>Images folder</h1>
 			</CardHeader>
-			<CardContent class="space-y-4">
+			<CardContent class="folder-card-content">
 				<div class="folder-selection">
-					<label for="folder-path" class="mb-2 block text-sm font-medium text-gray-200"> Select folder containing your wallpaper images: </label>
+					<label for="folder-path" class="folder-label"> Select folder containing your wallpaper images: </label>
 
 					{#if isLoading}
-						<div class="flex items-center justify-center py-4">
-							<p class="text-gray-400">Loading options...</p>
+						<div class="loading-state">
+							<p class="loading-text">Loading options...</p>
 						</div>
 					{:else}
-						<div class="flex gap-2">
+						<div class="input-row">
 							<input
 								id="folder-path"
 								type="text"
 								value={selectedFolder}
 								oninput={handleFolderPathChange}
 								placeholder="Enter folder path..."
-								class="folder-input flex-1"
+								class="folder-input"
 								disabled={isSaving}
 							/>
 							<Button variant="outline" onclick={handleBrowseFolder} disabled={isSelectingFolder || isSaving} class="browse-button">
@@ -138,12 +140,12 @@
 							</Button>
 						</div>
 
-						<div class="mt-2 flex items-center justify-between">
-							<p class="text-xs text-gray-400">
-								Current folder: <span class="text-gray-300">{selectedFolder || 'No folder selected'}</span>
+						<div class="status-row">
+							<p class="current-folder">
+								Current folder: <span class="folder-path">{selectedFolder || 'No folder selected'}</span>
 							</p>
 							{#if isSaving}
-								<p class="text-xs text-blue-400">Saving...</p>
+								<p class="saving-indicator">Saving...</p>
 							{/if}
 						</div>
 					{/if}
@@ -151,18 +153,9 @@
 			</CardContent>
 		</Card>
 	</div>
-
-	<AppVersion />
 </div>
 
 <style>
-	/* Ensure text elements are draggable when in transparent mode */
-	h1,
-	p,
-	label {
-		-webkit-app-region: drag;
-	}
-
 	.options-screen {
 		position: relative;
 		display: flex;
@@ -175,11 +168,40 @@
 		overflow-y: auto;
 	}
 
-	.cog-icon {
-		width: 2rem;
-		height: 2rem;
-		transform: translateY(2px);
-		-webkit-app-region: drag;
+	.header {
+		position: relative;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		z-index: 10;
+	}
+
+	.options-header {
+		margin-bottom: 2rem;
+		text-align: center;
+	}
+
+	.title-section {
+		margin-bottom: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+	}
+
+	.option-icon {
+		transform: translateY(5px);
+	}
+
+	.options-title {
+		font-size: 2.25rem;
+		font-weight: bold;
+		color: var(--text-primary);
+	}
+
+	.options-description {
+		color: var(--text-muted);
 	}
 
 	.options-content {
@@ -189,11 +211,12 @@
 	}
 
 	.folder-input {
-		background-color: rgba(55, 65, 81, 0.8);
-		border: 1px solid rgba(156, 163, 175, 0.3);
-		border-radius: 0.375rem;
+		flex: 1;
+		background-color: var(--input-bg);
+		border: 1px solid var(--input-border);
+		border-radius: var(--radius-sm);
 		padding: 0.5rem 0.75rem;
-		color: white;
+		color: var(--text-primary);
 		font-size: 0.875rem;
 		transition: border-color 0.2s ease;
 		-webkit-app-region: no-drag;
@@ -201,12 +224,12 @@
 
 	.folder-input:focus {
 		outline: none;
-		border-color: rgba(59, 130, 246, 0.5);
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+		border-color: var(--border-hover);
+		box-shadow: 0 0 0 2px rgba(var(--primary), 0.1);
 	}
 
 	.folder-input::placeholder {
-		color: rgba(156, 163, 175, 0.7);
+		color: var(--text-muted);
 	}
 
 	.browse-button {
@@ -216,6 +239,51 @@
 
 	.folder-selection {
 		-webkit-app-region: no-drag;
+	}
+
+	.folder-label {
+		display: block;
+		margin-bottom: 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--text-secondary);
+	}
+
+	.loading-state {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem 0;
+	}
+
+	.loading-text {
+		color: var(--text-muted);
+	}
+
+	.input-row {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.status-row {
+		margin-top: 0.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.current-folder {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+	}
+
+	.folder-path {
+		color: var(--text-secondary);
+	}
+
+	.saving-indicator {
+		font-size: 0.75rem;
+		color: var(--primary);
 	}
 
 	/* Make sure card components are not draggable */

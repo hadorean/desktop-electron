@@ -16,9 +16,6 @@
 
 <style>
 	.options-button {
-		position: fixed;
-		bottom: 1rem;
-		right: 1rem;
 		border-radius: 50%;
 		padding: 0;
 		color: hsl(222.2, 84%, 4.9%); /* secondary button text */
