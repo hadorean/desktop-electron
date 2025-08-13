@@ -4,11 +4,14 @@ import { loadUserOptions, shouldPreventUserOptionsSync, userOptions, getCurrentU
 import { app } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
+import type { LocalServer } from '../server'
 
 export class UserOptionsService {
 	private optionsPath: string
 	private defaultOptions: UserOptions = DefaultUserOptions
 	private hasInitialized = false
+	private localServer: LocalServer | null = null
+	private previousImageDirectory = ''
 
 	constructor() {
 		this.optionsPath = join(app.getPath('userData'), 'user-options.json')
@@ -23,7 +26,7 @@ export class UserOptionsService {
 		// Load options from file system
 		await this.loadFromFileSystem()
 
-		// Subscribe to store changes for automatic persistence
+		// Subscribe to store changes for automatic persistence and socket broadcasting
 		userOptions.subscribe((options) => {
 			// Skip persistence during initial load and internal operations
 			if (!shouldPreventUserOptionsSync() && this.hasInitialized) {
@@ -31,10 +34,25 @@ export class UserOptionsService {
 					console.error('Failed to save user options:', error)
 				})
 			}
+
+			// Broadcast image directory changes to clients
+			if (this.hasInitialized && this.localServer && this.previousImageDirectory && this.previousImageDirectory !== options.imageDirectory) {
+				console.log('🔄 UserOptionsService: Broadcasting image directory change to clients')
+				this.localServer.sockets.broadcastImagesUpdated('manual_refresh', 'image-directory-changed', 'user_options_change')
+			}
+			this.previousImageDirectory = options.imageDirectory
 		})
 
 		this.hasInitialized = true
 		console.log('🔧 UserOptionsService initialized')
+	}
+
+	/**
+	 * Connect the local server for socket broadcasting
+	 */
+	connectLocalServer(localServer: LocalServer): void {
+		this.localServer = localServer
+		console.log('🔧 UserOptionsService: Connected to LocalServer for socket broadcasting')
 	}
 
 	/**

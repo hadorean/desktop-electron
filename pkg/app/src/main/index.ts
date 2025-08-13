@@ -12,10 +12,17 @@ import { createWindow, mainWindow } from './windows/mainWindow'
 import { setupShortcuts } from './windows/shortcuts'
 import { setupTray } from './windows/tray'
 
-const localServer = new LocalServer()
-const bg = new BackgroundManager()
+async function start(): Promise<AppContext> {
+	// Initialize user options service FIRST, before any services that depend on it
+	await userOptionsService.initialize()
 
-function start(): AppContext {
+	// Now create services that depend on user options
+	const localServer = new LocalServer()
+	const bg = new BackgroundManager()
+
+	// Connect user options service to local server for socket broadcasting
+	userOptionsService.connectLocalServer(localServer)
+
 	const context = {
 		app,
 		icon,
@@ -32,9 +39,6 @@ function start(): AppContext {
 	setupIpc(context)
 	setupAutoUpdate(mainWindow)
 	setupDebug()
-
-	// Initialize user options service
-	userOptionsService.initialize().catch((error) => console.error('Failed to initialize user options service:', error))
 
 	localServer
 		.start()

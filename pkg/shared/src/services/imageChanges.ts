@@ -47,9 +47,9 @@ export function initializeImageChangeHandling(context: string): () => void {
 
 		lastProcessedEventTimestamp = event.timestamp
 
-		// Only refresh if it's a file change event
-		if (event.reason === 'file_change') {
-			console.log('🔄 Processing unique file change event')
+		// Refresh for file changes and manual refreshes (like directory changes)
+		if (event.reason === 'file_change' || event.reason === 'manual_refresh') {
+			console.log(`🔄 Processing unique ${event.reason} event`)
 			await loadImages()
 		}
 	}

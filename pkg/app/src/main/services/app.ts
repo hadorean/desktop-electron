@@ -20,11 +20,11 @@ export type AppContext = {
 
 let context: AppContext | null
 
-export function init(setup: () => AppContext): void {
+export function init(setup: () => AppContext | Promise<AppContext>): void {
 	// This method will be called when Electron has finished
 	// initialization and is ready to create browser windows.
 	// Some APIs can only be used after this event occurs.
-	app.whenReady().then(() => {
+	app.whenReady().then(async () => {
 		// Set app user model id for windows
 		electronApp.setAppUserModelId('com.electron')
 
@@ -35,7 +35,7 @@ export function init(setup: () => AppContext): void {
 			optimizer.watchWindowShortcuts(window)
 		})
 
-		context = setup()
+		context = await setup()
 	})
 
 	app.on('activate', function () {
