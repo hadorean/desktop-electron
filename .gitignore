@@ -17,3 +17,5 @@ pkg/shared/tsconfig.tsbuildinfo
 
 **/*.mjs
 !**/eslint.config.mjs
+
+temp/
