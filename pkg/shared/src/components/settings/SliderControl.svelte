@@ -104,7 +104,7 @@
 	.label-text {
 		font-size: 0.875rem;
 		font-weight: 500;
-		color: hsl(var(--foreground));
+		color: var(--foreground);
 	}
 
 	.slider-row {
@@ -120,7 +120,7 @@
 		min-width: 3rem;
 		text-align: right;
 		font-size: 0.875rem;
-		color: hsl(var(--muted-foreground));
+		color: var(--muted-foreground);
 	}
 
 	/* Ghost mode styling */
@@ -133,21 +133,21 @@
 		opacity: 0.7;
 	}
 
-	/* Ghost styling for slider track and fill */
-	:global(.ghost-slider .bg-secondary) {
+	/* Ghost styling for our custom slider classes */
+	:global(.ghost-slider .slider-track) {
 		background-color: transparent !important;
-		border: 1px solid hsl(var(--border)) !important;
+		border: 1px solid var(--border) !important;
 	}
 
-	:global(.ghost-slider .bg-primary) {
+	:global(.ghost-slider .slider-progress) {
 		background-color: transparent !important;
-		border: 1px solid hsl(var(--border)) !important;
+		border: 1px solid var(--border) !important;
 	}
 
 	/* Ghost styling for slider thumb */
-	:global(.ghost-slider .bg-background) {
+	:global(.ghost-slider .slider-thumb) {
 		background-color: transparent !important;
-		border: 1px solid hsl(var(--border)) !important;
+		border: 1px solid var(--border) !important;
 	}
 
 	/* Disabled styling */

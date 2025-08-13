@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { cn } from '../../../lib/utils.js'
-
 	interface Props {
 		class?: string
 		value?: number[]
@@ -60,17 +58,11 @@
 	}
 </script>
 
-<div class={cn('relative flex w-full touch-none select-none items-center', className)} {...restProps}>
+<div class="slider-container {className || ''}" {...restProps}>
 	<!-- Track -->
-	<div class="bg-secondary relative h-2 w-full rounded-full">
+	<div class="slider-track">
 		<!-- Progress fill -->
-		<div
-			class={cn(
-				'bg-primary absolute h-2 rounded-full'
-				// isDragging ? "" : "transition-all duration-200"  // Disabled for now
-			)}
-			style="width: {percentage}%"
-		></div>
+		<div class="slider-progress" style="width: {percentage}%"></div>
 		<!-- Slider input -->
 		<input
 			bind:this={sliderRef}
@@ -85,28 +77,81 @@
 			onmouseup={handleMouseUp}
 			ontouchstart={handleTouchStart}
 			ontouchend={handleTouchEnd}
-			class="absolute inset-0 h-2 w-full cursor-pointer appearance-none opacity-0"
+			class="slider-input"
 		/>
 		<!-- Thumb -->
-		<div
-			class={cn(
-				'bg-background border-primary absolute h-4 w-4 -translate-y-1 transform cursor-pointer rounded-full border-2 shadow-lg'
-				// isDragging ? "" : "transition-all duration-200"  // Disabled for now
-			)}
-			style="left: calc({percentage}% - 8px)"
-		></div>
+		<div class="slider-thumb" style="left: calc({percentage}% - 8px)"></div>
 	</div>
 </div>
 
 <style>
+	/* === SLIDER COMPONENT STYLES === */
+	.slider-container {
+		position: relative;
+		display: flex;
+		width: 100%;
+		touch-action: none;
+		user-select: none;
+		align-items: center;
+	}
+
+	.slider-track {
+		background-color: var(--secondary);
+		position: relative;
+		height: 0.5rem; /* 8px */
+		width: 100%;
+		border-radius: var(--radius-xl);
+	}
+
+	.slider-progress {
+		background-color: var(--primary);
+		position: absolute;
+		height: 0.5rem; /* 8px */
+		border-radius: var(--radius-xl);
+	}
+
+	.slider-input {
+		position: absolute;
+		inset: 0;
+		height: 0.5rem; /* 8px */
+		width: 100%;
+		cursor: pointer;
+		appearance: none;
+		opacity: 0;
+	}
+
+	.slider-input:disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+
+	.slider-thumb {
+		background-color: var(--background);
+		border: 2px solid var(--primary);
+		position: absolute;
+		height: 1rem; /* 16px */
+		width: 1rem; /* 16px */
+		transform: translateY(-4px); /* Center vertically */
+		cursor: pointer;
+		border-radius: 50%;
+		box-shadow: var(--shadow-lg);
+	}
+
+	.slider-thumb:hover {
+		box-shadow:
+			var(--shadow-lg),
+			0 0 0 4px rgb(var(--primary) / 0.1);
+		transform: translateY(-4px) scale(1.1);
+	}
+
 	/* Remove default input styling */
-	input[type='range']::-webkit-slider-thumb {
+	.slider-input::-webkit-slider-thumb {
 		appearance: none;
 		width: 0;
 		height: 0;
 	}
 
-	input[type='range']::-moz-range-thumb {
+	.slider-input::-moz-range-thumb {
 		appearance: none;
 		width: 0;
 		height: 0;
@@ -114,15 +159,30 @@
 		background: transparent;
 	}
 
-	input[type='range']::-webkit-slider-track {
+	.slider-input::-webkit-slider-track {
 		appearance: none;
 		background: transparent;
 		border: none;
 	}
 
-	input[type='range']::-moz-range-track {
+	.slider-input::-moz-range-track {
 		appearance: none;
 		background: transparent;
 		border: none;
+	}
+
+	/* Disabled state */
+	.slider-container:has(.slider-input:disabled) .slider-track {
+		opacity: 0.5;
+	}
+
+	.slider-container:has(.slider-input:disabled) .slider-thumb {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+
+	.slider-container:has(.slider-input:disabled) .slider-thumb:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--shadow-lg);
 	}
 </style>

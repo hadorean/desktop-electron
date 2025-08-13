@@ -52,7 +52,7 @@
 			<span class="label-text">{label}</span>
 		</label>
 		{#if isOverride}
-			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="mr-2 h-8 px-3 text-xs" onclick={handleOverride} {disabled}>
+			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-button" onclick={handleOverride} {disabled}>
 				{isOverridden ? 'Clear' : 'Override'}
 			</Button>
 		{/if}
@@ -60,7 +60,7 @@
 			id={`toggle-${label}`}
 			checked={displayChecked}
 			onCheckedChange={handleToggleChange}
-			class={cn('flex-shrink-0', isGhost && 'ghost-toggle', disabled && 'disabled-toggle')}
+			class={cn('switch-element', isGhost && 'ghost-toggle', disabled && 'disabled-toggle')}
 			{disabled}
 		/>
 	</div>
@@ -90,7 +90,18 @@
 	.label-text {
 		font-size: 0.875rem;
 		font-weight: 500;
-		color: hsl(var(--foreground));
+		color: var(--foreground);
+	}
+
+	:global(.override-button) {
+		margin-right: 0.5rem; /* mr-2 */
+		height: 2rem; /* h-8 */
+		padding: 0 0.75rem; /* px-3 */
+		font-size: 0.75rem; /* text-xs */
+	}
+
+	:global(.switch-element) {
+		flex-shrink: 0;
 	}
 
 	/* Ghost mode styling */
@@ -103,21 +114,21 @@
 		opacity: 0.7;
 	}
 
-	/* Ghost styling for switch background */
-	:global(.ghost-toggle.bg-primary) {
+	/* Ghost styling for our custom switch classes */
+	:global(.ghost-toggle.switch-button) {
 		background-color: transparent !important;
-		border: 1px solid hsl(var(--border)) !important;
+		border: 1px solid var(--border) !important;
 	}
 
-	:global(.ghost-toggle.bg-input) {
+	:global(.ghost-toggle.switch-checked) {
 		background-color: transparent !important;
-		border: 1px solid hsl(var(--border)) !important;
+		border: 1px solid var(--border) !important;
 	}
 
 	/* Ghost styling for switch thumb */
-	:global(.ghost-toggle .bg-background) {
+	:global(.ghost-toggle .switch-thumb) {
 		background-color: transparent !important;
-		border: 1px solid hsl(var(--border)) !important;
+		border: 1px solid var(--border) !important;
 	}
 
 	/* Disabled styling */
