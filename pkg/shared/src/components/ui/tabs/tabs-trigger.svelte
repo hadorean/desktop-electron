@@ -12,7 +12,7 @@
 		align-items: center;
 		justify-content: center;
 		white-space: nowrap;
-		border-radius: 0.375rem;
+		border-radius: var(--radius-sm);
 		padding: 0.25rem 0.75rem;
 		font-size: 0.875rem;
 		font-weight: 500;
@@ -20,18 +20,20 @@
 		background: transparent;
 		border: none;
 		cursor: pointer;
+		color: var(--muted-foreground);
 	}
 
 	:global([data-slot='tabs-trigger']:focus-visible) {
 		outline: none;
+		box-shadow: 
+			0 0 0 2px var(--background),
+			0 0 0 4px var(--ring);
 	}
 
 	:global([data-slot='tabs-trigger'][data-state='active']) {
-		background: hsl(var(--background));
-		color: hsl(var(--foreground));
-		box-shadow:
-			0 1px 3px 0 rgb(0 0 0 / 0.1),
-			0 1px 2px -1px rgb(0 0 0 / 0.1);
+		background-color: var(--background);
+		color: var(--foreground);
+		box-shadow: var(--shadow-sm);
 	}
 
 	:global([data-slot='tabs-trigger']:disabled) {

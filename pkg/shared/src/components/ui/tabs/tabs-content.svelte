@@ -1,12 +1,25 @@
 <script lang="ts">
 	import { Tabs as TabsPrimitive } from 'bits-ui'
-	import { cn } from '../../../lib/utils.js'
 
 	let { class: className, value, ...restProps }: TabsPrimitive.ContentProps = $props()
 </script>
 
 <TabsPrimitive.Content
 	{value}
-	class={cn('ring-offset-background focus-visible:ring-ring mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2', className)}
+	class="tabs-content {className || ''}"
 	{...restProps}
 />
+
+<style>
+	:global(.tabs-content) {
+		margin-top: 0.5rem;
+		outline: none;
+	}
+
+	:global(.tabs-content:focus-visible) {
+		outline: none;
+		box-shadow: 
+			0 0 0 2px var(--background),
+			0 0 0 4px var(--ring);
+	}
+</style>
