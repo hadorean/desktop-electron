@@ -59,17 +59,7 @@ export function createWindow(): void {
 
 	window.once('ready-to-show', () => {
 		if (!window) return
-		const { width: winW, height: winH } = window.getBounds()
-		const { workArea } = screen.getPrimaryDisplay() // respects taskbar/dock
-		const x = workArea.x + workArea.width - winW - 10 // align to the right
-		const y = workArea.y + (workArea.height - winH) / 2 // center vertically
-		window.setBounds({
-			x: x,
-			y: y,
-			width: winW,
-			height: winH
-		})
-		window.setPosition(x, y)
+		//snapToRight()
 		window.show()
 	})
 
@@ -129,6 +119,22 @@ function ensureTitleBarIsHidden(): void {
 			})
 		}
 	}, 1)
+}
+
+// @ts-ignore
+function snapToRight() {
+	if (!window) return
+	const { width: winW, height: winH } = window.getBounds()
+	const { workArea } = screen.getPrimaryDisplay() // respects taskbar/dock
+	const x = workArea.x + workArea.width - winW - 10 // align to the right
+	const y = workArea.y + (workArea.height - winH) / 2 // center vertically
+	window.setBounds({
+		x: x,
+		y: y,
+		width: winW,
+		height: winH
+	})
+	window.setPosition(x, y)
 }
 
 function getMainWindow(): BrowserWindow | null {
