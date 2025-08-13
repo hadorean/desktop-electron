@@ -45,7 +45,11 @@ export const IpcEvents = {
 	RecreateMainWindow: 'recreate-main-window',
 
 	// File System
-	ShowOpenDialog: 'show-open-dialog'
+	ShowOpenDialog: 'show-open-dialog',
+
+	// User Options
+	GetUserOptions: 'get-user-options',
+	UpdateUserOptions: 'update-user-options'
 } as const
 
 // Type for main process events (handled by ipcMain)
@@ -74,6 +78,8 @@ export type MainEvents =
 	| typeof IpcEvents.GetWindowConfig
 	| typeof IpcEvents.RecreateMainWindow
 	| typeof IpcEvents.ShowOpenDialog
+	| typeof IpcEvents.GetUserOptions
+	| typeof IpcEvents.UpdateUserOptions
 
 // Type for renderer process events (sent from main to renderer)
 export type RendererEvents =

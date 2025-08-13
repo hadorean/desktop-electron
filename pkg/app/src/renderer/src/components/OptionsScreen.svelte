@@ -4,6 +4,7 @@
 	import cogIcon from '../assets/cog.svg?url'
 	import AppVersion from './AppVersion.svelte'
 	import BackButton from './BackButton.svelte'
+	import { onMount } from 'svelte'
 
 	interface Props {
 		transparent?: boolean
@@ -14,8 +15,41 @@
 	let { class: className = '', onBack, ...restProps }: Props = $props()
 
 	// State for folder selection
-	let selectedFolder = $state('D:\\pictures\\wall') // Default value for UI demonstration
+	let selectedFolder = $state('')
 	let isSelectingFolder = $state(false)
+	let isLoading = $state(true)
+	let isSaving = $state(false)
+
+	// Load user options on mount
+	onMount(async () => {
+		try {
+			const result = await window.api.getUserOptions()
+			if (result.success && result.data) {
+				selectedFolder = result.data.imageDirectory
+			}
+		} catch (error) {
+			console.error('Error loading user options:', error)
+		} finally {
+			isLoading = false
+		}
+	})
+
+	// Save options to store
+	const saveOptions = async (imageDirectory: string) => {
+		try {
+			isSaving = true
+			const result = await window.api.updateUserOptions({ imageDirectory })
+			if (result.success) {
+				console.log('User options updated successfully')
+			} else {
+				console.error('Failed to update user options:', result.error)
+			}
+		} catch (error) {
+			console.error('Error saving user options:', error)
+		} finally {
+			isSaving = false
+		}
+	}
 
 	// Handler for browse button
 	const handleBrowseFolder = async () => {
@@ -33,7 +67,9 @@
 			})
 
 			if (result.success && result.data && !result.data.canceled && result.data.filePaths.length > 0) {
-				selectedFolder = result.data.filePaths[0]
+				const newFolder = result.data.filePaths[0]
+				selectedFolder = newFolder
+				await saveOptions(newFolder)
 			}
 		} catch (error) {
 			console.error('Error opening folder dialog:', error)
@@ -42,10 +78,19 @@
 		}
 	}
 
-	// Handler for manual path input
+	// Handler for manual path input - debounced save
+	let saveTimeout: ReturnType<typeof setTimeout> | null = null
 	const handleFolderPathChange = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		selectedFolder = target.value
+
+		// Debounce save to avoid excessive API calls while typing
+		if (saveTimeout) {
+			clearTimeout(saveTimeout)
+		}
+		saveTimeout = setTimeout(() => {
+			saveOptions(selectedFolder)
+		}, 1000) // Save after 1 second of inactivity
 	}
 </script>
 
@@ -76,23 +121,35 @@
 				<div class="folder-selection">
 					<label for="folder-path" class="mb-2 block text-sm font-medium text-gray-200"> Select folder containing your wallpaper images: </label>
 
-					<div class="flex gap-2">
-						<input
-							id="folder-path"
-							type="text"
-							value={selectedFolder}
-							oninput={handleFolderPathChange}
-							placeholder="Enter folder path..."
-							class="folder-input flex-1"
-						/>
-						<Button variant="outline" onclick={handleBrowseFolder} disabled={isSelectingFolder} class="browse-button">
-							{isSelectingFolder ? 'Selecting...' : 'Browse'}
-						</Button>
-					</div>
+					{#if isLoading}
+						<div class="flex items-center justify-center py-4">
+							<p class="text-gray-400">Loading options...</p>
+						</div>
+					{:else}
+						<div class="flex gap-2">
+							<input
+								id="folder-path"
+								type="text"
+								value={selectedFolder}
+								oninput={handleFolderPathChange}
+								placeholder="Enter folder path..."
+								class="folder-input flex-1"
+								disabled={isSaving}
+							/>
+							<Button variant="outline" onclick={handleBrowseFolder} disabled={isSelectingFolder || isSaving} class="browse-button">
+								{isSelectingFolder ? 'Selecting...' : 'Browse'}
+							</Button>
+						</div>
 
-					<p class="mt-2 text-xs text-gray-400">
-						Current folder: <span class="text-gray-300">{selectedFolder}</span>
-					</p>
+						<div class="mt-2 flex items-center justify-between">
+							<p class="text-xs text-gray-400">
+								Current folder: <span class="text-gray-300">{selectedFolder || 'No folder selected'}</span>
+							</p>
+							{#if isSaving}
+								<p class="text-xs text-blue-400">Saving...</p>
+							{/if}
+						</div>
+					{/if}
 				</div>
 			</CardContent>
 		</Card>

@@ -2,9 +2,10 @@ import { readdir } from 'fs/promises'
 import { watch } from 'fs'
 import { join } from 'path'
 import { EventEmitter } from 'events'
+import { getCurrentImageDirectory, onUserOptionsChanged } from '$shared/stores/userOptionsStore'
 
 export class ImageService extends EventEmitter {
-	private imagesPathValue = 'D:\\pictures\\wall'
+	private imagesPathValue: string
 	private readonly SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif']
 	private watcher: ReturnType<typeof watch> | null = null
 	private watcherInitialized = false
@@ -12,9 +13,23 @@ export class ImageService extends EventEmitter {
 	private lastScanTime = 0
 	private debounceTimer: NodeJS.Timeout | null = null
 	private readonly DEBOUNCE_DELAY = 2000 // ms to wait for additional events
+	private userOptionsUnsubscribe: (() => void) | null = null
 
 	constructor() {
 		super()
+
+		// Initialize with current image directory from store
+		this.imagesPathValue = getCurrentImageDirectory()
+
+		// Subscribe to image directory changes
+		this.userOptionsUnsubscribe = onUserOptionsChanged((newOptions, previousOptions) => {
+			if (newOptions.imageDirectory !== previousOptions.imageDirectory) {
+				console.log('🔧 ImageService: Image directory changed from', previousOptions.imageDirectory, 'to', newOptions.imageDirectory)
+				this.setImagesPath(newOptions.imageDirectory)
+			}
+		})
+
+		console.log('🔧 ImageService: Initialized with directory:', this.imagesPathValue)
 	}
 
 	/**
@@ -190,8 +205,16 @@ export class ImageService extends EventEmitter {
 			clearTimeout(this.debounceTimer)
 			this.debounceTimer = null
 		}
+
+		// Unsubscribe from user options changes
+		if (this.userOptionsUnsubscribe) {
+			this.userOptionsUnsubscribe()
+			this.userOptionsUnsubscribe = null
+		}
+
 		this.stopWatcher()
 		this.removeAllListeners()
+		console.log('🔧 ImageService: Disposed')
 	}
 }
 

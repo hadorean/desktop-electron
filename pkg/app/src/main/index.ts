@@ -5,6 +5,7 @@ import { AppContext, init } from './services/app'
 import { setupAutoUpdate } from './services/auto-update'
 import { setupDebug } from './services/debug'
 import { setupIpc } from './services/ipc'
+import { userOptionsService } from './services/user-options'
 import { setAppContext } from './stores/appStore'
 import { BackgroundManager } from './windows/backgrounds'
 import { createWindow, mainWindow } from './windows/mainWindow'
@@ -31,6 +32,9 @@ function start(): AppContext {
 	setupIpc(context)
 	setupAutoUpdate(mainWindow)
 	setupDebug()
+
+	// Initialize user options service
+	userOptionsService.initialize().catch((error) => console.error('Failed to initialize user options service:', error))
 
 	localServer
 		.start()

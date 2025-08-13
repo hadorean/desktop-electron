@@ -1,11 +1,12 @@
 import { getDebugMenuVisible } from '$shared/stores/debugStore'
 import { IpcEvents, MainEvents } from '$shared/types/ipc'
-import type { ScreenSettings } from '$shared/types/settings'
+import type { ScreenSettings, UserOptions } from '$shared/types'
 import { app, dialog, ipcMain } from 'electron'
 import { appConfig } from '../config'
 import { mainWindow } from '../windows/mainWindow'
 import { AppContext } from './app'
 import { settingsService } from './settings'
+import { userOptionsService } from './user-options'
 
 export function setupIpc(options: AppContext): void {
 	const { localServer, bg } = options
@@ -178,6 +179,28 @@ export function setupIpc(options: AppContext): void {
 			return { success: true, data: result }
 		} catch (error) {
 			console.error('IPC show-open-dialog error:', error)
+			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+		}
+	})
+
+	// User Options
+	handleIpc(IpcEvents.GetUserOptions, async () => {
+		try {
+			const options = userOptionsService.getCurrentOptions()
+			return { success: true, data: options }
+		} catch (error) {
+			console.error('IPC get-user-options error:', error)
+			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+		}
+	})
+
+	handleIpc(IpcEvents.UpdateUserOptions, async (...args: unknown[]) => {
+		try {
+			const options = args[1] as Partial<UserOptions>
+			const updateEvent = await userOptionsService.updateOptions(options, 'ipc-client')
+			return { success: true, data: updateEvent.options }
+		} catch (error) {
+			console.error('IPC update-user-options error:', error)
 			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
 		}
 	})

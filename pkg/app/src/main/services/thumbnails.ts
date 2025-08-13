@@ -3,6 +3,7 @@ import { join, dirname, basename, extname } from 'path'
 import { mkdir, access, stat } from 'fs/promises'
 import { constants } from 'fs'
 import { app } from 'electron'
+import { getCurrentImageDirectory, onUserOptionsChanged } from '$shared/stores/userOptionsStore'
 
 interface ThumbnailRequest {
 	imagePath: string
@@ -12,18 +13,33 @@ interface ThumbnailRequest {
 }
 
 export class ThumbnailService {
-	private readonly IMAGES_PATH = 'D:\\pictures\\wall'
+	private imagesPath: string
 	private readonly THUMBNAIL_SIZE = { width: 200, height: 200 }
 	private readonly THUMBNAIL_QUALITY = 80
 	private readonly thumbnailsDir: string
 	private readonly processingQueue: ThumbnailRequest[] = []
 	private readonly queuedPaths = new Set<string>()
 	private isProcessing = false
+	private userOptionsUnsubscribe: (() => void) | null = null
 
 	constructor() {
+		// Initialize with current image directory from store
+		this.imagesPath = getCurrentImageDirectory()
+
 		// Store thumbnails in app's userData directory
 		this.thumbnailsDir = join(app.getPath('userData'), 'thumbnails')
 		this.ensureThumbnailsDirectory()
+
+		// Subscribe to image directory changes
+		this.userOptionsUnsubscribe = onUserOptionsChanged((newOptions, previousOptions) => {
+			if (newOptions.imageDirectory !== previousOptions.imageDirectory) {
+				console.log('🔧 ThumbnailService: Image directory changed from', previousOptions.imageDirectory, 'to', newOptions.imageDirectory)
+				this.imagesPath = newOptions.imageDirectory
+				// Note: We don't need to regenerate thumbnails as they use relative paths
+			}
+		})
+
+		console.log('🔧 ThumbnailService: Initialized with directory:', this.imagesPath)
 	}
 
 	private async ensureThumbnailsDirectory(): Promise<void> {
@@ -52,7 +68,7 @@ export class ThumbnailService {
 	 * @returns Promise resolving to thumbnail file path
 	 */
 	public async getThumbnailAsync(imageName: string): Promise<string> {
-		const imagePath = join(this.IMAGES_PATH, imageName)
+		const imagePath = join(this.imagesPath, imageName)
 		const thumbnailPath = this.getThumbnailPath(imageName)
 
 		// Check if thumbnail already exists
@@ -93,7 +109,7 @@ export class ThumbnailService {
 
 		for (const imageName of imageNames) {
 			try {
-				const imagePath = join(this.IMAGES_PATH, imageName)
+				const imagePath = join(this.imagesPath, imageName)
 				const thumbnailPath = this.getThumbnailPath(imageName)
 
 				// Skip if thumbnail exists and is fresh
@@ -268,6 +284,26 @@ export class ThumbnailService {
 		} catch (error) {
 			console.error('Failed to clear thumbnail cache:', error)
 		}
+	}
+
+	/**
+	 * Get the current images directory path
+	 */
+	public getImagesPath(): string {
+		return this.imagesPath
+	}
+
+	/**
+	 * Cleanup method to dispose of the service
+	 */
+	public dispose(): void {
+		// Unsubscribe from user options changes
+		if (this.userOptionsUnsubscribe) {
+			this.userOptionsUnsubscribe()
+			this.userOptionsUnsubscribe = null
+		}
+
+		console.log('🔧 ThumbnailService: Disposed')
 	}
 }
 

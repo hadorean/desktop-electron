@@ -56,3 +56,26 @@ export {
 
 // API store
 export { effectiveApiUrl } from './apiStore'
+
+// User options store
+export {
+	clearUserOptions,
+	getCurrentImageDirectory,
+	getCurrentUserOptions,
+	getIsLoadingUserOptions,
+	imageDirectory,
+	isUserOptionsLoading,
+	loadUserOptions,
+	onUserOptionsChanged,
+	setUserOptionsError,
+	setUserOptionsLoading,
+	shouldPreventUserOptionsSync,
+	updateImageDirectory,
+	updateUserOptions,
+	updateUserOptionsSilent,
+	userOptions,
+	userOptionsError,
+	userOptionsLastUpdated,
+	userOptionsLoading,
+	userOptionsState
+} from './userOptionsStore'
