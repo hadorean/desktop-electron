@@ -11,7 +11,7 @@
   },
   "scripts": {
     "format": "prettier --plugin prettier-plugin-svelte --write .",
-    "lint": "eslint --cache .",
+    "lint": "eslint --cache . --config ../../eslint.config.mjs",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
     "typecheck": "pnpm typecheck:node && pnpm svelte-check",

@@ -12,7 +12,7 @@
 		"check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
 		"format": "prettier --write src --end-of-line lf",
 		"format:check": "prettier --check src --end-of-line lf",
-		"lint": "eslint --cache .",
+		"lint": "eslint --cache . --config ../../eslint.config.mjs",
 		"svelte-check": "svelte-check --tsconfig ./tsconfig.app.json"
 	},
 	"dependencies": {
