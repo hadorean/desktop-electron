@@ -37,6 +37,15 @@ declare global {
 			// Window configuration API
 			getWindowConfig: () => Promise<AppConfig>
 			recreateMainWindow: () => Promise<void>
+			// File system APIs
+			showOpenDialog: (options: {
+				title: string
+				buttonLabel: string
+				properties: string[]
+			}) => Promise<{ success: boolean; data?: { canceled: boolean; filePaths: string[] }; error?: string }>
+			// User options APIs
+			getUserOptions: () => Promise<{ success: boolean; data?: { imageDirectory: string }; error?: string }>
+			updateUserOptions: (options: { imageDirectory: string }) => Promise<{ success: boolean; error?: string }>
 		}
 	}
 }

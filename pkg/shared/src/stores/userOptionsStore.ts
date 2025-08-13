@@ -55,7 +55,6 @@ export function loadUserOptions(options: UserOptions, skipPreventSync = false): 
 		lastUpdated: Date.now()
 	}))
 
-
 	// Reset flags after loading
 	isLoadingOptions = false
 	// Use setTimeout to ensure all synchronous updates complete before allowing sync

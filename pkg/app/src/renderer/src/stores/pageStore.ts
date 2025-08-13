@@ -15,6 +15,6 @@ export function gotoPage(page: Page): void {
 // Helper to get current page value (for non-reactive contexts)
 export function getCurrentPageValue(): Page {
 	let value: Page = 'main'
-	currentPage.subscribe(v => value = v)()
+	currentPage.subscribe((v) => (value = v))()
 	return value
 }

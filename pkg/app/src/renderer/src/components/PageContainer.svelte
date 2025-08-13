@@ -40,7 +40,6 @@
 	}
 </script>
 
-
 <div class="page-container {className}" class:transitioning={isTransitioning} {...restProps}>
 	<Carousel class="carousel-full" currentIndex={currentPageIndex} onIndexChange={handlePageChange}>
 		<CarouselContent currentIndex={currentPageIndex}>
