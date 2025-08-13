@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte'
 	import { Carousel, CarouselContent, CarouselItem } from '$shared/components/ui'
+	import type { Snippet } from 'svelte'
 
 	interface Props {
 		settingsContent?: Snippet<[{ currentPage: number; goToOptions: () => void; goToSettings: () => void }]>
@@ -13,7 +13,6 @@
 
 	// Page navigation state
 	let currentPage = $state(0) // 0 = settings, 1 = options
-	let carousel: HTMLDivElement
 
 	// Navigation functions
 	export function goToSettings(): void {
@@ -48,7 +47,7 @@
 </script>
 
 <div class="page-container {className}" class:transitioning={isTransitioning} {...restProps}>
-	<Carousel bind:this={carousel} class="carousel-full" currentIndex={currentPage} onIndexChange={handlePageChange}>
+	<Carousel class="carousel-full" currentIndex={currentPage} onIndexChange={handlePageChange}>
 		<CarouselContent currentIndex={currentPage}>
 			<!-- Settings Page -->
 			<CarouselItem>

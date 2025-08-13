@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ErrorMessage, SettingsPanel, SettingsServerUpdate } from '$shared'
+	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
 	import { initializeImageChangeHandling } from '$shared/services'
 	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '$shared/stores'
 	import { toggleDayNightMode } from '$shared/stores/settingsStore'
@@ -71,6 +71,7 @@
 				<!-- Options Button - only show on settings page -->
 				{#if currentPage === 0}
 					<OptionsButton onclick={goToOptions} />
+					<KeyboardShortcuts shortcuts={[{ key: 'Escape', action: goToOptions }]} />
 				{/if}
 			</div>
 		{/snippet}

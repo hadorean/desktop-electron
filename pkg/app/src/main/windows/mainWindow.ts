@@ -114,7 +114,7 @@ let delta = 1
 
 // Dirty tricky to prevent the titlebar of a transparent window from appearing when window loose focus
 // Title bar is still visible for a fraction of a second
-function ensureTitleBarIsHidden() {
+function ensureTitleBarIsHidden(): void {
 	if (!appConfig.window.transparent) return
 	setTimeout(() => {
 		delta *= -1

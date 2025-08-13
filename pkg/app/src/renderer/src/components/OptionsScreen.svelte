@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { KeyboardShortcuts } from '$shared'
+	import cogIcon from '../assets/cog.svg?url'
 	import AppVersion from './AppVersion.svelte'
 	import BackButton from './BackButton.svelte'
-	import cogIcon from '../assets/cog.svg?url'
 
 	interface Props {
 		transparent?: boolean
@@ -11,6 +12,8 @@
 
 	let { class: className = '', onBack, ...restProps }: Props = $props()
 </script>
+
+<KeyboardShortcuts shortcuts={[{ key: 'Escape', action: onBack }]} />
 
 <div class="options-screen {className}" {...restProps}>
 	<!-- Back Button -->
@@ -47,8 +50,9 @@
 	}
 
 	.cog-icon {
-		width: 2.5rem;
-		height: 2.5rem;
+		width: 2rem;
+		height: 2rem;
+		transform: translateY(2px);
 		-webkit-app-region: drag;
 	}
 </style>
