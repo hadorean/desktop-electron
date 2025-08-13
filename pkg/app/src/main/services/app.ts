@@ -74,4 +74,10 @@ export function init(setup: () => AppContext): void {
 			app.quit()
 		}
 	})
+
+	// TODO
+	app.setLoginItemSettings({
+		openAtLogin: false,
+		openAsHidden: false
+	})
 }

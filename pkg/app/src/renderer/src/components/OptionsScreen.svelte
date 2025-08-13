@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AppVersion from './AppVersion.svelte'
 	import BackButton from './BackButton.svelte'
+	import cogIcon from '../assets/cog.svg?url'
 
 	interface Props {
 		transparent?: boolean
@@ -18,7 +19,10 @@
 	{/if}
 
 	<div class="text-center">
-		<h1 class="mb-4 text-4xl font-bold text-white">Options</h1>
+		<div class="mb-4 flex items-center justify-center gap-3">
+			<img src={cogIcon} alt="Settings" class="cog-icon" />
+			<h1 class="text-4xl font-bold text-white">Options</h1>
+		</div>
 		<p class="text-gray-400">Configuration options will be added here.</p>
 	</div>
 	<AppVersion />
@@ -40,5 +44,11 @@
 		gap: 1rem;
 		height: 100%;
 		width: 100%;
+	}
+
+	.cog-icon {
+		width: 2.5rem;
+		height: 2.5rem;
+		-webkit-app-region: drag;
 	}
 </style>

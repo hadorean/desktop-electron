@@ -1,4 +1,6 @@
 <script lang="ts">
+	import cogIcon from '../assets/cog.svg?url'
+
 	interface Props {
 		onclick?: () => void
 		class?: string
@@ -9,7 +11,7 @@
 </script>
 
 <button class="options-button {size} {className}" {onclick} {...restProps}>
-	<img src="/src/assets/cog.svg" alt="Options" class="options-icon {size}" />
+	<img src={cogIcon} alt="Options" class="options-icon {size}" />
 </button>
 
 <style>
