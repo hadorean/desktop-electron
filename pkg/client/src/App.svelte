@@ -13,6 +13,9 @@
 	let settingsPanel: HTMLElement | null = null
 	let settingsButton: HTMLElement | null = null
 
+	// Check for open-settings URL parameter
+	let openSettingsFromUrl: boolean = false
+
 	// Cleanup function for image change handling
 	let cleanupImageChanges: (() => void) | null = null
 
@@ -31,6 +34,10 @@
 	onMount(() => {
 		;(async () => {
 			try {
+				// Check for open-settings URL parameter
+				const urlParams = new URLSearchParams(window.location.search)
+				openSettingsFromUrl = urlParams.get('openSettings') === 'true'
+
 				// First load images using the store
 				await loadImages()
 
@@ -148,9 +155,9 @@
 
 	<ErrorMessage message={$imagesError || ''} />
 
-	<div id="settings-drawer" class:open={showSettings && $expandSettings}>
-		{#if showSettings}
-			<SettingsPanel bind:settingsPanel expanded={$expandSettings} />
+	<div id="settings-drawer" class:open={(showSettings && $expandSettings) || openSettingsFromUrl}>
+		{#if showSettings || openSettingsFromUrl}
+			<SettingsPanel bind:settingsPanel expanded={$expandSettings || openSettingsFromUrl} />
 		{/if}
 	</div>
 </div>
