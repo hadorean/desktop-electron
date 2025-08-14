@@ -37,15 +37,28 @@ During execution:
 
 ## Coding style
 
-- Use stores as single source of truth for state management
+- Don't use dynamic imports when static imports are possible
+- Group imports when possible
 
+## State management
 
+- Use stores as an observable, inspectable single source of truth for managing state
+- Store should be self-contained. Don't add dependencies to store.
+  Instead, use a services to modify and observe stores to handle side effects (networking, file system etc.)
 
 ### Styling
 
-- No tailwind, use meaningfull class names and css
+- Don't use tailwind classes, use meaningfull class names and semantic css
 - Use global css variables for theming
-- Use shadcn-svelte components
+
+### Components
+
+- Breakdown repetitive html patterns into components
+- Use shadcn-svelte components when possible
+- When creating a new shadcn component:
+  - Replace tailwind classes with meaningfull class names
+  - Use {children?.render()} pattern instead of <slot/>
+  
 
 ### Primary Development
 
