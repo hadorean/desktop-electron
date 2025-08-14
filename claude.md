@@ -21,7 +21,6 @@ The project uses a monorepo structure with three main packages:
 - **SocketManager** (pkg/app/src/main/server/sockets.ts): Real-time communication via Socket.IO
 - **Settings System**: Shared settings with screen-specific overrides, managed through adapters
 
-## Development Commands
 
 ## Planning and execution
 
@@ -58,7 +57,8 @@ During execution:
 - When creating a new shadcn component:
   - Replace tailwind classes with meaningfull class names
   - Use {children?.render()} pattern instead of <slot/>
-  
+
+## Development Commands
 
 ### Primary Development
 
@@ -134,3 +134,7 @@ Relevant docs can be found in docs/
 When creating topic-related documents, use the following format: YYYY-MM-DD-topic.md
 Set the date after the doc title: Date: YYYY-MM-DD
 Place new documents in the docs/memories/YYYY-MM directory.
+
+## Do / Don't
+
+- Don't delete files created by the user that are not version controlled
