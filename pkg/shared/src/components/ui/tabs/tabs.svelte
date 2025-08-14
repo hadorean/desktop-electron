@@ -5,9 +5,3 @@
 </script>
 
 <TabsPrimitive.Root bind:value {onValueChange} class="tabs {className || ''}" {...restProps} />
-
-<style>
-	:global(.tabs) {
-		width: 100%;
-	}
-</style>
