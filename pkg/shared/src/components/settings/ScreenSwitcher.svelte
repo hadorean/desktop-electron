@@ -10,7 +10,7 @@
 		screenIds,
 		toggleDayNightMode
 	} from '../../stores/settingsStore'
-	import { Button, Icon } from '../ui'
+	import { Icon } from '../ui'
 
 	let containerRef: HTMLDivElement
 	let underlineRef: HTMLDivElement
@@ -136,15 +136,19 @@
 		<!-- Day/Night toggle controls -->
 		<div class="daynight-controls">
 			<!-- Global Day/Night theme toggle -->
-			<Button
-				variant="ghost"
-				size="sm"
+			<div
+				class="daynight-tab"
 				onclick={() => toggleDayNightMode()}
-				class="daynight-toggle-btn global-theme"
+				role="button"
+				tabindex="0"
+				onkeydown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') toggleDayNightMode()
+				}}
 				title={$isNightMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
 			>
-				{$isNightMode ? '🌙' : '☀️'}
-			</Button>
+				<Icon name={$isNightMode ? 'moon' : 'sun'} size="md" className="daynight-icon" />
+				<span class="screen-name invisible">Theme</span>
+			</div>
 		</div>
 	</div>
 </div>
@@ -246,23 +250,46 @@
 		gap: 0.5rem;
 	}
 
-	:global(.daynight-toggle-btn) {
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
-		font-size: 1.2rem;
-		transition: all 0.3s ease;
+	.daynight-tab {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+		padding: 8px 12px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		border-radius: 8px;
+		min-width: 60px;
+		outline: none;
 	}
 
-	:global(.daynight-toggle-btn:hover) {
-		transform: scale(1.1);
+	.daynight-tab:hover {
+		background: rgba(255, 255, 255, 0.1);
 	}
 
-	:global(.daynight-toggle-btn.global-theme) {
-		background: rgba(255, 255, 255, 0.1) !important;
-		border: 1px solid rgba(255, 255, 255, 0.2) !important;
+	.daynight-tab:focus-visible {
+		background: rgba(255, 255, 255, 0.1);
+		outline: none;
 	}
 
-	:global(.daynight-toggle-btn.global-theme:hover) {
-		background: rgba(255, 255, 255, 0.2) !important;
-		border: 1px solid rgba(255, 255, 255, 0.3) !important;
+	:global(.daynight-tab .daynight-icon) {
+		color: white;
+		filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+		transition:
+			all 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+			transform 0.3s ease;
+		transform-origin: center;
+	}
+
+	.daynight-tab:hover :global(.daynight-icon),
+	.daynight-tab:focus-visible :global(.daynight-icon) {
+		transform: translateY(10px) scale(1.15);
+		transition: transform 0.8s ease;
+	}
+
+	.daynight-tab:hover .screen-name,
+	.daynight-tab:focus-visible .screen-name {
+		opacity: 0.3;
 	}
 </style>
