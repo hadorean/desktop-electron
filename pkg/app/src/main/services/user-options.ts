@@ -5,6 +5,7 @@ import { app } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import type { LocalServer } from '../server'
+import { appStore } from '../stores/appStore'
 
 export class UserOptionsService {
 	private optionsPath: string
@@ -15,6 +16,11 @@ export class UserOptionsService {
 
 	constructor() {
 		this.optionsPath = join(app.getPath('userData'), 'user-options.json')
+		appStore.subscribe((context) => {
+			if (context) {
+				this.localServer = context.localServer
+			}
+		})
 	}
 
 	/**
@@ -52,14 +58,6 @@ export class UserOptionsService {
 
 		this.hasInitialized = true
 		// console.log('🔧 UserOptionsService initialized')
-	}
-
-	/**
-	 * Connect the local server for socket broadcasting
-	 */
-	connectLocalServer(localServer: LocalServer): void {
-		this.localServer = localServer
-		console.log('🔧 UserOptionsService: Connected to LocalServer for socket broadcasting')
 	}
 
 	/**
@@ -147,4 +145,12 @@ export class UserOptionsService {
 	}
 }
 
-export const userOptionsService = new UserOptionsService()
+const userOptionsService = new UserOptionsService()
+
+export const setupUserOptions = async () => {
+	await userOptionsService.initialize()
+}
+
+export const updateUserOptions = async (newOptions: Partial<UserOptions>, clientId: string): Promise<UserOptionsUpdateEvent> => {
+	return await userOptionsService.updateOptions(newOptions, clientId)
+}

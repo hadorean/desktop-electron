@@ -1,4 +1,5 @@
 import { getDebugMenuVisible } from '$shared/stores/debugStore'
+import { getCurrentUserOptions } from '$shared/stores/userOptionsStore'
 import type { ScreenSettings, UserOptions } from '$shared/types'
 import { appConfig } from '$shared/types/config'
 import { IpcEvents, MainEvents } from '$shared/types/ipc'
@@ -6,7 +7,7 @@ import { app, dialog, ipcMain } from 'electron'
 import { mainWindow } from '../windows/mainWindow'
 import { AppContext } from './app'
 import { settingsService } from './settings'
-import { userOptionsService } from './user-options'
+import { updateUserOptions } from './user-options'
 
 export function setupIpc(options: AppContext): void {
 	const { localServer, bg } = options
@@ -186,7 +187,7 @@ export function setupIpc(options: AppContext): void {
 	// User Options
 	handleIpc(IpcEvents.GetUserOptions, async () => {
 		try {
-			const options = userOptionsService.getCurrentOptions()
+			const options = getCurrentUserOptions()
 			return { success: true, data: options }
 		} catch (error) {
 			console.error('IPC get-user-options error:', error)
@@ -197,7 +198,7 @@ export function setupIpc(options: AppContext): void {
 	handleIpc(IpcEvents.UpdateUserOptions, async (...args: unknown[]) => {
 		try {
 			const options = args[1] as Partial<UserOptions>
-			const updateEvent = await userOptionsService.updateOptions(options, 'ipc-client')
+			const updateEvent = await updateUserOptions(options, 'ipc-client')
 			return { success: true, data: updateEvent.options }
 		} catch (error) {
 			console.error('IPC update-user-options error:', error)

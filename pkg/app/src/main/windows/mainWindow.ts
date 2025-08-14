@@ -1,3 +1,4 @@
+import { getCurrentUserOptions } from '$shared/stores/userOptionsStore'
 import { appConfig } from '$shared/types/config'
 import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, screen, shell } from 'electron'
@@ -5,7 +6,6 @@ import { autoUpdater } from 'electron-updater'
 import { join } from 'path'
 import { get } from 'svelte/store'
 import icon from '../../../resources/icon.png?asset'
-import { userOptionsService } from '../services/user-options'
 import { isQuitting } from '../stores/appStore'
 
 // Store reference to main window
@@ -59,7 +59,7 @@ export function createWindow(): void {
 		if (!window) return
 		//snapToRight()
 
-		if (userOptionsService.getCurrentOptions().openWindowOnStart) {
+		if (getCurrentUserOptions().openWindowOnStart) {
 			window.show()
 		}
 	})
