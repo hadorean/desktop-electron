@@ -1,5 +1,9 @@
 // Icon exports for shared components
 export { default as BackArrowIcon } from './back-arrow.svg?raw'
+export { default as BrowserIcon } from './browser.svg?raw'
 export { default as CogIcon } from './cog.svg?raw'
+export { default as MonitorIcon } from './monitor.svg?raw'
+export { default as MoonIcon } from './moon.svg?raw'
+export { default as SunIcon } from './sun.svg?raw'
 export { default as WarningCircleIcon } from './warning-circle.svg?raw'
 export { default as XMarkIcon } from './x-mark.svg?raw'

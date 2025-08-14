@@ -1,12 +1,12 @@
 import { derived, get, writable } from 'svelte/store'
 import {
-	type DayNightMode,
-	type DayNightScreenSettings,
-	DefaultDayNightSettings,
+	DefaultScreenProfile,
 	DefaultScreenSettings,
 	DefaultUserSettings,
 	getThemeEditingSettings,
 	getThemeScreenSettings,
+	type DayNightMode,
+	type ScreenProfile,
 	type ScreenSettings,
 	type UserSettings
 } from '../types'
@@ -15,7 +15,7 @@ const defaultScreenId = 'monitor1'
 
 export const currentScreen = writable(defaultScreenId)
 
-const defaultSettings: ScreenSettings = DefaultScreenSettings
+const defaultSettings: ScreenProfile = DefaultScreenProfile
 const defaultUserSettings: UserSettings = DefaultUserSettings
 
 export const isLocalMode = writable(false)
@@ -28,7 +28,7 @@ let preventServerSync = false
 
 // Transition state stores
 export const inTransition = writable<boolean>(false)
-export const transitionSettings = writable<Partial<ScreenSettings>>({})
+export const transitionSettings = writable<Partial<ScreenProfile>>({})
 let transitionStartTime = 0
 let transitionDuration = 1000
 let animationFrameId: number | null = null
@@ -91,14 +91,14 @@ export function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightM
 		: isLocal
 			? {
 					...getThemeScreenSettings(allSettingsValue.shared, fromTheme),
-					...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultDayNightSettings, fromTheme)
+					...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultScreenSettings, fromTheme)
 				}
 			: getThemeScreenSettings(allSettingsValue.shared, fromTheme)
 
 	const toSettings = isLocal
 		? {
 				...getThemeScreenSettings(allSettingsValue.shared, toTheme),
-				...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultDayNightSettings, toTheme)
+				...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultScreenSettings, toTheme)
 			}
 		: getThemeScreenSettings(allSettingsValue.shared, toTheme)
 
@@ -115,7 +115,7 @@ export function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightM
 	transitionSettings.set(fromSettings)
 
 	// Handle non-numeric properties immediately (booleans, strings, arrays)
-	const immediateUpdates: Partial<ScreenSettings> = {
+	const immediateUpdates: Partial<ScreenProfile> = {
 		hideButton: toSettings.hideButton,
 		showTimeDate: toSettings.showTimeDate,
 		showWeather: toSettings.showWeather,
@@ -133,7 +133,7 @@ export function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightM
 		const easedProgress = easeQuadraticOut(progress)
 
 		// Interpolate numeric values
-		const interpolatedSettings: Partial<ScreenSettings> = {
+		const interpolatedSettings: Partial<ScreenProfile> = {
 			...immediateUpdates,
 			opacity: lerp(fromSettings.opacity ?? 1, toSettings.opacity ?? 1, easedProgress),
 			blur: lerp(fromSettings.blur ?? 0, toSettings.blur ?? 0, easedProgress),
@@ -212,14 +212,14 @@ function startThemeTransitionWithoutThemeUpdate(fromTheme: DayNightMode, toTheme
 		: isLocal
 			? {
 					...getThemeScreenSettings(allSettingsValue.shared, fromTheme),
-					...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultDayNightSettings, fromTheme)
+					...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultScreenSettings, fromTheme)
 				}
 			: getThemeScreenSettings(allSettingsValue.shared, fromTheme)
 
 	const toSettings = isLocal
 		? {
 				...getThemeScreenSettings(allSettingsValue.shared, toTheme),
-				...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultDayNightSettings, toTheme)
+				...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultScreenSettings, toTheme)
 			}
 		: getThemeScreenSettings(allSettingsValue.shared, toTheme)
 
@@ -230,7 +230,7 @@ function startThemeTransitionWithoutThemeUpdate(fromTheme: DayNightMode, toTheme
 	transitionSettings.set(fromSettings)
 
 	// Handle non-numeric properties immediately (booleans, strings, arrays)
-	const immediateUpdates: Partial<ScreenSettings> = {
+	const immediateUpdates: Partial<ScreenProfile> = {
 		hideButton: toSettings.hideButton,
 		showTimeDate: toSettings.showTimeDate,
 		showWeather: toSettings.showWeather,
@@ -248,7 +248,7 @@ function startThemeTransitionWithoutThemeUpdate(fromTheme: DayNightMode, toTheme
 		const easedProgress = easeQuadraticOut(progress)
 
 		// Interpolate numeric values
-		const interpolatedSettings: Partial<ScreenSettings> = {
+		const interpolatedSettings: Partial<ScreenProfile> = {
 			...immediateUpdates,
 			opacity: lerp(fromSettings.opacity ?? 1, toSettings.opacity ?? 1, easedProgress),
 			blur: lerp(fromSettings.blur ?? 0, toSettings.blur ?? 0, easedProgress),
@@ -291,13 +291,13 @@ export function getCurrentTheme(): DayNightMode {
 }
 
 // Return the day/night settings for a given screen id
-export function getScreenDayNightSettings(id: string): DayNightScreenSettings {
+export function getScreenDayNightSettings(id: string): ScreenSettings {
 	const value = get(allSettings)
-	return value.screens[id] ?? DefaultDayNightSettings
+	return value.screens[id] ?? DefaultScreenSettings
 }
 
 // Return the settings for a given screen id
-export function getScreenSettings(id: string): Partial<ScreenSettings> | undefined {
+export function getScreenSettings(id: string): Partial<ScreenProfile> | undefined {
 	const value = get(allSettings)
 	const theme = getCurrentTheme() as 'day' | 'night'
 	return value.screens[id]?.[theme] ?? {}
@@ -307,7 +307,7 @@ export function getScreenSettings(id: string): Partial<ScreenSettings> | undefin
 export const baseScreenSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
 	const currentTheme = theme as 'day' | 'night'
 	const themeShared = getThemeScreenSettings(all.shared, currentTheme)
-	return isLocal ? { ...themeShared, ...getThemeScreenSettings(all.screens[screen] ?? DefaultDayNightSettings, currentTheme) } : themeShared
+	return isLocal ? { ...themeShared, ...getThemeScreenSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme) } : themeShared
 })
 
 // Settings to use to render the current screen image (includes transitions for UI)
@@ -319,7 +319,7 @@ export const screenSettings = derived([baseScreenSettings, inTransition, transit
 // Base editing settings without transitions (for syncing to other clients)
 export const baseEditingSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
 	const currentTheme = theme as 'day' | 'night'
-	return isLocal ? getThemeEditingSettings(all.screens[screen] ?? DefaultDayNightSettings, currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
+	return isLocal ? getThemeEditingSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
 })
 
 // Settings to use in the settings panel (includes transitions for UI display)
@@ -328,7 +328,7 @@ export const editingSettings = derived([baseEditingSettings, inTransition, trans
 	return isTransitioning ? transition : base
 })
 
-export function updateSharedSettings(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
+export function updateSharedSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	const theme = getCurrentTheme() as 'day' | 'night'
 
 	allSettings.update((value) => {
@@ -349,7 +349,7 @@ export function updateSharedSettings(settings: (current: Partial<ScreenSettings>
 /**
  * Update shared settings without triggering server sync (for internal operations like validation)
  */
-export function updateSharedSettingsSilent(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
+export function updateSharedSettingsSilent(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	preventServerSync = true
 	try {
 		updateSharedSettings(settings)
@@ -361,7 +361,7 @@ export function updateSharedSettingsSilent(settings: (current: Partial<ScreenSet
 	}
 }
 
-export function updateLocalSettings(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
+export function updateLocalSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	allSettings.update((value) => {
 		const screen = get(currentScreen) || defaultScreenId
 		const theme = getCurrentTheme() as 'day' | 'night'
@@ -385,7 +385,7 @@ export function updateLocalSettings(settings: (current: Partial<ScreenSettings>)
 /**
  * Update local settings without triggering server sync (for internal operations like validation)
  */
-export function updateLocalSettingsSilent(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
+export function updateLocalSettingsSilent(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	preventServerSync = true
 	try {
 		updateLocalSettings(settings)
@@ -401,14 +401,14 @@ export function updateLocalSettingsSilent(settings: (current: Partial<ScreenSett
  * Update settings for the current context (shared or local screen+theme)
  * This function handles the day/night logic and null checks automatically
  */
-export function updateEditingSettings(settings: (current: Partial<ScreenSettings>) => Partial<ScreenSettings>): void {
+export function updateEditingSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	if (get(isLocalMode)) {
 		// Update local screen settings for current theme
 		const screen = get(currentScreen) || defaultScreenId
 		const theme = getCurrentTheme() as 'day' | 'night'
 
 		allSettings.update((value) => {
-			const currentScreenSettings = value.screens[screen] ?? DefaultDayNightSettings
+			const currentScreenSettings = value.screens[screen] ?? DefaultScreenSettings
 			const currentThemeSettings = currentScreenSettings[theme] ?? {}
 			const updatedSettings = settings(currentThemeSettings)
 

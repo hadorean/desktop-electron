@@ -1,6 +1,6 @@
 import { getDebugMenuVisible } from '$shared/stores/debugStore'
 import { getCurrentUserOptions } from '$shared/stores/userOptionsStore'
-import type { ScreenSettings, UserOptions } from '$shared/types'
+import type { ScreenProfile, UserOptions } from '$shared/types'
 import { appConfig } from '$shared/types/config'
 import { IpcEvents, MainEvents } from '$shared/types/ipc'
 import { app, dialog, ipcMain } from 'electron'
@@ -128,7 +128,7 @@ export function initIpc(): void {
 
 	handleIpc(IpcEvents.SettingsUpdateShared, async (...args: unknown[]) => {
 		try {
-			const settings = args[1] as Partial<ScreenSettings>
+			const settings = args[1] as Partial<ScreenProfile>
 			const currentSettings = await settingsService.getSettings()
 			const updatedSettings = {
 				shared: {
@@ -147,7 +147,7 @@ export function initIpc(): void {
 	handleIpc(IpcEvents.SettingsUpdateLocal, async (...args: unknown[]) => {
 		try {
 			const screenId = args[1] as string
-			const settings = args[2] as Partial<ScreenSettings>
+			const settings = args[2] as Partial<ScreenProfile>
 			const currentSettings = await settingsService.getSettings()
 			const updatedSettings = {
 				screens: {

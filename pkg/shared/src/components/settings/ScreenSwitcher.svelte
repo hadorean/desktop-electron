@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { allSettings, currentScreen, isLocalMode, isNightMode, screenIds, toggleDayNightMode } from '../../stores/settingsStore'
-	import { DefaultDayNightSettings } from '../../types'
+	import { DefaultScreenSettings } from '../../types'
 	import { Button, Tabs, TabsList, TabsTrigger } from '../ui'
 
 	let editMode = $state(false)
@@ -91,7 +91,7 @@
 			...settings,
 			screens: {
 				...settings.screens,
-				[newScreenName]: DefaultDayNightSettings
+				[newScreenName]: DefaultScreenSettings
 			}
 		}))
 

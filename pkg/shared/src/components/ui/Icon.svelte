@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { BackArrowIcon, CogIcon, WarningCircleIcon, XMarkIcon } from '../../assets/icons'
+	import { BackArrowIcon, BrowserIcon, CogIcon, MonitorIcon, MoonIcon, SunIcon, WarningCircleIcon, XMarkIcon } from '../../assets/icons'
 
-	export let name: 'warning-circle' | 'x-mark' | 'cog' | 'back-arrow'
+	export let name: 'warning-circle' | 'x-mark' | 'cog' | 'back-arrow' | 'monitor' | 'browser' | 'moon' | 'sun'
 	export let size: 'sm' | 'md' | 'lg' = 'md'
 	export let className: string = ''
 
@@ -9,7 +9,11 @@
 		'warning-circle': WarningCircleIcon,
 		'x-mark': XMarkIcon,
 		cog: CogIcon,
-		'back-arrow': BackArrowIcon
+		'back-arrow': BackArrowIcon,
+		monitor: MonitorIcon,
+		browser: BrowserIcon,
+		moon: MoonIcon,
+		sun: SunIcon
 	}
 
 	const sizes = {

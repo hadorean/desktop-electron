@@ -1,6 +1,6 @@
 import type { UserOptions, VersionInfo } from '$shared/types'
 import { IpcEvents } from '$shared/types/ipc'
-import type { ScreenSettings } from '$shared/types/settings'
+import type { ScreenProfile } from '$shared/types/settings'
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
 import type { ProgressInfo, UpdateInfo } from 'electron-updater'
@@ -34,8 +34,8 @@ const api = {
 	},
 	// Settings APIs
 	getSettings: () => ipcRenderer.invoke(IpcEvents.SettingsGet),
-	updateSharedSettings: (settings: Partial<ScreenSettings>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
-	updateLocalSettings: (screenId: string, settings: Partial<ScreenSettings>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
+	updateSharedSettings: (settings: Partial<ScreenProfile>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
+	updateLocalSettings: (screenId: string, settings: Partial<ScreenProfile>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
 	isSettingsAvailable: () => ipcRenderer.invoke(IpcEvents.SettingsIsAvailable),
 	// Debug menu API
 	getDebugState: () => ipcRenderer.invoke(IpcEvents.GetDebugState),

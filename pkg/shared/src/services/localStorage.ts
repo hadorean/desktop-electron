@@ -4,11 +4,11 @@
  */
 
 import { get } from 'svelte/store'
-import { checkStorageAvailability } from '../utils'
-import { debugVisible, setDebugMenuVisible } from '../stores/debugStore'
 import { apiBaseUrl } from '../stores/apiStore'
-import { currentScreen, allSettings, updateSharedSettings, updateLocalSettings, isLocalMode } from '../stores/settingsStore'
-import { type ScreenSettings, DefaultScreenSettings } from '../types'
+import { debugVisible, setDebugMenuVisible } from '../stores/debugStore'
+import { allSettings, currentScreen, isLocalMode, updateLocalSettings, updateSharedSettings } from '../stores/settingsStore'
+import { type ScreenProfile, DefaultScreenProfile } from '../types'
+import { checkStorageAvailability } from '../utils'
 
 class LocalStorageService {
 	private isInitialized = false
@@ -126,7 +126,7 @@ class LocalStorageService {
 				const savedSharedSettings = localStorage.getItem('settings.shared')
 				if (savedSharedSettings) {
 					const parsedSettings = JSON.parse(savedSharedSettings)
-					const defaultSettings: ScreenSettings = DefaultScreenSettings
+					const defaultSettings: ScreenProfile = DefaultScreenProfile
 
 					updateSharedSettings(() => ({
 						...defaultSettings,
