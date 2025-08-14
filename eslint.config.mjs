@@ -22,7 +22,8 @@ export default tseslint.config(
 	},
 	{
 		rules: {
-			'@typescript-eslint/explicit-function-return-type': 'off'
+			'@typescript-eslint/explicit-function-return-type': 'off',
+			'@typescript-eslint/ban-ts-comment': 'off'
 		}
 	},
 	eslintConfigPrettier

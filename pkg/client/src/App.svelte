@@ -42,7 +42,7 @@
 
 				// Initialize localStorage service (handles loading settings automatically)
 				localStorageService.init()
-				
+
 				// Load settings with current images
 				localStorageService.loadSettings(getCurrentImages())
 

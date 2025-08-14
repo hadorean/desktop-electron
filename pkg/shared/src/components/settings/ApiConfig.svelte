@@ -48,19 +48,8 @@
 				<span class="label-text">API Server URL</span>
 			</label>
 			<div class="input-group">
-				<input 
-					id="api-url" 
-					type="text" 
-					class="url-input" 
-					bind:value={localApiUrl} 
-					on:input={handleApiUrlChange} 
-					placeholder="http://localhost:8080"
-				/>
-				<button 
-					class="reconnect-btn {isReconnecting ? 'loading' : ''}" 
-					on:click={handleReconnect}
-					disabled={isReconnecting}
-				>
+				<input id="api-url" type="text" class="url-input" bind:value={localApiUrl} on:input={handleApiUrlChange} placeholder="http://localhost:8080" />
+				<button class="reconnect-btn {isReconnecting ? 'loading' : ''}" on:click={handleReconnect} disabled={isReconnecting}>
 					{isReconnecting ? 'Reconnecting...' : 'Reconnect'}
 				</button>
 			</div>
@@ -163,7 +152,9 @@
 		background-color: var(--input-bg);
 		color: var(--text-primary);
 		font-size: 0.875rem;
-		transition: border-color 0.3s ease, box-shadow 0.3s ease;
+		transition:
+			border-color 0.3s ease,
+			box-shadow 0.3s ease;
 	}
 
 	.url-input:focus {
@@ -185,7 +176,9 @@
 		font-size: 0.875rem;
 		font-weight: 500;
 		cursor: pointer;
-		transition: background-color 0.3s ease, opacity 0.3s ease;
+		transition:
+			background-color 0.3s ease,
+			opacity 0.3s ease;
 		white-space: nowrap;
 	}
 
@@ -218,7 +211,11 @@
 	}
 
 	@keyframes spin {
-		0% { transform: translate(-50%, -50%) rotate(0deg); }
-		100% { transform: translate(-50%, -50%) rotate(360deg); }
+		0% {
+			transform: translate(-50%, -50%) rotate(0deg);
+		}
+		100% {
+			transform: translate(-50%, -50%) rotate(360deg);
+		}
 	}
 </style>

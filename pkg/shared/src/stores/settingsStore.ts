@@ -1,19 +1,19 @@
-import { get, writable, derived } from 'svelte/store'
+import { derived, get, writable } from 'svelte/store'
 import {
-	type ScreenSettings,
-	type UserSettings,
 	type DayNightMode,
 	type DayNightScreenSettings,
+	DefaultDayNightSettings,
+	DefaultScreenSettings,
+	DefaultUserSettings,
+	getThemeEditingSettings,
 	getThemeScreenSettings,
-	getThemeEditingSettings
+	type ScreenSettings,
+	type UserSettings
 } from '../types'
-import { DefaultScreenSettings, DefaultUserSettings, DefaultDayNightSettings } from '../types'
 
 const defaultScreenId = 'monitor1'
 
 export const currentScreen = writable(defaultScreenId)
-
-// currentScreen subscription for localStorage is now handled by localStorage service
 
 const defaultSettings: ScreenSettings = DefaultScreenSettings
 const defaultUserSettings: UserSettings = DefaultUserSettings
@@ -523,8 +523,10 @@ export function resetSettings(): void {
  * Validate and fix selected images when the image list changes
  * Returns true if any settings were changed
  */
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function validateSelectedImages(availableImages: string[]): boolean {
-	let hasChanges = false
+	const hasChanges = false
 	// const fallbackImage = availableImages.length > 0 ? availableImages[0] : ''
 
 	// // Check shared settings

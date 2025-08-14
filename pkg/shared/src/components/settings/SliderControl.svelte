@@ -68,13 +68,7 @@
 		<span class="label-text">{label}</span>
 		<div class="slider-row">
 			{#if isOverride}
-				<Button 
-					variant={isOverridden ? 'default' : 'ghost'} 
-					size="sm" 
-					class="override-btn" 
-					onclick={handleOverride} 
-					{disabled}
-				>
+				<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-btn" onclick={handleOverride} {disabled}>
 					{isOverridden ? 'Clear' : 'Override'}
 				</Button>
 			{/if}

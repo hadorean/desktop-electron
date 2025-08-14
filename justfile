@@ -62,7 +62,6 @@ clean:
 # Publish a new version
 publish-patch:
 	just version
-	just build
 	just publish
 
 build:
@@ -81,6 +80,7 @@ version version=default-version:
 	just squash-last-two
 
 publish:
+	just build
 	node scripts/publish.js
 	
 move-prev-exe:

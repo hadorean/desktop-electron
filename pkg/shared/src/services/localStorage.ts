@@ -5,21 +5,9 @@
 
 import { get } from 'svelte/store'
 import { checkStorageAvailability } from '../utils'
-import { 
-	debugVisible, 
-	setDebugMenuVisible 
-} from '../stores/debugStore'
-import { 
-	apiBaseUrl, 
-	effectiveApiUrl 
-} from '../stores/apiStore'
-import { 
-	currentScreen,
-	allSettings,
-	updateSharedSettings,
-	updateLocalSettings,
-	isLocalMode
-} from '../stores/settingsStore'
+import { debugVisible, setDebugMenuVisible } from '../stores/debugStore'
+import { apiBaseUrl } from '../stores/apiStore'
+import { currentScreen, allSettings, updateSharedSettings, updateLocalSettings, isLocalMode } from '../stores/settingsStore'
 import { type ScreenSettings, DefaultScreenSettings } from '../types'
 
 class LocalStorageService {
@@ -58,7 +46,7 @@ class LocalStorageService {
 	 * Cleanup subscriptions (useful for testing or hot reload)
 	 */
 	cleanup(): void {
-		this.unsubscribers.forEach(unsubscribe => unsubscribe())
+		this.unsubscribers.forEach((unsubscribe) => unsubscribe())
 		this.unsubscribers = []
 		this.isInitialized = false
 		console.log('📦 LocalStorage service cleaned up')
@@ -124,22 +112,22 @@ class LocalStorageService {
 			if (savedCompleteSettings) {
 				const parsedCompleteSettings = JSON.parse(savedCompleteSettings)
 				console.log('📦 Loading complete settings from localStorage')
-				
+
 				// Validate selected images in the complete settings
 				this.validateAndUpdateImages(parsedCompleteSettings, images)
-				
+
 				// Set complete settings directly (like Socket.IO does)
 				allSettings.set(parsedCompleteSettings)
 			} else {
 				// Fallback to legacy loading method
 				console.log('📦 Using legacy settings loading method')
-				
+
 				// Load shared settings
 				const savedSharedSettings = localStorage.getItem('settings.shared')
 				if (savedSharedSettings) {
 					const parsedSettings = JSON.parse(savedSharedSettings)
 					const defaultSettings: ScreenSettings = DefaultScreenSettings
-					
+
 					updateSharedSettings(() => ({
 						...defaultSettings,
 						opacity: parsedSettings.opacity ?? defaultSettings.opacity,
@@ -175,24 +163,21 @@ class LocalStorageService {
 			}
 
 			// Initialize screen from server data if available (after settings are loaded)
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const serverData = (window as any).__SERVER_DATA__
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const initialScreenId = (window as any).__INITIAL_SCREEN_ID__ || serverData?.screenId
-			
+			const serverData = (window as { __SERVER_DATA__?: { screenId?: string } }).__SERVER_DATA__
+			const initialScreenId = (window as { __INITIAL_SCREEN_ID__?: string }).__INITIAL_SCREEN_ID__ || serverData?.screenId
+
 			console.log('📦 Checking for screen data:')
 			console.log('  - __SERVER_DATA__:', serverData)
-			console.log('  - __INITIAL_SCREEN_ID__:', (window as any).__INITIAL_SCREEN_ID__)
+			console.log('  - __INITIAL_SCREEN_ID__:', (window as { __INITIAL_SCREEN_ID__?: string }).__INITIAL_SCREEN_ID__)
 			console.log('  - Final screenId:', initialScreenId)
-			
+
 			if (initialScreenId) {
 				console.log('🖥️  Using initial screen from server data:', initialScreenId)
 				currentScreen.set(initialScreenId)
 				isLocalMode.set(true)
 				console.log('🖥️  Screen initialized:', initialScreenId, 'local mode: true')
 				// Clear the server data to avoid reuse
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				delete (window as any).__INITIAL_SCREEN_ID__
+				delete (window as { __INITIAL_SCREEN_ID__?: string }).__INITIAL_SCREEN_ID__
 			}
 
 			const currentSettings = get(allSettings)
@@ -215,9 +200,15 @@ class LocalStorageService {
 	/**
 	 * Validate and update images in complete settings object
 	 */
-	private validateAndUpdateImages(settings: any, availableImages: { name: string }[]): void {
-		const imageNames = availableImages.map(img => img.name)
-		
+	private validateAndUpdateImages(
+		settings: {
+			shared?: { day?: { selectedImage?: string }; night?: { selectedImage?: string } }
+			screens?: Record<string, { day?: { selectedImage?: string }; night?: { selectedImage?: string } }>
+		},
+		availableImages: { name: string }[]
+	): void {
+		const imageNames = availableImages.map((img) => img.name)
+
 		// Validate shared settings
 		if (settings.shared?.day?.selectedImage && !imageNames.includes(settings.shared.day.selectedImage)) {
 			console.log('📷 Shared day selected image no longer exists, clearing')
@@ -227,7 +218,7 @@ class LocalStorageService {
 			console.log('📷 Shared night selected image no longer exists, clearing')
 			delete settings.shared.night.selectedImage
 		}
-		
+
 		// Validate screen-specific settings
 		if (settings.screens) {
 			for (const screenId in settings.screens) {
@@ -260,21 +251,21 @@ class LocalStorageService {
 
 				for (const screenId in allLocalSettings) {
 					const screenSettings = allLocalSettings[screenId]
-					
+
 					// Check day settings
 					if (screenSettings.day?.selectedImage && !availableImages.includes(screenSettings.day.selectedImage)) {
 						console.log(`📷 Screen "${screenId}" day selected image "${screenSettings.day.selectedImage}" no longer exists, clearing override`)
 						delete screenSettings.day.selectedImage
 						localSettingsChanged = true
 					}
-					
+
 					// Check night settings
 					if (screenSettings.night?.selectedImage && !availableImages.includes(screenSettings.night.selectedImage)) {
 						console.log(`📷 Screen "${screenId}" night selected image "${screenSettings.night.selectedImage}" no longer exists, clearing override`)
 						delete screenSettings.night.selectedImage
 						localSettingsChanged = true
 					}
-					
+
 					// Clean up empty settings
 					if (screenSettings.day && Object.keys(screenSettings.day).length === 0) {
 						delete screenSettings.day
@@ -343,7 +334,7 @@ class LocalStorageService {
 			try {
 				// Save complete settings object for immediate loading
 				localStorage.setItem('settings.complete', JSON.stringify(settings))
-				
+
 				// Keep legacy storage for backward compatibility
 				localStorage.setItem('settings.shared', JSON.stringify(settings.shared))
 				if (Object.keys(settings.screens).length > 0) {

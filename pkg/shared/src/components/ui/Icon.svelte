@@ -23,6 +23,7 @@
 </script>
 
 <div class="icon {className}" style="width: {iconSize}; height: {iconSize};" {...$$restProps}>
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html iconSvg}
 </div>
 

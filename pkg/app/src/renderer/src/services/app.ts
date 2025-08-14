@@ -5,7 +5,7 @@ import { setAppConfig } from '../stores/appConfigStore'
 export async function init(): Promise<void> {
 	if (!window.api) {
 		console.error('No API found')
-		return null
+		return
 	}
 
 	let config = null as AppConfig | null

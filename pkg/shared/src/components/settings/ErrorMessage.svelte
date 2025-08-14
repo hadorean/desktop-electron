@@ -1,23 +1,25 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
 	import { Icon } from '../ui'
 
 	export let message: string = ''
-	
+
 	let visible = false
 	let timeoutId: ReturnType<typeof setTimeout> | null = null
 
-	// Show/hide animation when message changes
-	$: if (message) {
-		visible = true
-		// Auto-hide after 5 seconds
-		if (timeoutId) clearTimeout(timeoutId)
-		timeoutId = setTimeout(() => {
+	// Watch for message changes and handle visibility
+	$: handleMessageChange(message)
+	function handleMessageChange(newMessage: string) {
+		if (newMessage) {
+			visible = true
+			// Auto-hide after 5 seconds
+			if (timeoutId) clearTimeout(timeoutId)
+			timeoutId = setTimeout(() => {
+				visible = false
+			}, 5000)
+		} else {
 			visible = false
-		}, 5000)
-	} else {
-		visible = false
-		if (timeoutId) clearTimeout(timeoutId)
+			if (timeoutId) clearTimeout(timeoutId)
+		}
 	}
 
 	function handleDismiss() {
@@ -88,7 +90,9 @@
 		color: inherit;
 		cursor: pointer;
 		border-radius: 0.25rem;
-		transition: background-color 0.2s ease, opacity 0.2s ease;
+		transition:
+			background-color 0.2s ease,
+			opacity 0.2s ease;
 		opacity: 0.7;
 	}
 
@@ -118,7 +122,7 @@
 	/* Dark theme adjustments */
 	:global(.dark) .error-content {
 		border-color: rgba(239, 68, 68, 0.2);
-		box-shadow: 
+		box-shadow:
 			var(--shadow-lg),
 			0 0 0 1px rgba(239, 68, 68, 0.1);
 	}

@@ -1,4 +1,4 @@
-import type { AppConfig, ScreenSettings, UserSettings } from '$shared/types/settings'
+import type { AppConfig, ScreenSettings, UserSettings, UserOptions } from '$shared/types'
 import { ElectronAPI } from '@electron-toolkit/preload'
 import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 

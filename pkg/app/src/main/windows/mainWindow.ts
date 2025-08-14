@@ -122,6 +122,7 @@ function ensureTitleBarIsHidden(): void {
 }
 
 // @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function snapToRight() {
 	if (!window) return
 	const { width: winW, height: winH } = window.getBounds()

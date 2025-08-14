@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { cn } from '../../../lib/utils.js'
 	import { onMount } from 'svelte'
 
 	interface Props {
@@ -48,9 +47,7 @@
 	{...restProps}
 >
 	<!-- Thumb -->
-	<div
-		class="switch-thumb {checked ? 'switch-thumb-checked' : ''} {mounted ? 'switch-thumb-mounted' : ''}"
-	></div>
+	<div class="switch-thumb {checked ? 'switch-thumb-checked' : ''} {mounted ? 'switch-thumb-mounted' : ''}"></div>
 </button>
 
 <style>
@@ -69,14 +66,14 @@
 		background-color: var(--input);
 		box-shadow: var(--shadow-sm);
 		transition: all 0.2s ease;
-		
+
 		/* Focus styles */
 		outline: none;
 	}
 
 	.switch-button:focus-visible {
 		outline: none;
-		box-shadow: 
+		box-shadow:
 			var(--shadow-sm),
 			0 0 0 2px var(--background),
 			0 0 0 4px var(--ring);
@@ -137,7 +134,9 @@
 
 	/* Thumb hover effect */
 	.switch-button:not(.switch-disabled):hover .switch-thumb {
-		box-shadow: var(--shadow-lg), 0 0 0 2px rgb(var(--primary) / 0.1);
+		box-shadow:
+			var(--shadow-lg),
+			0 0 0 2px rgb(var(--primary) / 0.1);
 	}
 
 	/* Active/pressed state */
@@ -147,6 +146,8 @@
 
 	/* Accessibility improvements */
 	.switch-button:focus-visible .switch-thumb {
-		box-shadow: var(--shadow-lg), 0 0 0 2px var(--ring);
+		box-shadow:
+			var(--shadow-lg),
+			0 0 0 2px var(--ring);
 	}
 </style>

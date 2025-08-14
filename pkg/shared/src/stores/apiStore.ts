@@ -1,11 +1,10 @@
-import { writable, get } from 'svelte/store'
+import { get, writable } from 'svelte/store'
 import { socketService } from '../services/socket'
 
 // Create a store for the API configuration toggle
 export const apiConfigEnabled = writable(false)
 
 // Get the initial value from server data or environment variable
-// localStorage loading is now handled by localStorage service
 const getInitialApiUrl = (): string => {
 	if (typeof window !== 'undefined') {
 		// First check if server provided URL via template injection
@@ -26,8 +25,6 @@ export const apiBaseUrl = writable(getInitialApiUrl())
 
 // Create a derived store for the effective API URL
 export const effectiveApiUrl = writable(getInitialApiUrl())
-
-// Automatic saving to localStorage is now handled by localStorage service
 
 // Update effective URL when either store changes
 apiConfigEnabled.subscribe((enabled) => {

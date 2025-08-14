@@ -8,13 +8,6 @@ export function loadDebugState(): void {
 	console.warn('debugStore.loadDebugState() is deprecated. Initialize localStorageService instead.')
 }
 
-// Save debug state - now handled by localStorage service
-// This function is kept for backward compatibility but does nothing
-function saveDebugState(visible: boolean): void {
-	// Saving is now handled automatically by localStorage service
-	// This function is deprecated
-}
-
 // Toggle debug menu visibility
 export function toggleDebugMenu(): boolean {
 	debugVisible.update((current) => !current)
@@ -28,7 +21,4 @@ export function getDebugMenuVisible(): boolean {
 // Set debug menu visibility
 export function setDebugMenuVisible(visible: boolean): void {
 	debugVisible.set(visible)
-	// Saving to localStorage is now handled automatically by localStorage service
 }
-
-// Automatic saving is now handled by localStorage service

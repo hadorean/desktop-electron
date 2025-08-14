@@ -25,7 +25,7 @@
 
 	:global([data-slot='tabs-trigger']:focus-visible) {
 		outline: none;
-		box-shadow: 
+		box-shadow:
 			0 0 0 2px var(--background),
 			0 0 0 4px var(--ring);
 	}

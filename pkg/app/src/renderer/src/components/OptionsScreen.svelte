@@ -21,7 +21,6 @@
 
 	let isSelectingFolder = $state(false)
 	let isLoading = $state(true)
-	let isSaving = $state(false)
 
 	// Load user options on mount
 	onMount(async () => {
@@ -53,7 +52,7 @@
 		}>
 	) => {
 		try {
-			isSaving = true
+			// isSaving = true
 			const options = {
 				imageDirectory: selectedFolder,
 				port,
@@ -71,7 +70,7 @@
 		} catch (error) {
 			console.error('Error saving user options:', error)
 		} finally {
-			isSaving = false
+			// isSaving = false
 		}
 	}
 
