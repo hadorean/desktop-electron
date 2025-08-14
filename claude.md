@@ -27,7 +27,8 @@ The project uses a monorepo structure with three main packages:
 When exiting plan mode, always do this first:
  - Write the plan in docs/memories/YYYY-MM/YYYY-MM-DD-topic.md
  - Set the date after the doc title: Date: YYYY-MM-DD
- - create a branch feature/<topic>
+ - Create a branch feature/<topic>
+ - Commit the plan to the branch right away: "<Topic> plan"
 
 During execution:
  - Commit regularly (each phase)
