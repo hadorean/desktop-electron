@@ -1,4 +1,5 @@
 import { ServerEventMap, ServerEvents } from '$shared/types/sockets'
+import { onUserOptionsChanged } from '$shared/stores/userOptionsStore'
 import cors from 'cors'
 import express from 'express'
 import { createServer } from 'http'
@@ -19,6 +20,7 @@ export class LocalServer {
 	private dev: DevelopmentManager
 	public port: number = 8080
 	private isRunning: boolean = false
+	private unsubscribeOptionsWatcher: (() => void) | null = null
 
 	constructor() {
 		this.server = express()
@@ -29,6 +31,7 @@ export class LocalServer {
 		this.setupMiddleware()
 		registerRoutes(this)
 		this.setupImageWatcher()
+		this.setupPortWatcher()
 	}
 
 	private setupMiddleware(): void {
@@ -103,16 +106,21 @@ export class LocalServer {
 		})
 	}
 
-	public stop(): void {
-		if (this.isRunning) {
-			this.template.stop()
-			this.sockets.close()
+	public stop(): Promise<void> {
+		return new Promise((resolve) => {
+			if (this.isRunning) {
+				this.template.stop()
+				this.sockets.close()
 
-			// Note: In a real implementation, you'd want to properly close the server
-			// This is a simplified version
-			this.isRunning = false
-			console.log('🛑 Local server stopped')
-		}
+				this.httpServer.close(() => {
+					this.isRunning = false
+					console.log('🛑 Local server stopped')
+					resolve()
+				})
+			} else {
+				resolve()
+			}
+		})
 	}
 
 	public getUrl(): string {
@@ -146,6 +154,41 @@ export class LocalServer {
 
 	public set clientAssets(assets: { js: string; css: string } | null) {
 		this.dev.clientAssets = assets
+	}
+
+	public updatePort(newPort: number): void {
+		this.port = newPort
+		console.log(`🔧 Port updated to ${newPort}`)
+	}
+
+	public async restart(): Promise<void> {
+		console.log('🔄 Restarting local server...')
+		await this.stop()
+		await this.start()
+		// Notify observers that server has restarted
+		setLocalServer(this)
+		console.log('✅ Local server restarted successfully')
+	}
+
+	private setupPortWatcher(): void {
+		// Watch for port changes in user options
+		this.unsubscribeOptionsWatcher = onUserOptionsChanged((newOptions, previousOptions) => {
+			if (newOptions.port !== previousOptions.port) {
+				console.log(`🔧 Port change detected: ${previousOptions.port} → ${newOptions.port}`)
+				this.updatePort(newOptions.port)
+				this.restart().catch((error) => {
+					console.error('Failed to restart server after port change:', error)
+				})
+			}
+		})
+	}
+
+	public destroy(): void {
+		// Clean up watchers
+		if (this.unsubscribeOptionsWatcher) {
+			this.unsubscribeOptionsWatcher()
+			this.unsubscribeOptionsWatcher = null
+		}
 	}
 }
 

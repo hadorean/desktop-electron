@@ -1,13 +1,15 @@
 import { BrowserWindow, screen } from 'electron'
 import { attach, detach, reset } from 'electron-as-wallpaper'
-import { getLocalServer, setBg } from '../stores/appStore'
+import { getLocalServer, setBg, localServer } from '../stores/appStore'
 
 export class BackgroundManager {
 	private backgroundWindows: Map<number, BrowserWindow> = new Map()
 	private serverUrl: string | null = null
+	private serverUnsubscribe: (() => void) | null = null
 
 	constructor() {
 		this.serverUrl = getLocalServer()?.getUrl() ?? null
+		this.setupServerWatcher()
 		this.start()
 	}
 
@@ -221,6 +223,46 @@ export class BackgroundManager {
 		this.backgroundWindows.forEach((_window, monitorId) => {
 			this.makeNonInteractive(monitorId)
 		})
+	}
+
+	private setupServerWatcher(): void {
+		// Watch for server changes/restarts
+		this.serverUnsubscribe = localServer.subscribe((server) => {
+			if (server) {
+				const newServerUrl = server.getUrl()
+				if (this.serverUrl !== newServerUrl) {
+					console.log(`🔄 Server URL changed: ${this.serverUrl} → ${newServerUrl}`)
+					this.serverUrl = newServerUrl
+					this.reloadWindows()
+				}
+			}
+		})
+	}
+
+	public reloadWindows(): void {
+		if (!this.serverUrl) {
+			console.warn('⚠️ Cannot reload windows: server URL not available')
+			return
+		}
+
+		console.log('🔄 Reloading all background windows with new server URL...')
+		this.backgroundWindows.forEach((window, index) => {
+			if (!window.isDestroyed()) {
+				const monitorUrl = `monitor${index + 1}`
+				const backgroundUrl = `${this.serverUrl}/app/${monitorUrl}`
+				console.log(`🔄 Reloading monitor ${index}: ${backgroundUrl}`)
+				window.loadURL(backgroundUrl)
+			}
+		})
+	}
+
+	public destroy(): void {
+		// Clean up watchers
+		if (this.serverUnsubscribe) {
+			this.serverUnsubscribe()
+			this.serverUnsubscribe = null
+		}
+		this.cleanup()
 	}
 }
 

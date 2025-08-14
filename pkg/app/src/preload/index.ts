@@ -9,6 +9,8 @@ import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 const api = {
 	getServerUrl: () => ipcRenderer.invoke(IpcEvents.GetServerUrl),
 	isServerRunning: () => ipcRenderer.invoke(IpcEvents.IsServerRunning),
+	restartServerWithPort: (port: number) => ipcRenderer.invoke(IpcEvents.RestartServerWithPort, port),
+	getServerStatus: () => ipcRenderer.invoke(IpcEvents.GetServerStatus),
 	getAppVersion: () => ipcRenderer.invoke(IpcEvents.GetAppVersion),
 	reloadBackground: (monitorId: number) => ipcRenderer.invoke(IpcEvents.ReloadBackground, monitorId),
 	reloadAllBackgrounds: () => ipcRenderer.invoke(IpcEvents.ReloadAllBackgrounds),

@@ -42,6 +42,45 @@ export function initIpc(): void {
 		return localServer?.isServerRunning()
 	})
 
+	handleIpc(IpcEvents.RestartServerWithPort, async (...args: unknown[]) => {
+		try {
+			const newPort = args[1] as number
+			if (!localServer) {
+				return { success: false, error: 'Server not available' }
+			}
+
+			console.log(`🔄 Restarting server with port ${newPort}`)
+			localServer.updatePort(newPort)
+			await localServer.restart()
+			return { success: true, data: { port: newPort, url: localServer.getUrl() } }
+		} catch (error) {
+			console.error('IPC restart-server-with-port error:', error)
+			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+		}
+	})
+
+	handleIpc(IpcEvents.GetServerStatus, () => {
+		try {
+			const server = getLocalServer()
+			if (!server) {
+				return { success: true, data: { status: 'disconnected', port: null, url: null } }
+			}
+
+			const status = server.isServerRunning() ? 'connected' : 'disconnected'
+			return {
+				success: true,
+				data: {
+					status,
+					port: server.port,
+					url: server.isServerRunning() ? server.getUrl() : null
+				}
+			}
+		} catch (error) {
+			console.error('IPC get-server-status error:', error)
+			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+		}
+	})
+
 	// IPC handler for app version
 	handleIpc(IpcEvents.GetAppVersion, () => {
 		return app.getVersion()

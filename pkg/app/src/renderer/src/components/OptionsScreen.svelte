@@ -22,6 +22,12 @@
 	let isSelectingFolder = $state(false)
 	let isLoading = $state(true)
 
+	// Port management state
+	let originalPort = $state(8080)
+	let portPendingRestart = $state(false)
+	let serverStatus = $state<'connected' | 'pending' | 'disconnected' | 'unknown'>('unknown')
+	let isRestartingServer = $state(false)
+
 	// Load user options on mount
 	onMount(async () => {
 		try {
@@ -30,10 +36,12 @@
 			if (result.success && result.data) {
 				selectedFolder = result.data.imageDirectory
 				port = result.data.port || 8080
+				originalPort = port
 				autoStart = result.data.autoStart ?? true
 				openWindowOnStart = result.data.openWindowOnStart ?? false
 				windowOpacity = result.data.windowOpacity ?? 1.0
 			}
+			await checkServerStatus()
 		} catch (error) {
 			console.error('Error loading user options:', error)
 		} finally {
@@ -114,7 +122,10 @@
 		const target = event.target as HTMLInputElement
 		const newPort = parseInt(target.value) || 8080
 		port = newPort
-		saveAfterDelay({ port: newPort })
+		portPendingRestart = newPort !== originalPort
+		if (portPendingRestart) {
+			serverStatus = 'pending'
+		}
 	}
 
 	// Handler for switch changes
@@ -132,6 +143,59 @@
 	const handleOpacityChange = (value: number[]) => {
 		windowOpacity = value[0]
 		saveAfterDelay({ windowOpacity: value[0] })
+	}
+
+	// Check server status
+	const checkServerStatus = async () => {
+		try {
+			const result = await window.api.getServerStatus()
+			if (result.success && result.data) {
+				serverStatus = result.data.status as typeof serverStatus
+			} else {
+				serverStatus = 'unknown'
+			}
+		} catch (error) {
+			console.error('Error checking server status:', error)
+			serverStatus = 'unknown'
+		}
+	}
+
+	// Apply port changes
+	const applyPortChange = async () => {
+		if (!portPendingRestart) return
+
+		isRestartingServer = true
+		serverStatus = 'pending'
+
+		try {
+			// First save the port to user options
+			await saveOptions({ port })
+
+			// Then restart the server with the new port
+			const result = await window.api.restartServerWithPort(port)
+
+			if (result.success) {
+				originalPort = port
+				portPendingRestart = false
+				serverStatus = 'connected'
+				console.log('✅ Server restarted successfully on port', port)
+			} else {
+				serverStatus = 'disconnected'
+				console.error('❌ Failed to restart server:', result.error)
+			}
+		} catch (error) {
+			console.error('Error restarting server:', error)
+			serverStatus = 'disconnected'
+		} finally {
+			isRestartingServer = false
+		}
+	}
+
+	// Cancel port changes
+	const cancelPortChange = () => {
+		port = originalPort
+		portPendingRestart = false
+		serverStatus = 'connected'
 	}
 
 	function saveAfterDelay(
@@ -252,10 +316,50 @@
 				</CardHeader>
 				<CardContent class="folder-card-content">
 					<div class="option-section">
+						<div class="server-status-row">
+							<div class="status-indicator">
+								<div class="status-icon status-{serverStatus}"></div>
+								<span class="status-text">
+									{#if serverStatus === 'connected'}
+										Connected (Port {originalPort})
+									{:else if serverStatus === 'pending'}
+										{portPendingRestart ? 'Restart Required' : 'Connecting...'}
+									{:else if serverStatus === 'disconnected'}
+										Disconnected
+									{:else}
+										Checking Status...
+									{/if}
+								</span>
+							</div>
+						</div>
+
 						<div class="input-row">
 							<label for="port-input" class="option-label">Port:</label>
-							<input id="port-input" type="number" min="1000" max="65535" value={port} oninput={handlePortChange} placeholder="8080" class="option-input" />
+							<input
+								id="port-input"
+								type="number"
+								min="1000"
+								max="65535"
+								value={port}
+								oninput={handlePortChange}
+								placeholder="8080"
+								class="option-input"
+								disabled={isRestartingServer}
+							/>
 						</div>
+
+						{#if portPendingRestart}
+							<div class="port-actions">
+								<p class="port-warning">Changing the port requires restarting the server and will reload all background windows.</p>
+								<div class="button-row">
+									<Button variant="outline" onclick={cancelPortChange} disabled={isRestartingServer} class="cancel-button">Cancel</Button>
+									<Button onclick={applyPortChange} disabled={isRestartingServer} class="apply-button">
+										{isRestartingServer ? 'Restarting...' : 'Apply Changes'}
+									</Button>
+								</div>
+							</div>
+						{/if}
+
 						<p class="option-description">Port number for the local server (1000-65535)</p>
 					</div>
 				</CardContent>
@@ -511,5 +615,82 @@
 	/* Make sure card components are not draggable */
 	:global(.options-content .card) {
 		-webkit-app-region: no-drag;
+	}
+
+	/* Server status styles */
+	.server-status-row {
+		margin-bottom: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+	}
+
+	.status-indicator {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.status-icon {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.status-icon.status-connected {
+		background-color: #22c55e; /* Green */
+		box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+	}
+
+	.status-icon.status-pending {
+		background-color: #f59e0b; /* Amber */
+		box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+	}
+
+	.status-icon.status-disconnected {
+		background-color: #ef4444; /* Red */
+		box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+	}
+
+	.status-icon.status-unknown {
+		background-color: #6b7280; /* Gray */
+		box-shadow: 0 0 8px rgba(107, 114, 128, 0.5);
+	}
+
+	.status-text {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--text-secondary);
+	}
+
+	/* Port actions styles */
+	.port-actions {
+		margin-top: 1rem;
+		padding: 1rem;
+		background-color: var(--background-secondary);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+	}
+
+	.port-warning {
+		font-size: 0.875rem;
+		color: var(--text-warning);
+		margin-bottom: 1rem;
+		line-height: 1.4;
+	}
+
+	.button-row {
+		display: flex;
+		gap: 0.75rem;
+		justify-content: flex-end;
+	}
+
+	:global(.cancel-button) {
+		min-width: 80px;
+	}
+
+	:global(.apply-button) {
+		min-width: 120px;
 	}
 </style>

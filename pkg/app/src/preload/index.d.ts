@@ -8,6 +8,8 @@ declare global {
 		api: {
 			getServerUrl: () => Promise<string>
 			isServerRunning: () => Promise<boolean>
+			restartServerWithPort: (port: number) => Promise<{ success: boolean; data?: { port: number; url: string }; error?: string }>
+			getServerStatus: () => Promise<{ success: boolean; data?: { status: string; port: number | null; url: string | null }; error?: string }>
 			getAppVersion: () => Promise<string>
 			reloadBackground: (monitorId: number) => Promise<void>
 			reloadAllBackgrounds: () => Promise<void>

@@ -1,7 +1,7 @@
 /**
  * Reactive store for managing images across the application
  */
-import { writable, derived, get } from 'svelte/store'
+import { derived, get, writable } from 'svelte/store'
 import { api, type ImageInfo } from '../services'
 
 // Internal store state
@@ -31,6 +31,16 @@ const initialState: ImagesStoreState = {
 
 // Create the main store
 const imagesStoreInternal = writable<ImagesStoreState>(initialState)
+
+// Derived stores for convenient access
+export const images = derived(imagesStoreInternal, ($store) => $store.images)
+export const imagesLoading = derived(imagesStoreInternal, ($store) => $store.isLoading)
+export const imagesError = derived(imagesStoreInternal, ($store) => $store.error)
+export const imagesLastUpdated = derived(imagesStoreInternal, ($store) => $store.lastUpdated)
+export const hasImages = derived(images, ($images) => $images.length > 0)
+
+// Combined derived store for components that need multiple values
+export const imagesState = derived(imagesStoreInternal, ($store) => $store)
 
 /**
  * Load images from the API
@@ -92,9 +102,7 @@ export async function refreshImages(): Promise<void> {
 /**
  * Clear the store (useful for cleanup)
  */
-export function clearImages(): void {
-	imagesStoreInternal.set(initialState)
-}
+export const clearImages = (): void => imagesStoreInternal.set(initialState)
 
 /**
  * Update images directly (for use by socket events in Phase 3)
@@ -108,33 +116,8 @@ export function updateImages(newImages: ImageInfo[]): void {
 	console.log(`📷 Updated store with ${newImages.length} images via direct update`)
 }
 
-// Derived stores for convenient access
-export const images = derived(imagesStoreInternal, ($store) => $store.images)
-export const imagesLoading = derived(imagesStoreInternal, ($store) => $store.isLoading)
-export const imagesError = derived(imagesStoreInternal, ($store) => $store.error)
-export const imagesLastUpdated = derived(imagesStoreInternal, ($store) => $store.lastUpdated)
-
-// Combined derived store for components that need multiple values
-export const imagesState = derived(imagesStoreInternal, ($store) => $store)
-
-/**
- * Get current images synchronously (useful for imperative code)
- */
-export function getCurrentImages(): ImageInfo[] {
-	return get(images)
-}
-
-/**
- * Get current loading state synchronously
- */
-export function isImagesLoading(): boolean {
-	return get(imagesLoading)
-}
-
-/**
- * Check if images store is empty
- */
-export const hasImages = derived(images, ($images) => $images.length > 0)
+export const getCurrentImages = () => get(images)
+export const isImagesLoading = () => get(imagesLoading)
 
 /**
  * Register a callback to be notified when images change
@@ -183,6 +166,4 @@ export function imageExists(imageName: string): boolean {
 /**
  * Check if we're currently loading images (to prevent validation cascades)
  */
-export function getIsLoadingImages(): boolean {
-	return isLoadingImages
-}
+export const getIsLoadingImages = () => isLoadingImages

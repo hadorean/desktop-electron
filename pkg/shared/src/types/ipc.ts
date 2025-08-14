@@ -5,6 +5,8 @@ export const IpcEvents = {
 	// Server
 	GetServerUrl: 'get-server-url',
 	IsServerRunning: 'is-server-running',
+	RestartServerWithPort: 'restart-server-with-port',
+	GetServerStatus: 'get-server-status',
 
 	// App Info
 	GetAppVersion: 'get-app-version',
@@ -49,7 +51,10 @@ export const IpcEvents = {
 
 	// User Options
 	GetUserOptions: 'get-user-options',
-	UpdateUserOptions: 'update-user-options'
+	UpdateUserOptions: 'update-user-options',
+
+	// Server Status Events
+	ServerStatusChanged: 'server-status-changed'
 } as const
 
 // Type for main process events (handled by ipcMain)
@@ -57,6 +62,8 @@ export type MainEvents =
 	| typeof IpcEvents.Ping
 	| typeof IpcEvents.GetServerUrl
 	| typeof IpcEvents.IsServerRunning
+	| typeof IpcEvents.RestartServerWithPort
+	| typeof IpcEvents.GetServerStatus
 	| typeof IpcEvents.GetAppVersion
 	| typeof IpcEvents.ReloadBackground
 	| typeof IpcEvents.ReloadAllBackgrounds
@@ -87,3 +94,4 @@ export type RendererEvents =
 	| typeof IpcEvents.UpdateDownloadProgress
 	| typeof IpcEvents.UpdateDownloaded
 	| typeof IpcEvents.DebugStateChanged
+	| typeof IpcEvents.ServerStatusChanged
