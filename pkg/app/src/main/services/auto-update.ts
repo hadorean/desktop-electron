@@ -1,4 +1,5 @@
 import { IpcEvents, MainEvents, RendererEvents } from '$shared/types/ipc'
+import { is } from '@electron-toolkit/utils'
 import { ipcMain } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
 import { MainWindow } from '../windows/mainWindow'
@@ -12,6 +13,13 @@ export function setupAutoUpdate(mainWindow: MainWindow): {
 	// Configure auto-updater
 	autoUpdater.autoDownload = false
 	autoUpdater.autoInstallOnAppQuit = true
+
+	if (!is.dev) {
+		// Check for updates after a short delay to ensure app is fully loaded
+		setTimeout(() => {
+			autoUpdater.checkForUpdates()
+		}, 3000)
+	}
 
 	// Type-safe IPC wrappers
 	const handleIpc = (event: MainEvents, handler: () => void): void => {
