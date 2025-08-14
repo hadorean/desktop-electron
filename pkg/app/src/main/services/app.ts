@@ -7,8 +7,9 @@ import { onUserOptionsChanged } from '$shared/stores/userOptionsStore'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow } from 'electron'
 import { LocalServer } from '../server'
+import { setIsQuitting } from '../stores/appStore'
 import { BackgroundManager } from '../windows/backgrounds'
-import { createWindow, mainWindow, MainWindow } from '../windows/mainWindow'
+import { createWindow, MainWindow } from '../windows/mainWindow'
 import { unregisterGlobalShortcuts } from '../windows/shortcuts'
 
 export type AppContext = {
@@ -48,7 +49,7 @@ export function init(setup: () => Promise<AppContext>): void {
 	// Handle app quit events to ensure proper cleanup
 	app.on('before-quit', () => {
 		console.log('App quitting - starting cleanup...')
-		mainWindow.setIsQuitting(true)
+		setIsQuitting(true)
 		unregisterGlobalShortcuts()
 		context?.bg.cleanup()
 		context?.localServer.stop()

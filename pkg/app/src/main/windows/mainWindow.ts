@@ -3,14 +3,15 @@ import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, screen, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { join } from 'path'
+import { get } from 'svelte/store'
 import icon from '../../../resources/icon.png?asset'
 import { userOptionsService } from '../services/user-options'
+import { isQuitting } from '../stores/appStore'
 
 // Store reference to main window
 let window: BrowserWindow | null = null
 
 // Track if the app is actually quitting
-let isQuitting = false
 
 export function createWindow(): void {
 	const transparent = appConfig.window.transparent
@@ -78,7 +79,7 @@ export function createWindow(): void {
 
 	// Close to tray behavior
 	window.on('close', (event) => {
-		if (!isQuitting) {
+		if (!get(isQuitting)) {
 			event.preventDefault()
 			window?.hide()
 		}
@@ -86,7 +87,7 @@ export function createWindow(): void {
 
 	// Hide window when it loses focus
 	window.on('blur', () => {
-		if (!isQuitting && window && !window.isDestroyed()) {
+		if (!get(isQuitting) && window && !window.isDestroyed()) {
 			ensureTitleBarIsHidden()
 		}
 	})
@@ -142,14 +143,6 @@ function getMainWindow(): BrowserWindow | null {
 	return window
 }
 
-function setIsQuitting(quitting: boolean): void {
-	isQuitting = quitting
-}
-
-export function getIsQuitting(): boolean {
-	return isQuitting
-}
-
 function showMainWindow(): void {
 	if (window && !window.isDestroyed()) {
 		window.show()
@@ -182,7 +175,6 @@ export const mainWindow = {
 	hide: hideMainWindow,
 	toggle: toggleMainWindow,
 	get: getMainWindow,
-	setIsQuitting: (quitting: boolean) => setIsQuitting(quitting),
 	recreate: recreateMainWindow
 }
 

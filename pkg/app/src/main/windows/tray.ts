@@ -1,5 +1,6 @@
 import { Menu, shell, Tray } from 'electron'
 import { AppContext } from '../services/app'
+import { setIsQuitting } from '../stores/appStore'
 
 export function setupTray(context: AppContext): Tray {
 	const { app, icon, localServer, mainWindow, bg } = context
@@ -27,7 +28,7 @@ export function setupTray(context: AppContext): Tray {
 			label: 'Quit',
 			click: () => {
 				console.log('Tray quit clicked - starting cleanup...')
-				mainWindow.setIsQuitting(true)
+				setIsQuitting(true)
 				bg?.cleanup()
 				localServer.stop()
 
