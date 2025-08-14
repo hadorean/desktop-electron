@@ -8,7 +8,9 @@ import {
 	type DayNightMode,
 	type ScreenProfile,
 	type ScreenSettings,
-	type UserSettings
+	type ScreenType,
+	type UserSettings,
+	colors
 } from '../types'
 
 const defaultScreenId = 'monitor1'
@@ -497,6 +499,109 @@ export function shouldPreventServerSync(): boolean {
 //     updatingLocally = false;
 //   }
 // }
+
+/**
+ * Assign screen type based on screen name/context
+ */
+export function assignScreenType(screenId: string): ScreenType {
+	if (screenId.toLowerCase().includes('browser')) {
+		return 'interactive'
+	}
+	if (screenId.toLowerCase().includes('monitor')) {
+		return 'static'
+	}
+	// Default to static for unknown screen types
+	return 'static'
+}
+
+/**
+ * Assign a color to a screen from the predefined palette using index-based assignment
+ */
+export function assignScreenColor(screenId: string, allScreenIds: string[]): string {
+	// Skip white (index 0) - reserved for shared/home
+	const availableColors = colors.slice(1)
+
+	// Get the index of this screen in the sorted list
+	const sortedScreenIds = [...allScreenIds].sort()
+	const screenIndex = sortedScreenIds.indexOf(screenId)
+
+	// Use modulo to cycle through available colors if we have more screens than colors
+	const colorIndex = screenIndex % availableColors.length
+
+	return availableColors[colorIndex]
+}
+
+/**
+ * Ensure all screens have proper type and color assignments
+ */
+export function normalizeScreenSettings(): void {
+	allSettings.update((settings) => {
+		const updatedScreens: Record<string, ScreenSettings> = {}
+		let hasChanges = false
+
+		// Get all screen IDs for color assignment
+		const allScreenIds = Object.keys(settings.screens)
+
+		// Process each screen
+		for (const [screenId, screenSettings] of Object.entries(settings.screens)) {
+			const updatedSettings = { ...screenSettings }
+
+			// Assign type if missing
+			if (!updatedSettings.type) {
+				updatedSettings.type = assignScreenType(screenId)
+				hasChanges = true
+			}
+
+			// Assign color if missing or is white (which should be reserved for shared)
+			if (!updatedSettings.color || updatedSettings.color === 'white' || updatedSettings.color === '#ffffff') {
+				updatedSettings.color = assignScreenColor(screenId, allScreenIds)
+				hasChanges = true
+			}
+
+			updatedScreens[screenId] = updatedSettings
+		}
+
+		// Ensure shared settings has white color
+		let updatedShared = settings.shared
+		if (!updatedShared.color || updatedShared.color !== '#ffffff') {
+			updatedShared = { ...updatedShared, color: '#ffffff' }
+			hasChanges = true
+		}
+
+		return hasChanges
+			? {
+					...settings,
+					screens: updatedScreens,
+					shared: updatedShared
+				}
+			: settings
+	})
+}
+
+/**
+ * Get formatted screen name based on type and ID
+ */
+export function getFormattedScreenName(screenId: string, screenSettings?: ScreenSettings): string {
+	if (!screenSettings?.type) {
+		// Fallback to basic formatting
+		if (screenId.toLowerCase().includes('monitor')) {
+			const match = screenId.match(/(\d+)/)
+			return match ? `Monitor ${match[1]}` : 'Monitor'
+		}
+		if (screenId.toLowerCase().includes('browser')) {
+			return 'Browser'
+		}
+		return screenId
+	}
+
+	if (screenSettings.type === 'interactive') {
+		return 'Browser'
+	} else {
+		// Static screen - extract monitor number if possible
+		const match = screenId.match(/(\d+)/)
+		return match ? `Monitor ${match[1]}` : 'Monitor'
+	}
+}
 
 // loadSettings function moved to localStorage service
 // This function is now deprecated - use localStorageService.loadSettings() instead

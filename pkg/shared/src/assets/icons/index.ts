@@ -2,6 +2,7 @@
 export { default as BackArrowIcon } from './back-arrow.svg?raw'
 export { default as BrowserIcon } from './browser.svg?raw'
 export { default as CogIcon } from './cog.svg?raw'
+export { default as HomeIcon } from './home.svg?raw'
 export { default as MonitorIcon } from './monitor.svg?raw'
 export { default as MoonIcon } from './moon.svg?raw'
 export { default as SunIcon } from './sun.svg?raw'

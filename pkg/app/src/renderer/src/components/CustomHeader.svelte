@@ -48,7 +48,6 @@
 		padding: 0 15px;
 		z-index: 9999; /* Higher z-index to prevent white header from showing */
 		padding: 0.5rem;
-		margin-bottom: 1rem;
 	}
 
 	.header-left {

@@ -1,196 +1,152 @@
 <script lang="ts">
-	import { allSettings, currentScreen, isLocalMode, isNightMode, screenIds, toggleDayNightMode } from '../../stores/settingsStore'
-	import { DefaultScreenSettings } from '../../types'
-	import { Button, Tabs, TabsList, TabsTrigger } from '../ui'
+	import { onMount } from 'svelte'
+	import {
+		allSettings,
+		currentScreen,
+		getFormattedScreenName,
+		isLocalMode,
+		isNightMode,
+		normalizeScreenSettings,
+		screenIds,
+		toggleDayNightMode
+	} from '../../stores/settingsStore'
+	import { Button, Icon } from '../ui'
 
-	let editMode = $state(false)
-	let renamingScreen = $state<string | null>(null)
-	let renameValue = $state('')
-	let showDeleteConfirm = $state<string | null>(null)
+	let containerRef: HTMLDivElement
+	let underlineRef: HTMLDivElement
+	let tabRefs: HTMLDivElement[] = []
 
 	// Reactive current tab value based on local mode and current screen
 	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared')
 
-	function handleTabChange(value: string): void {
-		if (!editMode) {
-			if (value === 'shared') {
-				isLocalMode.set(false)
-			} else {
-				currentScreen.set(value)
-				isLocalMode.set(true)
+	// Get all available tabs with their settings
+	const allTabs = $derived(() => {
+		const tabs = ['shared', ...$screenIds]
+		return tabs.map((tabId) => {
+			const settings = tabId === 'shared' ? $allSettings.shared : $allSettings.screens[tabId]
+			return {
+				id: tabId,
+				settings,
+				color: settings?.color || '#ffffff',
+				type: settings?.type,
+				name: tabId === 'shared' ? '' : getFormattedScreenName(tabId, settings),
+				icon: tabId === 'shared' ? ('home' as const) : settings?.type === 'interactive' ? ('browser' as const) : ('monitor' as const)
 			}
+		})
+	})
+
+	function handleTabClick(tabId: string): void {
+		if (tabId === 'shared') {
+			isLocalMode.set(false)
+		} else {
+			currentScreen.set(tabId)
+			isLocalMode.set(true)
 		}
+		updateUnderlinePosition()
 	}
 
-	function toggleEditMode(): void {
-		editMode = !editMode
-		renamingScreen = null
-		showDeleteConfirm = null
+	function updateUnderlinePosition(): void {
+		if (!underlineRef || !containerRef) return
+
+		const tabs = allTabs()
+		const currentIndex = tabs.findIndex((tab) => tab.id === currentTab)
+		if (currentIndex === -1) return
+
+		const targetTab = tabRefs[currentIndex]
+		if (!targetTab) return
+
+		const containerRect = containerRef.getBoundingClientRect()
+		const tabRect = targetTab.getBoundingClientRect()
+
+		const left = tabRect.left - containerRect.left
+		const width = tabRect.width
+		const color = tabs[currentIndex].color
+
+		underlineRef.style.left = `${left}px`
+		underlineRef.style.width = `${width}px`
+		underlineRef.style.backgroundColor = color
 	}
 
-	function confirmRename(): void {
-		if (renamingScreen && renameValue.trim() && renameValue !== renamingScreen) {
-			// Update settings structure with new screen name
-			allSettings.update((settings) => {
-				const oldScreenSettings = settings.screens[renamingScreen!]
-				const newScreens = { ...settings.screens }
+	onMount(() => {
+		// Ensure screen settings are normalized on mount
+		normalizeScreenSettings()
 
-				// Remove old screen
-				delete newScreens[renamingScreen!]
-				// Add with new name
-				newScreens[renameValue.trim()] = oldScreenSettings || {}
+		// Update underline position after initial render
+		setTimeout(() => {
+			updateUnderlinePosition()
+		}, 0)
+	})
 
-				return {
-					...settings,
-					screens: newScreens
-				}
-			})
-
-			// Update current screen if it was the renamed one
-			if ($currentScreen === renamingScreen) {
-				currentScreen.set(renameValue.trim())
-			}
-		}
-		renamingScreen = null
-	}
-
-	function cancelRename(): void {
-		renamingScreen = null
-	}
-
-	function confirmDelete(): void {
-		if (showDeleteConfirm && $screenIds.length > 1) {
-			const screenToDelete = showDeleteConfirm
-
-			// Switch to another screen if deleting current screen
-			if ($currentScreen === screenToDelete) {
-				const otherScreen = $screenIds.find((id) => id !== screenToDelete)
-				if (otherScreen) {
-					currentScreen.set(otherScreen)
-				}
-			}
-
-			// Remove from settings
-			allSettings.update((settings) => ({
-				...settings,
-				screens: Object.fromEntries(Object.entries(settings.screens).filter(([key]) => key !== screenToDelete))
-			}))
-		}
-		showDeleteConfirm = null
-	}
-
-	function cancelDelete(): void {
-		showDeleteConfirm = null
-	}
-
-	function addNewScreen(): void {
-		const newScreenName = `Screen ${$screenIds.length + 1}`
-
-		// Add new screen to settings
-		allSettings.update((settings) => ({
-			...settings,
-			screens: {
-				...settings.screens,
-				[newScreenName]: DefaultScreenSettings
-			}
-		}))
-
-		// Switch to new screen
-		currentScreen.set(newScreenName)
-	}
-
-	function handleKeyDown(event: KeyboardEvent): void {
-		if (event.key === 'Enter') {
-			confirmRename()
-		} else if (event.key === 'Escape') {
-			cancelRename()
-		}
-	}
-
-	function focus(element: HTMLElement): void {
-		element.focus()
-	}
+	// Update underline when current tab changes
+	$effect(() => {
+		currentTab // Track dependency
+		setTimeout(() => {
+			updateUnderlinePosition()
+		}, 0)
+	})
 
 	// Export function to be called from SettingsPanel
 	export function switchToNextScreen(direction: 'forward' | 'backward' = 'forward'): void {
-		if (editMode || renamingScreen) return
-
 		// Get all available tabs: shared + screen IDs
-		const allTabs = ['shared', ...$screenIds]
-		const currentIndex = allTabs.indexOf(currentTab)
+		const tabs = allTabs()
+		const tabIds = tabs.map((t) => t.id)
+		const currentIndex = tabIds.indexOf(currentTab)
 
 		// Calculate next index (cycle through)
 		let nextIndex: number
 		if (direction === 'backward') {
-			nextIndex = currentIndex <= 0 ? allTabs.length - 1 : currentIndex - 1
+			nextIndex = currentIndex <= 0 ? tabIds.length - 1 : currentIndex - 1
 		} else {
-			nextIndex = currentIndex >= allTabs.length - 1 ? 0 : currentIndex + 1
+			nextIndex = currentIndex >= tabIds.length - 1 ? 0 : currentIndex + 1
 		}
 
 		// Switch to next tab
-		const nextTab = allTabs[nextIndex]
-		handleTabChange(nextTab)
+		const nextTab = tabIds[nextIndex]
+		handleTabClick(nextTab)
 	}
 </script>
 
 <!-- Screen switcher container -->
 <div class="screen-switcher-container" role="tablist" aria-label="Screen switcher">
-	<Tabs value={currentTab} onValueChange={handleTabChange}>
-		<div class="tabs-wrapper">
-			<TabsList class="screen-tabs-list">
-				<!-- Shared settings tab -->
-				<TabsTrigger value="shared" class="screen-tab shared-tab">Shared</TabsTrigger>
-
-				{#each $screenIds as screenId (screenId)}
-					{#if renamingScreen === screenId}
-						<input class="screen-rename-input" bind:value={renameValue} onkeydown={handleKeyDown} onblur={confirmRename} use:focus />
-					{:else}
-						<TabsTrigger value={screenId} disabled={editMode} class="screen-tab">
-							{screenId}
-							{#if editMode}
-								<span class="edit-icon">✏️</span>
-							{/if}
-						</TabsTrigger>
-					{/if}
-				{/each}
-			</TabsList>
-
-			<!-- Day/Night toggle controls -->
-			<div class="daynight-controls">
-				{#if editMode}
-					<Button variant="secondary" size="sm" onclick={addNewScreen} class="add-screen-btn">+ Add</Button>
-				{/if}
-
-				<Button variant={editMode ? 'default' : 'ghost'} size="sm" onclick={toggleEditMode} class="edit-toggle-btn">
-					{editMode ? '✓ Done' : '✏️'}
-				</Button>
-
-				<!-- Global Day/Night theme toggle (always visible) -->
-				<Button
-					variant="ghost"
-					size="sm"
-					onclick={() => toggleDayNightMode()}
-					class="daynight-toggle-btn global-theme"
-					title={$isNightMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
+	<div class="tabs-wrapper">
+		<div class="screen-tabs-container" bind:this={containerRef}>
+			{#each allTabs() as tab, index (tab.id)}
+				<div
+					class="screen-tab"
+					class:active={currentTab === tab.id}
+					bind:this={tabRefs[index]}
+					onclick={() => handleTabClick(tab.id)}
+					role="tab"
+					tabindex="0"
+					onkeydown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') handleTabClick(tab.id)
+					}}
 				>
-					{$isNightMode ? '🌙' : '☀️'}
-				</Button>
-			</div>
-		</div>
-	</Tabs>
-
-	<!-- Delete confirmation dialog -->
-	{#if showDeleteConfirm}
-		<div class="delete-confirm">
-			<div class="delete-dialog">
-				<p>Delete "{showDeleteConfirm}"?</p>
-				<div class="delete-actions">
-					<Button variant="destructive" size="sm" onclick={confirmDelete}>Delete</Button>
-					<Button variant="secondary" size="sm" onclick={cancelDelete}>Cancel</Button>
+					<Icon name={tab.icon} size="md" className="screen-icon" />
+					<span class="screen-name" class:invisible={!tab.name}>
+						{tab.name || 'Home'}
+					</span>
 				</div>
-			</div>
+			{/each}
+
+			<!-- Animated underline -->
+			<div class="animated-underline" bind:this={underlineRef}></div>
 		</div>
-	{/if}
+
+		<!-- Day/Night toggle controls -->
+		<div class="daynight-controls">
+			<!-- Global Day/Night theme toggle -->
+			<Button
+				variant="ghost"
+				size="sm"
+				onclick={() => toggleDayNightMode()}
+				class="daynight-toggle-btn global-theme"
+				title={$isNightMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
+			>
+				{$isNightMode ? '🌙' : '☀️'}
+			</Button>
+		</div>
+	</div>
 </div>
 
 <style>
@@ -198,15 +154,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-bottom: 1rem;
+		margin-bottom: 2rem;
 		outline: none;
 		border-radius: 0.5rem;
 	}
-
-	/* .screen-switcher-container:focus-visible {
-		outline: 2px solid hsl(var(--primary));
-		outline-offset: 2px;
-	} */
 
 	.tabs-wrapper {
 		display: flex;
@@ -215,93 +166,84 @@
 		backdrop-filter: blur(10px);
 		padding: 8px 16px;
 		border-radius: 12px;
-		background: rgba(0, 0, 0, 0.3);
+		/* background: rgba(0, 0, 0, 0.3); */
 	}
 
-	:global(.screen-tabs-list) {
-		background: transparent !important;
+	.screen-tabs-container {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 4px 0;
+	}
+
+	.screen-tab {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 		gap: 4px;
-	}
-
-	:global(.screen-tab) {
-		color: rgba(255, 255, 255, 0.7) !important;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-		font-size: 0.875rem;
+		padding: 8px 12px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		border-radius: 8px;
 		min-width: 60px;
-		border-radius: 8px !important;
+		outline: none;
 	}
 
-	:global(.screen-tab[data-state='active']) {
-		background: hsl(var(--primary)) !important;
-		color: hsl(var(--primary-foreground)) !important;
-		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.3);
+	.screen-tab:hover {
+		background: rgba(255, 255, 255, 0.1);
 	}
 
-	:global(.screen-tab.shared-tab[data-state='active']) {
-		background: hsl(142 76% 36%) !important; /* Green for shared */
-		box-shadow: 0 0 0 2px hsl(142 76% 36% / 0.3);
+	.screen-tab:focus-visible {
+		outline: 2px solid rgba(255, 255, 255, 0.5);
+		outline-offset: 2px;
+	}
+
+	:global(.screen-tab .screen-icon) {
+		color: white;
+		filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+		transition: transform 0.2s ease;
+	}
+
+	.screen-tab.active :global(.screen-icon) {
+		transform: scale(1.1);
+	}
+
+	.screen-name {
+		color: rgba(255, 255, 255, 0.425);
+		font-size: 0.75rem;
+		font-weight: 500;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+		white-space: nowrap;
+		text-align: center;
+		transition: color 0.2s ease;
+	}
+
+	.screen-tab.active .screen-name {
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.screen-name.invisible {
+		visibility: hidden;
+	}
+
+	.animated-underline {
+		position: absolute;
+		bottom: -2px;
+		left: 0;
+		height: 3px;
+		border-radius: 1.5px;
+		background-color: #ffffff;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		pointer-events: none;
+		box-shadow: 0 0 8px currentColor;
 	}
 
 	.daynight-controls {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-	}
-
-	.edit-icon {
-		margin-left: 4px;
-		font-size: 0.75rem;
-	}
-
-	.screen-rename-input {
-		background: rgba(255, 255, 255, 0.9);
-		color: black;
-		border: 2px solid hsl(var(--primary));
-		padding: 6px 12px;
-		border-radius: 8px;
-		font-size: 0.875rem;
-		font-weight: 500;
-		min-width: 60px;
-		text-align: center;
-		outline: none;
-	}
-
-	:global(.add-screen-btn) {
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
-	}
-
-	:global(.edit-toggle-btn) {
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
-	}
-
-	.delete-confirm {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.5);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 1000;
-	}
-
-	.delete-dialog {
-		background: rgba(0, 0, 0, 0.8);
-		backdrop-filter: blur(10px);
-		padding: 20px;
-		border-radius: 12px;
-		color: white;
-		text-align: center;
-		min-width: 200px;
-	}
-
-	.delete-actions {
-		display: flex;
-		gap: 8px;
-		margin-top: 12px;
-		justify-content: center;
 	}
 
 	:global(.daynight-toggle-btn) {
