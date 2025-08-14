@@ -219,23 +219,4 @@
 		font-weight: 500;
 		color: var(--text-primary);
 	}
-
-	/* Scrollbar styling */
-	.settings-panel::-webkit-scrollbar {
-		width: 8px;
-	}
-
-	.settings-panel::-webkit-scrollbar-track {
-		background: var(--surface-hover);
-		border-radius: var(--radius-sm);
-	}
-
-	.settings-panel::-webkit-scrollbar-thumb {
-		background: var(--border-hover);
-		border-radius: var(--radius-sm);
-	}
-
-	.settings-panel::-webkit-scrollbar-thumb:hover {
-		background: var(--text-muted);
-	}
 </style>

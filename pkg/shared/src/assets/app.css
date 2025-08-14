@@ -10,60 +10,6 @@
    Clean CSS Variables - No Tailwind Required
    ======================================== */
 
-/* Draggable window areas - applied selectively instead of globally */
-body {
-	-webkit-app-region: drag;
-}
-
-/* Make interactive elements non-draggable */
-button,
-input,
-textarea,
-select,
-a,
-img,
-.slider,
-.slider-container,
-.settings-panel,
-.debug-menu,
-.switch-button,
-.switch-thumb,
-.switch-element,
-.image-grid-container,
-.image-grid,
-.image-thumbnail-card,
-.card-container,
-[role='button'],
-[role='switch'],
-[onclick],
-[data-interactive] {
-	-webkit-app-region: no-drag;
-}
-
-/* Explicitly make text elements draggable */
-label,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-span:not([role]):not(button span),
-div:not([role]):not(.slider):not(.slider-container):not(.icon):not(.switch-thumb):not(.slider-track):not(.slider-progress):not(.slider-thumb) {
-	-webkit-app-region: drag;
-}
-
-/* Make spans inside buttons non-draggable */
-button span {
-	-webkit-app-region: no-drag;
-}
-
-/* Utility class for making specific elements non-draggable */
-.no-drag {
-	-webkit-app-region: no-drag !important;
-}
-
 :root {
 	/* === BRAND COLORS === */
 	--brand-primary: #8ba1a7; /* Cyan 600 - main brand color */
@@ -250,7 +196,87 @@ code {
 	width: 100vw;
 }
 
+/* === SCROLLBAR === */
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--surface-hover);
+	border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--border-hover);
+	border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--text-muted);
+}
+
+/* === NO DRAG === */
+
+/* Draggable window areas - applied selectively instead of globally */
+body {
+	-webkit-app-region: drag;
+}
+
+/* Make interactive elements non-draggable */
+button,
+input,
+textarea,
+select,
+a,
+img,
+.slider,
+.slider-container,
+.settings-panel,
+.debug-menu,
+.switch-button,
+.switch-thumb,
+.switch-element,
+.image-grid-container,
+.image-grid,
+.image-thumbnail-card,
+.card-container,
+[role='button'],
+[role='switch'],
+[onclick],
+[data-interactive] {
+	-webkit-app-region: no-drag;
+}
+
+/* Explicitly make text elements draggable */
+/* label,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span:not([role]):not(button span),
+div:not([role]):not(.slider):not(.slider-container):not(.icon):not(.switch-thumb):not(.slider-track):not(.slider-progress):not(.slider-thumb) {
+	-webkit-app-region: drag;
+} */
+
+/* Make spans inside buttons non-draggable */
+button span {
+	-webkit-app-region: no-drag;
+}
+
+/* Utility class for making specific elements non-draggable */
+.no-drag {
+	-webkit-app-region: no-drag !important;
+}
+
+/* === DEBUG === */
+
 /* Debug styles - only active when body has 'debug' class */
+
 :global(body.debug button) {
 	border: 2px solid red !important;
 	background: rgba(255, 0, 0, 0.1) !important;

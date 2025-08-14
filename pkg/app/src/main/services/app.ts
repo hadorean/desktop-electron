@@ -3,6 +3,7 @@
  *
  */
 
+import { onUserOptionsChanged } from '$shared/stores/userOptionsStore'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow } from 'electron'
 import { LocalServer } from '../server'
@@ -20,7 +21,7 @@ export type AppContext = {
 
 let context: AppContext | null
 
-export function init(setup: () => AppContext | Promise<AppContext>): void {
+export function init(setup: () => Promise<AppContext>): void {
 	// This method will be called when Electron has finished
 	// initialization and is ready to create browser windows.
 	// Some APIs can only be used after this event occurs.
@@ -75,9 +76,12 @@ export function init(setup: () => AppContext | Promise<AppContext>): void {
 		}
 	})
 
-	// TODO
-	app.setLoginItemSettings({
-		openAtLogin: false,
-		openAsHidden: false
+	onUserOptionsChanged((options, previousOptions) => {
+		if (options.autoStart !== previousOptions.autoStart) {
+			app.setLoginItemSettings({
+				openAtLogin: options.autoStart,
+				openAsHidden: false
+			})
+		}
 	})
 }

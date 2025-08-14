@@ -2,6 +2,10 @@
 
 export interface UserOptions {
 	imageDirectory: string
+	port: number
+	autoStart: boolean
+	openWindowOnStart: boolean
+	windowOpacity: number
 }
 
 export interface UserOptionsUpdateEvent {
@@ -12,5 +16,9 @@ export interface UserOptionsUpdateEvent {
 }
 
 export const DefaultUserOptions: UserOptions = {
-	imageDirectory: 'D:\\pictures\\wall' // Default fallback
+	imageDirectory: 'D:\\pictures\\wall', // Default fallback
+	port: 8080,
+	autoStart: true,
+	openWindowOnStart: false,
+	windowOpacity: 1.0
 }

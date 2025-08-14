@@ -313,23 +313,4 @@
 	.ghost-thumbnail:hover {
 		opacity: 0.8 !important;
 	}
-
-	/* Scrollbar styling for the grid */
-	.image-grid-container :global(.overflow-y-auto)::-webkit-scrollbar {
-		width: 6px;
-	}
-
-	.image-grid-container :global(.overflow-y-auto)::-webkit-scrollbar-track {
-		background: hsl(var(--muted) / 0.3);
-		border-radius: 3px;
-	}
-
-	.image-grid-container :global(.overflow-y-auto)::-webkit-scrollbar-thumb {
-		background: hsl(var(--muted-foreground) / 0.5);
-		border-radius: 3px;
-	}
-
-	.image-grid-container :global(.overflow-y-auto)::-webkit-scrollbar-thumb:hover {
-		background: hsl(var(--muted-foreground) / 0.7);
-	}
 </style>

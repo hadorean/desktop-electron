@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Button, Card, CardContent, CardHeader, Icon } from '$shared/components/ui'
+	import { Button, Card, CardContent, CardHeader, Icon, Slider, Switch } from '$shared/components/ui'
+	import { updateUserOptions } from '$shared/stores'
 	import { onMount } from 'svelte'
 	import BackButton from './BackButton.svelte'
 
@@ -11,8 +12,13 @@
 
 	let { class: className = '', onBack, ...restProps }: Props = $props()
 
-	// State for folder selection
+	// State for options
 	let selectedFolder = $state('')
+	let port = $state(8080)
+	let autoStart = $state(true)
+	let openWindowOnStart = $state(false)
+	let windowOpacity = $state(1.0)
+
 	let isSelectingFolder = $state(false)
 	let isLoading = $state(true)
 	let isSaving = $state(false)
@@ -21,8 +27,13 @@
 	onMount(async () => {
 		try {
 			const result = await window.api.getUserOptions()
+
 			if (result.success && result.data) {
 				selectedFolder = result.data.imageDirectory
+				port = result.data.port || 8080
+				autoStart = result.data.autoStart ?? true
+				openWindowOnStart = result.data.openWindowOnStart ?? false
+				windowOpacity = result.data.windowOpacity ?? 1.0
 			}
 		} catch (error) {
 			console.error('Error loading user options:', error)
@@ -32,10 +43,26 @@
 	})
 
 	// Save options to store
-	const saveOptions = async (imageDirectory: string) => {
+	const saveOptions = async (
+		partialOptions: Partial<{
+			imageDirectory: string
+			port: number
+			autoStart: boolean
+			openWindowOnStart: boolean
+			windowOpacity: number
+		}>
+	) => {
 		try {
 			isSaving = true
-			const result = await window.api.updateUserOptions({ imageDirectory })
+			const options = {
+				imageDirectory: selectedFolder,
+				port,
+				autoStart,
+				openWindowOnStart,
+				windowOpacity,
+				...partialOptions
+			}
+			const result = await window.api.updateUserOptions(options)
 			if (result.success) {
 				console.log('User options updated successfully')
 			} else {
@@ -66,7 +93,7 @@
 			if (result.success && result.data && !result.data.canceled && result.data.filePaths.length > 0) {
 				const newFolder = result.data.filePaths[0]
 				selectedFolder = newFolder
-				await saveOptions(newFolder)
+				await saveOptions({ imageDirectory: newFolder })
 			}
 		} catch (error) {
 			console.error('Error opening folder dialog:', error)
@@ -80,18 +107,54 @@
 	const handleFolderPathChange = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		selectedFolder = target.value
+		saveAfterDelay({ imageDirectory: selectedFolder })
+	}
 
-		// Debounce save to avoid excessive API calls while typing
+	// Handler for port change
+	const handlePortChange = (event: Event) => {
+		const target = event.target as HTMLInputElement
+		const newPort = parseInt(target.value) || 8080
+		port = newPort
+		saveAfterDelay({ port: newPort })
+	}
+
+	// Handler for switch changes
+	const handleAutoStartChange = (checked: boolean) => {
+		autoStart = checked
+		saveAfterDelay({ autoStart: checked })
+	}
+
+	const handleOpenWindowOnStartChange = (checked: boolean) => {
+		openWindowOnStart = checked
+		saveAfterDelay({ openWindowOnStart: checked })
+	}
+
+	// Handler for opacity slider
+	const handleOpacityChange = (value: number[]) => {
+		windowOpacity = value[0]
+		saveAfterDelay({ windowOpacity: value[0] })
+	}
+
+	function saveAfterDelay(
+		options: Partial<{
+			imageDirectory: string
+			port: number
+			autoStart: boolean
+			openWindowOnStart: boolean
+			windowOpacity: number
+		}>
+	) {
+		updateUserOptions((current) => ({ ...current, ...options }))
 		if (saveTimeout) {
 			clearTimeout(saveTimeout)
 		}
 		saveTimeout = setTimeout(() => {
-			saveOptions(selectedFolder)
-		}, 1000) // Save after 1 second of inactivity
+			saveOptions(options)
+		}, 1000)
 	}
 </script>
 
-<div class="options-screen {className}" {...restProps}>
+<div class="options-screen no-drag {className}" {...restProps}>
 	<!-- Back Button -->
 	<div class="header">
 		{#if onBack}
@@ -111,12 +174,12 @@
 	</div>
 
 	<!-- Options Content -->
-	<div class="options-content">
-		<Card class="mb-6">
+	<div class="options-content no-drag">
+		<Card class="no-drag option-card">
 			<CardHeader>
 				<h1>Images folder</h1>
 			</CardHeader>
-			<CardContent class="folder-card-content">
+			<CardContent class="folder-card-content no-drag">
 				<div class="folder-selection">
 					<label for="folder-path" class="folder-label"> Select folder containing your wallpaper images: </label>
 
@@ -150,6 +213,95 @@
 						</div>
 					{/if}
 				</div>
+			</CardContent>
+		</Card>
+
+		<!-- Startup Options -->
+		<Card class="option-card">
+			<CardHeader>
+				<h1>Startup Options</h1>
+			</CardHeader>
+			<CardContent class="folder-card-content">
+				{#if isLoading}
+					<div class="loading-state">
+						<p class="loading-text">Loading...</p>
+					</div>
+				{:else}
+					<div class="option-section">
+						<div class="switch-row">
+							<div class="switch-info">
+								<label for="auto-start-switch" class="option-label">Auto-start application</label>
+								<p class="option-description">Automatically start the application when system boots</p>
+							</div>
+							<Switch id="auto-start-switch" checked={autoStart} onCheckedChange={handleAutoStartChange} disabled={isSaving} />
+						</div>
+					</div>
+
+					<div class="option-section">
+						<div class="switch-row">
+							<div class="switch-info">
+								<label for="open-window-switch" class="option-label">Open window on start</label>
+								<p class="option-description">Show the main window when application starts</p>
+							</div>
+							<Switch id="open-window-switch" checked={openWindowOnStart} onCheckedChange={handleOpenWindowOnStartChange} disabled={isSaving} />
+						</div>
+					</div>
+				{/if}
+			</CardContent>
+		</Card>
+
+		<!-- Server Configuration -->
+		<Card class="option-card">
+			<CardHeader>
+				<h1>Server Configuration</h1>
+			</CardHeader>
+			<CardContent class="folder-card-content">
+				<div class="option-section">
+					<label for="port-input" class="option-label">Port:</label>
+					{#if isLoading}
+						<div class="loading-state">
+							<p class="loading-text">Loading...</p>
+						</div>
+					{:else}
+						<div class="input-row">
+							<input
+								id="port-input"
+								type="number"
+								min="1000"
+								max="65535"
+								value={port}
+								oninput={handlePortChange}
+								placeholder="8080"
+								class="option-input"
+								disabled={isSaving}
+							/>
+						</div>
+						<p class="option-description">Port number for the local server (1000-65535)</p>
+					{/if}
+				</div>
+			</CardContent>
+		</Card>
+
+		<!-- Window Settings -->
+		<Card class="option-card">
+			<CardHeader>
+				<h1>Window Settings</h1>
+			</CardHeader>
+			<CardContent class="folder-card-content">
+				{#if isLoading}
+					<div class="loading-state">
+						<p class="loading-text">Loading...</p>
+					</div>
+				{:else}
+					<div class="option-section">
+						<label for="window-opacity-slider" class="option-label">Window Opacity:</label>
+						<div class="slider-section">
+							<Slider value={[windowOpacity]} min={0} max={1} step={0.01} onValueChange={handleOpacityChange} disabled={isSaving} class="opacity-slider" />
+							<span class="slider-value">{(windowOpacity * 100).toFixed(0)}%</span>
+						</div>
+						<p class="option-description">Adjust the transparency of application windows</p>
+					</div>
+				{/if}
 			</CardContent>
 		</Card>
 	</div>
@@ -208,6 +360,9 @@
 		width: 100%;
 		max-width: 600px;
 		-webkit-app-region: no-drag;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
 	}
 
 	.folder-input {
@@ -284,6 +439,88 @@
 	.saving-indicator {
 		font-size: 0.75rem;
 		color: var(--primary);
+	}
+
+	.option-section {
+		margin-bottom: 1.5rem;
+		-webkit-app-region: no-drag;
+	}
+
+	.option-section:last-child {
+		margin-bottom: 0;
+	}
+
+	.option-label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--text-secondary);
+	}
+
+	.option-description {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+		margin-top: 0.25rem;
+		line-height: 1.4;
+	}
+
+	.option-input {
+		flex: 1;
+		max-width: 200px;
+		background-color: var(--input-bg);
+		border: 1px solid var(--input-border);
+		border-radius: var(--radius-sm);
+		padding: 0.5rem 0.75rem;
+		color: var(--text-primary);
+		font-size: 0.875rem;
+		transition: border-color 0.2s ease;
+		-webkit-app-region: no-drag;
+	}
+
+	.option-input:focus {
+		outline: none;
+		border-color: var(--border-hover);
+		box-shadow: 0 0 0 2px rgba(var(--primary), 0.1);
+	}
+
+	.option-input::placeholder {
+		color: var(--text-muted);
+	}
+
+	.switch-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.switch-info {
+		flex: 1;
+	}
+
+	.slider-section {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-top: 0.5rem;
+	}
+
+	:global(.opacity-slider) {
+		flex: 1;
+		max-width: 300px;
+	}
+
+	.slider-value {
+		min-width: 3rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--text-primary);
+		text-align: right;
+	}
+
+	.option-card {
+		margin-bottom: 1.5rem;
 	}
 
 	/* Make sure card components are not draggable */

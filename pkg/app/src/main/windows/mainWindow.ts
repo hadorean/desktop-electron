@@ -1,9 +1,10 @@
+import { appConfig } from '$shared/types/config'
 import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, screen, shell } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { join } from 'path'
 import icon from '../../../resources/icon.png?asset'
-import { appConfig } from '../config'
+import { userOptionsService } from '../services/user-options'
 
 // Store reference to main window
 let window: BrowserWindow | null = null
@@ -53,14 +54,13 @@ export function createWindow(): void {
 		//console.log('Window resized', window?.getBounds())
 	})
 
-	window.on('ready-to-show', () => {
-		window?.show()
-	})
-
 	window.once('ready-to-show', () => {
 		if (!window) return
 		//snapToRight()
-		window.show()
+
+		if (userOptionsService.getCurrentOptions().openWindowOnStart) {
+			window.show()
+		}
 	})
 
 	// Check for updates when window is shown

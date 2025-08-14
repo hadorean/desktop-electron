@@ -32,7 +32,6 @@ async function start(): Promise<AppContext> {
 	}
 
 	setAppContext(context)
-
 	createWindow()
 	setupTray(context)
 	setupShortcuts(mainWindow)
@@ -40,12 +39,12 @@ async function start(): Promise<AppContext> {
 	setupAutoUpdate(mainWindow)
 	setupDebug()
 
-	localServer
-		.start()
-		.then(() => {
-			bg.start(localServer.getUrl())
-		})
-		.catch((error) => console.error('Failed to start local server:', error))
+	try {
+		await localServer.start()
+		bg.start(localServer.getUrl())
+	} catch (error) {
+		console.error('Failed to start local server:', error)
+	}
 
 	return context
 }

@@ -1,6 +1,6 @@
+import { getCurrentUserOptions, loadUserOptions, shouldPreventUserOptionsSync, userOptions } from '$shared/stores/userOptionsStore'
 import type { UserOptions, UserOptionsUpdateEvent } from '$shared/types'
 import { DefaultUserOptions } from '$shared/types/user-options'
-import { loadUserOptions, shouldPreventUserOptionsSync, userOptions, getCurrentUserOptions } from '$shared/stores/userOptionsStore'
 import { app } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
@@ -28,30 +28,30 @@ export class UserOptionsService {
 
 		// Subscribe to store changes for automatic persistence and socket broadcasting
 		userOptions.subscribe((options) => {
-			console.log('🔧 UserOptionsService subscription triggered with options:', options)
-			console.log('🔧 shouldPreventUserOptionsSync():', shouldPreventUserOptionsSync())
-			console.log('🔧 this.hasInitialized:', this.hasInitialized)
+			// console.log('🔧 UserOptionsService subscription triggered with options:', options)
+			// console.log('🔧 shouldPreventUserOptionsSync():', shouldPreventUserOptionsSync())
+			// console.log('🔧 this.hasInitialized:', this.hasInitialized)
 
 			// Skip persistence during initial load and internal operations
 			if (!shouldPreventUserOptionsSync() && this.hasInitialized) {
-				console.log('🔧 UserOptionsService: Auto-saving options to file system')
+				// console.log('🔧 UserOptionsService: Auto-saving options to file system')
 				this.saveToFileSystem(options).catch((error) => {
 					console.error('Failed to save user options:', error)
 				})
 			} else {
-				console.log('🔧 UserOptionsService: Skipping auto-save (preventSync:', shouldPreventUserOptionsSync(), 'initialized:', this.hasInitialized, ')')
+				// console.log('🔧 UserOptionsService: Skipping auto-save (preventSync:', shouldPreventUserOptionsSync(), 'initialized:', this.hasInitialized, ')')
 			}
 
 			// Broadcast image directory changes to clients
 			if (this.hasInitialized && this.localServer && this.previousImageDirectory && this.previousImageDirectory !== options.imageDirectory) {
-				console.log('🔄 UserOptionsService: Broadcasting image directory change to clients')
+				// console.log('🔄 UserOptionsService: Broadcasting image directory change to clients')
 				this.localServer.sockets.broadcastImagesUpdated('manual_refresh', 'image-directory-changed', 'user_options_change')
 			}
 			this.previousImageDirectory = options.imageDirectory
 		})
 
 		this.hasInitialized = true
-		console.log('🔧 UserOptionsService initialized')
+		// console.log('🔧 UserOptionsService initialized')
 	}
 
 	/**

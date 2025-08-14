@@ -1,69 +1,27 @@
 <script lang="ts">
 	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
 	import { initializeImageChangeHandling } from '$shared/services'
-	import { debugVisible, effectiveApiUrl, imagesError, loadImages, setDebugMenuVisible } from '$shared/stores'
-	import { toggleDayNightMode } from '$shared/stores/settingsStore'
+	import { debugVisible, effectiveApiUrl, imagesError, loadImages, userOptions } from '$shared/stores'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { ActionButtons, AppVersion, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
+	import { init } from './services/app'
+	import { appConfig } from './stores/appConfigStore'
 	import { currentPage, gotoPage } from './stores/pageStore'
 
 	const disabled = true
-	let transparentWindow = $state(false)
+
+	let transparent = $state(false)
 
 	onMount(async () => {
+		await init()
+
+		appConfig.subscribe((config) => {
+			transparent = config?.window.transparent ?? false
+		})
 		effectiveApiUrl.set('http://localhost:8080')
-
-		// Load images using the store
 		await loadImages()
-
-		// Get window configuration
-		if (window.api) {
-			try {
-				const config = await window.api.getWindowConfig()
-				transparentWindow = config.window.transparent
-				console.log('Desktop app: Window config:', config)
-			} catch (error) {
-				console.error('Failed to get window config:', error)
-			}
-
-			// Setup IPC listener for debug state changes
-			window.api.onDebugStateChanged((visible) => {
-				console.log('Desktop app: Received debug state change:', visible)
-				setDebugMenuVisible(visible)
-			})
-
-			// Setup IPC listener for day/night mode toggle
-			if (window.electron?.ipcRenderer) {
-				window.electron.ipcRenderer.on('toggle-day-night-mode', async () => {
-					try {
-						toggleDayNightMode()
-					} catch (error) {
-						console.error('Failed to toggle day/night mode in renderer:', error)
-					}
-				})
-			}
-		}
-
-		// Setup image change handling (deduplication, socket events, validation)
 		initializeImageChangeHandling('Desktop app')
-
-		// Add click debugging (only when body has debug class)
-		document.addEventListener(
-			'click',
-			(event) => {
-				if (document.body.classList.contains('debug')) {
-					console.log('🐛 DEBUG Click event:', {
-						target: event.target,
-						tagName: (event.target as Element)?.tagName,
-						className: (event.target as Element)?.className,
-						id: (event.target as Element)?.id,
-						coordinates: { x: event.clientX, y: event.clientY }
-					})
-				}
-			},
-			true
-		)
 	})
 </script>
 
@@ -82,15 +40,15 @@
 	]}
 />
 
-<div class:transparent={transparentWindow} class="flex h-full flex-col">
-	{#if transparentWindow}
+<div class:transparent class="flex h-full flex-col" style="--opacity: {transparent ? $userOptions.windowOpacity : 1}">
+	{#if transparent}
 		<CustomHeader />
 	{/if}
 
-	<PageContainer transparent={transparentWindow} class="flex-1">
+	<PageContainer {transparent} class="flex-1">
 		{#snippet settingsContent()}
 			<div class="settings-container">
-				<SettingsPanel expanded={true} transparent={transparentWindow} />
+				<SettingsPanel expanded={true} {transparent} />
 				<SettingsServerUpdate />
 				<ActionButtons />
 				<ErrorMessage message={$imagesError || ''} />
@@ -111,7 +69,7 @@
 		{/snippet}
 
 		{#snippet optionsContent()}
-			<OptionsScreen transparent={transparentWindow} onBack={() => gotoPage('main')} />
+			<OptionsScreen {transparent} onBack={() => gotoPage('main')} />
 		{/snippet}
 	</PageContainer>
 
@@ -137,13 +95,12 @@
 	}
 
 	footer {
-		position: absolute;
-		bottom: 1rem;
-		left: 1rem;
-		right: 1.5rem;
+		margin-top: auto;
+		padding: 0.5rem;
 		display: flex;
 		justify-content: flex-end;
 		gap: 0.5rem;
 		align-items: center;
+		z-index: 99999;
 	}
 </style>
