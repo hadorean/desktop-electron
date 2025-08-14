@@ -157,14 +157,15 @@
 <div class="options-screen no-drag {className}" {...restProps}>
 	<!-- Back Button -->
 	<div class="header">
-		{#if onBack}
-			<BackButton onclick={onBack} />
-		{/if}
+		{#if onBack}{/if}
 	</div>
 
 	<!-- Header -->
 	<div class="options-header">
 		<div class="title-section">
+			<div class="left" style="position: absolute; left: 2rem;">
+				<BackButton onclick={onBack} />
+			</div>
 			<div class="option-icon">
 				<Icon name="cog" size="lg" />
 			</div>
@@ -173,21 +174,21 @@
 		<p class="options-description">Configure application settings</p>
 	</div>
 
-	<!-- Options Content -->
-	<div class="options-content no-drag">
-		<Card class="no-drag option-card">
-			<CardHeader>
-				<h1>Images folder</h1>
-			</CardHeader>
-			<CardContent class="folder-card-content no-drag">
-				<div class="folder-selection">
-					<label for="folder-path" class="folder-label"> Select folder containing your wallpaper images: </label>
+	{#if isLoading}
+		<div class="loading-state">
+			<p class="loading-text">Loading options...</p>
+		</div>
+	{:else}
+		<!-- Options Content -->
+		<div class="options-content no-drag">
+			<Card class="no-drag option-card">
+				<CardHeader>
+					<h1>Images folder</h1>
+				</CardHeader>
+				<CardContent class="folder-card-content no-drag">
+					<div class="folder-selection">
+						<label for="folder-path" class="folder-label"> Select folder containing your wallpaper images: </label>
 
-					{#if isLoading}
-						<div class="loading-state">
-							<p class="loading-text">Loading options...</p>
-						</div>
-					{:else}
 						<div class="input-row">
 							<input
 								id="folder-path"
@@ -196,9 +197,8 @@
 								oninput={handleFolderPathChange}
 								placeholder="Enter folder path..."
 								class="folder-input"
-								disabled={isSaving}
 							/>
-							<Button variant="outline" onclick={handleBrowseFolder} disabled={isSelectingFolder || isSaving} class="browse-button">
+							<Button variant="outline" onclick={handleBrowseFolder} disabled={isSelectingFolder} class="browse-button">
 								{isSelectingFolder ? 'Selecting...' : 'Browse'}
 							</Button>
 						</div>
@@ -207,104 +207,89 @@
 							<p class="current-folder">
 								Current folder: <span class="folder-path">{selectedFolder || 'No folder selected'}</span>
 							</p>
-							{#if isSaving}
-								<p class="saving-indicator">Saving...</p>
-							{/if}
-						</div>
-					{/if}
-				</div>
-			</CardContent>
-		</Card>
-
-		<!-- Startup Options -->
-		<Card class="option-card">
-			<CardHeader>
-				<h1>Startup Options</h1>
-			</CardHeader>
-			<CardContent class="folder-card-content">
-				{#if isLoading}
-					<div class="loading-state">
-						<p class="loading-text">Loading...</p>
-					</div>
-				{:else}
-					<div class="option-section">
-						<div class="switch-row">
-							<div class="switch-info">
-								<label for="auto-start-switch" class="option-label">Auto-start application</label>
-								<p class="option-description">Automatically start the application when system boots</p>
-							</div>
-							<Switch id="auto-start-switch" checked={autoStart} onCheckedChange={handleAutoStartChange} disabled={isSaving} />
 						</div>
 					</div>
+				</CardContent>
+			</Card>
 
-					<div class="option-section">
-						<div class="switch-row">
-							<div class="switch-info">
-								<label for="open-window-switch" class="option-label">Open window on start</label>
-								<p class="option-description">Show the main window when application starts</p>
-							</div>
-							<Switch id="open-window-switch" checked={openWindowOnStart} onCheckedChange={handleOpenWindowOnStartChange} disabled={isSaving} />
-						</div>
-					</div>
-				{/if}
-			</CardContent>
-		</Card>
-
-		<!-- Server Configuration -->
-		<Card class="option-card">
-			<CardHeader>
-				<h1>Server Configuration</h1>
-			</CardHeader>
-			<CardContent class="folder-card-content">
-				<div class="option-section">
-					<label for="port-input" class="option-label">Port:</label>
+			<!-- Startup Options -->
+			<Card class="option-card">
+				<CardHeader>
+					<h1>Startup Options</h1>
+				</CardHeader>
+				<CardContent class="folder-card-content">
 					{#if isLoading}
 						<div class="loading-state">
 							<p class="loading-text">Loading...</p>
 						</div>
 					{:else}
+						<div class="option-section">
+							<div class="switch-row">
+								<div class="switch-info">
+									<label for="auto-start-switch" class="option-label">Auto-start application</label>
+									<p class="option-description">Automatically start the application when system boots</p>
+								</div>
+								<Switch id="auto-start-switch" checked={autoStart} onCheckedChange={handleAutoStartChange} />
+							</div>
+						</div>
+
+						<div class="option-section">
+							<div class="switch-row">
+								<div class="switch-info">
+									<label for="open-window-switch" class="option-label">Open window on start</label>
+									<p class="option-description">Show the main window when application starts</p>
+								</div>
+								<Switch id="open-window-switch" checked={openWindowOnStart} onCheckedChange={handleOpenWindowOnStartChange} />
+							</div>
+						</div>
+					{/if}
+				</CardContent>
+			</Card>
+
+			<!-- Server Configuration -->
+			<Card class="option-card">
+				<CardHeader>
+					<h1>Server Configuration</h1>
+				</CardHeader>
+				<CardContent class="folder-card-content">
+					<div class="option-section">
 						<div class="input-row">
-							<input
-								id="port-input"
-								type="number"
-								min="1000"
-								max="65535"
-								value={port}
-								oninput={handlePortChange}
-								placeholder="8080"
-								class="option-input"
-								disabled={isSaving}
-							/>
+							<label for="port-input" class="option-label">Port:</label>
+							<input id="port-input" type="number" min="1000" max="65535" value={port} oninput={handlePortChange} placeholder="8080" class="option-input" />
 						</div>
 						<p class="option-description">Port number for the local server (1000-65535)</p>
-					{/if}
-				</div>
-			</CardContent>
-		</Card>
+					</div>
+				</CardContent>
+			</Card>
 
-		<!-- Window Settings -->
-		<Card class="option-card">
-			<CardHeader>
-				<h1>Window Settings</h1>
-			</CardHeader>
-			<CardContent class="folder-card-content">
-				{#if isLoading}
-					<div class="loading-state">
-						<p class="loading-text">Loading...</p>
-					</div>
-				{:else}
-					<div class="option-section">
-						<label for="window-opacity-slider" class="option-label">Window Opacity:</label>
-						<div class="slider-section">
-							<Slider value={[windowOpacity]} min={0} max={1} step={0.01} onValueChange={handleOpacityChange} disabled={isSaving} class="opacity-slider" />
-							<span class="slider-value">{(windowOpacity * 100).toFixed(0)}%</span>
+			<!-- Window Settings -->
+			<Card class="option-card">
+				<CardHeader>
+					<h1>Window Settings</h1>
+				</CardHeader>
+				<CardContent class="folder-card-content">
+					{#if isLoading}
+						<div class="loading-state">
+							<p class="loading-text">Loading...</p>
 						</div>
-						<p class="option-description">Adjust the transparency of application windows</p>
-					</div>
-				{/if}
-			</CardContent>
-		</Card>
-	</div>
+					{:else}
+						<div class="option-section">
+							<label for="window-opacity-slider" class="option-label">Window Opacity:</label>
+							<div class="slider-section">
+								<Slider value={[windowOpacity]} min={0} max={1} step={0.01} onValueChange={handleOpacityChange} class="opacity-slider" />
+								<span class="slider-value">{(windowOpacity * 100).toFixed(0)}%</span>
+							</div>
+							<p class="option-description">Adjust the transparency of application windows</p>
+						</div>
+					{/if}
+				</CardContent>
+			</Card>
+		</div>
+	{/if}
+
+	<!-- {#if isSaving}
+		<p class="saving-indicator">Saving...</p>
+	{/if} -->
 </div>
 
 <style>
@@ -417,7 +402,9 @@
 
 	.input-row {
 		display: flex;
-		gap: 0.5rem;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 0.5rem;
 	}
 
 	.status-row {
@@ -452,7 +439,6 @@
 
 	.option-label {
 		display: block;
-		margin-bottom: 0.5rem;
 		font-size: 0.875rem;
 		font-weight: 500;
 		color: var(--text-secondary);
