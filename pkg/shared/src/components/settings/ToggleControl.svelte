@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { Switch } from '../ui'
-	import { Button } from '../ui'
+	import { Switch, Icon } from '../ui'
 	import { cn } from '../../lib/utils'
+	import { currentScreenColor } from '../../stores/settingsStore'
 
 	const {
 		label,
 		checked,
 		onChange,
-		defaultValue = null,
 		isOverride = false,
 		overrideValue = null,
 		disabled = false
@@ -23,18 +22,14 @@
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
 	const isGhost = $derived(isOverride && !isOverridden)
+	const displayChecked = $derived(isOverridden ? (overrideValue ?? false) : (checked ?? false))
+	const canRevert = $derived(isOverridden)
 
-	function handleOverride(): void {
-		if (disabled) return
+	function handleRevert(): void {
+		if (disabled || !canRevert) return
 
-		if (!isOverridden) {
-			// When enabling override, use either the defaultValue or the current shared value
-			const newValue = defaultValue ?? checked ?? false
-			onChange(newValue)
-		} else {
-			// When disabling override, set to null to use shared value
-			onChange(null)
-		}
+		// In override mode, turn off the override
+		onChange(null)
 	}
 
 	function handleToggleChange(newChecked: boolean): void {
@@ -42,27 +37,27 @@
 
 		onChange(newChecked)
 	}
-
-	const displayChecked = $derived(isOverridden ? (overrideValue ?? false) : (checked ?? false))
 </script>
 
 <div class="toggle-control" class:disabled>
 	<div class="toggle-row">
-		<label class="toggle-label" for={`toggle-${label}`}>
-			<span class="label-text">{label}</span>
-		</label>
-		{#if isOverride}
-			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-button" onclick={handleOverride} {disabled}>
-				{isOverridden ? 'Clear' : 'Override'}
-			</Button>
+		<span class="label-text">{label}</span>
+		{#if isOverride && canRevert}
+			<button class="revert-button" class:disabled onclick={handleRevert} title="Clear override" aria-label="Clear override">
+				<Icon name="revert" size="sm" />
+			</button>
+		{:else}
+			<div class="revert-spacer"></div>
 		{/if}
-		<Switch
-			id={`toggle-${label}`}
-			checked={displayChecked}
-			onCheckedChange={handleToggleChange}
-			class={cn('switch-element', isGhost && 'ghost-toggle', disabled && 'disabled-toggle')}
-			{disabled}
-		/>
+		<div class="switch-wrapper" style="--toggle-color: {$currentScreenColor}">
+			<Switch
+				id={`toggle-${label}`}
+				checked={displayChecked}
+				onCheckedChange={handleToggleChange}
+				class={cn('switch-element', isGhost && 'ghost-toggle', isOverridden && 'override-toggle', disabled && 'disabled-toggle')}
+				{disabled}
+			/>
+		</div>
 	</div>
 </div>
 
@@ -75,33 +70,78 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
-	.toggle-label {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		cursor: pointer;
-		flex: 1;
+		gap: 0.75rem;
 	}
 
 	.label-text {
 		font-size: 0.875rem;
 		font-weight: 500;
 		color: var(--foreground);
+		flex: 1;
 	}
 
-	:global(.override-button) {
-		margin-right: 0.5rem; /* mr-2 */
-		height: 2rem; /* h-8 */
-		padding: 0 0.75rem; /* px-3 */
-		font-size: 0.75rem; /* text-xs */
+	.revert-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		border: none;
+		border-radius: 0.25rem;
+		background: transparent;
+		color: var(--text-secondary);
+		cursor: pointer;
+		transition: all 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.revert-button:hover:not(.disabled) {
+		background: var(--surface-hover);
+		color: var(--text-primary);
+		transform: scale(1.1);
+	}
+
+	.revert-button.disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
+	.revert-spacer {
+		width: 1.5rem;
+		height: 1.5rem;
+		flex-shrink: 0;
+	}
+
+	.switch-wrapper {
+		flex-shrink: 0;
 	}
 
 	:global(.switch-element) {
-		flex-shrink: 0;
+		transition: all 0.3s ease;
+	}
+
+	/* Override mode styling - make more visible */
+	:global(.override-toggle) {
+		opacity: 1 !important;
+	}
+
+	:global(.override-toggle[data-state='checked']) {
+		background-color: var(--toggle-color, var(--primary)) !important;
+		border-color: var(--toggle-color, var(--primary)) !important;
+		box-shadow: 0 0 8px rgba(var(--toggle-color, var(--primary)), 0.3) !important;
+	}
+
+	:global(.override-toggle[data-state='unchecked']) {
+		background-color: rgba(255, 255, 255, 0.2) !important;
+		border: 1px solid var(--toggle-color, var(--primary)) !important;
+	}
+
+	:global(.override-toggle .switch-thumb) {
+		background-color: white !important;
+		border: 1px solid var(--toggle-color, var(--primary)) !important;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+		scale: 1.1;
 	}
 
 	/* Ghost mode styling */
@@ -114,7 +154,6 @@
 		opacity: 0.7;
 	}
 
-	/* Ghost styling for our custom switch classes */
 	:global(.ghost-toggle.switch-button) {
 		background-color: transparent !important;
 		border: 1px solid var(--border) !important;
@@ -125,7 +164,6 @@
 		border: 1px solid var(--border) !important;
 	}
 
-	/* Ghost styling for switch thumb */
 	:global(.ghost-toggle .switch-thumb) {
 		background-color: transparent !important;
 		border: 1px solid var(--border) !important;

@@ -70,7 +70,6 @@
 		<div class="settings-groups">
 			<!-- Image Selection -->
 			<div class="setting-section">
-				<h3 class="section-title">Background Image</h3>
 				<!-- Display Options -->
 				<ImageGrid
 					selectedImage={$screenSettings.selectedImage ?? ''}
@@ -210,13 +209,13 @@
 		margin-bottom: 0.5rem;
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 2rem;
 	}
 
-	.section-title {
+	/* .section-title {
 		margin-bottom: 0.5rem;
 		font-size: 1.125rem;
 		font-weight: 500;
 		color: var(--text-primary);
-	}
+	} */
 </style>

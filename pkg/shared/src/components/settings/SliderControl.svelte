@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Slider } from '../ui'
-	import { Button } from '../ui'
+	import { Slider, Icon } from '../ui'
+	import { currentScreenColor } from '../../stores/settingsStore'
 
 	const {
 		label,
@@ -30,21 +30,19 @@
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
 	const isGhost = $derived(isOverride && !isOverridden)
+	const currentValue = $derived(value ?? defaultValue)
+	const displayValue = $derived(isOverridden ? (overrideValue ?? min) : currentValue)
+	const canRevert = $derived(isOverridden || displayValue !== defaultValue)
 
-	function handleOverride(): void {
-		if (disabled) return
+	function handleRevert(): void {
+		if (disabled || !canRevert) return
 
-		console.log(`[SliderControl ${label}] handleOverride called:`, {
-			isOverridden,
-			overrideValue
-		})
-		if (!isOverridden) {
-			// When enabling override, use either the defaultValue or the current shared value
-			const newValue = defaultValue ?? value ?? min
-			onChange(newValue)
-		} else {
-			// When disabling override, set to null to use shared value
+		if (isOverridden) {
+			// In override mode, turn off the override
 			onChange(null)
+		} else {
+			// Reset to default value with animation
+			onChange(defaultValue)
 		}
 	}
 
@@ -52,40 +50,37 @@
 		if (disabled) return
 
 		const newValue = newValues[0]
-		console.log(`[SliderControl ${label}] handleValueChange called:`, {
-			newValue,
-			previous: value
-		})
 		onChange(newValue)
 	}
-
-	const currentValue = $derived(value ?? defaultValue)
-	const displayValue = $derived(isOverridden ? (overrideValue ?? min) : currentValue)
 </script>
 
 <div class="slider-control" class:disabled>
-	<label class="slider-label">
+	<div class="slider-row">
 		<span class="label-text">{label}</span>
-		<div class="slider-row">
-			{#if isOverride}
-				<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" class="override-btn" onclick={handleOverride} {disabled}>
-					{isOverridden ? 'Clear' : 'Override'}
-				</Button>
-			{/if}
+		<button
+			class="revert-button"
+			class:disabled={disabled || !canRevert}
+			onclick={handleRevert}
+			title={isOverridden ? 'Clear override' : 'Reset to default'}
+			aria-label={isOverridden ? 'Clear override' : 'Reset to default'}
+		>
+			<Icon name="revert" size="sm" />
+		</button>
+		<div class="slider-wrapper" style="--slider-color: {$currentScreenColor}">
 			<Slider
 				value={[displayValue]}
 				{min}
 				{max}
 				{step}
 				onValueChange={handleValueChange}
-				class="slider-control-input {isGhost ? 'ghost-slider' : ''} {disabled ? 'disabled-slider' : ''}"
+				class="slider-control-input {isGhost ? 'ghost-slider' : ''} {isOverridden ? 'override-slider' : ''} {disabled ? 'disabled-slider' : ''}"
 				{disabled}
 			/>
-			<span class="value-display">
-				{formatValue(displayValue)}
-			</span>
 		</div>
-	</label>
+		<span class="value-display">
+			{formatValue(displayValue)}
+		</span>
+	</div>
 </div>
 
 <style>
@@ -93,26 +88,47 @@
 		width: 100%;
 	}
 
-	.slider-label {
+	.slider-row {
 		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.5rem;
+		width: 100%;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.75rem;
 	}
 
 	.label-text {
 		font-size: 0.875rem;
 		font-weight: 500;
 		color: var(--text-primary);
+		min-width: 5rem;
+		flex-shrink: 0;
 	}
 
-	.slider-row {
+	.revert-button {
 		display: flex;
-		width: 100%;
-		flex-direction: row;
 		align-items: center;
-		justify-content: space-between;
-		gap: 0.5rem;
+		justify-content: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		border: none;
+		border-radius: 0.25rem;
+		background: transparent;
+		color: var(--text-secondary);
+		cursor: pointer;
+		transition: all 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.revert-button:hover:not(.disabled) {
+		background: var(--surface-hover);
+		color: var(--text-primary);
+		transform: scale(1.1);
+	}
+
+	.revert-button.disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+		pointer-events: none;
 	}
 
 	.value-display {
@@ -120,19 +136,39 @@
 		text-align: right;
 		font-size: 0.875rem;
 		color: var(--text-secondary);
+		flex-shrink: 0;
 	}
 
-	/* Override button styling */
-	:global(.override-btn) {
-		height: 2rem;
-		padding: 0 0.75rem;
-		font-size: 0.75rem;
-		line-height: 1;
+	.slider-wrapper {
+		flex: 1;
 	}
 
 	/* Slider control input styling */
 	:global(.slider-control-input) {
-		flex: 1;
+		width: 100%;
+		transition: all 0.3s ease;
+	}
+
+	/* Override mode styling - make more visible */
+	:global(.override-slider) {
+		opacity: 1 !important;
+	}
+
+	:global(.override-slider .slider-track) {
+		background-color: rgba(255, 255, 255, 0.2) !important;
+		border: 1px solid var(--slider-color, var(--primary)) !important;
+	}
+
+	:global(.override-slider .slider-progress) {
+		background-color: var(--slider-color, var(--primary)) !important;
+		box-shadow: 0 0 8px rgba(var(--slider-color, var(--primary)), 0.3) !important;
+	}
+
+	:global(.override-slider .slider-thumb) {
+		background-color: var(--slider-color, var(--primary)) !important;
+		border: 2px solid white !important;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+		scale: 1.1;
 	}
 
 	/* Ghost mode styling */
@@ -145,7 +181,6 @@
 		opacity: 0.7;
 	}
 
-	/* Ghost styling for our custom slider classes */
 	:global(.ghost-slider .slider-track) {
 		background-color: transparent !important;
 		border: 1px solid var(--border) !important;
@@ -156,7 +191,6 @@
 		border: 1px solid var(--border) !important;
 	}
 
-	/* Ghost styling for slider thumb */
 	:global(.ghost-slider .slider-thumb) {
 		background-color: transparent !important;
 		border: 1px solid var(--border) !important;

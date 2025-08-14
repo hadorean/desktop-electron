@@ -79,7 +79,7 @@
 
 	// Update underline when current tab changes
 	$effect(() => {
-		currentTab // Track dependency
+		void currentTab // Track dependency
 		setTimeout(() => {
 			updateUnderlinePosition()
 		}, 0)

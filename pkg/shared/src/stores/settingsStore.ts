@@ -603,6 +603,20 @@ export function getFormattedScreenName(screenId: string, screenSettings?: Screen
 	}
 }
 
+/**
+ * Get the current screen's color
+ */
+export const currentScreenColor = derived([allSettings, currentScreen, isLocalMode], ([$allSettings, $currentScreen, $isLocalMode]) => {
+	if (!$isLocalMode) {
+		// Shared/home screen uses white
+		return '#ffffff'
+	}
+
+	// Get the current screen's color
+	const screenSettings = $allSettings.screens[$currentScreen]
+	return screenSettings?.color || '#ffffff'
+})
+
 // loadSettings function moved to localStorage service
 // This function is now deprecated - use localStorageService.loadSettings() instead
 export function loadSettings(images: { name: string }[]): string {

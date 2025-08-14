@@ -1,22 +1,26 @@
 <script lang="ts">
 	import { getImageUrl } from '../../services'
 	import { images, imagesError, imagesLoading, screenSettings, updateSharedSettings } from '../../stores'
-	import { Button, Card, CardContent } from '../ui'
+	import { Card, CardContent, Icon } from '../ui'
 
 	const {
 		selectedImage = '',
 		onImageChange,
 		isOverride = false,
-		overrideValue = null
+		overrideValue = null,
+		defaultImage = ''
 	} = $props<{
 		selectedImage: string
 		onImageChange: (image: string | null) => void
 		isOverride?: boolean
 		overrideValue?: string | null
+		defaultImage?: string
 	}>()
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
 	const isGhost = $derived(isOverride && !isOverridden)
+	const effectiveImage = $derived(isOverridden ? overrideValue : selectedImage)
+	const canRevert = $derived(isOverridden && effectiveImage !== defaultImage)
 
 	// Function to get thumbnail URL
 	function getThumbnailUrl(imageName: string): string {
@@ -32,14 +36,11 @@
 		}
 	}
 
-	function handleOverride(): void {
-		if (!isOverridden) {
-			// When enabling override, use the current value
-			onImageChange(selectedImage)
-		} else {
-			// When disabling override, set to null to use shared value
-			onImageChange(null)
-		}
+	function handleRevert(): void {
+		if (!canRevert) return
+
+		// Turn off the override to use shared value
+		onImageChange(null)
 	}
 
 	function toggleFavorite(imageName: string, event: Event): void {
@@ -68,8 +69,6 @@
 			})
 		})()
 	)
-
-	const effectiveImage = $derived(isOverridden ? overrideValue : selectedImage)
 </script>
 
 {#snippet message(icon: string, message: string, detail?: string, isError?: boolean)}
@@ -86,10 +85,11 @@
 
 <div class="image-grid-container">
 	<div class="header-section">
-		{#if isOverride}
-			<Button variant={isOverridden ? 'default' : 'ghost'} size="sm" onclick={handleOverride} class="override-button">
-				{isOverridden ? 'Clear' : 'Override'}
-			</Button>
+		<h3 class="section-title">Background image</h3>
+		{#if isOverride && canRevert}
+			<button class="revert-button" onclick={handleRevert} title="Clear override" aria-label="Clear override">
+				<Icon name="revert" size="sm" />
+			</button>
 		{/if}
 	</div>
 
@@ -164,14 +164,36 @@
 		margin-bottom: 0.5rem;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		gap: 0.75rem;
 	}
 
-	:global(.override-button) {
-		margin-left: auto;
-		height: 2rem;
-		padding: 0 0.75rem;
-		font-size: 0.75rem;
+	.section-title {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--text-primary);
+		margin: 0;
+		flex: 1;
+	}
+
+	.revert-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		border: none;
+		border-radius: 0.25rem;
+		background: transparent;
+		color: var(--text-secondary);
+		cursor: pointer;
+		transition: all 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.revert-button:hover {
+		background: var(--surface-hover);
+		color: var(--text-primary);
+		transform: scale(1.1);
 	}
 
 	:global(.grid-card-content) {
