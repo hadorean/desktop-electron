@@ -168,10 +168,10 @@
 	}
 
 	.section-title {
-		font-size: 0.875rem;
+		font-size: 1.1rem;
 		font-weight: 500;
 		color: var(--text-primary);
-		margin: 0;
+		margin: 0 0 0.5rem 0;
 		flex: 1;
 	}
 
@@ -315,8 +315,8 @@
 	}
 
 	:global(.image-grid-card) {
-		background: hsl(var(--card) / 0.3) !important;
-		backdrop-filter: blur(10px);
+		background: rgba(0, 0, 0, 0.2) !important;
+		/* backdrop-filter: blur(10px); */
 		border: 1px solid hsl(var(--border) / 0.3) !important;
 	}
 

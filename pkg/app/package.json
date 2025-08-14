@@ -1,6 +1,6 @@
 {
   "name": "heyketsu",
-  "version": "0.1.62",
+  "version": "0.1.63",
   "description": "A peaceful space for your desktop and browser",
   "main": "./out/main/index.js",
   "author": "Hadrien Grandry",

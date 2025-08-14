@@ -158,7 +158,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-bottom: 2rem;
+		margin-bottom: 3rem;
 		outline: none;
 		border-radius: 0.5rem;
 	}
@@ -167,7 +167,7 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		backdrop-filter: blur(10px);
+		/* backdrop-filter: blur(10px); */
 		padding: 8px 16px;
 		border-radius: 12px;
 		/* background: rgba(0, 0, 0, 0.3); */
@@ -200,8 +200,8 @@
 	}
 
 	.screen-tab:focus-visible {
-		outline: 2px solid rgba(255, 255, 255, 0.5);
-		outline-offset: 2px;
+		/* outline: 2px solid rgba(255, 255, 255, 0.5); */
+		/* outline-offset: 2px; */
 	}
 
 	:global(.screen-tab .screen-icon) {

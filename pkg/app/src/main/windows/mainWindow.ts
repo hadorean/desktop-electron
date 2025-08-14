@@ -19,7 +19,7 @@ export function createWindow(): BrowserWindow {
 
 	// Create the browser window.
 	window = new BrowserWindow({
-		width: 600,
+		width: 500,
 		height: 1120,
 		show: false,
 		autoHideMenuBar: true,
@@ -37,7 +37,7 @@ export function createWindow(): BrowserWindow {
 		minimizable: true,
 		maximizable: true,
 		closable: true,
-		minWidth: 600,
+		minWidth: 500,
 		...(process.platform === 'linux' ? { icon } : {}),
 		webPreferences: {
 			preload: join(__dirname, '../preload/index.js'),

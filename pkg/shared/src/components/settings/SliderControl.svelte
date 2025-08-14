@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Slider, Icon } from '../ui'
 	import { currentScreenColor } from '../../stores/settingsStore'
+	import { Icon, Slider } from '../ui'
 
 	const {
 		label,
@@ -157,11 +157,13 @@
 	:global(.override-slider .slider-track) {
 		background-color: rgba(255, 255, 255, 0.2) !important;
 		border: 1px solid var(--slider-color, var(--primary)) !important;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
 	:global(.override-slider .slider-progress) {
 		background-color: var(--slider-color, var(--primary)) !important;
 		box-shadow: 0 0 8px rgba(var(--slider-color, var(--primary)), 0.3) !important;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
 	:global(.override-slider .slider-thumb) {
@@ -169,10 +171,12 @@
 		border: 2px solid white !important;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 		scale: 1.1;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
 	/* Ghost mode styling */
 	:global(.ghost-slider) {
+		--border-color: rgb(165, 165, 165);
 		opacity: 0.5;
 		transition: opacity 0.2s ease;
 	}
@@ -183,17 +187,17 @@
 
 	:global(.ghost-slider .slider-track) {
 		background-color: transparent !important;
-		border: 1px solid var(--border) !important;
+		border: 1px solid var(--border-color) !important;
 	}
 
 	:global(.ghost-slider .slider-progress) {
 		background-color: transparent !important;
-		border: 1px solid var(--border) !important;
+		border: 1px solid var(--border-color) !important;
 	}
 
 	:global(.ghost-slider .slider-thumb) {
 		background-color: transparent !important;
-		border: 1px solid var(--border) !important;
+		border: 1px solid var(--border-color) !important;
 		box-shadow: none !important;
 	}
 

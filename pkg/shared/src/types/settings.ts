@@ -3,7 +3,7 @@
 export type DayNightMode = 'day' | 'night'
 export type SettingsButtonPosition = 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left'
 export type ScreenType = 'static' | 'interactive'
-export const colors = ['#ffffff', 'rgb(0, 139, 204)', '#f0b71b', '#1ec735', '#e02828', '#7b16f0', '#d933fa', '#11e4b6']
+export const colors = ['#90A0A7', 'rgb(0, 139, 204)', '#f0b71b', '#1ec735', '#e02828', '#7b16f0', '#d933fa', '#11e4b6']
 
 export interface ScreenProfile {
 	selectedImage: string

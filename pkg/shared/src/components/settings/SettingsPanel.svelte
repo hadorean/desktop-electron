@@ -87,7 +87,7 @@
 					onChange={(newOpacity: number | null) => handleSettingChange('opacity', newOpacity)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={$screenSettings.opacity ?? 1}
+					defaultValue={1}
 					overrideValue={$editingSettings.opacity}
 					disabled={$inTransition}
 				/>
@@ -101,7 +101,7 @@
 					onChange={(newSaturation: number | null) => handleSettingChange('saturation', newSaturation)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={$screenSettings.saturation ?? 1}
+					defaultValue={1}
 					overrideValue={$editingSettings.saturation}
 					disabled={$inTransition}
 				/>
@@ -115,7 +115,7 @@
 					onChange={(newBlur: number | null) => handleSettingChange('blur', newBlur)}
 					formatValue={(v: number) => `${v.toFixed(1)}px`}
 					isOverride={$isLocalMode}
-					defaultValue={$screenSettings.blur ?? 0}
+					defaultValue={0}
 					overrideValue={$editingSettings.blur}
 					disabled={$inTransition}
 				/>
@@ -129,7 +129,7 @@
 					onChange={(newTransitionTime: number | null) => handleSettingChange('transitionTime', newTransitionTime)}
 					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
-					defaultValue={$screenSettings.transitionTime ?? 1}
+					defaultValue={1}
 					overrideValue={$editingSettings.transitionTime}
 					disabled={$inTransition}
 				/>
@@ -141,7 +141,7 @@
 				onChange={(newShowTimeDate: boolean | null) => handleSettingChange('showTimeDate', newShowTimeDate)}
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.showTimeDate}
-				defaultValue={$screenSettings.showTimeDate ?? true}
+				defaultValue={true}
 				disabled={$inTransition}
 			/>
 
@@ -151,7 +151,7 @@
 				onChange={(newShowWeather: boolean | null) => handleSettingChange('showWeather', newShowWeather)}
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.showWeather}
-				defaultValue={$screenSettings.showWeather ?? false}
+				defaultValue={false}
 				disabled={$inTransition}
 			/>
 
@@ -161,7 +161,7 @@
 				onChange={(newHideButton: boolean | null) => handleSettingChange('hideButton', newHideButton)}
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.hideButton}
-				defaultValue={$screenSettings.hideButton ?? false}
+				defaultValue={false}
 				disabled={$inTransition}
 			/>
 		</div>
@@ -170,7 +170,7 @@
 
 <style>
 	.settings-panel {
-		padding: min(2rem, 5vw);
+		padding: 1rem 2rem;
 		color: var(--text-primary);
 		max-width: 100%;
 		max-height: 90vh;

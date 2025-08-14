@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Switch, Icon } from '../ui'
 	import { cn } from '../../lib/utils'
 	import { currentScreenColor } from '../../stores/settingsStore'
+	import { Icon, Switch } from '../ui'
 
 	const {
 		label,
@@ -117,8 +117,21 @@
 		flex-shrink: 0;
 	}
 
-	:global(.switch-element) {
+	:global(.switch-button) {
 		transition: all 0.3s ease;
+	}
+
+	/* Regular switch styling with screen color */
+	:global(.switch-button.switch-checked:not(.ghost-toggle):not(.override-toggle)) {
+		background-color: var(--toggle-color, var(--primary)) !important;
+		border-color: var(--toggle-color, var(--primary)) !important;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+	}
+
+	/* Hover state should maintain the screen color */
+	:global(.switch-button.switch-checked:not(.ghost-toggle):not(.override-toggle):hover) {
+		background-color: var(--toggle-color, var(--primary)) !important;
+		opacity: 0.9;
 	}
 
 	/* Override mode styling - make more visible */
@@ -126,15 +139,17 @@
 		opacity: 1 !important;
 	}
 
-	:global(.override-toggle[data-state='checked']) {
+	:global(.override-toggle.switch-checked) {
 		background-color: var(--toggle-color, var(--primary)) !important;
 		border-color: var(--toggle-color, var(--primary)) !important;
 		box-shadow: 0 0 8px rgba(var(--toggle-color, var(--primary)), 0.3) !important;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
-	:global(.override-toggle[data-state='unchecked']) {
+	:global(.override-toggle:not(.switch-checked)) {
 		background-color: rgba(255, 255, 255, 0.2) !important;
 		border: 1px solid var(--toggle-color, var(--primary)) !important;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
 	:global(.override-toggle .switch-thumb) {
@@ -142,21 +157,25 @@
 		border: 1px solid var(--toggle-color, var(--primary)) !important;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 		scale: 1.1;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+	}
+
+	/* Override hover state should maintain screen color */
+	:global(.override-toggle.switch-checked:hover) {
+		background-color: var(--toggle-color, var(--primary)) !important;
+		opacity: 0.9;
 	}
 
 	/* Ghost mode styling */
 	:global(.ghost-toggle) {
 		opacity: 0.5;
 		transition: opacity 0.2s ease;
+		background-color: transparent !important;
+		border: 1px solid var(--border) !important;
 	}
 
 	:global(.ghost-toggle:hover) {
 		opacity: 0.7;
-	}
-
-	:global(.ghost-toggle.switch-button) {
-		background-color: transparent !important;
-		border: 1px solid var(--border) !important;
 	}
 
 	:global(.ghost-toggle.switch-checked) {
