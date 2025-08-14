@@ -3,16 +3,32 @@
 What's left to ship?
 
 # Must have
-- Option screen
-  - Set images directory
-  - Enable/disable auto-launch
-  - Enable/disable monitors
-- Initial screen: setup default options
-- Feedback screen : send feedback to developer
-- Landing page
-- Online demo
+
+### Option screen
+
+- [X] Set images directory
+- [X] Enable/disable auto-launch
+- [ ] Port selection
+
+### Monitor management
+
+- [ ] Enable/disable monitors
+- [ ] React to monitor changes
+
+### Initial screen
+
+- [ ] Setup default options
+
+### Feedback screen
+
+- [ ] Send feedback to developer
+
+### Landing page
+
+- [ ] Landing page
+- [ ] Online demo
 
 ## Nice to have
-- Set Url as background
-- React to display changes
-- Color coding for screens
+
+- [ ] Set Url as background
+- [ ] Color coding for screens
