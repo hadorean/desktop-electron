@@ -27,6 +27,7 @@
 	let portPendingRestart = $state(false)
 	let serverStatus = $state<'connected' | 'pending' | 'disconnected' | 'unknown'>('unknown')
 	let isRestartingServer = $state(false)
+	let statusCheckInterval: ReturnType<typeof setInterval> | null = null
 
 	// Load user options on mount
 	onMount(async () => {
@@ -46,6 +47,14 @@
 			console.error('Error loading user options:', error)
 		} finally {
 			isLoading = false
+		}
+
+		// Start periodic server status checking
+		startStatusMonitoring()
+
+		// Cleanup on unmount
+		return () => {
+			stopStatusMonitoring()
 		}
 	})
 
@@ -150,7 +159,11 @@
 		try {
 			const result = await window.api.getServerStatus()
 			if (result.success && result.data) {
-				serverStatus = result.data.status as typeof serverStatus
+				const newStatus = result.data.status as typeof serverStatus
+				if (newStatus !== serverStatus) {
+					console.log(`🔄 Server status changed: ${serverStatus} → ${newStatus}`)
+					serverStatus = newStatus
+				}
 			} else {
 				serverStatus = 'unknown'
 			}
@@ -160,12 +173,52 @@
 		}
 	}
 
+	// Start monitoring server status
+	const startStatusMonitoring = () => {
+		// Check status immediately
+		checkServerStatus()
+		
+		// Then check every 3 seconds (slower for normal operation)
+		statusCheckInterval = setInterval(() => {
+			checkServerStatus()
+		}, 3000)
+	}
+
+	// Start faster monitoring during server restart
+	const startFastStatusMonitoring = () => {
+		stopStatusMonitoring()
+		
+		// Check every 500ms during restart for quick feedback
+		statusCheckInterval = setInterval(() => {
+			checkServerStatus()
+		}, 500)
+		
+		// After 10 seconds, switch back to normal monitoring
+		setTimeout(() => {
+			if (statusCheckInterval) {
+				stopStatusMonitoring()
+				startStatusMonitoring()
+			}
+		}, 10000)
+	}
+
+	// Stop monitoring server status
+	const stopStatusMonitoring = () => {
+		if (statusCheckInterval) {
+			clearInterval(statusCheckInterval)
+			statusCheckInterval = null
+		}
+	}
+
 	// Apply port changes
 	const applyPortChange = async () => {
 		if (!portPendingRestart) return
 
 		isRestartingServer = true
 		serverStatus = 'pending'
+		
+		// Start fast monitoring during restart
+		startFastStatusMonitoring()
 
 		try {
 			// First save the port to user options
@@ -177,8 +230,10 @@
 			if (result.success) {
 				originalPort = port
 				portPendingRestart = false
-				serverStatus = 'connected'
 				console.log('✅ Server restarted successfully on port', port)
+				
+				// Check server status immediately to update UI
+				await checkServerStatus()
 			} else {
 				serverStatus = 'disconnected'
 				console.error('❌ Failed to restart server:', result.error)
