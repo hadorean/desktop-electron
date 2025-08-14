@@ -1,5 +1,5 @@
 /**
- * Shared services for API and Socket.IO communication
+ * Shared services for API, Socket.IO, and localStorage management
  */
 
 // API service
@@ -10,3 +10,6 @@ export { SocketService, socketService, type SettingsUpdatedResponse } from './so
 
 // Image change handling service
 export { initializeImageChangeHandling, cleanupImageChangeHandling, getLastProcessedEventTimestamp, resetProcessedEventTimestamp } from './imageChanges'
+
+// localStorage service
+export { localStorageService, LocalStorageService } from './localStorage'

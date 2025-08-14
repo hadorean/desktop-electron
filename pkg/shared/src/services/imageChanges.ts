@@ -3,8 +3,9 @@
  * Consolidates socket event handling, deduplication, and validation logic
  */
 
-import { loadImages, onImagesChanged, validateSelectedImages, getIsLoadingImages } from '../stores'
+import { loadImages, onImagesChanged, getIsLoadingImages } from '../stores'
 import { socketService } from './socket'
+import { localStorageService } from './localStorage'
 
 // Type for image updated events (matches socket service signature)
 type ImageUpdatedEvent = {
@@ -59,7 +60,7 @@ export function initializeImageChangeHandling(context: string): () => void {
 		// Only validate if we're not currently loading to prevent validation cascades
 		if (!getIsLoadingImages()) {
 			const imageNames = newImages.map((img) => img.name)
-			validateSelectedImages(imageNames)
+			localStorageService.validateSelectedImages(imageNames)
 		}
 	}
 

@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { BackgroundImage, ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate, TimeDisplay, WeatherDisplay } from '$shared/components'
-	import { initializeImageChangeHandling, socketService } from '$shared/services'
+	import { initializeImageChangeHandling, localStorageService, socketService } from '$shared/services'
 	import { expandSettings, getCurrentImages, imagesError, loadImages, screenSettings } from '$shared/stores'
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
-	import { loadSettings } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
 
@@ -41,8 +40,11 @@
 				// First load images using the store
 				await loadImages()
 
-				// Then load saved settings (after we have the images list)
-				loadSettings(getCurrentImages())
+				// Initialize localStorage service (handles loading settings automatically)
+				localStorageService.init()
+				
+				// Load settings with current images
+				localStorageService.loadSettings(getCurrentImages())
 
 				// Add event listeners
 				window.addEventListener('reconnectApi', handleReconnect)

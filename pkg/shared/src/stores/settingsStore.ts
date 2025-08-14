@@ -13,10 +13,7 @@ const defaultScreenId = 'monitor1'
 
 export const currentScreen = writable(defaultScreenId)
 
-currentScreen.subscribe((screenId) => {
-	// Update the current screen in localStorage
-	localStorage.setItem('currentScreen', screenId)
-})
+// currentScreen subscription for localStorage is now handled by localStorage service
 
 const defaultSettings: ScreenSettings = DefaultScreenSettings
 const defaultUserSettings: UserSettings = DefaultUserSettings
@@ -501,66 +498,19 @@ export function shouldPreventServerSync(): boolean {
 //   }
 // }
 
-// Load settings from localStorage
+// loadSettings function moved to localStorage service
+// This function is now deprecated - use localStorageService.loadSettings() instead
 export function loadSettings(images: { name: string }[]): string {
-	try {
-		// Load shared settings
-		const savedSharedSettings = localStorage.getItem('settings.shared')
-		if (savedSharedSettings) {
-			const parsedSettings = JSON.parse(savedSharedSettings)
-			updateSharedSettings(() => ({
-				...defaultSettings,
-				opacity: parsedSettings.opacity ?? defaultSettings.opacity,
-				blur: parsedSettings.blur ?? defaultSettings.blur,
-				saturation: parsedSettings.saturation ?? defaultSettings.saturation,
-				hideButton: parsedSettings.hideButton ?? defaultSettings.hideButton,
-				transitionTime: parsedSettings.transitionTime ?? defaultSettings.transitionTime,
-				showTimeDate: parsedSettings.showTimeDate ?? defaultSettings.showTimeDate,
-				showWeather: parsedSettings.showWeather ?? defaultSettings.showWeather,
-				showScreenSwitcher: parsedSettings.showScreenSwitcher ?? defaultSettings.showScreenSwitcher,
-				favorites: parsedSettings.favorites ?? defaultSettings.favorites,
-				selectedImage:
-					parsedSettings.selectedImage && images.some((img) => img.name === parsedSettings.selectedImage)
-						? parsedSettings.selectedImage
-						: images.length > 0
-							? images[0].name
-							: '',
-				settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
-			}))
-		} else if (images.length > 0) {
-			updateSharedSettings((current) => ({
-				...current,
-				selectedImage: images[0].name
-			}))
-		}
-
-		// Load local settings
-		const savedLocalSettings = localStorage.getItem('settings.local')
-		if (savedLocalSettings) {
-			const parsedLocalSettings = JSON.parse(savedLocalSettings)
-			updateLocalSettings(() => parsedLocalSettings)
-		}
-
-		// Initialize screen from server data if available (after settings are loaded)
-		if (typeof window !== 'undefined') {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const initialScreenId = (window as any).__INITIAL_SCREEN_ID__
-			if (initialScreenId) {
-				console.log('🖥️  Applying initial screen after settings loaded:', initialScreenId)
-				setCurrentScreen(initialScreenId)
-				isLocalMode.set(true)
-				console.log('🖥️  Screen initialized:', initialScreenId, 'local mode: true')
-				// Clean up
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				delete (window as any).__INITIAL_SCREEN_ID__
-			}
-		}
-
-		return ''
-	} catch (error) {
-		console.error('Error loading settings from localStorage:', error)
-		return `Error loading settings: ${error instanceof Error ? error.message : 'Unknown error'}`
+	console.warn('settingsStore.loadSettings() is deprecated. Use localStorageService.loadSettings() instead.')
+	// Fallback: just set default image if available
+	if (images.length > 0) {
+		updateSharedSettings((current) => ({
+			...current,
+			selectedImage: images[0].name
+		}))
+		return images[0].name
 	}
+	return ''
 }
 
 // Reset settings to defaults
@@ -601,44 +551,8 @@ export function validateSelectedImages(availableImages: string[]): boolean {
 	// 	hasChanges = true
 	// }
 
-	// Check all local settings if we have access to them
-	try {
-		const allLocalSettingsString = localStorage.getItem('settings.local')
-		if (allLocalSettingsString) {
-			const allLocalSettings = JSON.parse(allLocalSettingsString)
-			let localSettingsChanged = false
-
-			for (const screenId in allLocalSettings) {
-				const screenSettings = allLocalSettings[screenId]
-				if (screenSettings.selectedImage && !availableImages.includes(screenSettings.selectedImage)) {
-					console.log(`📷 Screen "${screenId}" selected image "${screenSettings.selectedImage}" no longer exists, clearing override`)
-					delete screenSettings.selectedImage
-					if (Object.keys(screenSettings).length === 0) {
-						delete allLocalSettings[screenId]
-					}
-					localSettingsChanged = true
-				}
-			}
-
-			if (localSettingsChanged) {
-				if (Object.keys(allLocalSettings).length === 0) {
-					localStorage.removeItem('settings.local')
-				} else {
-					localStorage.setItem('settings.local', JSON.stringify(allLocalSettings))
-				}
-
-				// Trigger a re-read of local settings only by updating allSettings screens
-				allSettings.update((current) => ({
-					...current,
-					screens: allLocalSettings
-				}))
-
-				hasChanges = true
-			}
-		}
-	} catch (error) {
-		console.error('Error validating local settings:', error)
-	}
+	// validateSelectedImages localStorage logic moved to localStorage service
+	console.warn('settingsStore.validateSelectedImages() localStorage logic is now handled by localStorageService.validateSelectedImages()')
 
 	return hasChanges
 }
