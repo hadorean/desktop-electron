@@ -119,43 +119,59 @@ class LocalStorageService {
 		}
 
 		try {
-			// Load shared settings
-			const savedSharedSettings = localStorage.getItem('settings.shared')
-			if (savedSharedSettings) {
-				const parsedSettings = JSON.parse(savedSharedSettings)
-				const defaultSettings: ScreenSettings = DefaultScreenSettings
+			// Try to load complete settings first (new approach)
+			const savedCompleteSettings = localStorage.getItem('settings.complete')
+			if (savedCompleteSettings) {
+				const parsedCompleteSettings = JSON.parse(savedCompleteSettings)
+				console.log('📦 Loading complete settings from localStorage')
 				
-				updateSharedSettings(() => ({
-					...defaultSettings,
-					opacity: parsedSettings.opacity ?? defaultSettings.opacity,
-					blur: parsedSettings.blur ?? defaultSettings.blur,
-					saturation: parsedSettings.saturation ?? defaultSettings.saturation,
-					hideButton: parsedSettings.hideButton ?? defaultSettings.hideButton,
-					transitionTime: parsedSettings.transitionTime ?? defaultSettings.transitionTime,
-					showTimeDate: parsedSettings.showTimeDate ?? defaultSettings.showTimeDate,
-					showWeather: parsedSettings.showWeather ?? defaultSettings.showWeather,
-					showScreenSwitcher: parsedSettings.showScreenSwitcher ?? defaultSettings.showScreenSwitcher,
-					favorites: parsedSettings.favorites ?? defaultSettings.favorites,
-					selectedImage:
-						parsedSettings.selectedImage && images.some((img) => img.name === parsedSettings.selectedImage)
-							? parsedSettings.selectedImage
-							: images.length > 0
-								? images[0].name
-								: '',
-					settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
-				}))
-			} else if (images.length > 0) {
-				updateSharedSettings((current) => ({
-					...current,
-					selectedImage: images[0].name
-				}))
-			}
+				// Validate selected images in the complete settings
+				this.validateAndUpdateImages(parsedCompleteSettings, images)
+				
+				// Set complete settings directly (like Socket.IO does)
+				allSettings.set(parsedCompleteSettings)
+			} else {
+				// Fallback to legacy loading method
+				console.log('📦 Using legacy settings loading method')
+				
+				// Load shared settings
+				const savedSharedSettings = localStorage.getItem('settings.shared')
+				if (savedSharedSettings) {
+					const parsedSettings = JSON.parse(savedSharedSettings)
+					const defaultSettings: ScreenSettings = DefaultScreenSettings
+					
+					updateSharedSettings(() => ({
+						...defaultSettings,
+						opacity: parsedSettings.opacity ?? defaultSettings.opacity,
+						blur: parsedSettings.blur ?? defaultSettings.blur,
+						saturation: parsedSettings.saturation ?? defaultSettings.saturation,
+						hideButton: parsedSettings.hideButton ?? defaultSettings.hideButton,
+						transitionTime: parsedSettings.transitionTime ?? defaultSettings.transitionTime,
+						showTimeDate: parsedSettings.showTimeDate ?? defaultSettings.showTimeDate,
+						showWeather: parsedSettings.showWeather ?? defaultSettings.showWeather,
+						showScreenSwitcher: parsedSettings.showScreenSwitcher ?? defaultSettings.showScreenSwitcher,
+						favorites: parsedSettings.favorites ?? defaultSettings.favorites,
+						selectedImage:
+							parsedSettings.selectedImage && images.some((img) => img.name === parsedSettings.selectedImage)
+								? parsedSettings.selectedImage
+								: images.length > 0
+									? images[0].name
+									: '',
+						settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
+					}))
+				} else if (images.length > 0) {
+					updateSharedSettings((current) => ({
+						...current,
+						selectedImage: images[0].name
+					}))
+				}
 
-			// Load local settings
-			const savedLocalSettings = localStorage.getItem('settings.local')
-			if (savedLocalSettings) {
-				const parsedLocalSettings = JSON.parse(savedLocalSettings)
-				updateLocalSettings(() => parsedLocalSettings)
+				// Load local settings
+				const savedLocalSettings = localStorage.getItem('settings.local')
+				if (savedLocalSettings) {
+					const parsedLocalSettings = JSON.parse(savedLocalSettings)
+					updateLocalSettings(() => parsedLocalSettings)
+				}
 			}
 
 			// Initialize screen from server data if available (after settings are loaded)
@@ -193,6 +209,38 @@ class LocalStorageService {
 				return images[0].name
 			}
 			return ''
+		}
+	}
+
+	/**
+	 * Validate and update images in complete settings object
+	 */
+	private validateAndUpdateImages(settings: any, availableImages: { name: string }[]): void {
+		const imageNames = availableImages.map(img => img.name)
+		
+		// Validate shared settings
+		if (settings.shared?.day?.selectedImage && !imageNames.includes(settings.shared.day.selectedImage)) {
+			console.log('📷 Shared day selected image no longer exists, clearing')
+			delete settings.shared.day.selectedImage
+		}
+		if (settings.shared?.night?.selectedImage && !imageNames.includes(settings.shared.night.selectedImage)) {
+			console.log('📷 Shared night selected image no longer exists, clearing')
+			delete settings.shared.night.selectedImage
+		}
+		
+		// Validate screen-specific settings
+		if (settings.screens) {
+			for (const screenId in settings.screens) {
+				const screenSettings = settings.screens[screenId]
+				if (screenSettings.day?.selectedImage && !imageNames.includes(screenSettings.day.selectedImage)) {
+					console.log(`📷 Screen "${screenId}" day selected image no longer exists, clearing`)
+					delete screenSettings.day.selectedImage
+				}
+				if (screenSettings.night?.selectedImage && !imageNames.includes(screenSettings.night.selectedImage)) {
+					console.log(`📷 Screen "${screenId}" night selected image no longer exists, clearing`)
+					delete screenSettings.night.selectedImage
+				}
+			}
 		}
 	}
 
@@ -293,10 +341,11 @@ class LocalStorageService {
 		// Subscribe to settings changes for automatic saving
 		const unsubscribeSettings = allSettings.subscribe((settings) => {
 			try {
-				// Save shared settings
-				localStorage.setItem('settings.shared', JSON.stringify(settings.shared))
+				// Save complete settings object for immediate loading
+				localStorage.setItem('settings.complete', JSON.stringify(settings))
 				
-				// Save local settings if they exist
+				// Keep legacy storage for backward compatibility
+				localStorage.setItem('settings.shared', JSON.stringify(settings.shared))
 				if (Object.keys(settings.screens).length > 0) {
 					localStorage.setItem('settings.local', JSON.stringify(settings.screens))
 				}
