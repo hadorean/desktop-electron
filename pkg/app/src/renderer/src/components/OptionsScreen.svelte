@@ -160,9 +160,19 @@
 			const result = await window.api.getServerStatus()
 			if (result.success && result.data) {
 				const newStatus = result.data.status as typeof serverStatus
+				const serverPort = result.data.port
+				
+				// Update server status
 				if (newStatus !== serverStatus) {
 					console.log(`🔄 Server status changed: ${serverStatus} → ${newStatus}`)
 					serverStatus = newStatus
+				}
+				
+				// If server is connected and running on our target port, clear pending restart
+				if (newStatus === 'connected' && serverPort === port && portPendingRestart) {
+					console.log(`✅ Server confirmed running on port ${port}, clearing pending restart`)
+					originalPort = port
+					portPendingRestart = false
 				}
 			} else {
 				serverStatus = 'unknown'
@@ -228,11 +238,10 @@
 			const result = await window.api.restartServerWithPort(port)
 
 			if (result.success) {
-				originalPort = port
-				portPendingRestart = false
-				console.log('✅ Server restarted successfully on port', port)
+				console.log('✅ Server restart initiated successfully on port', port)
 				
 				// Check server status immediately to update UI
+				// This will clear portPendingRestart once server is confirmed running on new port
 				await checkServerStatus()
 			} else {
 				serverStatus = 'disconnected'
