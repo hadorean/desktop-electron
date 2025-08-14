@@ -1,3 +1,4 @@
 // Shared utility functions
-export * from './formatting.js'
-export * from './storage.js'
+export * from './formatting'
+export * from './storage'
+export * from './store'

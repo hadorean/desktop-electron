@@ -1,18 +1,5 @@
-import { get, writable } from 'svelte/store'
+import { createStore } from '$shared/utils'
 import { AppContext } from '../services/app'
 
-export const appStore = writable<AppContext | null>(null)
-
-export const isQuitting = writable<boolean>(false)
-
-export function setIsQuitting(quitting: boolean): void {
-	isQuitting.set(quitting)
-}
-
-export function setAppContext(context: AppContext): void {
-	appStore.set(context)
-}
-
-export function getAppContext(): AppContext | null {
-	return get(appStore)
-}
+export const { store: isQuitting, set: setIsQuitting } = createStore<boolean>(false)
+export const { store: appStore, set: setAppContext, get: getAppContext } = createStore<AppContext | null>(null)
