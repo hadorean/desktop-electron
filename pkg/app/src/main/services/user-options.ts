@@ -5,7 +5,7 @@ import { app } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import type { LocalServer } from '../server'
-import { appStore } from '../stores/appStore'
+import { localServer as localServerStore } from '../stores/appStore'
 
 export class UserOptionsService {
 	private optionsPath: string
@@ -16,10 +16,8 @@ export class UserOptionsService {
 
 	constructor() {
 		this.optionsPath = join(app.getPath('userData'), 'user-options.json')
-		appStore.subscribe((context) => {
-			if (context) {
-				this.localServer = context.localServer
-			}
+		localServerStore.subscribe((server) => {
+			this.localServer = server
 		})
 	}
 
@@ -147,7 +145,7 @@ export class UserOptionsService {
 
 const userOptionsService = new UserOptionsService()
 
-export const setupUserOptions = async () => {
+export const initUserOptions = async () => {
 	await userOptionsService.initialize()
 }
 

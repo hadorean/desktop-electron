@@ -6,14 +6,14 @@ import { autoUpdater } from 'electron-updater'
 import { join } from 'path'
 import { get } from 'svelte/store'
 import icon from '../../../resources/icon.png?asset'
-import { isQuitting } from '../stores/appStore'
+import { isQuitting, setMainWindow } from '../stores/appStore'
 
 // Store reference to main window
 let window: BrowserWindow | null = null
 
 // Track if the app is actually quitting
 
-export function createWindow(): void {
+export function createWindow(): BrowserWindow {
 	const transparent = appConfig.window.transparent
 	console.log('Creating window with transparent:', transparent)
 
@@ -99,6 +99,8 @@ export function createWindow(): void {
 	} else {
 		window.loadFile(join(__dirname, '../renderer/index.html'))
 	}
+
+	return window
 }
 
 let delta = 1
@@ -167,7 +169,8 @@ function toggleMainWindow(): void {
 
 export function recreateMainWindow(): void {
 	window?.destroy()
-	createWindow()
+	window = createWindow()
+	window.show()
 }
 
 export const mainWindow = {
@@ -179,3 +182,8 @@ export const mainWindow = {
 }
 
 export type MainWindow = typeof mainWindow
+
+export const initMainWindow = (): void => {
+	createWindow()
+	setMainWindow(mainWindow)
+}

@@ -2,9 +2,9 @@ import { IpcEvents, MainEvents, RendererEvents } from '$shared/types/ipc'
 import { is } from '@electron-toolkit/utils'
 import { ipcMain } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
-import { MainWindow } from '../windows/mainWindow'
+import { getMainWindow } from '../stores/appStore'
 
-export function setupAutoUpdate(mainWindow: MainWindow): {
+export function initAutoUpdate(): {
 	checkForUpdates: () => void
 	downloadUpdate: () => void
 	installUpdate: () => void
@@ -27,7 +27,7 @@ export function setupAutoUpdate(mainWindow: MainWindow): {
 	}
 
 	const sendToRenderer = (event: RendererEvents, data: unknown): void => {
-		const window = mainWindow.get()
+		const window = getMainWindow()?.get()
 		if (window) {
 			window.webContents.send(event, data)
 		}

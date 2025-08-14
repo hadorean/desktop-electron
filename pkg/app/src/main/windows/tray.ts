@@ -1,10 +1,8 @@
-import { Menu, shell, Tray } from 'electron'
-import { AppContext } from '../services/app'
-import { setIsQuitting } from '../stores/appStore'
+import { app, Menu, shell, Tray } from 'electron'
+import icon from '../../../resources/icon.png?asset'
+import { getBg, getLocalServer, getMainWindow, setIsQuitting } from '../stores/appStore'
 
-export function setupTray(context: AppContext): Tray {
-	const { app, icon, localServer, mainWindow, bg } = context
-
+export function initTray(): Tray {
 	const tray = new Tray(icon)
 	tray.setToolTip('Hey Ketsu')
 
@@ -12,14 +10,15 @@ export function setupTray(context: AppContext): Tray {
 		{
 			label: 'Show App',
 			click: () => {
-				mainWindow.show()
+				getMainWindow()?.show()
 			}
 		},
 		{
 			label: 'Open in Browser',
 			click: () => {
-				if (localServer.isServerRunning()) {
-					shell.openExternal(localServer.getUrl())
+				const localServer = getLocalServer()
+				if (localServer?.isServerRunning()) {
+					shell.openExternal(localServer.getAppUrl())
 				}
 			}
 		},
@@ -29,8 +28,8 @@ export function setupTray(context: AppContext): Tray {
 			click: () => {
 				console.log('Tray quit clicked - starting cleanup...')
 				setIsQuitting(true)
-				bg?.cleanup()
-				localServer.stop()
+				getBg()?.cleanup()
+				getLocalServer()?.stop()
 
 				// Force quit after cleanup
 				setTimeout(() => {
@@ -45,7 +44,7 @@ export function setupTray(context: AppContext): Tray {
 
 	// Double click tray icon to show window
 	tray.on('double-click', () => {
-		mainWindow.show()
+		getMainWindow()?.show()
 	})
 
 	return tray

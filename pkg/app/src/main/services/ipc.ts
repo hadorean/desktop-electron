@@ -4,13 +4,22 @@ import type { ScreenSettings, UserOptions } from '$shared/types'
 import { appConfig } from '$shared/types/config'
 import { IpcEvents, MainEvents } from '$shared/types/ipc'
 import { app, dialog, ipcMain } from 'electron'
+import { bg as bgStore, getBg, getLocalServer, localServer as localServerStore } from '../stores/appStore'
 import { mainWindow } from '../windows/mainWindow'
-import { AppContext } from './app'
 import { settingsService } from './settings'
 import { updateUserOptions } from './user-options'
 
-export function setupIpc(options: AppContext): void {
-	const { localServer, bg } = options
+let localServer = getLocalServer()
+let bg = getBg()
+
+export function initIpc(): void {
+	localServerStore.subscribe((server) => {
+		localServer = server
+	})
+
+	bgStore.subscribe((b) => {
+		bg = b
+	})
 
 	// Type-safe wrappers for IPC
 	const handleIpc = (event: MainEvents, handler: (...args: unknown[]) => unknown): void => {
@@ -26,11 +35,11 @@ export function setupIpc(options: AppContext): void {
 
 	// IPC handlers for server communication
 	handleIpc(IpcEvents.GetServerUrl, () => {
-		return localServer.getUrl()
+		return localServer?.getUrl()
 	})
 
 	handleIpc(IpcEvents.IsServerRunning, () => {
-		return localServer.isServerRunning()
+		return localServer?.isServerRunning()
 	})
 
 	// IPC handler for app version

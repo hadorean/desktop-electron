@@ -1,24 +1,26 @@
-import { debugVisible } from '$shared/stores/debugStore'
+import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
 import { IpcEvents, RendererEvents } from '$shared/types/ipc'
 import { SocketEvents } from '$shared/types/sockets'
 import { app } from 'electron'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import type { LocalServer } from '../server'
-import { appStore } from '../stores/appStore'
-import type { MainWindow } from '../windows/mainWindow'
+import { localServer as localServerStore, mainWindow as mainWindowStore } from '../stores/appStore'
+import { MainWindow } from '../windows/mainWindow'
 
 let localServer: LocalServer | null = null
 let mainWindow: MainWindow | null = null
 
-export function setupDebug(): void {
+export function initDebug(): void {
 	initializeStore()
 	observeStore()
-	appStore.subscribe((app) => {
+	localServerStore.subscribe((server) => {
 		if (app) {
-			localServer = app.localServer
-			mainWindow = app.mainWindow
+			localServer = server
 		}
+	})
+	mainWindowStore.subscribe((window) => {
+		mainWindow = window
 	})
 }
 
@@ -35,7 +37,7 @@ function initializeStore(): void {
 			const data = readFileSync(statePath, 'utf8')
 			const state = JSON.parse(data)
 			const savedVisible = state.visible ?? true
-			debugVisible.set(savedVisible)
+			setDebugMenuVisible(savedVisible)
 		}
 	} catch (error) {
 		console.error('Error loading debug state from file:', error)
@@ -60,10 +62,8 @@ function saveToFile(visible: boolean): void {
 }
 
 function sendToRenderer(event: RendererEvents, data: unknown): void {
-	if (mainWindow) {
-		const win = mainWindow.get()
-		win?.webContents.send(event, data)
-	}
+	const win = mainWindow?.get()
+	win?.webContents.send(event, data)
 }
 
 function broadcastState(visible: boolean): void {

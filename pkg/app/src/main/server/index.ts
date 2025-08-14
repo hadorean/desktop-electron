@@ -5,6 +5,7 @@ import { createServer } from 'http'
 import { join } from 'path'
 import { imageService } from '../services/images'
 import { thumbnailService } from '../services/thumbnails'
+import { setLocalServer } from '../stores/appStore'
 import { DevelopmentManager } from './dev'
 import { registerRoutes } from './routes'
 import { SocketManager } from './sockets'
@@ -118,6 +119,10 @@ export class LocalServer {
 		return `http://localhost:${this.port}`
 	}
 
+	public getAppUrl(): string {
+		return `http://localhost:${this.port}/app/browser`
+	}
+
 	public isServerRunning(): boolean {
 		return this.isRunning
 	}
@@ -141,5 +146,15 @@ export class LocalServer {
 
 	public set clientAssets(assets: { js: string; css: string } | null) {
 		this.dev.clientAssets = assets
+	}
+}
+
+export const initLocalServer = async (): Promise<void> => {
+	const localServer = new LocalServer()
+	try {
+		await localServer.start()
+		setLocalServer(localServer)
+	} catch (error) {
+		console.error('Failed to start local server:', error)
 	}
 }

@@ -245,8 +245,13 @@ export function registerRoutes(localServer: LocalServer): void {
 	})
 
 	// Fallback route for /app
+	server.get('/', (_req, res) => {
+		res.redirect('/app/browser')
+	})
+
+	// Fallback route for /app
 	server.get(ApiRoutes.App, (_req, res) => {
-		res.redirect('/app/monitor1')
+		res.redirect('/app/browser')
 	})
 
 	// Legacy static route for fallback

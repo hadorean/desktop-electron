@@ -1,5 +1,9 @@
 import { createStore } from '$shared/utils'
-import { AppContext } from '../services/app'
+import { LocalServer } from '../server'
+import { BackgroundManager } from '../windows/backgrounds'
+import { MainWindow } from '../windows/mainWindow'
 
 export const { store: isQuitting, set: setIsQuitting } = createStore<boolean>(false)
-export const { store: appStore, set: setAppContext, get: getAppContext } = createStore<AppContext | null>(null)
+export const { store: mainWindow, set: setMainWindow, get: getMainWindow } = createStore<MainWindow | null>(null)
+export const { store: localServer, set: setLocalServer, get: getLocalServer } = createStore<LocalServer | null>(null)
+export const { store: bg, set: setBg, get: getBg } = createStore<BackgroundManager | null>(null)

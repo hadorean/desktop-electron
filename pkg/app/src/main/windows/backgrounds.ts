@@ -1,12 +1,17 @@
 import { BrowserWindow, screen } from 'electron'
 import { attach, detach, reset } from 'electron-as-wallpaper'
+import { getLocalServer, setBg } from '../stores/appStore'
 
 export class BackgroundManager {
 	private backgroundWindows: Map<number, BrowserWindow> = new Map()
 	private serverUrl: string | null = null
 
-	public start(serverUrl: string): void {
-		this.serverUrl = serverUrl
+	constructor() {
+		this.serverUrl = getLocalServer()?.getUrl() ?? null
+		this.start()
+	}
+
+	public start(): void {
 		const displays = screen.getAllDisplays()
 
 		console.log(`Setting up background windows for ${displays.length} monitor(s)`)
@@ -217,4 +222,9 @@ export class BackgroundManager {
 			this.makeNonInteractive(monitorId)
 		})
 	}
+}
+
+export const initBackgrounds = (): void => {
+	const bg = new BackgroundManager()
+	setBg(bg)
 }

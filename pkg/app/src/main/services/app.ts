@@ -6,27 +6,15 @@
 import { onUserOptionsChanged } from '$shared/stores/userOptionsStore'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow } from 'electron'
-import { LocalServer } from '../server'
-import { setIsQuitting } from '../stores/appStore'
-import { BackgroundManager } from '../windows/backgrounds'
-import { createWindow, MainWindow } from '../windows/mainWindow'
+import { getBg, getLocalServer, setIsQuitting } from '../stores/appStore'
+import { createWindow } from '../windows/mainWindow'
 import { unregisterGlobalShortcuts } from '../windows/shortcuts'
 
-export type AppContext = {
-	app: Electron.App
-	icon: string | Electron.NativeImage
-	bg: BackgroundManager
-	localServer: LocalServer
-	mainWindow: MainWindow
-}
-
-let context: AppContext | null
-
-export function init(setup: () => Promise<AppContext>): void {
+export async function initApp(): Promise<void> {
 	// This method will be called when Electron has finished
 	// initialization and is ready to create browser windows.
 	// Some APIs can only be used after this event occurs.
-	app.whenReady().then(async () => {
+	await app.whenReady().then(async () => {
 		// Set app user model id for windows
 		electronApp.setAppUserModelId('com.electron')
 
@@ -36,8 +24,6 @@ export function init(setup: () => Promise<AppContext>): void {
 		app.on('browser-window-created', (_, window) => {
 			optimizer.watchWindowShortcuts(window)
 		})
-
-		context = await setup()
 	})
 
 	app.on('activate', function () {
@@ -51,8 +37,8 @@ export function init(setup: () => Promise<AppContext>): void {
 		console.log('App quitting - starting cleanup...')
 		setIsQuitting(true)
 		unregisterGlobalShortcuts()
-		context?.bg.cleanup()
-		context?.localServer.stop()
+		getBg()?.cleanup()
+		getLocalServer()?.stop()
 	})
 
 	// Force quit after a timeout if normal quit doesn't work
@@ -71,8 +57,8 @@ export function init(setup: () => Promise<AppContext>): void {
 	app.on('window-all-closed', () => {
 		if (process.platform !== 'darwin') {
 			unregisterGlobalShortcuts()
-			context?.bg.cleanup()
-			context?.localServer.stop()
+			getBg()?.cleanup()
+			getLocalServer()?.stop()
 			app.quit()
 		}
 	})
