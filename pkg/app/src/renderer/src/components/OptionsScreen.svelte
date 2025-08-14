@@ -161,13 +161,13 @@
 			if (result.success && result.data) {
 				const newStatus = result.data.status as typeof serverStatus
 				const serverPort = result.data.port
-				
+
 				// Update server status
 				if (newStatus !== serverStatus) {
 					console.log(`🔄 Server status changed: ${serverStatus} → ${newStatus}`)
 					serverStatus = newStatus
 				}
-				
+
 				// If server is connected and running on our target port, clear pending restart
 				if (newStatus === 'connected' && serverPort === port && portPendingRestart) {
 					console.log(`✅ Server confirmed running on port ${port}, clearing pending restart`)
@@ -187,7 +187,7 @@
 	const startStatusMonitoring = () => {
 		// Check status immediately
 		checkServerStatus()
-		
+
 		// Then check every 3 seconds (slower for normal operation)
 		statusCheckInterval = setInterval(() => {
 			checkServerStatus()
@@ -197,12 +197,12 @@
 	// Start faster monitoring during server restart
 	const startFastStatusMonitoring = () => {
 		stopStatusMonitoring()
-		
+
 		// Check every 500ms during restart for quick feedback
 		statusCheckInterval = setInterval(() => {
 			checkServerStatus()
 		}, 500)
-		
+
 		// After 10 seconds, switch back to normal monitoring
 		setTimeout(() => {
 			if (statusCheckInterval) {
@@ -226,7 +226,7 @@
 
 		isRestartingServer = true
 		serverStatus = 'pending'
-		
+
 		// Start fast monitoring during restart
 		startFastStatusMonitoring()
 
@@ -239,7 +239,7 @@
 
 			if (result.success) {
 				console.log('✅ Server restart initiated successfully on port', port)
-				
+
 				// Check server status immediately to update UI
 				// This will clear portPendingRestart once server is confirmed running on new port
 				await checkServerStatus()

@@ -29,14 +29,15 @@ export const effectiveApiUrl = writable(getInitialApiUrl())
 // Track if we have a server-provided URL to prevent fallbacks
 let hasServerProvidedUrl = false
 if (typeof window !== 'undefined') {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const serverData = (window as any).__SERVER_DATA__
-	hasServerProvidedUrl = !!(serverData?.serverUrl)
+	hasServerProvidedUrl = !!serverData?.serverUrl
 }
 
 // Update effective URL when either store changes
 apiConfigEnabled.subscribe((enabled) => {
 	const currentBaseUrl = get(apiBaseUrl)
-	
+
 	// If we have a server-provided URL, always use apiBaseUrl regardless of config
 	if (hasServerProvidedUrl) {
 		effectiveApiUrl.set(currentBaseUrl)
@@ -50,7 +51,7 @@ apiConfigEnabled.subscribe((enabled) => {
 
 apiBaseUrl.subscribe((value) => {
 	const configEnabled = get(apiConfigEnabled)
-	
+
 	// If we have a server-provided URL or config is enabled, use the base URL
 	if (hasServerProvidedUrl || configEnabled) {
 		effectiveApiUrl.set(value)

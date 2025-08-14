@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { getImageUrl } from '../../../services'
-	import { images, imagesError, imagesLoading, screenSettings, updateSharedSettings } from '../../../stores'
-	import { Button, Card, CardContent } from '../../ui'
-	import ImageGridMessage from './ImageGridMessage.svelte'
+	import { getImageUrl } from '../../services'
+	import { images, imagesError, imagesLoading, screenSettings, updateSharedSettings } from '../../stores'
+	import { Button, Card, CardContent } from '../ui'
 
 	const {
 		selectedImage = '',
@@ -73,6 +72,18 @@
 	const effectiveImage = $derived(isOverridden ? overrideValue : selectedImage)
 </script>
 
+{#snippet message(icon: string, message: string, detail?: string, isError?: boolean)}
+	<div class="state-container {isError ? 'error' : ''}">
+		<div class="state-content">
+			<div class="state-icon">{icon}</div>
+			<div class="state-message">{message}</div>
+			{#if detail}
+				<div class="state-detail">{detail}</div>
+			{/if}
+		</div>
+	</div>
+{/snippet}
+
 <div class="image-grid-container">
 	<div class="header-section">
 		{#if isOverride}
@@ -85,11 +96,11 @@
 	<Card class="image-grid-card{isGhost ? 'ghost-image-grid' : ''}">
 		<CardContent class="grid-card-content no-drag">
 			{#if $imagesLoading}
-				<ImageGridMessage icon="⏳" message="Loading images..." />
+				{@render message('⏳', 'Loading images...')}
 			{:else if $imagesError}
-				<ImageGridMessage icon="⚠️" message="Failed to load images" detail={$imagesError} isError />
+				{@render message('⚠️', 'Failed to load images', $imagesError, true)}
 			{:else if sortedImages.length === 0}
-				<ImageGridMessage icon="📁" message="No images found" detail="Add images to your wallpapers folder" />
+				{@render message('📁', 'No images found', 'Add images to your wallpapers folder')}
 			{:else}
 				<div class="image-grid no-drag">
 					{#each sortedImages as image (image.name)}
@@ -312,5 +323,42 @@
 
 	.ghost-thumbnail:hover {
 		opacity: 0.8 !important;
+	}
+
+	/* Message styling */
+
+	.state-container {
+		color: var(--text-muted);
+		display: flex;
+		height: 120px;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+
+	.state-container.error {
+		color: var(--danger);
+	}
+
+	.state-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.state-icon {
+		margin-bottom: 0.5rem;
+		font-size: 2.25rem;
+		opacity: 0.5;
+	}
+
+	.state-message {
+		font-size: 0.875rem;
+	}
+
+	.state-detail {
+		font-size: 0.75rem;
+		opacity: 0.7;
 	}
 </style>

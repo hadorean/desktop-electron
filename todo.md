@@ -8,12 +8,13 @@ What's left to ship?
 
 - [X] Set images directory
 - [X] Enable/disable auto-launch
-- [ ] Port selection
+- [X] Port selection
 
 ### Monitor management
 
 - [ ] Enable/disable monitors
 - [ ] React to monitor changes
+- [ ] Color coding for screens
 
 ### Initial screen
 
@@ -31,4 +32,3 @@ What's left to ship?
 ## Nice to have
 
 - [ ] Set Url as background
-- [ ] Color coding for screens
