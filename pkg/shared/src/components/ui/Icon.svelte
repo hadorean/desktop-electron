@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BackArrowIcon, Cog6ToothIcon, WarningCircleIcon, XMarkIcon } from '../../assets/icons'
+	import { BackArrowIcon, CogIcon, WarningCircleIcon, XMarkIcon } from '../../assets/icons'
 
 	export let name: 'warning-circle' | 'x-mark' | 'cog' | 'back-arrow'
 	export let size: 'sm' | 'md' | 'lg' = 'md'
@@ -8,7 +8,7 @@
 	const icons = {
 		'warning-circle': WarningCircleIcon,
 		'x-mark': XMarkIcon,
-		cog: Cog6ToothIcon,
+		cog: CogIcon,
 		'back-arrow': BackArrowIcon
 	}
 

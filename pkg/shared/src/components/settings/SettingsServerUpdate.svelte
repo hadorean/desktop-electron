@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { allSettings, currentScreen, shouldPreventServerSync } from '../../stores/settingsStore'
-	import { apiBaseUrl } from '../../stores/apiStore'
-	import { onMount, onDestroy } from 'svelte'
-	import { socketService } from '../../services/socket'
 	import { Inspect } from '@hgrandry/dbg'
+	import { onDestroy, onMount } from 'svelte'
+	import { socketService } from '../../services/socket'
+	import { apiBaseUrl } from '../../stores/apiStore'
+	import { allSettings, currentScreen, shouldPreventServerSync } from '../../stores/settingsStore'
 	import type { SettingsUpdateEvent } from '../../types'
 
 	let isConnected = false
@@ -79,31 +79,18 @@
 
 <Inspect>
 	{#if isConnected}
-		<span class="status-indicator connected">🟢 Socket.IO Connected</span>
+		<span class="connected">🟢 Socket.IO Connected</span>
 	{:else}
-		<span class="status-indicator disconnected">🔴 Socket.IO Disconnected</span>
+		<span class="disconnected">🔴 Socket.IO Disconnected</span>
 	{/if}
 </Inspect>
 
 <style>
-	/* .socket-status {
-		position: fixed;
-		top: 10px;
-		right: 10px;
-		z-index: 1000;
-		background: rgba(0, 0, 0, 0.8);
-		color: white;
-		padding: 8px 12px;
-		border-radius: 6px;
-		font-size: 12px;
-		font-weight: bold;
-	} */
-
-	.status-indicator.connected {
+	.connected {
 		color: #4ade80;
 	}
 
-	.status-indicator.disconnected {
+	.disconnected {
 		color: #f87171;
 	}
 </style>

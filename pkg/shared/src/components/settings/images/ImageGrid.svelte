@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { getImageUrl } from '../../services'
-	import { screenSettings, updateSharedSettings, images, imagesLoading, imagesError } from '../../stores'
-	import { Button, Card, CardContent } from '../ui'
+	import { getImageUrl } from '../../../services'
+	import { images, imagesError, imagesLoading, screenSettings, updateSharedSettings } from '../../../stores'
+	import { Button, Card, CardContent } from '../../ui'
+	import ImageGridMessage from './ImageGridMessage.svelte'
 
 	const {
 		selectedImage = '',
@@ -81,36 +82,16 @@
 		{/if}
 	</div>
 
-	<Card class="image-grid-card {isGhost ? 'ghost-image-grid' : ''}">
-		<CardContent class="grid-card-content">
+	<Card class="image-grid-card{isGhost ? 'ghost-image-grid' : ''}">
+		<CardContent class="grid-card-content no-drag">
 			{#if $imagesLoading}
-				<!-- Loading state -->
-				<div class="state-container">
-					<div class="state-content">
-						<div class="state-icon">⏳</div>
-						<div class="state-message">Loading images...</div>
-					</div>
-				</div>
+				<ImageGridMessage icon="⏳" message="Loading images..." />
 			{:else if $imagesError}
-				<!-- Error state -->
-				<div class="state-container error">
-					<div class="state-content">
-						<div class="state-icon">⚠️</div>
-						<div class="state-message">Failed to load images</div>
-						<div class="state-detail">{$imagesError}</div>
-					</div>
-				</div>
+				<ImageGridMessage icon="⚠️" message="Failed to load images" detail={$imagesError} isError />
 			{:else if sortedImages.length === 0}
-				<!-- Empty state -->
-				<div class="state-container">
-					<div class="state-content">
-						<div class="state-icon">📁</div>
-						<div class="state-message">No images found</div>
-						<div class="state-detail">Add images to your wallpapers folder</div>
-					</div>
-				</div>
+				<ImageGridMessage icon="📁" message="No images found" detail="Add images to your wallpapers folder" />
 			{:else}
-				<div class="image-grid">
+				<div class="image-grid no-drag">
 					{#each sortedImages as image (image.name)}
 						<div class="card-container">
 							<div
@@ -186,41 +167,6 @@
 		padding: 0.5rem !important;
 	}
 
-	.state-container {
-		color: var(--text-muted);
-		display: flex;
-		height: 120px;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
-	}
-
-	.state-container.error {
-		color: var(--danger);
-	}
-
-	.state-content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.state-icon {
-		margin-bottom: 0.5rem;
-		font-size: 2.25rem;
-		opacity: 0.5;
-	}
-
-	.state-message {
-		font-size: 0.875rem;
-	}
-
-	.state-detail {
-		font-size: 0.75rem;
-		opacity: 0.7;
-	}
-
 	.image-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -255,7 +201,9 @@
 	}
 
 	.image-thumbnail-card.selected {
-		box-shadow: var(--shadow-lg), 0 0 0 2px var(--primary);
+		box-shadow:
+			var(--shadow-lg),
+			0 0 0 2px var(--primary);
 	}
 
 	:global(.thumbnail-content) {

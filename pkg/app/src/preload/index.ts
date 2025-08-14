@@ -1,4 +1,4 @@
-import type { VersionInfo } from '$shared/types'
+import type { UserOptions, VersionInfo } from '$shared/types'
 import { IpcEvents } from '$shared/types/ipc'
 import type { ScreenSettings } from '$shared/types/settings'
 import { electronAPI } from '@electron-toolkit/preload'
@@ -51,7 +51,7 @@ const api = {
 	showOpenDialog: (options?: Electron.OpenDialogOptions) => ipcRenderer.invoke(IpcEvents.ShowOpenDialog, options),
 	// User Options API
 	getUserOptions: () => ipcRenderer.invoke(IpcEvents.GetUserOptions),
-	updateUserOptions: (options: Partial<import('$shared/types').UserOptions>) => ipcRenderer.invoke(IpcEvents.UpdateUserOptions, options)
+	updateUserOptions: (options: Partial<UserOptions>) => ipcRenderer.invoke(IpcEvents.UpdateUserOptions, options)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

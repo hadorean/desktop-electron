@@ -2,7 +2,7 @@
 	import { Inspect } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { currentScreen, editingSettings, inTransition, isLocalMode, screenSettings, updateEditingSettings } from '../../stores'
-	import ImageGrid from './ImageGrid.svelte'
+	import ImageGrid from './images/ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
 	import SliderControl from './SliderControl.svelte'
 	import ToggleControl from './ToggleControl.svelte'
