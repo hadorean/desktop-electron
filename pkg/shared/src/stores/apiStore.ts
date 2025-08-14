@@ -36,7 +36,6 @@ if (typeof window !== 'undefined') {
 // Update effective URL when either store changes
 apiConfigEnabled.subscribe((enabled) => {
 	const currentBaseUrl = get(apiBaseUrl)
-	console.log('🔧 apiConfigEnabled changed:', enabled, 'hasServerProvidedUrl:', hasServerProvidedUrl, 'currentBaseUrl:', currentBaseUrl)
 	
 	// If we have a server-provided URL, always use apiBaseUrl regardless of config
 	if (hasServerProvidedUrl) {
@@ -45,14 +44,12 @@ apiConfigEnabled.subscribe((enabled) => {
 		effectiveApiUrl.set(currentBaseUrl)
 	} else {
 		const envUrl = import.meta.env.VITE_API_BASE_URL || ''
-		console.log('🔧 Falling back to environment URL:', envUrl)
 		effectiveApiUrl.set(envUrl)
 	}
 })
 
 apiBaseUrl.subscribe((value) => {
 	const configEnabled = get(apiConfigEnabled)
-	console.log('🔧 apiBaseUrl changed:', value, 'hasServerProvidedUrl:', hasServerProvidedUrl, 'configEnabled:', configEnabled)
 	
 	// If we have a server-provided URL or config is enabled, use the base URL
 	if (hasServerProvidedUrl || configEnabled) {
