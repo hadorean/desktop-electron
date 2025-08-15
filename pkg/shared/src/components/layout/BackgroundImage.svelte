@@ -40,12 +40,12 @@
 			previousImage.tween = new Tween({ opacity: previousImage.opacity })
 				.to({ opacity: 0 }, ($screenSettings.transitionTime ?? 1) * 1000)
 				.easing(Easing.Quadratic.Out)
-				.onUpdate((value) => {
+				.onUpdate(value => {
 					if (previousImage) {
 						previousImage.opacity = value.opacity
 						if (value.opacity <= 0) {
 							// Remove from stack when fully transparent
-							imageStack = imageStack.filter((img) => img !== previousImage)
+							imageStack = imageStack.filter(img => img !== previousImage)
 							previousImage.tween?.stop()
 							previousImage.tween = null
 						}
@@ -64,7 +64,7 @@
 		activeImage.tween = new Tween({ opacity: 0 })
 			.to({ opacity: 1 }, ($screenSettings.transitionTime ?? 1) * 1000)
 			.easing(Easing.Quadratic.Out)
-			.onUpdate((value) => {
+			.onUpdate(value => {
 				if (activeImage) {
 					activeImage.opacity = value.opacity
 					if (value.opacity >= 1) {
@@ -90,7 +90,7 @@
 		}
 
 		// Update stack tweens and clean up completed ones
-		imageStack = imageStack.filter((image) => {
+		imageStack = imageStack.filter(image => {
 			if (image.tween) {
 				image.tween.update(time)
 				hasActiveTweens = true

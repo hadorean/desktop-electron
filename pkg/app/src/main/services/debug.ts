@@ -14,12 +14,12 @@ let mainWindow: MainWindow | null = null
 export function initDebug(): void {
 	initializeStore()
 	observeStore()
-	localServerStore.subscribe((server) => {
+	localServerStore.subscribe(server => {
 		if (app) {
 			localServer = server
 		}
 	})
-	mainWindowStore.subscribe((window) => {
+	mainWindowStore.subscribe(window => {
 		mainWindow = window
 	})
 }
@@ -46,7 +46,7 @@ function initializeStore(): void {
 
 // Observe store changes and handle persistence + broadcasting
 function observeStore(): void {
-	debugMenu.visibility.subscribe((visible) => {
+	debugMenu.visibility.subscribe(visible => {
 		saveToFile(visible)
 		broadcastState(visible)
 	})

@@ -16,7 +16,7 @@ export class UserOptionsService {
 
 	constructor() {
 		this.optionsPath = join(app.getPath('userData'), 'user-options.json')
-		localServerStore.subscribe((server) => {
+		localServerStore.subscribe(server => {
 			this.localServer = server
 		})
 	}
@@ -31,7 +31,7 @@ export class UserOptionsService {
 		await this.loadFromFileSystem()
 
 		// Subscribe to store changes for automatic persistence and socket broadcasting
-		userOptions.subscribe((options) => {
+		userOptions.subscribe(options => {
 			// console.log('🔧 UserOptionsService subscription triggered with options:', options)
 			// console.log('🔧 shouldPreventUserOptionsSync():', shouldPreventUserOptionsSync())
 			// console.log('🔧 this.hasInitialized:', this.hasInitialized)
@@ -39,7 +39,7 @@ export class UserOptionsService {
 			// Skip persistence during initial load and internal operations
 			if (!shouldPreventUserOptionsSync() && this.hasInitialized) {
 				// console.log('🔧 UserOptionsService: Auto-saving options to file system')
-				this.saveToFileSystem(options).catch((error) => {
+				this.saveToFileSystem(options).catch(error => {
 					console.error('Failed to save user options:', error)
 				})
 			} else {

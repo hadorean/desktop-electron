@@ -122,7 +122,7 @@ export default defineConfig({
 				output: {
 					assetFileNames: 'assets/[name].[ext]'
 				},
-				external: (id) => {
+				external: id => {
 					// Don't externalize SVG imports
 					if (id.endsWith('.svg')) return false
 					return false

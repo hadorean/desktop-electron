@@ -13,11 +13,11 @@ let localServer = getLocalServer()
 let bg = getBg()
 
 export function initIpc(): void {
-	localServerStore.subscribe((server) => {
+	localServerStore.subscribe(server => {
 		localServer = server
 	})
 
-	bgStore.subscribe((b) => {
+	bgStore.subscribe(b => {
 		bg = b
 	})
 

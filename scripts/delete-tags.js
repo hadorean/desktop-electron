@@ -41,7 +41,7 @@ class TagCleaner {
 	getLocalTags() {
 		try {
 			const output = this.execCommand(`git tag -l "${this.tagPattern}"`, true)
-			return output ? output.split('\n').filter((tag) => tag.trim()) : []
+			return output ? output.split('\n').filter(tag => tag.trim()) : []
 		} catch (error) {
 			console.warn(chalk.yellow('Failed to get local tags'))
 			return []
@@ -222,7 +222,7 @@ class TagCleaner {
 		const totalTags = allTags.size
 		const question = chalk.yellow(`\n⚠️  This will delete ${totalTags} tags matching "${this.tagPattern}". Continue? (y/N): `)
 
-		rl.question(question, (answer) => {
+		rl.question(question, answer => {
 			rl.close()
 
 			if (answer.toLowerCase() !== 'y' && answer.toLowerCase() !== 'yes') {
@@ -258,7 +258,7 @@ function parseArgs() {
 	}
 
 	// Get pattern argument (first non-flag argument)
-	const pattern = args.find((arg) => !arg.startsWith('-'))
+	const pattern = args.find(arg => !arg.startsWith('-'))
 	return pattern
 }
 
@@ -266,7 +266,7 @@ function parseArgs() {
 if (require.main === module) {
 	const pattern = parseArgs()
 	const cleaner = new TagCleaner(pattern)
-	cleaner.run().catch((error) => {
+	cleaner.run().catch(error => {
 		console.error(chalk.red('Unexpected error:'), error)
 		process.exit(1)
 	})

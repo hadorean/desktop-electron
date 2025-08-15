@@ -33,14 +33,14 @@ const initialState: ImagesStoreState = {
 const imagesStoreInternal = writable<ImagesStoreState>(initialState)
 
 // Derived stores for convenient access
-const images = derived(imagesStoreInternal, ($store) => $store.images)
-const imagesLoading = derived(imagesStoreInternal, ($store) => $store.isLoading)
-const imagesError = derived(imagesStoreInternal, ($store) => $store.error)
-const imagesLastUpdated = derived(imagesStoreInternal, ($store) => $store.lastUpdated)
-const hasImages = derived(images, ($images) => $images.length > 0)
+const images = derived(imagesStoreInternal, $store => $store.images)
+const imagesLoading = derived(imagesStoreInternal, $store => $store.isLoading)
+const imagesError = derived(imagesStoreInternal, $store => $store.error)
+const imagesLastUpdated = derived(imagesStoreInternal, $store => $store.lastUpdated)
+const hasImages = derived(images, $images => $images.length > 0)
 
 // Combined derived store for components that need multiple values
-const imagesState = derived(imagesStoreInternal, ($store) => $store)
+const imagesState = derived(imagesStoreInternal, $store => $store)
 
 // Single export object containing all properties and functions
 export const imagesStore = {
@@ -58,7 +58,7 @@ export const imagesStore = {
 		isLoadingImages = true
 
 		// Set loading state
-		imagesStoreInternal.update((state) => ({
+		imagesStoreInternal.update(state => ({
 			...state,
 			isLoading: true,
 			error: null
@@ -68,7 +68,7 @@ export const imagesStore = {
 			const images = await api.getImages()
 			const previousImages = this.getCurrentImages()
 
-			imagesStoreInternal.update((state) => ({
+			imagesStoreInternal.update(state => ({
 				...state,
 				images,
 				isLoading: false,
@@ -86,7 +86,7 @@ export const imagesStore = {
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error loading images'
 
-			imagesStoreInternal.update((state) => ({
+			imagesStoreInternal.update(state => ({
 				...state,
 				isLoading: false,
 				error: errorMessage
@@ -109,7 +109,7 @@ export const imagesStore = {
 	},
 
 	updateImages(newImages: ImageInfo[]): void {
-		imagesStoreInternal.update((state) => ({
+		imagesStoreInternal.update(state => ({
 			...state,
 			images: newImages,
 			lastUpdated: Date.now()
@@ -144,7 +144,7 @@ export const imagesStore = {
 
 	imageExists(imageName: string): boolean {
 		if (!imageName) return false
-		return this.getCurrentImages().some((img) => img.name === imageName)
+		return this.getCurrentImages().some(img => img.name === imageName)
 	},
 
 	getIsLoadingImages() {
@@ -153,7 +153,7 @@ export const imagesStore = {
 
 	// Private helper method
 	notifyImageChangeCallbacks(newImages: ImageInfo[], previousImages: ImageInfo[]): void {
-		imageChangeCallbacks.forEach((callback) => {
+		imageChangeCallbacks.forEach(callback => {
 			try {
 				callback(newImages, previousImages)
 			} catch (error) {

@@ -46,7 +46,7 @@ class LocalStorageService {
 	 * Cleanup subscriptions (useful for testing or hot reload)
 	 */
 	cleanup(): void {
-		this.unsubscribers.forEach((unsubscribe) => unsubscribe())
+		this.unsubscribers.forEach(unsubscribe => unsubscribe())
 		this.unsubscribers = []
 		this.isInitialized = false
 		console.log('📦 LocalStorage service cleaned up')
@@ -97,7 +97,7 @@ class LocalStorageService {
 		if (typeof window === 'undefined' || !checkStorageAvailability()) {
 			// Set default image if available in non-browser environments
 			if (images.length > 0) {
-				updateSharedSettings((current) => ({
+				updateSharedSettings(current => ({
 					...current,
 					selectedImage: images[0].name
 				}))
@@ -140,7 +140,7 @@ class LocalStorageService {
 						showScreenSwitcher: parsedSettings.showScreenSwitcher ?? defaultSettings.showScreenSwitcher,
 						favorites: parsedSettings.favorites ?? defaultSettings.favorites,
 						selectedImage:
-							parsedSettings.selectedImage && images.some((img) => img.name === parsedSettings.selectedImage)
+							parsedSettings.selectedImage && images.some(img => img.name === parsedSettings.selectedImage)
 								? parsedSettings.selectedImage
 								: images.length > 0
 									? images[0].name
@@ -148,7 +148,7 @@ class LocalStorageService {
 						settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
 					}))
 				} else if (images.length > 0) {
-					updateSharedSettings((current) => ({
+					updateSharedSettings(current => ({
 						...current,
 						selectedImage: images[0].name
 					}))
@@ -187,7 +187,7 @@ class LocalStorageService {
 		} catch (error) {
 			console.error('Error loading settings from localStorage:', error)
 			if (images.length > 0) {
-				updateSharedSettings((current) => ({
+				updateSharedSettings(current => ({
 					...current,
 					selectedImage: images[0].name
 				}))
@@ -207,7 +207,7 @@ class LocalStorageService {
 		},
 		availableImages: { name: string }[]
 	): void {
-		const imageNames = availableImages.map((img) => img.name)
+		const imageNames = availableImages.map(img => img.name)
 
 		// Validate shared settings
 		if (settings.shared?.day?.selectedImage && !imageNames.includes(settings.shared.day.selectedImage)) {
@@ -300,7 +300,7 @@ class LocalStorageService {
 	 */
 	private setupStoreSubscriptions(): void {
 		// Subscribe to debug state changes
-		const unsubscribeDebug = debugMenu.visibility.subscribe((visible) => {
+		const unsubscribeDebug = debugMenu.visibility.subscribe(visible => {
 			try {
 				localStorage.setItem('debug.visible', JSON.stringify(visible))
 			} catch (error) {
@@ -310,7 +310,7 @@ class LocalStorageService {
 		this.unsubscribers.push(unsubscribeDebug)
 
 		// Subscribe to API URL changes
-		const unsubscribeApi = apiBaseUrl.subscribe((value) => {
+		const unsubscribeApi = apiBaseUrl.subscribe(value => {
 			try {
 				localStorage.setItem('apiBaseUrl', value)
 			} catch (error) {
@@ -320,7 +320,7 @@ class LocalStorageService {
 		this.unsubscribers.push(unsubscribeApi)
 
 		// Subscribe to current screen changes
-		const unsubscribeScreen = currentScreen.subscribe((screenId) => {
+		const unsubscribeScreen = currentScreen.subscribe(screenId => {
 			try {
 				localStorage.setItem('currentScreen', screenId)
 			} catch (error) {
@@ -330,7 +330,7 @@ class LocalStorageService {
 		this.unsubscribers.push(unsubscribeScreen)
 
 		// Subscribe to settings changes for automatic saving
-		const unsubscribeSettings = allSettings.subscribe((settings) => {
+		const unsubscribeSettings = allSettings.subscribe(settings => {
 			try {
 				// Save complete settings object for immediate loading
 				localStorage.setItem('settings.complete', JSON.stringify(settings))

@@ -13,7 +13,7 @@
 
 	onMount(() => {
 		// Setup Socket.IO connection status monitoring
-		socketService.onConnectionStatus((connected) => {
+		socketService.onConnectionStatus(connected => {
 			isConnected = connected
 			console.log('Socket.IO connection status:', connected)
 		})
@@ -41,14 +41,14 @@
 		})
 
 		// Monitor API base URL changes and update socket connection
-		apiBaseUrl.subscribe((serverUrl) => {
+		apiBaseUrl.subscribe(serverUrl => {
 			if (serverUrl) {
 				socketService.updateServerUrl(serverUrl)
 			}
 		})
 
 		// Subscribe to settings changes and send to server
-		unsubscribeSettings = allSettings.subscribe((value) => {
+		unsubscribeSettings = allSettings.subscribe(value => {
 			if (!initialSubscribeHandled) {
 				initialSubscribeHandled = true
 				return // Skip the initial subscribe callback

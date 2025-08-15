@@ -16,7 +16,7 @@
 	onMount(async () => {
 		await init()
 
-		appConfig.subscribe((config) => {
+		appConfig.subscribe(config => {
 			transparent = config?.window.transparent ?? false
 		})
 		effectiveApiUrl.set('http://localhost:8080')

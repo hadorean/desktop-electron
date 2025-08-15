@@ -72,13 +72,13 @@ export function createWindow(): BrowserWindow {
 		}
 	})
 
-	window.webContents.setWindowOpenHandler((details) => {
+	window.webContents.setWindowOpenHandler(details => {
 		shell.openExternal(details.url)
 		return { action: 'deny' }
 	})
 
 	// Close to tray behavior
-	window.on('close', (event) => {
+	window.on('close', event => {
 		if (!get(isQuitting)) {
 			event.preventDefault()
 			window?.hide()

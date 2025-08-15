@@ -227,7 +227,7 @@ export class BackgroundManager {
 
 	private setupServerWatcher(): void {
 		// Watch for server changes/restarts
-		this.serverUnsubscribe = localServer.subscribe((server) => {
+		this.serverUnsubscribe = localServer.subscribe(server => {
 			if (server) {
 				const newServerUrl = server.getUrl()
 				if (this.serverUrl !== newServerUrl) {

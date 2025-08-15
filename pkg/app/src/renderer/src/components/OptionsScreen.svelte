@@ -271,7 +271,7 @@
 			windowOpacity: number
 		}>
 	) {
-		updateUserOptions((current) => ({ ...current, ...options }))
+		updateUserOptions(current => ({ ...current, ...options }))
 		if (saveTimeout) {
 			clearTimeout(saveTimeout)
 		}

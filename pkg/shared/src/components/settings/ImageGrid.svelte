@@ -45,7 +45,7 @@
 
 	function toggleFavorite(imageName: string, event: Event): void {
 		event.stopPropagation() // Prevent triggering the image selection
-		updateSharedSettings((current) => {
+		updateSharedSettings(current => {
 			const currentFavorites = current.favorites ?? []
 			return {
 				favorites: currentFavorites.includes(imageName) ? currentFavorites.filter((name: string) => name !== imageName) : [...currentFavorites, imageName]
@@ -123,7 +123,7 @@
 										alt={image.name}
 										class="thumbnail-image"
 										loading="lazy"
-										onerror={(e) => {
+										onerror={e => {
 											const target = e.target as HTMLImageElement
 											target.style.display = 'none'
 											const fallback = target.nextElementSibling as HTMLElement

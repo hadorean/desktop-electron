@@ -26,7 +26,7 @@ export class SocketManager {
 	}
 
 	private setupSocketHandlers(): void {
-		this.io.on('connection', async (socket) => {
+		this.io.on('connection', async socket => {
 			console.log(`🔌 Client connected: ${socket.id}`)
 
 			// Send current settings to newly connected client
@@ -53,7 +53,7 @@ export class SocketManager {
 			}
 
 			// Handle settings updates from clients - type-safe
-			this.onClientEvent(socket, SocketEvents.ClientUpdatedSettings, async (data) => {
+			this.onClientEvent(socket, SocketEvents.ClientUpdatedSettings, async data => {
 				try {
 					const { settings, clientId } = data
 					const updateEvent = await settingsService.updateSettings(settings, clientId)

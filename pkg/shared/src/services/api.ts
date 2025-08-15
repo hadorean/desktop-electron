@@ -136,7 +136,7 @@ export const api = {
 		const response = await fetchWithErrorHandling<ServerImageResponse>(url, createRequestOptions('GET'))
 
 		// Transform server response to client format
-		return response.images.map((img) => ({
+		return response.images.map(img => ({
 			name: img.name,
 			thumbnailUrl: getImageUrl(img.name, true),
 			fullUrl: getImageUrl(img.name, false)

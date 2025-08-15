@@ -52,7 +52,7 @@
 				document.addEventListener('mousedown', handleClickOutside)
 
 				// Setup socket listener for debug state changes
-				socketService.onDebugStateChanged((visible) => {
+				socketService.onDebugStateChanged(visible => {
 					console.log('Client app: Received debug state change:', visible)
 					debugMenu.setVisible(visible)
 				})
@@ -94,7 +94,7 @@
 
 	// Function to handle settings toggle
 	function toggleSettings(): void {
-		expandSettings.update((current) => !current)
+		expandSettings.update(current => !current)
 	}
 
 	// Handle expandSettings changes with explicit subscription to avoid reactive loops
@@ -102,7 +102,7 @@
 
 	onMount(() => {
 		// Subscribe to expandSettings changes
-		unsubscribeExpandSettings = expandSettings.subscribe((expanded) => {
+		unsubscribeExpandSettings = expandSettings.subscribe(expanded => {
 			if (expanded === false) {
 				settingsClosingTimeout = setTimeout(() => {
 					showSettings = false

@@ -99,7 +99,7 @@ export class LocalServer {
 
 	private setupImageWatcher(): void {
 		// Listen for file changes from the image service
-		imageService.onImagesChanged((data) => {
+		imageService.onImagesChanged(data => {
 			console.log(`📷 Images changed: ${data.eventType} - ${data.filename}`)
 			// Broadcast to all connected clients
 			this.sockets.broadcastImagesUpdated('file_change', data.filename, data.eventType)
@@ -107,7 +107,7 @@ export class LocalServer {
 	}
 
 	public stop(): Promise<void> {
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			if (this.isRunning) {
 				this.template.stop()
 				this.sockets.close()
@@ -176,7 +176,7 @@ export class LocalServer {
 			if (newOptions.port !== previousOptions.port) {
 				console.log(`🔧 Port change detected: ${previousOptions.port} → ${newOptions.port}`)
 				this.updatePort(newOptions.port)
-				this.restart().catch((error) => {
+				this.restart().catch(error => {
 					console.error('Failed to restart server after port change:', error)
 				})
 			}

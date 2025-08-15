@@ -64,13 +64,13 @@ export class SocketService {
 			this.onConnectionStatusCallback?.(true)
 		})
 
-		this.socket.on('disconnect', (reason) => {
+		this.socket.on('disconnect', reason => {
 			console.log('🔌 Socket.IO disconnected:', reason)
 			this.isConnected = false
 			this.onConnectionStatusCallback?.(false)
 		})
 
-		this.socket.on('connect_error', (error) => {
+		this.socket.on('connect_error', error => {
 			console.error('🔌 Socket.IO connection error:', error)
 			this.isConnected = false
 			this.reconnectAttempts++

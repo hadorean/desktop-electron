@@ -22,7 +22,7 @@ function copyDirectory(src, dest) {
 	fs.mkdirSync(dest, { recursive: true })
 	const items = fs.readdirSync(src)
 
-	items.forEach((item) => {
+	items.forEach(item => {
 		const srcPath = path.join(src, item)
 		const destPath = path.join(dest, item)
 

@@ -35,7 +35,7 @@ if (typeof window !== 'undefined') {
 }
 
 // Update effective URL when either store changes
-apiConfigEnabled.subscribe((enabled) => {
+apiConfigEnabled.subscribe(enabled => {
 	const currentBaseUrl = get(apiBaseUrl)
 
 	// If we have a server-provided URL, always use apiBaseUrl regardless of config
@@ -49,7 +49,7 @@ apiConfigEnabled.subscribe((enabled) => {
 	}
 })
 
-apiBaseUrl.subscribe((value) => {
+apiBaseUrl.subscribe(value => {
 	const configEnabled = get(apiConfigEnabled)
 
 	// If we have a server-provided URL or config is enabled, use the base URL
@@ -59,7 +59,7 @@ apiBaseUrl.subscribe((value) => {
 })
 
 // Reinitialize socket when effective URL changes
-effectiveApiUrl.subscribe((url) => {
+effectiveApiUrl.subscribe(url => {
 	if (typeof window !== 'undefined' && url) {
 		console.log('🔌 API URL changed, reinitializing socket:', url)
 		socketService.reinitialize()

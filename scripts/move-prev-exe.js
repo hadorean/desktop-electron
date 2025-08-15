@@ -29,7 +29,7 @@ try {
 	const files = fs.readdirSync(distPath)
 
 	// Filter for .exe and .blockmap files (excluding the prev directory itself)
-	const targetFiles = files.filter((file) => (file.endsWith('.exe') || file.endsWith('.blockmap')) && file !== 'prev')
+	const targetFiles = files.filter(file => (file.endsWith('.exe') || file.endsWith('.blockmap')) && file !== 'prev')
 
 	if (targetFiles.length === 0) {
 		console.log('No .exe or .blockmap files found in pkg/app/dist/')
@@ -37,7 +37,7 @@ try {
 	}
 
 	// Move each target file
-	targetFiles.forEach((file) => {
+	targetFiles.forEach(file => {
 		const oldPath = path.join(distPath, file)
 		const newPath = path.join(prevPath, file)
 

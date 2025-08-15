@@ -390,7 +390,7 @@ async function cleanup() {
 
 	if (stats.errors.length > 0) {
 		console.log(colorize(`\n⚠️ Errors encountered (${stats.errors.length}):`, 'red'))
-		stats.errors.forEach((error) => console.log(`  ${colorize('•', 'red')} ${error}`))
+		stats.errors.forEach(error => console.log(`  ${colorize('•', 'red')} ${error}`))
 	}
 
 	if (CONFIG.dryRun) {
@@ -407,7 +407,7 @@ if (CONFIG.showHelp) {
 	process.exit(0)
 }
 
-cleanup().catch((error) => {
+cleanup().catch(error => {
 	console.error(colorize(`\n❌ Cleanup failed: ${error.message}`, 'red'))
 	process.exit(1)
 })

@@ -47,7 +47,7 @@ export function loadUserOptions(options: UserOptions, skipPreventSync = false): 
 
 	const previousOptions = getCurrentUserOptions()
 
-	userOptionsStoreInternal.update((state) => ({
+	userOptionsStoreInternal.update(state => ({
 		...state,
 		options,
 		isLoading: false,
@@ -76,7 +76,7 @@ export function updateUserOptions(updater: (current: UserOptions) => UserOptions
 
 	const previousOptions = getCurrentUserOptions()
 
-	userOptionsStoreInternal.update((state) => {
+	userOptionsStoreInternal.update(state => {
 		const updatedOptions = updater(state.options)
 		return {
 			...state,
@@ -110,7 +110,7 @@ export function updateUserOptionsSilent(updater: (current: UserOptions) => UserO
  * Set loading state
  */
 export function setUserOptionsLoading(loading: boolean): void {
-	userOptionsStoreInternal.update((state) => ({
+	userOptionsStoreInternal.update(state => ({
 		...state,
 		isLoading: loading
 	}))
@@ -120,7 +120,7 @@ export function setUserOptionsLoading(loading: boolean): void {
  * Set error state
  */
 export function setUserOptionsError(error: string | null): void {
-	userOptionsStoreInternal.update((state) => ({
+	userOptionsStoreInternal.update(state => ({
 		...state,
 		error,
 		isLoading: false
@@ -135,16 +135,16 @@ export function clearUserOptions(): void {
 }
 
 // Derived stores for convenient access
-export const userOptions = derived(userOptionsStoreInternal, ($store) => $store.options)
-export const userOptionsLoading = derived(userOptionsStoreInternal, ($store) => $store.isLoading)
-export const userOptionsError = derived(userOptionsStoreInternal, ($store) => $store.error)
-export const userOptionsLastUpdated = derived(userOptionsStoreInternal, ($store) => $store.lastUpdated)
+export const userOptions = derived(userOptionsStoreInternal, $store => $store.options)
+export const userOptionsLoading = derived(userOptionsStoreInternal, $store => $store.isLoading)
+export const userOptionsError = derived(userOptionsStoreInternal, $store => $store.error)
+export const userOptionsLastUpdated = derived(userOptionsStoreInternal, $store => $store.lastUpdated)
 
 // Specific derived stores for individual options
-export const imageDirectory = derived(userOptions, ($options) => $options.imageDirectory)
+export const imageDirectory = derived(userOptions, $options => $options.imageDirectory)
 
 // Combined derived store for components that need multiple values
-export const userOptionsState = derived(userOptionsStoreInternal, ($store) => $store)
+export const userOptionsState = derived(userOptionsStoreInternal, $store => $store)
 
 /**
  * Get current user options synchronously (useful for imperative code)
@@ -186,7 +186,7 @@ export function onUserOptionsChanged(callback: OptionsChangeCallback): () => voi
  * Notify all registered callbacks about options changes
  */
 function notifyOptionsChangeCallbacks(newOptions: UserOptions, previousOptions: UserOptions): void {
-	optionsChangeCallbacks.forEach((callback) => {
+	optionsChangeCallbacks.forEach(callback => {
 		try {
 			callback(newOptions, previousOptions)
 		} catch (error) {
@@ -213,7 +213,7 @@ export function getIsLoadingUserOptions(): boolean {
  * Update image directory specifically
  */
 export function updateImageDirectory(directory: string): void {
-	updateUserOptions((current) => ({
+	updateUserOptions(current => ({
 		...current,
 		imageDirectory: directory
 	}))

@@ -14,7 +14,7 @@
 	let { shortcuts }: Props = $props()
 
 	function handleKeydown(event: KeyboardEvent): void {
-		const shortcut = shortcuts.find((s) => s.key === event.key)
+		const shortcut = shortcuts.find(s => s.key === event.key)
 		if (shortcut) {
 			event.preventDefault()
 			shortcut.action()

@@ -20,10 +20,10 @@ export async function init(): Promise<void> {
 	}
 
 	const result = await window.api.getUserOptions()
-	updateUserOptions((current) => ({ ...current, ...result.data }))
+	updateUserOptions(current => ({ ...current, ...result.data }))
 
 	// Setup IPC listener for debug state changes
-	window.api.onDebugStateChanged((visible) => {
+	window.api.onDebugStateChanged(visible => {
 		console.log('Desktop app: Received debug state change:', visible)
 		debugMenu.setVisible(visible)
 	})

@@ -40,7 +40,7 @@
 	})
 
 	function handleSettingChange<K extends keyof typeof $editingSettings>(key: K, value: (typeof $editingSettings)[K] | null): void {
-		updateEditingSettings((current) => {
+		updateEditingSettings(current => {
 			if (value === null) {
 				// Remove property (reset to default)
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars

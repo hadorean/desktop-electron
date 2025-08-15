@@ -55,12 +55,12 @@
 			console.log('Update available:', info)
 		})
 
-		window.api.onUpdateDownloadProgress((progressObj) => {
+		window.api.onUpdateDownloadProgress(progressObj => {
 			updateProgress = progressObj.percent || 0
 			console.log('Download progress:', progressObj)
 		})
 
-		window.api.onUpdateDownloaded((info) => {
+		window.api.onUpdateDownloaded(info => {
 			updateDownloaded = true
 			updateProgress = 100
 			console.log('Update downloaded:', info)

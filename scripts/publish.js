@@ -40,7 +40,7 @@ function main() {
 		}
 
 		console.log(`✅ Found all required files:`)
-		filesToUpload.forEach((file) => {
+		filesToUpload.forEach(file => {
 			const stats = fs.statSync(file)
 			const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2)
 			console.log(`   - ${path.basename(file)} (${sizeInMB} MB)`)
@@ -50,7 +50,7 @@ function main() {
 		const tagName = `v${version}`
 		const releaseTitle = `Release ${version}`
 
-		const command = ['gh', 'release', 'create', tagName, ...filesToUpload.map((f) => `"${f}"`), '--title', `"${releaseTitle}"`, '--notes', `""`].join(' ')
+		const command = ['gh', 'release', 'create', tagName, ...filesToUpload.map(f => `"${f}"`), '--title', `"${releaseTitle}"`, '--notes', `""`].join(' ')
 
 		console.log(`\n🚀 Creating GitHub release...`)
 		console.log(`Command: ${command}\n`)

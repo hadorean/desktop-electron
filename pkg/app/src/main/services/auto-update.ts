@@ -47,20 +47,20 @@ export function initAutoUpdate(): {
 		})
 	})
 
-	autoUpdater.on('update-not-available', (info) => {
+	autoUpdater.on('update-not-available', info => {
 		console.log('Update not available:', info)
 	})
 
-	autoUpdater.on('error', (err) => {
+	autoUpdater.on('error', err => {
 		console.error('Auto-updater error:', err)
 	})
 
-	autoUpdater.on('download-progress', (progressObj) => {
+	autoUpdater.on('download-progress', progressObj => {
 		console.log('Download progress:', progressObj)
 		sendToRenderer(IpcEvents.UpdateDownloadProgress, progressObj)
 	})
 
-	autoUpdater.on('update-downloaded', (info) => {
+	autoUpdater.on('update-downloaded', info => {
 		console.log('Update downloaded:', info)
 		sendToRenderer(IpcEvents.UpdateDownloaded, info)
 	})

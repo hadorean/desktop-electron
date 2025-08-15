@@ -31,7 +31,7 @@ async function waitForClient() {
 		}
 
 		attempts++
-		await new Promise((resolve) => setTimeout(resolve, 500))
+		await new Promise(resolve => setTimeout(resolve, 500))
 		process.stdout.write('.')
 	}
 

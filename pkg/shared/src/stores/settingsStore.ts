@@ -47,12 +47,12 @@ function easeQuadraticOut(t: number): number {
 export const allSettings = writable<UserSettings>(defaultUserSettings)
 
 // Derived store for current theme from UserSettings
-export const currentTheme = derived(allSettings, (settings) => settings.currentTheme)
+export const currentTheme = derived(allSettings, settings => settings.currentTheme)
 
 // Derived store to check if current theme is night mode
-export const isNightMode = derived(currentTheme, (theme) => theme === 'night')
+export const isNightMode = derived(currentTheme, theme => theme === 'night')
 
-export const screenIds = derived(allSettings, ($allSettings) =>
+export const screenIds = derived(allSettings, $allSettings =>
 	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreen), get(currentScreen)])).sort()
 )
 
@@ -105,7 +105,7 @@ export function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightM
 		: getThemeScreenSettings(allSettingsValue.shared, toTheme)
 
 	// Update the theme immediately (this will sync to other clients)
-	allSettings.update((settings) => ({
+	allSettings.update(settings => ({
 		...settings,
 		currentTheme: toTheme
 	}))
@@ -163,7 +163,7 @@ export function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightM
 let previousTheme: DayNightMode | null = null
 
 // Subscribe to theme changes and automatically start transitions for external updates
-currentTheme.subscribe((newTheme) => {
+currentTheme.subscribe(newTheme => {
 	// Skip if this is the first subscription
 	if (previousTheme === null) {
 		previousTheme = newTheme
@@ -282,7 +282,7 @@ export function toggleDayNightMode(): void {
 }
 
 export function setCurrentTheme(theme: DayNightMode): void {
-	allSettings.update((settings) => ({
+	allSettings.update(settings => ({
 		...settings,
 		currentTheme: theme
 	}))
@@ -333,7 +333,7 @@ export const editingSettings = derived([baseEditingSettings, inTransition, trans
 export function updateSharedSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	const theme = getCurrentTheme() as 'day' | 'night'
 
-	allSettings.update((value) => {
+	allSettings.update(value => {
 		const currentSharedSettings = value.shared
 		const currentThemeSettings = getThemeEditingSettings(currentSharedSettings, theme)
 		const updatedSettings = settings(currentThemeSettings)
@@ -364,7 +364,7 @@ export function updateSharedSettingsSilent(settings: (current: Partial<ScreenPro
 }
 
 export function updateLocalSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
-	allSettings.update((value) => {
+	allSettings.update(value => {
 		const screen = get(currentScreen) || defaultScreenId
 		const theme = getCurrentTheme() as 'day' | 'night'
 		const currentScreenSettings = value.screens[screen] ?? { day: {}, night: {} }
@@ -409,7 +409,7 @@ export function updateEditingSettings(settings: (current: Partial<ScreenProfile>
 		const screen = get(currentScreen) || defaultScreenId
 		const theme = getCurrentTheme() as 'day' | 'night'
 
-		allSettings.update((value) => {
+		allSettings.update(value => {
 			const currentScreenSettings = value.screens[screen] ?? DefaultScreenSettings
 			const currentThemeSettings = currentScreenSettings[theme] ?? {}
 			const updatedSettings = settings(currentThemeSettings)
@@ -434,7 +434,7 @@ export function updateEditingSettings(settings: (current: Partial<ScreenProfile>
 		// Update shared settings for current theme
 		const theme = getCurrentTheme() as 'day' | 'night'
 
-		allSettings.update((value) => {
+		allSettings.update(value => {
 			const currentSharedSettings = value.shared
 			const currentThemeSettings = currentSharedSettings[theme] ?? {}
 			const updatedSettings = settings(currentThemeSettings)
@@ -535,7 +535,7 @@ export function assignScreenColor(screenId: string, allScreenIds: string[]): str
  * Ensure all screens have proper type and color assignments
  */
 export function normalizeScreenSettings(): void {
-	allSettings.update((settings) => {
+	allSettings.update(settings => {
 		const updatedScreens: Record<string, ScreenSettings> = {}
 		let hasChanges = false
 
@@ -630,7 +630,7 @@ export function loadSettings(images: { name: string }[]): string {
 	console.warn('settingsStore.loadSettings() is deprecated. Use localStorageService.loadSettings() instead.')
 	// Fallback: just set default image if available
 	if (images.length > 0) {
-		updateSharedSettings((current) => ({
+		updateSharedSettings(current => ({
 			...current,
 			selectedImage: images[0].name
 		}))

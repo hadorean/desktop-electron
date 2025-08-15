@@ -59,7 +59,7 @@ export function initializeImageChangeHandling(context: string): () => void {
 	const handleImagesChanged = (newImages: Array<{ name: string }>): void => {
 		// Only validate if we're not currently loading to prevent validation cascades
 		if (!imagesStore.getIsLoadingImages()) {
-			const imageNames = newImages.map((img) => img.name)
+			const imageNames = newImages.map(img => img.name)
 			localStorageService.validateSelectedImages(imageNames)
 		}
 	}

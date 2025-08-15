@@ -22,7 +22,7 @@
 	// Get all available tabs with their settings
 	const allTabs = $derived(() => {
 		const tabs = ['shared', ...$screenIds]
-		return tabs.map((tabId) => {
+		return tabs.map(tabId => {
 			const settings = tabId === 'shared' ? $allSettings.shared : $allSettings.screens[tabId]
 			return {
 				id: tabId,
@@ -49,7 +49,7 @@
 		if (!underlineRef || !containerRef) return
 
 		const tabs = allTabs()
-		const currentIndex = tabs.findIndex((tab) => tab.id === currentTab)
+		const currentIndex = tabs.findIndex(tab => tab.id === currentTab)
 		if (currentIndex === -1) return
 
 		const targetTab = tabRefs[currentIndex]
@@ -89,7 +89,7 @@
 	export function switchToNextScreen(direction: 'forward' | 'backward' = 'forward'): void {
 		// Get all available tabs: shared + screen IDs
 		const tabs = allTabs()
-		const tabIds = tabs.map((t) => t.id)
+		const tabIds = tabs.map(t => t.id)
 		const currentIndex = tabIds.indexOf(currentTab)
 
 		// Calculate next index (cycle through)
@@ -118,7 +118,7 @@
 					onclick={() => handleTabClick(tab.id)}
 					role="tab"
 					tabindex="0"
-					onkeydown={(e) => {
+					onkeydown={e => {
 						if (e.key === 'Enter' || e.key === ' ') handleTabClick(tab.id)
 					}}
 				>
@@ -141,7 +141,7 @@
 				onclick={() => toggleDayNightMode()}
 				role="button"
 				tabindex="0"
-				onkeydown={(e) => {
+				onkeydown={e => {
 					if (e.key === 'Enter' || e.key === ' ') toggleDayNightMode()
 				}}
 				title={$isNightMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}

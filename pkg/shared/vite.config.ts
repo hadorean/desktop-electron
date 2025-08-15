@@ -16,7 +16,7 @@ export default defineConfig({
 		lib: {
 			entry: path.resolve(__dirname, 'src/index.ts'),
 			name: 'HeyketsuShared',
-			fileName: (format) => `index.${format}.js`
+			fileName: format => `index.${format}.js`
 		},
 		rollupOptions: {
 			external: ['svelte', 'socket.io-client', 'socket.io'],

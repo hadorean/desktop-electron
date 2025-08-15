@@ -126,7 +126,7 @@ export class ThumbnailService {
 							console.log(`📸 Generated ${generated} thumbnails, skipped ${skipped}`)
 						}
 					})
-					.catch((error) => {
+					.catch(error => {
 						console.error(`Failed to generate thumbnail for ${imageName}:`, error)
 					})
 			} catch (error) {
@@ -193,19 +193,19 @@ export class ThumbnailService {
 
 	private getQueuedPromise(imagePath: string): Promise<string> {
 		// Find existing request in queue
-		const existingRequest = this.processingQueue.find((req) => req.imagePath === imagePath)
+		const existingRequest = this.processingQueue.find(req => req.imagePath === imagePath)
 		if (existingRequest) {
 			return new Promise((resolve, reject) => {
 				// Wrap the existing promise
 				const originalResolve = existingRequest.resolve
 				const originalReject = existingRequest.reject
 
-				existingRequest.resolve = (result) => {
+				existingRequest.resolve = result => {
 					originalResolve(result)
 					resolve(result)
 				}
 
-				existingRequest.reject = (error) => {
+				existingRequest.reject = error => {
 					originalReject(error)
 					reject(error)
 				}
