@@ -116,6 +116,9 @@ class LocalStorageService {
 				// Validate selected images in the complete settings
 				this.validateAndUpdateImages(parsedCompleteSettings, images)
 
+				// Clean up legacy color/type properties (migration)
+				this.cleanupLegacyColorTypeData(parsedCompleteSettings)
+
 				// Set complete settings directly (like Socket.IO does)
 				allSettings.set(parsedCompleteSettings)
 			} else {
@@ -293,6 +296,44 @@ class LocalStorageService {
 		}
 
 		return false
+	}
+
+	/**
+	 * Clean up legacy color and type properties from settings (migration helper)
+	 */
+	private cleanupLegacyColorTypeData(settings: any): void {
+		try {
+			let hasChanges = false
+
+			// Clean up shared settings
+			if (settings.shared && ('color' in settings.shared || 'type' in settings.shared)) {
+				console.log('🧹 Cleaning up legacy color/type from shared settings')
+				delete settings.shared.color
+				delete settings.shared.type
+				hasChanges = true
+			}
+
+			// Clean up screen settings
+			if (settings.screens) {
+				for (const screenId in settings.screens) {
+					const screenSettings = settings.screens[screenId]
+					if ('color' in screenSettings || 'type' in screenSettings) {
+						console.log(`🧹 Cleaning up legacy color/type from screen "${screenId}"`)
+						delete screenSettings.color
+						delete screenSettings.type
+						hasChanges = true
+					}
+				}
+			}
+
+			// Save cleaned settings back to localStorage if changes were made
+			if (hasChanges) {
+				localStorage.setItem('settings.complete', JSON.stringify(settings))
+				console.log('🧹 Saved cleaned settings back to localStorage')
+			}
+		} catch (error) {
+			console.error('Error cleaning up legacy color/type data:', error)
+		}
 	}
 
 	/**
