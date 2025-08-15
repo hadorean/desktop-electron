@@ -3,6 +3,7 @@
 	import { initializeImageChangeHandling, localStorageService, socketService } from '$shared/services'
 	import { expandSettings, imagesStore, screenSettings } from '$shared/stores'
 	import { debugMenu } from '$shared/stores/debugStore'
+	import { currentScreenType } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
 
@@ -150,7 +151,7 @@
 	{/if}
 
 	<SettingsButton
-		hideButton={$screenSettings.hideButton}
+		hideButton={$screenSettings.hideButton || $currentScreenType === 'static'}
 		{buttonHovered}
 		onToggle={toggleSettings}
 		onMouseEnter={handleButtonMouseEnter}
