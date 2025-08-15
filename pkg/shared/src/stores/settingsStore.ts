@@ -547,8 +547,8 @@ export function normalizeScreenSettings(): void {
 /**
  * Get formatted screen name based on computed type and ID
  */
-export function getFormattedScreenName(screenId: string, _screenSettings?: ScreenSettings): string {
-	// Always compute type from screenId (screenSettings param kept for compatibility)
+export function getFormattedScreenName(screenId: string): string {
+	// Always compute type from screenId
 	const screenType = assignScreenType(screenId)
 
 	if (screenType === 'interactive') {

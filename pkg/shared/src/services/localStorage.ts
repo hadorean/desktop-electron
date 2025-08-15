@@ -7,7 +7,7 @@ import { get } from 'svelte/store'
 import { apiBaseUrl } from '../stores/apiStore'
 import { debugMenu } from '../stores/debugStore'
 import { allSettings, currentScreen, isLocalMode, updateLocalSettings, updateSharedSettings } from '../stores/settingsStore'
-import { type ScreenProfile, DefaultScreenProfile } from '../types'
+import { type ScreenProfile, type UserSettings, DefaultScreenProfile } from '../types'
 import { checkStorageAvailability } from '../utils'
 
 class LocalStorageService {
@@ -301,26 +301,27 @@ class LocalStorageService {
 	/**
 	 * Clean up legacy color and type properties from settings (migration helper)
 	 */
-	private cleanupLegacyColorTypeData(settings: any): void {
+	private cleanupLegacyColorTypeData(settings: UserSettings): void {
 		try {
 			let hasChanges = false
 
-			// Clean up shared settings
-			if (settings.shared && ('color' in settings.shared || 'type' in settings.shared)) {
+			// Clean up shared settings (using any for legacy property access)
+			const sharedAny = settings.shared as any
+			if (sharedAny && ('color' in sharedAny || 'type' in sharedAny)) {
 				console.log('🧹 Cleaning up legacy color/type from shared settings')
-				delete settings.shared.color
-				delete settings.shared.type
+				delete sharedAny.color
+				delete sharedAny.type
 				hasChanges = true
 			}
 
 			// Clean up screen settings
 			if (settings.screens) {
 				for (const screenId in settings.screens) {
-					const screenSettings = settings.screens[screenId]
-					if ('color' in screenSettings || 'type' in screenSettings) {
+					const screenSettingsAny = settings.screens[screenId] as any
+					if ('color' in screenSettingsAny || 'type' in screenSettingsAny) {
 						console.log(`🧹 Cleaning up legacy color/type from screen "${screenId}"`)
-						delete screenSettings.color
-						delete screenSettings.type
+						delete screenSettingsAny.color
+						delete screenSettingsAny.type
 						hasChanges = true
 					}
 				}
