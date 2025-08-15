@@ -20,8 +20,6 @@ export interface ScreenProfile {
 }
 
 export interface ScreenSettings {
-	type?: ScreenType
-	color: string
 	day: Partial<ScreenProfile>
 	night: Partial<ScreenProfile> | null
 }
@@ -70,8 +68,7 @@ export const DefaultScreenProfile: ScreenProfile = {
 
 export const DefaultScreenSettings: ScreenSettings = {
 	day: {},
-	night: null,
-	color: 'white'
+	night: null
 }
 
 export const DefaultUserSettings: UserSettings = {

@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte'
 	import {
 		allSettings,
+		assignScreenColor,
+		assignScreenType,
 		currentScreen,
 		getFormattedScreenName,
 		isLocalMode,
@@ -22,15 +24,19 @@
 	// Get all available tabs with their settings
 	const allTabs = $derived(() => {
 		const tabs = ['shared', ...$screenIds]
+		const allScreenIds = $screenIds
 		return tabs.map(tabId => {
 			const settings = tabId === 'shared' ? $allSettings.shared : $allSettings.screens[tabId]
+			// Compute color and type instead of reading from settings
+			const color = tabId === 'shared' ? '#ffffff' : assignScreenColor(tabId, allScreenIds)
+			const type = tabId === 'shared' ? 'shared' : assignScreenType(tabId)
 			return {
 				id: tabId,
 				settings,
-				color: settings?.color || '#ffffff',
-				type: settings?.type,
+				color,
+				type,
 				name: tabId === 'shared' ? '' : getFormattedScreenName(tabId, settings),
-				icon: tabId === 'shared' ? ('home' as const) : settings?.type === 'interactive' ? ('browser' as const) : ('monitor' as const)
+				icon: tabId === 'shared' ? ('home' as const) : type === 'interactive' ? ('browser' as const) : ('monitor' as const)
 			}
 		})
 	})

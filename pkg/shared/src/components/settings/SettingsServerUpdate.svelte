@@ -28,8 +28,8 @@
 				// Check if current screen exists in server settings
 				const currentScreenId = $currentScreen
 				if (newSettings.screens && !newSettings.screens[currentScreenId]) {
-					// Add current screen to settings (empty object)
-					newSettings.screens[currentScreenId] = { day: {}, night: {}, color: '#ffffff' }
+					// Add current screen to settings (empty object, colors are computed)
+					newSettings.screens[currentScreenId] = { day: {}, night: {} }
 					updatingSettingsFromServer = false // we want to update the server settings with the new screen
 				}
 

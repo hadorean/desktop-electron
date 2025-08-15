@@ -532,69 +532,26 @@ export function assignScreenColor(screenId: string, allScreenIds: string[]): str
 }
 
 /**
- * Ensure all screens have proper type and color assignments
+ * Ensure all screens have proper settings (colors and types are now computed, not stored)
  */
 export function normalizeScreenSettings(): void {
+	// Colors and types are now computed on-demand, so this function only ensures
+	// that screen settings exist but doesn't store computed values
 	allSettings.update(settings => {
-		const updatedScreens: Record<string, ScreenSettings> = {}
-		let hasChanges = false
-
-		// Get all screen IDs for color assignment
-		const allScreenIds = Object.keys(settings.screens)
-
-		// Process each screen
-		for (const [screenId, screenSettings] of Object.entries(settings.screens)) {
-			const updatedSettings = { ...screenSettings }
-
-			// Assign type if missing
-			if (!updatedSettings.type) {
-				updatedSettings.type = assignScreenType(screenId)
-				hasChanges = true
-			}
-
-			// Assign color if missing or is white (which should be reserved for shared)
-			if (!updatedSettings.color || updatedSettings.color === 'white' || updatedSettings.color === '#ffffff') {
-				updatedSettings.color = assignScreenColor(screenId, allScreenIds)
-				hasChanges = true
-			}
-
-			updatedScreens[screenId] = updatedSettings
-		}
-
-		// Ensure shared settings has white color
-		let updatedShared = settings.shared
-		if (!updatedShared.color || updatedShared.color !== '#ffffff') {
-			updatedShared = { ...updatedShared, color: '#ffffff' }
-			hasChanges = true
-		}
-
-		return hasChanges
-			? {
-					...settings,
-					screens: updatedScreens,
-					shared: updatedShared
-				}
-			: settings
+		// No changes needed - colors and types are computed on demand
+		// This function is kept for potential future normalization needs
+		return settings
 	})
 }
 
 /**
- * Get formatted screen name based on type and ID
+ * Get formatted screen name based on computed type and ID
  */
-export function getFormattedScreenName(screenId: string, screenSettings?: ScreenSettings): string {
-	if (!screenSettings?.type) {
-		// Fallback to basic formatting
-		if (screenId.toLowerCase().includes('monitor')) {
-			const match = screenId.match(/(\d+)/)
-			return match ? `Monitor ${match[1]}` : 'Monitor'
-		}
-		if (screenId.toLowerCase().includes('browser')) {
-			return 'Browser'
-		}
-		return screenId
-	}
+export function getFormattedScreenName(screenId: string, _screenSettings?: ScreenSettings): string {
+	// Always compute type from screenId (screenSettings param kept for compatibility)
+	const screenType = assignScreenType(screenId)
 
-	if (screenSettings.type === 'interactive') {
+	if (screenType === 'interactive') {
 		return 'Browser'
 	} else {
 		// Static screen - extract monitor number if possible
@@ -604,7 +561,7 @@ export function getFormattedScreenName(screenId: string, screenSettings?: Screen
 }
 
 /**
- * Get the current screen's color
+ * Get the current screen's color (computed from screen index)
  */
 export const currentScreenColor = derived([allSettings, currentScreen, isLocalMode], ([$allSettings, $currentScreen, $isLocalMode]) => {
 	if (!$isLocalMode) {
@@ -612,16 +569,17 @@ export const currentScreenColor = derived([allSettings, currentScreen, isLocalMo
 		return '#ffffff'
 	}
 
-	// Get the current screen's color
-	const screenSettings = $allSettings.screens[$currentScreen]
-	return screenSettings?.color || '#ffffff'
+	// Compute color based on screen index in the sorted list
+	const allScreenIds = Object.keys($allSettings.screens).sort()
+	return assignScreenColor($currentScreen, allScreenIds)
 })
 
-export const currentScreenType = derived([allSettings, currentScreen, isLocalMode], ([$allSettings, $currentScreen, $isLocalMode]) => {
+export const currentScreenType = derived([currentScreen, isLocalMode], ([$currentScreen, $isLocalMode]) => {
 	if (!$isLocalMode) {
 		return 'shared'
 	}
-	return $allSettings.screens[$currentScreen]?.type || 'static'
+	// Compute type based on screenId pattern
+	return assignScreenType($currentScreen)
 })
 
 // loadSettings function moved to localStorage service
