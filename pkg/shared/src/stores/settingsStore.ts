@@ -123,6 +123,8 @@ export function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightM
 		showWeather: toSettings.showWeather,
 		showScreenSwitcher: toSettings.showScreenSwitcher,
 		selectedImage: toSettings.selectedImage,
+		mode: toSettings.mode,
+		url: toSettings.url,
 		favorites: toSettings.favorites,
 		settingsButtonPosition: toSettings.settingsButtonPosition
 	}
@@ -238,6 +240,8 @@ function startThemeTransitionWithoutThemeUpdate(fromTheme: DayNightMode, toTheme
 		showWeather: toSettings.showWeather,
 		showScreenSwitcher: toSettings.showScreenSwitcher,
 		selectedImage: toSettings.selectedImage,
+		mode: toSettings.mode,
+		url: toSettings.url,
 		favorites: toSettings.favorites,
 		settingsButtonPosition: toSettings.settingsButtonPosition
 	}

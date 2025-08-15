@@ -3,10 +3,12 @@
 	import { onMount } from 'svelte'
 	import { currentScreen, editingSettings, inTransition, isLocalMode, screenSettings, updateEditingSettings } from '../../stores'
 	import { currentScreenType } from '../../stores/settingsStore'
+	import BackgroundModeSelector from './BackgroundModeSelector.svelte'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
 	import SliderControl from './SliderControl.svelte'
 	import ToggleControl from './ToggleControl.svelte'
+	import UrlInput from './UrlInput.svelte'
 
 	// Props
 	export let expanded: boolean = false
@@ -69,15 +71,32 @@
 		</Inspect>
 
 		<div class="settings-groups">
-			<!-- Image Selection -->
+			<!-- Background Selection -->
 			<div class="setting-section">
-				<!-- Display Options -->
-				<ImageGrid
-					selectedImage={$screenSettings.selectedImage ?? ''}
-					isOverride={$isLocalMode}
-					overrideValue={$editingSettings.selectedImage}
-					onImageChange={(newImage: string | null) => handleSettingChange('selectedImage', newImage)}
+				<!-- Background Mode Selector -->
+				<BackgroundModeSelector
+					mode={$editingSettings.mode ?? $screenSettings.mode ?? 'image'}
+					onModeChange={(newMode: 'image' | 'url') => handleSettingChange('mode', newMode)}
+					canRevert={$isLocalMode && $editingSettings.mode !== undefined}
+					onRevert={() => handleSettingChange('mode', null)}
 				/>
+
+				<!-- Conditional Background Input -->
+				{#if ($editingSettings.mode ?? $screenSettings.mode ?? 'image') === 'image'}
+					<ImageGrid
+						selectedImage={$screenSettings.selectedImage ?? ''}
+						isOverride={$isLocalMode}
+						overrideValue={$editingSettings.selectedImage}
+						onImageChange={(newImage: string | null) => handleSettingChange('selectedImage', newImage)}
+					/>
+				{:else}
+					<UrlInput
+						url={$screenSettings.url ?? ''}
+						isOverride={$isLocalMode}
+						overrideValue={$editingSettings.url}
+						onUrlChange={(newUrl: string | null) => handleSettingChange('url', newUrl)}
+					/>
+				{/if}
 
 				<SliderControl
 					label="Brightness"

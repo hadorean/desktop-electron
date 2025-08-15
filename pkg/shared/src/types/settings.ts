@@ -7,6 +7,8 @@ export const colors = ['#90A0A7', 'rgb(0, 139, 204)', '#f0b71b', '#1ec735', '#e0
 
 export interface ScreenProfile {
 	selectedImage: string
+	mode: 'image' | 'url'
+	url: string
 	opacity: number
 	blur: number
 	saturation: number
@@ -54,6 +56,8 @@ export interface SettingsUpdateEvent {
 
 export const DefaultScreenProfile: ScreenProfile = {
 	selectedImage: '',
+	mode: 'image',
+	url: '',
 	opacity: 1,
 	blur: 0,
 	saturation: 1,

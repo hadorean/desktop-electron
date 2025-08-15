@@ -1,27 +1,38 @@
 <script lang="ts">
-	import { getImageUrl } from '../../services'
-	import { screenSettings } from '../../stores/settingsStore'
 	import { Easing, Tween } from '@tweenjs/tween.js'
 	import { onMount } from 'svelte'
+	import { getImageUrl } from '../../services'
+	import { screenSettings } from '../../stores/settingsStore'
 
-	interface ImageState {
+	interface BackgroundState {
 		url: string
+		mode: 'image' | 'url'
 		tween: Tween | null
 		opacity: number
 	}
 
-	let activeImage: ImageState | null = null
-	let imageStack: ImageState[] = []
-	let currentImageUrl = ''
+	let activeBackground: BackgroundState | null = null
+	let backgroundStack: BackgroundState[] = []
+	let currentBackgroundUrl = ''
+	let currentMode: 'image' | 'url' = 'image'
 	let animationFrameId: number | null = null
 	let imageScale = 1
 
-	// Subscribe to settings store for image changes
+	// Subscribe to settings store for background changes
 	$: {
-		const selectedImage = $screenSettings.selectedImage ?? ''
-		const imageUrl = getImageUrl(selectedImage)
-		if (imageUrl !== currentImageUrl) {
-			currentImageUrl = imageUrl
+		const mode = $screenSettings.mode ?? 'image'
+		let backgroundUrl = ''
+
+		if (mode === 'image') {
+			const selectedImage = $screenSettings.selectedImage ?? ''
+			backgroundUrl = getImageUrl(selectedImage)
+		} else {
+			backgroundUrl = $screenSettings.url ?? ''
+		}
+
+		if (backgroundUrl !== currentBackgroundUrl || mode !== currentMode) {
+			currentBackgroundUrl = backgroundUrl
+			currentMode = mode
 			startTransition()
 		}
 
@@ -29,47 +40,48 @@
 	}
 
 	function startTransition(): void {
-		if (!currentImageUrl) return
+		if (!currentBackgroundUrl) return
 
-		// If we have an active image, move it to the stack and start fading it out
-		if (activeImage) {
-			const previousImage = activeImage
-			imageStack = [...imageStack, previousImage]
-			previousImage.tween?.stop()
+		// If we have an active background, move it to the stack and start fading it out
+		if (activeBackground) {
+			const previousBackground = activeBackground
+			backgroundStack = [...backgroundStack, previousBackground]
+			previousBackground.tween?.stop()
 
-			previousImage.tween = new Tween({ opacity: previousImage.opacity })
+			previousBackground.tween = new Tween({ opacity: previousBackground.opacity })
 				.to({ opacity: 0 }, ($screenSettings.transitionTime ?? 1) * 1000)
 				.easing(Easing.Quadratic.Out)
 				.onUpdate(value => {
-					if (previousImage) {
-						previousImage.opacity = value.opacity
+					if (previousBackground) {
+						previousBackground.opacity = value.opacity
 						if (value.opacity <= 0) {
 							// Remove from stack when fully transparent
-							imageStack = imageStack.filter(img => img !== previousImage)
-							previousImage.tween?.stop()
-							previousImage.tween = null
+							backgroundStack = backgroundStack.filter(bg => bg !== previousBackground)
+							previousBackground.tween?.stop()
+							previousBackground.tween = null
 						}
 					}
 				})
 				.start()
 		}
 
-		// Set new image as active and start fading in
-		activeImage = {
-			url: currentImageUrl,
+		// Set new background as active and start fading in
+		activeBackground = {
+			url: currentBackgroundUrl,
+			mode: currentMode,
 			opacity: 0,
 			tween: null
 		}
 
-		activeImage.tween = new Tween({ opacity: 0 })
+		activeBackground.tween = new Tween({ opacity: 0 })
 			.to({ opacity: 1 }, ($screenSettings.transitionTime ?? 1) * 1000)
 			.easing(Easing.Quadratic.Out)
 			.onUpdate(value => {
-				if (activeImage) {
-					activeImage.opacity = value.opacity
+				if (activeBackground) {
+					activeBackground.opacity = value.opacity
 					if (value.opacity >= 1) {
-						activeImage.tween?.stop()
-						activeImage.tween = null
+						activeBackground.tween?.stop()
+						activeBackground.tween = null
 					}
 				}
 			})
@@ -83,16 +95,16 @@
 	function animate(time: number): void {
 		let hasActiveTweens = false
 
-		// Update active image tween
-		if (activeImage?.tween) {
-			activeImage.tween.update(time)
+		// Update active background tween
+		if (activeBackground?.tween) {
+			activeBackground.tween.update(time)
 			hasActiveTweens = true
 		}
 
 		// Update stack tweens and clean up completed ones
-		imageStack = imageStack.filter(image => {
-			if (image.tween) {
-				image.tween.update(time)
+		backgroundStack = backgroundStack.filter(background => {
+			if (background.tween) {
+				background.tween.update(time)
 				hasActiveTweens = true
 				return true
 			}
@@ -107,8 +119,18 @@
 	}
 
 	onMount(() => {
-		if ($screenSettings.selectedImage) {
-			currentImageUrl = getImageUrl($screenSettings.selectedImage)
+		const mode = $screenSettings.mode ?? 'image'
+		let initialUrl = ''
+
+		if (mode === 'image' && $screenSettings.selectedImage) {
+			initialUrl = getImageUrl($screenSettings.selectedImage)
+		} else if (mode === 'url' && $screenSettings.url) {
+			initialUrl = $screenSettings.url
+		}
+
+		if (initialUrl) {
+			currentBackgroundUrl = initialUrl
+			currentMode = mode
 			startTransition()
 		}
 
@@ -129,11 +151,31 @@
 		.filter(Boolean)
 		.join(' ')};"
 >
-	{#each imageStack as image (image.url)}
-		<img src={image.url} alt="Background" class="background-image" style="opacity: {image.opacity};" />
+	{#each backgroundStack as background (background.url + background.mode)}
+		{#if background.mode === 'image'}
+			<img src={background.url} alt="Background" class="background-image" style="opacity: {background.opacity};" />
+		{:else if background.mode === 'url' && background.url}
+			<iframe
+				src={background.url}
+				title="Background URL"
+				class="background-iframe"
+				style="opacity: {background.opacity};"
+				sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+			></iframe>
+		{/if}
 	{/each}
-	{#if activeImage}
-		<img src={activeImage.url} alt="Background" class="background-image" style="opacity: {activeImage.opacity};" />
+	{#if activeBackground}
+		{#if activeBackground.mode === 'image'}
+			<img src={activeBackground.url} alt="Background" class="background-image" style="opacity: {activeBackground.opacity};" />
+		{:else if activeBackground.mode === 'url' && activeBackground.url}
+			<iframe
+				src={activeBackground.url}
+				title="Background URL"
+				class="background-iframe"
+				style="opacity: {activeBackground.opacity};"
+				sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+			></iframe>
+		{/if}
 	{/if}
 </div>
 
@@ -154,5 +196,16 @@
 		height: 100%;
 		object-fit: cover;
 		opacity: 1;
+	}
+
+	.background-iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		border: none;
+		opacity: 1;
+		pointer-events: none; /* Prevent interaction with iframe content */
 	}
 </style>
