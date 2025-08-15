@@ -1,4 +1,4 @@
-import { getDebugMenuVisible } from '$shared/stores/debugStore'
+import { debugMenu } from '$shared/stores/debugStore'
 import { ClientEventMap, ClientEvents, ServerEventMap, ServerEvents, SocketEvents } from '$shared/types/sockets'
 import { createServer } from 'http'
 import { Socket, Server as SocketIOServer } from 'socket.io'
@@ -45,7 +45,7 @@ export class SocketManager {
 			// Send current debug state to newly connected client
 			try {
 				socket.emit(SocketEvents.DebugStateChanged, {
-					visible: getDebugMenuVisible(),
+					visible: debugMenu.isVisible,
 					timestamp: Date.now()
 				})
 			} catch (error) {

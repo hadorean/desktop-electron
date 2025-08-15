@@ -32,7 +32,7 @@ export {
 } from './settingsStore'
 
 // Debug store
-export { debugVisible, setDebugMenuVisible, toggleDebugMenu } from './debugStore'
+export { debugMenu } from './debugStore'
 
 // Images store
 export { imagesStore } from './imagesStore'

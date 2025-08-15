@@ -1,4 +1,4 @@
-import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
+import { debugMenu } from '$shared/stores/debugStore'
 import { IpcEvents, RendererEvents } from '$shared/types/ipc'
 import { SocketEvents } from '$shared/types/sockets'
 import { app } from 'electron'
@@ -37,7 +37,7 @@ function initializeStore(): void {
 			const data = readFileSync(statePath, 'utf8')
 			const state = JSON.parse(data)
 			const savedVisible = state.visible ?? true
-			setDebugMenuVisible(savedVisible)
+			debugMenu.setVisible(savedVisible)
 		}
 	} catch (error) {
 		console.error('Error loading debug state from file:', error)
@@ -46,7 +46,7 @@ function initializeStore(): void {
 
 // Observe store changes and handle persistence + broadcasting
 function observeStore(): void {
-	debugVisible.subscribe((visible) => {
+	debugMenu.visibility.subscribe((visible) => {
 		saveToFile(visible)
 		broadcastState(visible)
 	})

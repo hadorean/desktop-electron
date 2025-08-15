@@ -2,7 +2,7 @@
 	import { BackgroundImage, ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate, TimeDisplay, WeatherDisplay } from '$shared/components'
 	import { initializeImageChangeHandling, localStorageService, socketService } from '$shared/services'
 	import { expandSettings, imagesStore, screenSettings } from '$shared/stores'
-	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
+	import { debugMenu } from '$shared/stores/debugStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
 
@@ -54,7 +54,7 @@
 				// Setup socket listener for debug state changes
 				socketService.onDebugStateChanged((visible) => {
 					console.log('Client app: Received debug state change:', visible)
-					setDebugMenuVisible(visible)
+					debugMenu.setVisible(visible)
 				})
 
 				// Setup image change handling (deduplication, socket events, validation)
@@ -131,6 +131,7 @@
 	}
 
 	const { imagesError } = imagesStore
+	const { visibility: debugVisible } = debugMenu
 </script>
 
 <div class="full-page-container">

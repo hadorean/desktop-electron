@@ -1,4 +1,4 @@
-import { getDebugMenuVisible, toggleDebugMenu } from '$shared/stores/debugStore'
+import { debugMenu } from '$shared/stores/debugStore'
 import { globalShortcut } from 'electron'
 import { getMainWindow } from '../stores/appStore'
 
@@ -12,7 +12,7 @@ export function initShortcuts(): void {
 		globalShortcut.register('CommandOrControl+Shift+I', () => {
 			const win = getMainWindow()?.get()
 			if (!win || !win.isFocused()) return
-			if (!getDebugMenuVisible()) return
+			if (!debugMenu.isVisible) return
 			win.webContents.toggleDevTools()
 		})
 
@@ -21,7 +21,7 @@ export function initShortcuts(): void {
 			try {
 				const win = getMainWindow()?.get()
 				if (!win || !win.isFocused()) return
-				toggleDebugMenu()
+				debugMenu.toggle()
 			} catch (error) {
 				console.error('Failed to toggle debug menu:', error)
 			}

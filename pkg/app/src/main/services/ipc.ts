@@ -1,4 +1,4 @@
-import { getDebugMenuVisible } from '$shared/stores/debugStore'
+import { debugMenu } from '$shared/stores/debugStore'
 import { getCurrentUserOptions } from '$shared/stores/userOptionsStore'
 import type { ScreenProfile, UserOptions } from '$shared/types'
 import { appConfig } from '$shared/types/config'
@@ -179,7 +179,7 @@ export function initIpc(): void {
 	// IPC handler to get current debug state
 	handleIpc(IpcEvents.GetDebugState, () => {
 		try {
-			return { success: true, visible: getDebugMenuVisible() }
+			return { success: true, visible: debugMenu.isVisible }
 		} catch (error) {
 			console.error('IPC get-debug-state error:', error)
 			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }

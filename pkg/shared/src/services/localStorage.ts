@@ -5,7 +5,7 @@
 
 import { get } from 'svelte/store'
 import { apiBaseUrl } from '../stores/apiStore'
-import { debugVisible, setDebugMenuVisible } from '../stores/debugStore'
+import { debugMenu } from '../stores/debugStore'
 import { allSettings, currentScreen, isLocalMode, updateLocalSettings, updateSharedSettings } from '../stores/settingsStore'
 import { type ScreenProfile, DefaultScreenProfile } from '../types'
 import { checkStorageAvailability } from '../utils'
@@ -61,7 +61,7 @@ class LocalStorageService {
 			const savedDebugState = localStorage.getItem('debug.visible')
 			if (savedDebugState !== null) {
 				const isVisible = JSON.parse(savedDebugState)
-				setDebugMenuVisible(isVisible)
+				debugMenu.setVisible(isVisible)
 			}
 		} catch (error) {
 			console.error('Error loading debug state from localStorage:', error)
@@ -300,7 +300,7 @@ class LocalStorageService {
 	 */
 	private setupStoreSubscriptions(): void {
 		// Subscribe to debug state changes
-		const unsubscribeDebug = debugVisible.subscribe((visible) => {
+		const unsubscribeDebug = debugMenu.visibility.subscribe((visible) => {
 			try {
 				localStorage.setItem('debug.visible', JSON.stringify(visible))
 			} catch (error) {
