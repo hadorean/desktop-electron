@@ -79,14 +79,13 @@ export const storeName = {
 
 #### Usage
 ```ts
-// Import the object
+// Import and destructure
 import { storeName } from './store'
-
-// Destructure for Svelte $ syntax
 const { store1, store2 } = storeName
 
-// Use in components
+// Reactive in components
 $: console.log($store1, $store2)
+storeName.loadData()
 ```
 
 ### Styling
