@@ -2,6 +2,7 @@
 	import { Inspect } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { currentScreen, editingSettings, inTransition, isLocalMode, screenSettings, updateEditingSettings } from '../../stores'
+	import { currentScreenType } from '../../stores/settingsStore'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
 	import SliderControl from './SliderControl.svelte'
@@ -155,15 +156,17 @@
 				disabled={$inTransition}
 			/>
 
-			<ToggleControl
-				label="Auto-hide settings button"
-				checked={$editingSettings.hideButton ?? $screenSettings.hideButton ?? false}
-				onChange={(newHideButton: boolean | null) => handleSettingChange('hideButton', newHideButton)}
-				isOverride={$isLocalMode}
-				overrideValue={$editingSettings.hideButton}
-				defaultValue={false}
-				disabled={$inTransition}
-			/>
+			{#if $currentScreenType === 'interactive'}
+				<ToggleControl
+					label="Auto-hide settings button"
+					checked={$editingSettings.hideButton ?? $screenSettings.hideButton ?? false}
+					onChange={(newHideButton: boolean | null) => handleSettingChange('hideButton', newHideButton)}
+					isOverride={$isLocalMode}
+					overrideValue={$editingSettings.hideButton}
+					defaultValue={false}
+					disabled={$inTransition}
+				/>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -182,6 +185,7 @@
 		backdrop-filter: blur(10px);
 		border-radius: var(--radius-xl);
 		box-sizing: border-box;
+		overflow-x: hidden;
 	}
 
 	.settings-panel.transparent {

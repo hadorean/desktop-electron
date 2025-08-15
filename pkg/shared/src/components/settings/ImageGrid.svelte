@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getImageUrl } from '../../services'
-	import { images, imagesError, imagesLoading, screenSettings, updateSharedSettings } from '../../stores'
+	import { imagesStore, screenSettings, updateSharedSettings } from '../../stores'
 	import { Card, CardContent, Icon } from '../ui'
 
 	const {
@@ -54,6 +54,9 @@
 	}
 
 	// Sort images to show favorites first - use derived to minimize recalculation
+	// Access individual stores from the imagesStore object
+	const { images, imagesLoading, imagesError } = imagesStore
+
 	const sortedImages = $derived(
 		(() => {
 			const imageList = $images

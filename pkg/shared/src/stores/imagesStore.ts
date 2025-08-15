@@ -33,137 +33,132 @@ const initialState: ImagesStoreState = {
 const imagesStoreInternal = writable<ImagesStoreState>(initialState)
 
 // Derived stores for convenient access
-export const images = derived(imagesStoreInternal, ($store) => $store.images)
-export const imagesLoading = derived(imagesStoreInternal, ($store) => $store.isLoading)
-export const imagesError = derived(imagesStoreInternal, ($store) => $store.error)
-export const imagesLastUpdated = derived(imagesStoreInternal, ($store) => $store.lastUpdated)
-export const hasImages = derived(images, ($images) => $images.length > 0)
+const images = derived(imagesStoreInternal, ($store) => $store.images)
+const imagesLoading = derived(imagesStoreInternal, ($store) => $store.isLoading)
+const imagesError = derived(imagesStoreInternal, ($store) => $store.error)
+const imagesLastUpdated = derived(imagesStoreInternal, ($store) => $store.lastUpdated)
+const hasImages = derived(images, ($images) => $images.length > 0)
 
 // Combined derived store for components that need multiple values
-export const imagesState = derived(imagesStoreInternal, ($store) => $store)
+const imagesState = derived(imagesStoreInternal, ($store) => $store)
 
-/**
- * Load images from the API
- */
-export async function loadImages(): Promise<void> {
-	// Prevent validation cascades during loading
-	isLoadingImages = true
+// Single export object containing all properties and functions
+export const imagesStore = {
+	// Reactive stores
+	images,
+	imagesLoading,
+	imagesError,
+	imagesLastUpdated,
+	hasImages,
+	imagesState,
 
-	// Set loading state
-	imagesStoreInternal.update((state) => ({
-		...state,
-		isLoading: true,
-		error: null
-	}))
+	// Functions defined directly in the object
+	async loadImages(): Promise<void> {
+		// Prevent validation cascades during loading
+		isLoadingImages = true
 
-	try {
-		const images = await api.getImages()
-		const previousImages = getCurrentImages()
-
+		// Set loading state
 		imagesStoreInternal.update((state) => ({
 			...state,
-			images,
-			isLoading: false,
-			error: null,
+			isLoading: true,
+			error: null
+		}))
+
+		try {
+			const images = await api.getImages()
+			const previousImages = this.getCurrentImages()
+
+			imagesStoreInternal.update((state) => ({
+				...state,
+				images,
+				isLoading: false,
+				error: null,
+				lastUpdated: Date.now()
+			}))
+
+			console.log(`📷 Loaded ${images.length} images into store`)
+
+			// Reset loading flag before notifying callbacks
+			isLoadingImages = false
+
+			// Notify callbacks of image changes
+			this.notifyImageChangeCallbacks(images, previousImages)
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error loading images'
+
+			imagesStoreInternal.update((state) => ({
+				...state,
+				isLoading: false,
+				error: errorMessage
+			}))
+
+			// Reset loading flag on error too
+			isLoadingImages = false
+
+			console.error('📷 Error loading images:', error)
+		}
+	},
+
+	async refreshImages(): Promise<void> {
+		console.log('📷 Force refreshing images')
+		await this.loadImages()
+	},
+
+	clearImages(): void {
+		imagesStoreInternal.set(initialState)
+	},
+
+	updateImages(newImages: ImageInfo[]): void {
+		imagesStoreInternal.update((state) => ({
+			...state,
+			images: newImages,
 			lastUpdated: Date.now()
 		}))
+		console.log(`📷 Updated store with ${newImages.length} images via direct update`)
+	},
 
-		console.log(`📷 Loaded ${images.length} images into store`)
+	getCurrentImages() {
+		return get(images)
+	},
 
-		// Reset loading flag before notifying callbacks
-		isLoadingImages = false
+	isImagesLoading() {
+		return get(imagesLoading)
+	},
 
-		// Notify callbacks of image changes
-		notifyImageChangeCallbacks(images, previousImages)
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : 'Unknown error loading images'
+	onImagesChanged(callback: ImageChangeCallback): () => void {
+		imageChangeCallbacks.push(callback)
 
-		imagesStoreInternal.update((state) => ({
-			...state,
-			isLoading: false,
-			error: errorMessage
-		}))
+		// Return unsubscribe function
+		return () => {
+			const index = imageChangeCallbacks.indexOf(callback)
+			if (index > -1) {
+				imageChangeCallbacks.splice(index, 1)
+			}
+		}
+	},
 
-		// Reset loading flag on error too
-		isLoadingImages = false
+	getFallbackImageName(): string {
+		const currentImages = this.getCurrentImages()
+		return currentImages.length > 0 ? currentImages[0].name : ''
+	},
 
-		console.error('📷 Error loading images:', error)
+	imageExists(imageName: string): boolean {
+		if (!imageName) return false
+		return this.getCurrentImages().some((img) => img.name === imageName)
+	},
+
+	getIsLoadingImages() {
+		return isLoadingImages
+	},
+
+	// Private helper method
+	notifyImageChangeCallbacks(newImages: ImageInfo[], previousImages: ImageInfo[]): void {
+		imageChangeCallbacks.forEach((callback) => {
+			try {
+				callback(newImages, previousImages)
+			} catch (error) {
+				console.error('📷 Error in image change callback:', error)
+			}
+		})
 	}
 }
-
-/**
- * Force refresh images (bypasses any caching)
- */
-export async function refreshImages(): Promise<void> {
-	console.log('📷 Force refreshing images')
-	await loadImages()
-}
-
-/**
- * Clear the store (useful for cleanup)
- */
-export const clearImages = (): void => imagesStoreInternal.set(initialState)
-
-/**
- * Update images directly (for use by socket events in Phase 3)
- */
-export function updateImages(newImages: ImageInfo[]): void {
-	imagesStoreInternal.update((state) => ({
-		...state,
-		images: newImages,
-		lastUpdated: Date.now()
-	}))
-	console.log(`📷 Updated store with ${newImages.length} images via direct update`)
-}
-
-export const getCurrentImages = () => get(images)
-export const isImagesLoading = () => get(imagesLoading)
-
-/**
- * Register a callback to be notified when images change
- */
-export function onImagesChanged(callback: ImageChangeCallback): () => void {
-	imageChangeCallbacks.push(callback)
-
-	// Return unsubscribe function
-	return () => {
-		const index = imageChangeCallbacks.indexOf(callback)
-		if (index > -1) {
-			imageChangeCallbacks.splice(index, 1)
-		}
-	}
-}
-
-/**
- * Notify all registered callbacks about image changes
- */
-function notifyImageChangeCallbacks(newImages: ImageInfo[], previousImages: ImageInfo[]): void {
-	imageChangeCallbacks.forEach((callback) => {
-		try {
-			callback(newImages, previousImages)
-		} catch (error) {
-			console.error('📷 Error in image change callback:', error)
-		}
-	})
-}
-
-/**
- * Get fallback image name (first available image or empty string)
- */
-export function getFallbackImageName(): string {
-	const currentImages = getCurrentImages()
-	return currentImages.length > 0 ? currentImages[0].name : ''
-}
-
-/**
- * Check if an image name exists in the current images list
- */
-export function imageExists(imageName: string): boolean {
-	if (!imageName) return false
-	return getCurrentImages().some((img) => img.name === imageName)
-}
-
-/**
- * Check if we're currently loading images (to prevent validation cascades)
- */
-export const getIsLoadingImages = () => isLoadingImages

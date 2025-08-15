@@ -3,9 +3,9 @@
  * Consolidates socket event handling, deduplication, and validation logic
  */
 
-import { loadImages, onImagesChanged, getIsLoadingImages } from '../stores'
-import { socketService } from './socket'
+import { imagesStore } from '../stores'
 import { localStorageService } from './localStorage'
+import { socketService } from './socket'
 
 // Type for image updated events (matches socket service signature)
 type ImageUpdatedEvent = {
@@ -51,14 +51,14 @@ export function initializeImageChangeHandling(context: string): () => void {
 		// Refresh for file changes and manual refreshes (like directory changes)
 		if (event.reason === 'file_change' || event.reason === 'manual_refresh') {
 			console.log(`🔄 Processing unique ${event.reason} event`)
-			await loadImages()
+			await imagesStore.loadImages()
 		}
 	}
 
 	// Setup image change validation (skip during initial loading to prevent cascades)
 	const handleImagesChanged = (newImages: Array<{ name: string }>): void => {
 		// Only validate if we're not currently loading to prevent validation cascades
-		if (!getIsLoadingImages()) {
+		if (!imagesStore.getIsLoadingImages()) {
 			const imageNames = newImages.map((img) => img.name)
 			localStorageService.validateSelectedImages(imageNames)
 		}
@@ -66,7 +66,7 @@ export function initializeImageChangeHandling(context: string): () => void {
 
 	// Register listeners
 	socketService.onImagesUpdated(handleImagesUpdated)
-	const unsubscribeImagesChanged = onImagesChanged(handleImagesChanged)
+	const unsubscribeImagesChanged = imagesStore.onImagesChanged(handleImagesChanged)
 
 	// Create cleanup function
 	cleanup = () => {

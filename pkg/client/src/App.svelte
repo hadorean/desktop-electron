@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { BackgroundImage, ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate, TimeDisplay, WeatherDisplay } from '$shared/components'
 	import { initializeImageChangeHandling, localStorageService, socketService } from '$shared/services'
-	import { expandSettings, getCurrentImages, imagesError, loadImages, screenSettings } from '$shared/stores'
+	import { expandSettings, imagesStore, screenSettings } from '$shared/stores'
 	import { debugVisible, setDebugMenuVisible } from '$shared/stores/debugStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
@@ -22,7 +22,7 @@
 	async function handleReconnect(): Promise<void> {
 		try {
 			console.log('Reconnecting to API...')
-			await loadImages()
+			await imagesStore.loadImages()
 			console.log('Reconnection successful')
 		} catch (error: unknown) {
 			console.error('Reconnection failed:', error)
@@ -38,13 +38,13 @@
 				openSettingsFromUrl = urlParams.get('openSettings') === 'true'
 
 				// First load images using the store
-				await loadImages()
+				await imagesStore.loadImages()
 
 				// Initialize localStorage service (handles loading settings automatically)
 				localStorageService.init()
 
 				// Load settings with current images
-				localStorageService.loadSettings(getCurrentImages())
+				localStorageService.loadSettings(imagesStore.getCurrentImages())
 
 				// Add event listeners
 				window.addEventListener('reconnectApi', handleReconnect)
@@ -129,6 +129,8 @@
 	function handleButtonMouseLeave(): void {
 		buttonHovered = false
 	}
+
+	const { imagesError } = imagesStore
 </script>
 
 <div class="full-page-container">

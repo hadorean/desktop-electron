@@ -1,5 +1,6 @@
 import { derived, get, writable } from 'svelte/store'
 import {
+	colors,
 	DefaultScreenProfile,
 	DefaultScreenSettings,
 	DefaultUserSettings,
@@ -9,8 +10,7 @@ import {
 	type ScreenProfile,
 	type ScreenSettings,
 	type ScreenType,
-	type UserSettings,
-	colors
+	type UserSettings
 } from '../types'
 
 const defaultScreenId = 'monitor1'
@@ -615,6 +615,13 @@ export const currentScreenColor = derived([allSettings, currentScreen, isLocalMo
 	// Get the current screen's color
 	const screenSettings = $allSettings.screens[$currentScreen]
 	return screenSettings?.color || '#ffffff'
+})
+
+export const currentScreenType = derived([allSettings, currentScreen, isLocalMode], ([$allSettings, $currentScreen, $isLocalMode]) => {
+	if (!$isLocalMode) {
+		return 'shared'
+	}
+	return $allSettings.screens[$currentScreen]?.type || 'static'
 })
 
 // loadSettings function moved to localStorage service

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
 	import { initializeImageChangeHandling } from '$shared/services'
-	import { debugVisible, effectiveApiUrl, imagesError, loadImages, userOptions } from '$shared/stores'
+	import { debugVisible, effectiveApiUrl, imagesStore, userOptions } from '$shared/stores'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { ActionButtons, AppVersion, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
@@ -20,9 +20,11 @@
 			transparent = config?.window.transparent ?? false
 		})
 		effectiveApiUrl.set('http://localhost:8080')
-		await loadImages()
+		await imagesStore.loadImages()
 		initializeImageChangeHandling('Desktop app')
 	})
+
+	const { imagesError } = imagesStore
 </script>
 
 <KeyboardShortcuts

@@ -35,24 +35,7 @@ export {
 export { debugVisible, setDebugMenuVisible, toggleDebugMenu } from './debugStore'
 
 // Images store
-export {
-	clearImages,
-	getCurrentImages,
-	getFallbackImageName,
-	getIsLoadingImages,
-	hasImages,
-	imageExists,
-	images,
-	imagesError,
-	imagesLastUpdated,
-	imagesLoading,
-	imagesState,
-	isImagesLoading,
-	loadImages,
-	onImagesChanged,
-	refreshImages,
-	updateImages
-} from './imagesStore'
+export { imagesStore } from './imagesStore'
 
 // API store
 export { effectiveApiUrl } from './apiStore'

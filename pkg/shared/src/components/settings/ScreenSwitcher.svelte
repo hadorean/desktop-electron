@@ -167,7 +167,7 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		/* backdrop-filter: blur(10px); */
+		/* backdrop-filter: blur(10px);	 */
 		padding: 8px 16px;
 		border-radius: 12px;
 		/* background: rgba(0, 0, 0, 0.3); */
@@ -197,11 +197,6 @@
 
 	.screen-tab:hover {
 		background: rgba(255, 255, 255, 0.1);
-	}
-
-	.screen-tab:focus-visible {
-		/* outline: 2px solid rgba(255, 255, 255, 0.5); */
-		/* outline-offset: 2px; */
 	}
 
 	:global(.screen-tab .screen-icon) {
