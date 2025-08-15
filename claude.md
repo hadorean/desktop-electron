@@ -40,11 +40,54 @@ During execution:
 - Don't use dynamic imports when static imports are possible
 - Group imports when possible
 
-## State management
+## Stores
 
 - Use stores as an observable, inspectable single source of truth for managing state
 - Store should be self-contained. Don't add dependencies to store.
   Instead, use a services to modify and observe stores to handle side effects (networking, file system etc.)
+- Use createStore from $shared/stores/createStore.ts to create store properties
+  Use store, get and set when applicable, not systematically.
+  ```ts
+  export const { store: currentPage, get: getCurrentPage, set: gotoPage } = createStore<Page>('main')
+  ```
+
+### Svelte Store Object Pattern
+
+Create a single export object that contains all reactive stores and functions, using getters for derived stores to maintain reactivity with Svelte's $ syntax.
+
+#### Key characteristics:
+  - Single export const storeName = { ... } object
+  - Individual stores as properties (for direct access)
+  - Functions defined as methods within the object
+  - Use this.methodName() for internal method calls
+  - Import and destructure individual stores: const { store1, store2 } = storeName
+
+#### Example
+```ts
+// Store structure
+export const storeName = {
+  // Reactive stores
+  store1: derived(internalStore, $s => $s.prop1),
+  store2: derived(internalStore, $s => $s.prop2),
+  
+  // Functions
+  async loadData() { /* implementation */ },
+  updateData(value) { /* implementation */ },
+  getCurrentValue() { return get(store1) }
+}
+```
+
+#### Usage
+```ts
+// Import the object
+import { storeName } from './store'
+
+// Destructure for Svelte $ syntax
+const { store1, store2 } = storeName
+
+// Use in components
+$: console.log($store1, $store2)
+```
 
 ### Styling
 
@@ -53,7 +96,7 @@ During execution:
 
 ### Components
 
-- Breakdown repetitive html patterns into components
+- Breakdown repetitive html patterns into {#snippet}
 - Use shadcn-svelte components when possible
 - When creating a new shadcn component:
   - Replace tailwind classes with meaningfull class names

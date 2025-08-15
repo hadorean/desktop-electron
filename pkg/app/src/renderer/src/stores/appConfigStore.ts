@@ -1,8 +1,3 @@
-import type { AppConfig } from '$shared'
-import { writable } from 'svelte/store'
+import { createStore, type AppConfig } from '$shared'
 
-export const appConfig = writable<AppConfig | null>(null)
-
-export function setAppConfig(config: AppConfig | null): void {
-	appConfig.set(config)
-}
+export const { store: appConfig, set: setAppConfig } = createStore<AppConfig | null>(null)

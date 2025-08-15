@@ -204,12 +204,12 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-	background: var(--surface-hover);
+	background: var(--surface);
 	border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb {
-	background: var(--border-hover);
+	background: var(--secondary);
 	border-radius: var(--radius-sm);
 }
 
@@ -266,6 +266,10 @@ div:not([role]):not(.slider):not(.slider-container):not(.icon):not(.switch-thumb
 /* Make spans inside buttons non-draggable */
 button span {
 	-webkit-app-region: no-drag;
+}
+
+.drag {
+	-webkit-app-region: drag;
 }
 
 /* Utility class for making specific elements non-draggable */

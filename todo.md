@@ -14,7 +14,7 @@ What's left to ship?
 
 - [ ] Enable/disable monitors
 - [ ] React to monitor changes
-- [ ] Color coding for screens
+- [X] Color coding for screens
 
 ### Initial screen
 

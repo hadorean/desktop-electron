@@ -45,9 +45,9 @@
 		<CustomHeader />
 	{/if}
 
-	<PageContainer {transparent} class="flex-1">
+	<PageContainer {transparent} class="drag flex-1">
 		{#snippet settingsContent()}
-			<div class="settings-container">
+			<div class="settings-container drag">
 				<SettingsPanel expanded={true} {transparent} />
 				<SettingsServerUpdate />
 				<ActionButtons />
@@ -92,6 +92,7 @@
 		display: flex;
 		flex-direction: column;
 		position: relative;
+		padding: 1rem;
 	}
 
 	footer {

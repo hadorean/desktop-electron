@@ -70,6 +70,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		height: 25px;
 		gap: 0.75rem;
 	}
 
@@ -98,7 +99,6 @@
 	.revert-button:hover:not(.disabled) {
 		background: var(--surface-hover);
 		color: var(--text-primary);
-		transform: scale(1.1);
 	}
 
 	.revert-button.disabled {
@@ -115,10 +115,16 @@
 
 	.switch-wrapper {
 		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	:global(.switch-button) {
 		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	/* Regular switch styling with screen color */
@@ -156,7 +162,6 @@
 		background-color: white !important;
 		border: 1px solid var(--toggle-color, var(--primary)) !important;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-		scale: 1.1;
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
