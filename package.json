@@ -31,6 +31,7 @@
 	},
 	"dependencies": {
 		"@hgrandry/dbg": "0.1.10",
+		"@lucide/svelte": "^0.539.0",
 		"@tweenjs/tween.js": "^25.0.0",
 		"bits-ui": "^2.9.2",
 		"electron": "^37.2.6",
@@ -70,6 +71,8 @@
 		"svelte-check": "^4.3.0",
 		"tailwind-merge": "^3.3.1",
 		"tailwindcss": "^4.1.12",
+		"tailwind-variants": "^2.1.0",
+		"tw-animate-css": "^1.3.6",
 		"typescript": "^5.8.3",
 		"vite": "^6.2.0",
 		"wait-on": "^8.0.4"
