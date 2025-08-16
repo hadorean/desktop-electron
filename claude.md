@@ -91,8 +91,9 @@ storeName.loadData()
 
 ### Styling
 
-- Don't use tailwind classes, use meaningfull class names and semantic css
 - Use global css variables for theming
+- IMPORTANT: Don't use tailwind classes, use meaningfull class names and semantic css
+- Note we still relies on tailwind because we use shadcn-svelte components, but we don't use tailwind classes in our own code.
 
 ### Components
 
