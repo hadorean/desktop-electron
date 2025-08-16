@@ -85,4 +85,11 @@
 		color: var(--text-primary);
 		transform: scale(1.1);
 	}
+
+	/* Ensure Select component takes full width */
+	:global(.mode-selector-container [data-bits-select-root]),
+	:global(.mode-selector-container [data-select-root]),
+	:global(.mode-selector-container > *) {
+		width: 100% !important;
+	}
 </style>
