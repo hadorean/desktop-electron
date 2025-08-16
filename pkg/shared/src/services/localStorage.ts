@@ -300,9 +300,10 @@ class LocalStorageService {
 	/**
 	 * Set up automatic saving when stores change
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private setupStoreSubscriptions(subscriptions: { store: any; key: string }[]): void {
 		subscriptions.forEach(({ store, key }) => {
-			var unsubscribe = this.subscribeToStore(store, key)
+			const unsubscribe = this.subscribeToStore(store, key)
 			this.unsubscribers.push(unsubscribe)
 		})
 	}
