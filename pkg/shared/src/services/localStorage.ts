@@ -56,41 +56,36 @@ class LocalStorageService {
 	}
 
 	/**
+	 * Load a value from localStorage and update a store
+	 */
+	private loadFromStorage<T>(
+		storageKey: string,
+		setter: (value: T) => void,
+		parser: (value: string) => T = JSON.parse,
+		description: string = storageKey,
+		logSuccess: boolean = false
+	): void {
+		try {
+			const savedValue = localStorage.getItem(storageKey)
+			if (savedValue !== null) {
+				const parsedValue = parser(savedValue)
+				setter(parsedValue)
+				if (logSuccess) {
+					console.log(`📦 Loaded ${description} from localStorage:`, parsedValue)
+				}
+			}
+		} catch (error) {
+			console.error(`Error loading ${description} from localStorage:`, error)
+		}
+	}
+
+	/**
 	 * Load initial state from localStorage (non-settings data)
 	 */
 	private loadInitialState(): void {
-		// Load debug state
-		try {
-			const savedDebugState = localStorage.getItem('debug')
-			if (savedDebugState !== null) {
-				const isVisible = JSON.parse(savedDebugState)
-				debugMenu.setVisible(isVisible)
-			}
-		} catch (error) {
-			console.error('Error loading debug state from localStorage:', error)
-		}
-
-		// Load API URL
-		try {
-			const savedApiUrl = localStorage.getItem('api')
-			if (savedApiUrl) {
-				apiStore.setServerUrl(savedApiUrl)
-				console.log('🔌 Loaded API URL from localStorage:', savedApiUrl)
-			}
-		} catch (error) {
-			console.error('Error loading API URL from localStorage:', error)
-		}
-
-		// Load current screen
-		try {
-			const savedScreen = localStorage.getItem('screen')
-			if (savedScreen) {
-				console.log('📦 Loaded saved screen from localStorage:', savedScreen)
-				settingsStore.setCurrentScreen(savedScreen)
-			}
-		} catch (error) {
-			console.error('Error loading current screen from localStorage:', error)
-		}
+		this.loadFromStorage('debug', debugMenu.setVisible, JSON.parse, 'debug state')
+		this.loadFromStorage('api', apiStore.setServerUrl, value => value, 'API URL', true)
+		this.loadFromStorage('screen', settingsStore.setCurrentScreen, value => value, 'saved screen', true)
 	}
 
 	/**
@@ -301,49 +296,32 @@ class LocalStorageService {
 	}
 
 	/**
+	 * Subscribe to a store and automatically save its value to localStorage
+	 */
+	private subscribeToStore<T>(
+		store: { subscribe: (callback: (value: T) => void) => () => void },
+		storageKey: string,
+		transform: (value: T) => string = (value: T) => JSON.stringify(value),
+		description: string = storageKey
+	): void {
+		const unsubscriber = store.subscribe(value => {
+			try {
+				localStorage.setItem(storageKey, transform(value))
+			} catch (error) {
+				console.error(`Error saving ${description} to localStorage:`, error)
+			}
+		})
+		this.unsubscribers.push(unsubscriber)
+	}
+
+	/**
 	 * Set up automatic saving when stores change
 	 */
 	private setupStoreSubscriptions(): void {
-		// Subscribe to debug state changes
-		const unsubscribeDebug = debugMenu.visibility.subscribe(visible => {
-			try {
-				localStorage.setItem('debug', JSON.stringify(visible))
-			} catch (error) {
-				console.error('Error saving debug state to localStorage:', error)
-			}
-		})
-		this.unsubscribers.push(unsubscribeDebug)
-
-		// Subscribe to API URL changes
-		const unsubscribeApi = apiStore.url.subscribe(url => {
-			try {
-				localStorage.setItem('api', url)
-			} catch (error) {
-				console.error('Error saving API URL to localStorage:', error)
-			}
-		})
-		this.unsubscribers.push(unsubscribeApi)
-
-		// Subscribe to current screen changes
-		const unsubscribeScreen = settingsStore.currentScreen.subscribe(screenId => {
-			try {
-				localStorage.setItem('screen', screenId)
-			} catch (error) {
-				console.error('Error saving current screen to localStorage:', error)
-			}
-		})
-		this.unsubscribers.push(unsubscribeScreen)
-
-		// Subscribe to settings changes for automatic saving
-		const unsubscribeSettings = settingsStore.allSettings.subscribe(settings => {
-			try {
-				// Save unified settings object
-				localStorage.setItem('settings', JSON.stringify(settings))
-			} catch (error) {
-				console.error('Error saving settings to localStorage:', error)
-			}
-		})
-		this.unsubscribers.push(unsubscribeSettings)
+		this.subscribeToStore(debugMenu.visibility, 'debug', JSON.stringify, 'debug state')
+		this.subscribeToStore(apiStore.url, 'api', value => value, 'API URL')
+		this.subscribeToStore(settingsStore.currentScreen, 'screen', value => value, 'current screen')
+		this.subscribeToStore(settingsStore.allSettings, 'settings', JSON.stringify, 'settings')
 	}
 }
 
