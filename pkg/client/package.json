@@ -16,7 +16,6 @@
 		"svelte-check": "svelte-check --tsconfig ./tsconfig.app.json"
 	},
 	"dependencies": {
-		"@heyketsu/shared": "file:../shared",
 		"socket.io-client": "^4.8.1"
 	}
 }
