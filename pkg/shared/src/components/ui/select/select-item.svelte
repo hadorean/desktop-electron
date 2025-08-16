@@ -27,6 +27,7 @@
 		display: flex;
 		width: 100%;
 		align-items: center;
+		justify-content: flex-start;
 		gap: 0.5rem;
 		border-radius: calc(var(--radius) - 2px);
 		padding: 0.375rem 0.5rem 0.375rem 0.5rem;
@@ -36,6 +37,7 @@
 		user-select: none;
 		cursor: default;
 		outline: none;
+		text-align: left;
 	}
 
 	.select-item[data-highlighted] {
@@ -50,17 +52,19 @@
 
 	.check-container {
 		position: absolute;
-		right: 0.5rem;
+		right: 0.75rem;
+		top: 50%;
+		transform: translateY(-50%);
 		display: flex;
-		width: 0.875rem;
-		height: 0.875rem;
+		width: 1rem;
+		height: 1rem;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.check-icon {
-		width: 1rem;
-		height: 1rem;
+		width: 0.875rem;
+		height: 0.875rem;
 	}
 
 	:global(.select-item svg:not(.check-icon)) {

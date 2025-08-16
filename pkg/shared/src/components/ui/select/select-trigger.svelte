@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { ChevronDown as ChevronDownIcon } from 'lucide-svelte'
 	import { Select as SelectPrimitive } from 'bits-ui'
+	import { ChevronDown as ChevronDownIcon } from 'lucide-svelte'
 	import { cn, type WithoutChild } from '../../../lib/utils'
 
 	let {
@@ -25,7 +25,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5rem;
-		width: fit-content;
+		width: 100%;
 		padding: 0.5rem 0.75rem;
 		border-radius: var(--radius);
 		border: 1px solid hsl(var(--border));
@@ -79,6 +79,7 @@
 		opacity: 0.5;
 		pointer-events: none;
 		flex-shrink: 0;
+		margin-left: auto;
 	}
 
 	:global(.select-trigger svg:not(.chevron-icon)) {
