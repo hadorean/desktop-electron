@@ -6,20 +6,11 @@
 	let { ref = $bindable(null), class: className, value, label, children: childrenProp, ...restProps }: WithoutChild<SelectPrimitive.ItemProps> = $props()
 </script>
 
-<SelectPrimitive.Item
-	bind:ref
-	{value}
-	data-slot="select-item"
-	class={cn(
-		"data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground outline-hidden *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2 relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-2 pr-8 text-sm data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-		className
-	)}
-	{...restProps}
->
+<SelectPrimitive.Item bind:ref {value} data-slot="select-item" class={cn('select-item', className)} {...restProps}>
 	{#snippet children({ selected, highlighted })}
-		<span class="absolute right-2 flex size-3.5 items-center justify-center">
+		<span class="check-container">
 			{#if selected}
-				<CheckIcon class="size-4" />
+				<CheckIcon class="check-icon" />
 			{/if}
 		</span>
 		{#if childrenProp}
@@ -29,3 +20,57 @@
 		{/if}
 	{/snippet}
 </SelectPrimitive.Item>
+
+<style>
+	.select-item {
+		position: relative;
+		display: flex;
+		width: 100%;
+		align-items: center;
+		gap: 0.5rem;
+		border-radius: calc(var(--radius) - 2px);
+		padding: 0.375rem 0.5rem 0.375rem 0.5rem;
+		padding-right: 2rem;
+		font-size: 0.875rem;
+		line-height: 1.25rem;
+		user-select: none;
+		cursor: default;
+		outline: none;
+	}
+
+	.select-item[data-highlighted] {
+		background: hsl(var(--accent));
+		color: hsl(var(--accent-foreground));
+	}
+
+	.select-item[data-disabled] {
+		pointer-events: none;
+		opacity: 0.5;
+	}
+
+	.check-container {
+		position: absolute;
+		right: 0.5rem;
+		display: flex;
+		width: 0.875rem;
+		height: 0.875rem;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.check-icon {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	:global(.select-item svg:not(.check-icon)) {
+		width: 1rem;
+		height: 1rem;
+		pointer-events: none;
+		flex-shrink: 0;
+	}
+
+	:global(.select-item svg:not([class*='text-'])) {
+		color: hsl(var(--muted-foreground));
+	}
+</style>

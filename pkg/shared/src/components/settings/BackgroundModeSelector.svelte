@@ -34,7 +34,7 @@
 	</div>
 
 	<Select type="single" value={mode} onValueChange={handleModeChange}>
-		<SelectTrigger class="mode-selector">
+		<SelectTrigger>
 			{mode === 'image' ? 'Image' : 'URL'}
 		</SelectTrigger>
 		<SelectContent>
@@ -84,22 +84,5 @@
 		background: var(--surface-hover);
 		color: var(--text-primary);
 		transform: scale(1.1);
-	}
-
-	:global(.mode-selector) {
-		width: 100%;
-		background: rgba(0, 0, 0, 0.2);
-		border: 1px solid hsl(var(--border) / 0.3);
-		color: var(--text-primary);
-		transition: all 0.2s ease;
-	}
-
-	:global(.mode-selector:hover) {
-		background: rgba(0, 0, 0, 0.3);
-	}
-
-	:global(.mode-selector:focus) {
-		border-color: var(--primary);
-		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
 	}
 </style>
