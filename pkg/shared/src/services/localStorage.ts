@@ -32,16 +32,18 @@ class LocalStorageService {
 
 		console.log('📦 Initializing localStorage service...')
 
-		// Load initial state from localStorage
 		this.loadInitialState()
 
-		// Set up store subscriptions for automatic saving
-		this.setupStoreSubscriptions()
+		this.setupStoreSubscriptions([
+			{ store: debugMenu.visibility, key: 'debug' },
+			{ store: apiStore.url, key: 'api' },
+			{ store: settingsStore.currentScreen, key: 'screen' },
+			{ store: settingsStore.allSettings, key: 'settings' }
+		])
 
 		this.isInitialized = true
 		console.log('📦 LocalStorage service initialized successfully')
 
-		// Load complete settings
 		return this.loadSettings(images)
 	}
 
@@ -296,37 +298,33 @@ class LocalStorageService {
 	}
 
 	/**
+	 * Set up automatic saving when stores change
+	 */
+	private setupStoreSubscriptions(subscriptions: { store: any; key: string }[]): void {
+		subscriptions.forEach(({ store, key }) => {
+			var unsubscribe = this.subscribeToStore(store, key)
+			this.unsubscribers.push(unsubscribe)
+		})
+	}
+
+	/**
 	 * Subscribe to a store and automatically save its value to localStorage
 	 */
 	private subscribeToStore<T>(
 		store: { subscribe: (callback: (value: T) => void) => () => void },
 		storageKey: string,
-		transform: (value: T) => string = (value: T) => JSON.stringify(value),
+		transform: (value: T) => string = (value: T) => (typeof value === 'string' ? value : JSON.stringify(value)),
 		description: string = storageKey
-	): void {
-		const unsubscriber = store.subscribe(value => {
+	): () => void {
+		return store.subscribe(value => {
 			try {
 				localStorage.setItem(storageKey, transform(value))
 			} catch (error) {
 				console.error(`Error saving ${description} to localStorage:`, error)
 			}
 		})
-		this.unsubscribers.push(unsubscriber)
-	}
-
-	/**
-	 * Set up automatic saving when stores change
-	 */
-	private setupStoreSubscriptions(): void {
-		this.subscribeToStore(debugMenu.visibility, 'debug', JSON.stringify, 'debug state')
-		this.subscribeToStore(apiStore.url, 'api', value => value, 'API URL')
-		this.subscribeToStore(settingsStore.currentScreen, 'screen', value => value, 'current screen')
-		this.subscribeToStore(settingsStore.allSettings, 'settings', JSON.stringify, 'settings')
 	}
 }
 
 // Export a singleton instance
 export const localStorageService = new LocalStorageService()
-
-// Export the class for testing
-export { LocalStorageService }
