@@ -29,6 +29,7 @@ When exiting plan mode, always do this first:
  - Set the date after the doc title: Date: YYYY-MM-DD
  - Create a branch feature/<topic>
  - Commit the plan to the branch right away: "<Topic> plan"
+ - Commit the specs file as well if it's not yet commited
 
 During execution:
  - Commit regularly (each phase)
