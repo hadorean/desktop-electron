@@ -2,25 +2,15 @@ import { createStore } from '../utils'
 
 const visible = createStore<boolean>(false)
 
-class DebugMenu {
-	public visibility = visible.store
+export const debugMenu = {
+	visibility: visible.store,
 
-	get isVisible(): boolean {
-		return visible.get()
-	}
+	getVisible: (): boolean => visible.get(),
 
-	setVisible(value: boolean) {
-		visible.set(value)
-	}
+	setVisible: (value: boolean): void => visible.set(value),
 
-	updateVisible(callback: (value: boolean) => boolean) {
-		visible.update(callback)
-	}
-
-	toggle(): boolean {
+	toggle: (): boolean => {
 		visible.update(current => !current)
 		return visible.get()
 	}
 }
-
-export const debugMenu = new DebugMenu()

@@ -179,7 +179,7 @@ export function initIpc(): void {
 	// IPC handler to get current debug state
 	handleIpc(IpcEvents.GetDebugState, () => {
 		try {
-			return { success: true, visible: debugMenu.isVisible }
+			return { success: true, visible: debugMenu.getVisible() }
 		} catch (error) {
 			console.error('IPC get-debug-state error:', error)
 			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }

@@ -45,7 +45,7 @@ export class SocketManager {
 			// Send current debug state to newly connected client
 			try {
 				socket.emit(SocketEvents.DebugStateChanged, {
-					visible: debugMenu.isVisible,
+					visible: debugMenu.getVisible(),
 					timestamp: Date.now()
 				})
 			} catch (error) {

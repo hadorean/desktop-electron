@@ -12,7 +12,7 @@ export function initShortcuts(): void {
 		globalShortcut.register('CommandOrControl+Shift+I', () => {
 			const win = getMainWindow()?.get()
 			if (!win || !win.isFocused()) return
-			if (!debugMenu.isVisible) return
+			if (!debugMenu.getVisible()) return
 			win.webContents.toggleDevTools()
 		})
 
