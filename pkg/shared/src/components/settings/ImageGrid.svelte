@@ -56,7 +56,7 @@
 
 	// Sort images to show favorites first - use derived to minimize recalculation
 	// Access individual stores from the imagesStore object
-	const { images, imagesLoading, imagesError } = imagesStore
+	const { images, loading: imagesLoading, error: imagesError } = imagesStore
 	const { screenSettings } = settingsStore
 
 	const sortedImages = $derived(

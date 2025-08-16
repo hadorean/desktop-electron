@@ -34,9 +34,9 @@ const imagesStoreInternal = writable<ImagesStoreState>(initialState)
 
 // Derived stores for convenient access
 const images = derived(imagesStoreInternal, $store => $store.images)
-const imagesLoading = derived(imagesStoreInternal, $store => $store.isLoading)
-const imagesError = derived(imagesStoreInternal, $store => $store.error)
-const imagesLastUpdated = derived(imagesStoreInternal, $store => $store.lastUpdated)
+const loading = derived(imagesStoreInternal, $store => $store.isLoading)
+const error = derived(imagesStoreInternal, $store => $store.error)
+const lastUpdated = derived(imagesStoreInternal, $store => $store.lastUpdated)
 const hasImages = derived(images, $images => $images.length > 0)
 
 // Combined derived store for components that need multiple values
@@ -46,9 +46,9 @@ const imagesState = derived(imagesStoreInternal, $store => $store)
 export const imagesStore = {
 	// Reactive stores
 	images,
-	imagesLoading,
-	imagesError,
-	imagesLastUpdated,
+	loading,
+	error,
+	lastUpdated,
 	hasImages,
 	imagesState,
 
@@ -122,7 +122,7 @@ export const imagesStore = {
 	},
 
 	isImagesLoading() {
-		return get(imagesLoading)
+		return get(loading)
 	},
 
 	onImagesChanged(callback: ImageChangeCallback): () => void {

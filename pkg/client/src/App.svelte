@@ -133,7 +133,7 @@
 		buttonHovered = false
 	}
 
-	const { imagesError } = imagesStore
+	const { error: imagesError } = imagesStore
 	const { visibility: debugVisible } = debugMenu
 </script>
 

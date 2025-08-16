@@ -1,8 +1,7 @@
 import { io, Socket } from 'socket.io-client'
-import { get } from 'svelte/store'
-import { apiBaseUrl, effectiveApiUrl } from '../stores/apiStore'
+import { apiStore } from '../stores/apiStore'
 import type { SettingsUpdateEvent } from '../types'
-import { SocketEvents, ClientEvents } from '../types'
+import { ClientEvents, SocketEvents } from '../types'
 
 export interface SettingsUpdatedResponse {
 	success: boolean
@@ -25,20 +24,23 @@ export class SocketService {
 	private onImagesUpdatedCallback: ((event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void) | null = null
 
 	constructor() {
-		// Don't initialize immediately - wait for stores to be ready
 		this.delayedInitialize()
 	}
 
 	private delayedInitialize(): void {
 		// Wait a bit for server data injection to happen
 		setTimeout(() => {
-			this.initializeConnection()
+			apiStore.url.subscribe(url => {
+				if (typeof window !== 'undefined' && url) {
+					console.log('🔌 API URL changed, reinitializing socket:', url)
+					socketService.reinitialize()
+				}
+			})
 		}, 100)
 	}
 
 	private initializeConnection(): void {
-		const serverUrl = get(effectiveApiUrl) || get(apiBaseUrl) || 'http://localhost:8080'
-
+		const serverUrl = apiStore.getUrl()
 		console.log('🔌 Initializing Socket.IO connection to:', serverUrl)
 
 		this.socket = io(serverUrl, {
@@ -104,7 +106,7 @@ export class SocketService {
 	/**
 	 * Update server URL and reconnect
 	 */
-	public updateServerUrl(newUrl: string): void {
+	public setServerUrl(newUrl: string): void {
 		console.log('🔌 Updating server URL to:', newUrl)
 
 		if (this.socket) {

@@ -2,10 +2,10 @@
  * Shared stores for settings and screen management
  */
 
-export const stores = {
-	effectiveApiUrl: './apiStore',
-	debugMenu: './debugStore',
-	imagesStore: './imagesStore',
-	settingsStore: './settingsStore',
-	userOptionsStore: './userOptionsStore'
-}
+import { apiStore } from './apiStore'
+import { debugMenu } from './debugStore'
+import { imagesStore } from './imagesStore'
+import { settingsStore } from './settingsStore'
+import { userOptionsStore } from './userOptionsStore'
+
+export { apiStore, debugMenu, imagesStore, settingsStore, userOptionsStore }

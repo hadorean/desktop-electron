@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
 	import { initializeImageChangeHandling } from '$shared/services'
-	import { debugMenu, effectiveApiUrl, imagesStore, userOptionsStore } from '$shared/stores'
+	import { debugMenu } from '$shared/stores/debugStore'
+	import { imagesStore } from '$shared/stores/imagesStore'
+	import { userOptionsStore } from '$shared/stores/userOptionsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { ActionButtons, AppVersion, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
@@ -19,12 +21,11 @@
 		appConfig.subscribe(config => {
 			transparent = config?.window.transparent ?? false
 		})
-		effectiveApiUrl.set('http://localhost:8080')
 		await imagesStore.loadImages()
 		initializeImageChangeHandling('Desktop app')
 	})
 
-	const { imagesError } = imagesStore
+	const { error: imagesError } = imagesStore
 	const { visibility: debugVisible } = debugMenu
 	const { userOptions } = userOptionsStore
 </script>

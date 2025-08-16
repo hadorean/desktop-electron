@@ -1,20 +1,22 @@
 <script lang="ts">
-	import { apiBaseUrl, apiConfigEnabled } from '../../stores/apiStore'
+	import { apiStore } from '../../stores/apiStore'
 
 	export let onApiUrlChange: (value: string) => void
 	export let onReconnect: () => void
 
-	let localApiUrl = $apiBaseUrl
-	let showApiConfig = $apiConfigEnabled
+	const { url, configEnabled } = apiStore
+
+	let localApiUrl = $url
+	let showApiConfig = $configEnabled
 	let isReconnecting = false
 
 	function handleApiUrlChange(): void {
 		onApiUrlChange(localApiUrl)
-		apiBaseUrl.set(localApiUrl)
+		apiStore.setServerUrl(localApiUrl)
 	}
 
 	function handleApiConfigToggle(): void {
-		apiConfigEnabled.set(showApiConfig)
+		apiStore.setConfigEnabled(showApiConfig)
 		// Trigger reconnection in both cases
 		handleReconnect()
 	}

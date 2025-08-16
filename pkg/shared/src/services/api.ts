@@ -1,8 +1,7 @@
 /**
  * API client for making requests to the server
  */
-import { get } from 'svelte/store'
-import { effectiveApiUrl } from '../stores/apiStore'
+import { apiStore } from '../stores/apiStore'
 import { ApiRoutes, buildRoute } from '../types/api'
 
 /**
@@ -49,7 +48,7 @@ async function fetchWithErrorHandling<T>(url: string, options: RequestInit): Pro
  * Get base URL from store
  */
 function getBaseUrl(): string {
-	return get(effectiveApiUrl) || ''
+	return apiStore.getUrl()
 }
 
 /**

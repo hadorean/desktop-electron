@@ -4,7 +4,7 @@
  */
 
 import { get } from 'svelte/store'
-import { apiBaseUrl } from '../stores/apiStore'
+import { apiStore } from '../stores/apiStore'
 import { debugMenu } from '../stores/debugStore'
 import { settingsStore } from '../stores/settingsStore'
 import { type ScreenProfile, type UserSettings, DefaultScreenProfile } from '../types'
@@ -69,9 +69,9 @@ class LocalStorageService {
 
 		// Load API URL
 		try {
-			const savedApiUrl = localStorage.getItem('apiBaseUrl')
+			const savedApiUrl = localStorage.getItem('apiUrl')
 			if (savedApiUrl) {
-				apiBaseUrl.set(savedApiUrl)
+				apiStore.setServerUrl(savedApiUrl)
 				console.log('🔌 Loaded API URL from localStorage:', savedApiUrl)
 			}
 		} catch (error) {
@@ -354,9 +354,9 @@ class LocalStorageService {
 		this.unsubscribers.push(unsubscribeDebug)
 
 		// Subscribe to API URL changes
-		const unsubscribeApi = apiBaseUrl.subscribe(value => {
+		const unsubscribeApi = apiStore.url.subscribe(url => {
 			try {
-				localStorage.setItem('apiBaseUrl', value)
+				localStorage.setItem('apiUrl', url)
 			} catch (error) {
 				console.error('Error saving API URL to localStorage:', error)
 			}

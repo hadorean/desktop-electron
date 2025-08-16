@@ -2,7 +2,7 @@
 	import { Inspect } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
 	import { socketService } from '../../services/socket'
-	import { apiBaseUrl } from '../../stores/apiStore'
+	import { apiStore } from '../../stores/apiStore'
 	import { settingsStore } from '../../stores/settingsStore'
 	import type { SettingsUpdateEvent } from '../../types'
 
@@ -43,9 +43,9 @@
 		})
 
 		// Monitor API base URL changes and update socket connection
-		apiBaseUrl.subscribe(serverUrl => {
+		apiStore.url.subscribe(serverUrl => {
 			if (serverUrl) {
-				socketService.updateServerUrl(serverUrl)
+				socketService.setServerUrl(serverUrl)
 			}
 		})
 
