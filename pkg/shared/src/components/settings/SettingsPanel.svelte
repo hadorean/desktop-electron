@@ -201,7 +201,6 @@
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 		transition: opacity 0.3s cubic-bezier(0.9, 0.14, 1, 0.75);
 		opacity: 0;
-		backdrop-filter: blur(10px);
 		border-radius: var(--radius-xl);
 		box-sizing: border-box;
 		overflow-x: hidden;

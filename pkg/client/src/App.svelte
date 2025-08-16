@@ -171,31 +171,25 @@
 <style>
 	#settings-drawer {
 		position: fixed;
-		top: 50%;
+		height: min(calc(100% - 5rem), 1050px);
+		top: calc(50% - 2.5rem);
 		right: 0;
 		width: auto;
+		margin: 1rem 0 3rem 0;
 		transform: translate(100%, -50%);
 		transition: transform 0.3s cubic-bezier(0.35, 1.04, 0.58, 1);
 		background-color: rgba(0, 0, 0, 0.6);
 		border-radius: 1rem;
 		padding: 1rem 0.5rem 2rem 0.5rem;
+		backdrop-filter: blur(10px);
+		display: flex;
+		flex-direction: column;
+		padding: 1rem;
 	}
 
 	#settings-drawer.open {
 		transition: transform 0.5s cubic-bezier(0.35, 1.04, 0.58, 1);
 		transform: translate(-1rem, -50%);
-	}
-
-	/* Override SettingsPanel positioning since drawer handles it */
-	#settings-drawer :global(.settings-panel) {
-		position: static !important;
-		top: auto !important;
-		right: auto !important;
-		transform: none !important;
-		/* Keep the sizing and styling */
-		min-width: 450px;
-		max-width: 600px;
-		width: auto;
 	}
 
 	.full-page-container {
