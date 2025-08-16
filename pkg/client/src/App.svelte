@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { BackgroundImage, ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate, TimeDisplay, WeatherDisplay } from '$shared/components'
 	import { initializeImageChangeHandling, localStorageService, socketService } from '$shared/services'
-	import { expandSettings, imagesStore, screenSettings } from '$shared/stores'
+	import { imagesStore, settingsStore } from '$shared/stores'
 	import { debugMenu } from '$shared/stores/debugStore'
-	import { currentScreenType } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
+
+	const { expandSettings, screenSettings, currentScreenType } = settingsStore
 
 	let showSettings: boolean = false
 	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null

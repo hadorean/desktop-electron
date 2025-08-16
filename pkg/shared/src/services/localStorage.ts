@@ -6,7 +6,7 @@
 import { get } from 'svelte/store'
 import { apiBaseUrl } from '../stores/apiStore'
 import { debugMenu } from '../stores/debugStore'
-import { allSettings, currentScreen, isLocalMode, updateLocalSettings, updateSharedSettings } from '../stores/settingsStore'
+import { settingsStore } from '../stores/settingsStore'
 import { type ScreenProfile, type UserSettings, DefaultScreenProfile } from '../types'
 import { checkStorageAvailability } from '../utils'
 
@@ -83,7 +83,7 @@ class LocalStorageService {
 			const savedScreen = localStorage.getItem('currentScreen')
 			if (savedScreen) {
 				console.log('📦 Loaded saved screen from localStorage:', savedScreen)
-				currentScreen.set(savedScreen)
+				settingsStore.setCurrentScreen(savedScreen)
 			}
 		} catch (error) {
 			console.error('Error loading current screen from localStorage:', error)
@@ -97,7 +97,7 @@ class LocalStorageService {
 		if (typeof window === 'undefined' || !checkStorageAvailability()) {
 			// Set default image if available in non-browser environments
 			if (images.length > 0) {
-				updateSharedSettings(current => ({
+				settingsStore.updateSharedSettings(current => ({
 					...current,
 					selectedImage: images[0].name
 				}))
@@ -120,7 +120,7 @@ class LocalStorageService {
 				this.cleanupLegacyColorTypeData(parsedCompleteSettings)
 
 				// Set complete settings directly (like Socket.IO does)
-				allSettings.set(parsedCompleteSettings)
+				settingsStore.allSettings.set(parsedCompleteSettings)
 			} else {
 				// Fallback to legacy loading method
 				console.log('📦 Using legacy settings loading method')
@@ -131,7 +131,7 @@ class LocalStorageService {
 					const parsedSettings = JSON.parse(savedSharedSettings)
 					const defaultSettings: ScreenProfile = DefaultScreenProfile
 
-					updateSharedSettings(() => ({
+					settingsStore.updateSharedSettings(() => ({
 						...defaultSettings,
 						opacity: parsedSettings.opacity ?? defaultSettings.opacity,
 						blur: parsedSettings.blur ?? defaultSettings.blur,
@@ -151,7 +151,7 @@ class LocalStorageService {
 						settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
 					}))
 				} else if (images.length > 0) {
-					updateSharedSettings(current => ({
+					settingsStore.updateSharedSettings(current => ({
 						...current,
 						selectedImage: images[0].name
 					}))
@@ -161,7 +161,7 @@ class LocalStorageService {
 				const savedLocalSettings = localStorage.getItem('settings.local')
 				if (savedLocalSettings) {
 					const parsedLocalSettings = JSON.parse(savedLocalSettings)
-					updateLocalSettings(() => parsedLocalSettings)
+					settingsStore.updateLocalSettings(() => parsedLocalSettings)
 				}
 			}
 
@@ -176,21 +176,21 @@ class LocalStorageService {
 
 			if (initialScreenId) {
 				console.log('🖥️  Using initial screen from server data:', initialScreenId)
-				currentScreen.set(initialScreenId)
-				isLocalMode.set(true)
+				settingsStore.currentScreen.set(initialScreenId)
+				settingsStore.isLocalMode.set(true)
 				console.log('🖥️  Screen initialized:', initialScreenId, 'local mode: true')
 				// Clear the server data to avoid reuse
 				delete (window as { __INITIAL_SCREEN_ID__?: string }).__INITIAL_SCREEN_ID__
 			}
 
-			const currentSettings = get(allSettings)
+			const currentSettings = get(settingsStore.allSettings)
 			// Get the selected image from the current theme (day by default)
 			const selectedImage = currentSettings.shared.day?.selectedImage
 			return selectedImage || (images.length > 0 ? images[0].name : '')
 		} catch (error) {
 			console.error('Error loading settings from localStorage:', error)
 			if (images.length > 0) {
-				updateSharedSettings(current => ({
+				settingsStore.updateSharedSettings(current => ({
 					...current,
 					selectedImage: images[0].name
 				}))
@@ -364,7 +364,7 @@ class LocalStorageService {
 		this.unsubscribers.push(unsubscribeApi)
 
 		// Subscribe to current screen changes
-		const unsubscribeScreen = currentScreen.subscribe(screenId => {
+		const unsubscribeScreen = settingsStore.currentScreen.subscribe(screenId => {
 			try {
 				localStorage.setItem('currentScreen', screenId)
 			} catch (error) {
@@ -374,7 +374,7 @@ class LocalStorageService {
 		this.unsubscribers.push(unsubscribeScreen)
 
 		// Subscribe to settings changes for automatic saving
-		const unsubscribeSettings = allSettings.subscribe(settings => {
+		const unsubscribeSettings = settingsStore.allSettings.subscribe(settings => {
 			try {
 				// Save complete settings object for immediate loading
 				localStorage.setItem('settings.complete', JSON.stringify(settings))

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getImageUrl } from '../../services'
-	import { imagesStore, screenSettings, updateSharedSettings } from '../../stores'
+	import { imagesStore, settingsStore } from '../../stores'
 	import { Card, CardContent, Icon } from '../ui'
 
 	const {
@@ -45,7 +45,7 @@
 
 	function toggleFavorite(imageName: string, event: Event): void {
 		event.stopPropagation() // Prevent triggering the image selection
-		updateSharedSettings(current => {
+		settingsStore.updateSharedSettings(current => {
 			const currentFavorites = current.favorites ?? []
 			return {
 				favorites: currentFavorites.includes(imageName) ? currentFavorites.filter((name: string) => name !== imageName) : [...currentFavorites, imageName]
@@ -56,6 +56,7 @@
 	// Sort images to show favorites first - use derived to minimize recalculation
 	// Access individual stores from the imagesStore object
 	const { images, imagesLoading, imagesError } = imagesStore
+	const { screenSettings } = settingsStore
 
 	const sortedImages = $derived(
 		(() => {

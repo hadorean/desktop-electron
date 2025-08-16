@@ -1,22 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import {
-		allSettings,
-		assignScreenColor,
-		assignScreenType,
-		currentScreen,
-		getFormattedScreenName,
-		isLocalMode,
-		isNightMode,
-		normalizeScreenSettings,
-		screenIds,
-		toggleDayNightMode
-	} from '../../stores/settingsStore'
+	import { settingsStore } from '../../stores'
 	import { Icon } from '../ui'
 
 	let containerRef: HTMLDivElement
 	let underlineRef: HTMLDivElement
 	let tabRefs: HTMLDivElement[] = $state([])
+
+	const { allSettings, currentScreen, isLocalMode, isNightMode, screenIds } = settingsStore
 
 	// Reactive current tab value based on local mode and current screen
 	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared')
@@ -28,14 +19,14 @@
 		return tabs.map(tabId => {
 			const settings = tabId === 'shared' ? $allSettings.shared : $allSettings.screens[tabId]
 			// Compute color and type instead of reading from settings
-			const color = tabId === 'shared' ? '#ffffff' : assignScreenColor(tabId, allScreenIds)
-			const type = tabId === 'shared' ? 'shared' : assignScreenType(tabId)
+			const color = tabId === 'shared' ? '#ffffff' : settingsStore.assignScreenColor(tabId, allScreenIds)
+			const type = tabId === 'shared' ? 'shared' : settingsStore.assignScreenType(tabId)
 			return {
 				id: tabId,
 				settings,
 				color,
 				type,
-				name: tabId === 'shared' ? '' : getFormattedScreenName(tabId),
+				name: tabId === 'shared' ? '' : settingsStore.getFormattedScreenName(tabId),
 				icon: tabId === 'shared' ? ('home' as const) : type === 'interactive' ? ('browser' as const) : ('monitor' as const)
 			}
 		})
@@ -75,7 +66,7 @@
 
 	onMount(() => {
 		// Ensure screen settings are normalized on mount
-		normalizeScreenSettings()
+		settingsStore.normalizeScreenSettings()
 
 		// Update underline position after initial render
 		setTimeout(() => {
@@ -144,11 +135,11 @@
 			<!-- Global Day/Night theme toggle -->
 			<div
 				class="daynight-tab"
-				onclick={() => toggleDayNightMode()}
+				onclick={() => settingsStore.toggleDayNightMode()}
 				role="button"
 				tabindex="0"
 				onkeydown={e => {
-					if (e.key === 'Enter' || e.key === ' ') toggleDayNightMode()
+					if (e.key === 'Enter' || e.key === ' ') settingsStore.toggleDayNightMode()
 				}}
 				title={$isNightMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
 			>

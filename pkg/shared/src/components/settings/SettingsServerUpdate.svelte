@@ -2,14 +2,16 @@
 	import { Inspect } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
 	import { socketService } from '../../services/socket'
+	import { settingsStore } from '../../stores'
 	import { apiBaseUrl } from '../../stores/apiStore'
-	import { allSettings, currentScreen, shouldPreventServerSync } from '../../stores/settingsStore'
 	import type { SettingsUpdateEvent } from '../../types'
 
 	let isConnected = false
 	let updatingSettingsFromServer = false
 	let initialSubscribeHandled = false
 	let unsubscribeSettings: (() => void) | null = null
+
+	const { allSettings, currentScreen } = settingsStore
 
 	onMount(() => {
 		// Setup Socket.IO connection status monitoring
@@ -55,7 +57,7 @@
 			}
 
 			// Check if server sync should be prevented (e.g., during validation operations)
-			if (shouldPreventServerSync()) {
+			if (settingsStore.shouldPreventServerSync()) {
 				console.log('🚫 Skipping server sync (silent update)')
 				return
 			}

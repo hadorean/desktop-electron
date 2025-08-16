@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { Inspect } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
-	import { currentScreen, editingSettings, inTransition, isLocalMode, screenSettings, updateEditingSettings } from '../../stores'
-	import { currentScreenType } from '../../stores/settingsStore'
+	import { settingsStore } from '../../stores'
 	import BackgroundModeSelector from './BackgroundModeSelector.svelte'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
@@ -18,6 +17,8 @@
 
 	// Reference to ScreenSwitcher component
 	let screenSwitcher: ScreenSwitcher
+
+	const { screenSettings, editingSettings, inTransition, isLocalMode, currentScreen, currentScreenType } = settingsStore
 
 	// Document-level keyboard handler for Tab key
 	function handleDocumentKeyDown(event: KeyboardEvent): void {
@@ -42,7 +43,7 @@
 	})
 
 	function handleSettingChange<K extends keyof typeof $editingSettings>(key: K, value: (typeof $editingSettings)[K] | null): void {
-		updateEditingSettings(current => {
+		settingsStore.updateEditingSettings(current => {
 			if (value === null) {
 				// Remove property (reset to default)
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars

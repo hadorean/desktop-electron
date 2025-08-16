@@ -2,7 +2,9 @@
 	import { Easing, Tween } from '@tweenjs/tween.js'
 	import { onMount } from 'svelte'
 	import { getImageUrl } from '../../services'
-	import { screenSettings } from '../../stores/settingsStore'
+	import { settingsStore } from '../../stores/settingsStore'
+
+	const { screenSettings } = settingsStore
 
 	interface BackgroundState {
 		url: string

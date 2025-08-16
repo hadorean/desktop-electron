@@ -15,25 +15,25 @@ import {
 
 const defaultScreenId = 'monitor1'
 
-export const currentScreen = writable(defaultScreenId)
+const currentScreen = writable(defaultScreenId)
 
 const defaultSettings: ScreenProfile = DefaultScreenProfile
 const defaultUserSettings: UserSettings = DefaultUserSettings
 
-export const isLocalMode = writable(false)
+const isLocalMode = writable(false)
 
 // Settings panel expansion state
-export const expandSettings = writable(false)
-
-// Flag to prevent server sync during internal operations
-let preventServerSync = false
+const expandSettings = writable(false)
 
 // Transition state stores
-export const inTransition = writable<boolean>(false)
-export const transitionSettings = writable<Partial<ScreenProfile>>({})
+const inTransition = writable<boolean>(false)
+const transitionSettings = writable<Partial<ScreenProfile>>({})
 let transitionStartTime = 0
 let transitionDuration = 1000
 let animationFrameId: number | null = null
+
+// Flag to prevent server sync during internal operations
+let preventServerSync = false
 
 // Interpolation helper functions
 function lerp(start: number, end: number, progress: number): number {
@@ -44,25 +44,25 @@ function easeQuadraticOut(t: number): number {
 	return 1 - (1 - t) * (1 - t)
 }
 
-export const allSettings = writable<UserSettings>(defaultUserSettings)
+const allSettings = writable<UserSettings>(defaultUserSettings)
 
 // Derived store for current theme from UserSettings
-export const currentTheme = derived(allSettings, settings => settings.currentTheme)
+const currentTheme = derived(allSettings, settings => settings.currentTheme)
 
 // Derived store to check if current theme is night mode
-export const isNightMode = derived(currentTheme, theme => theme === 'night')
+const isNightMode = derived(currentTheme, theme => theme === 'night')
 
-export const screenIds = derived(allSettings, $allSettings =>
+const screenIds = derived(allSettings, $allSettings =>
 	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreen), get(currentScreen)])).sort()
 )
 
-export function setCurrentScreen(screenId: string): void {
+function setCurrentScreen(screenId: string): void {
 	console.log('Setting current screen to', screenId)
 	currentScreen.set(screenId)
 }
 
 // Function to start a smooth theme transition
-export function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightMode): void {
+function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightMode): void {
 	// Cancel any existing transition
 	if (animationFrameId !== null) {
 		cancelAnimationFrame(animationFrameId)
@@ -279,62 +279,62 @@ function startThemeTransitionWithoutThemeUpdate(fromTheme: DayNightMode, toTheme
 }
 
 // Function to toggle day/night mode
-export function toggleDayNightMode(): void {
+function toggleDayNightMode(): void {
 	const currentThemeValue = getCurrentTheme()
 	const targetTheme = currentThemeValue === 'night' ? 'day' : 'night'
 	startThemeTransition(currentThemeValue, targetTheme)
 }
 
-export function setCurrentTheme(theme: DayNightMode): void {
+function setCurrentTheme(theme: DayNightMode): void {
 	allSettings.update(settings => ({
 		...settings,
 		currentTheme: theme
 	}))
 }
 
-export function getCurrentTheme(): DayNightMode {
+function getCurrentTheme(): DayNightMode {
 	return get(allSettings).currentTheme
 }
 
 // Return the day/night settings for a given screen id
-export function getScreenDayNightSettings(id: string): ScreenSettings {
+function getScreenDayNightSettings(id: string): ScreenSettings {
 	const value = get(allSettings)
 	return value.screens[id] ?? DefaultScreenSettings
 }
 
 // Return the settings for a given screen id
-export function getScreenSettings(id: string): Partial<ScreenProfile> | undefined {
+function getScreenSettings(id: string): Partial<ScreenProfile> | undefined {
 	const value = get(allSettings)
 	const theme = getCurrentTheme() as 'day' | 'night'
 	return value.screens[id]?.[theme] ?? {}
 }
 
 // Base screen settings without transitions (for syncing to other clients)
-export const baseScreenSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
+const baseScreenSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
 	const currentTheme = theme as 'day' | 'night'
 	const themeShared = getThemeScreenSettings(all.shared, currentTheme)
 	return isLocal ? { ...themeShared, ...getThemeScreenSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme) } : themeShared
 })
 
 // Settings to use to render the current screen image (includes transitions for UI)
-export const screenSettings = derived([baseScreenSettings, inTransition, transitionSettings], ([base, isTransitioning, transition]) => {
+const screenSettings = derived([baseScreenSettings, inTransition, transitionSettings], ([base, isTransitioning, transition]) => {
 	// During transition, return the interpolated transition settings for UI display
 	return isTransitioning ? transition : base
 })
 
 // Base editing settings without transitions (for syncing to other clients)
-export const baseEditingSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
+const baseEditingSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
 	const currentTheme = theme as 'day' | 'night'
 	return isLocal ? getThemeEditingSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
 })
 
 // Settings to use in the settings panel (includes transitions for UI display)
-export const editingSettings = derived([baseEditingSettings, inTransition, transitionSettings], ([base, isTransitioning, transition]) => {
+const editingSettings = derived([baseEditingSettings, inTransition, transitionSettings], ([base, isTransitioning, transition]) => {
 	// During transition, return the interpolated transition settings for UI display
 	return isTransitioning ? transition : base
 })
 
-export function updateSharedSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
+function updateSharedSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	const theme = getCurrentTheme() as 'day' | 'night'
 
 	allSettings.update(value => {
@@ -355,7 +355,7 @@ export function updateSharedSettings(settings: (current: Partial<ScreenProfile>)
 /**
  * Update shared settings without triggering server sync (for internal operations like validation)
  */
-export function updateSharedSettingsSilent(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
+function updateSharedSettingsSilent(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	preventServerSync = true
 	try {
 		updateSharedSettings(settings)
@@ -367,7 +367,7 @@ export function updateSharedSettingsSilent(settings: (current: Partial<ScreenPro
 	}
 }
 
-export function updateLocalSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
+function updateLocalSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	allSettings.update(value => {
 		const screen = get(currentScreen) || defaultScreenId
 		const theme = getCurrentTheme() as 'day' | 'night'
@@ -391,7 +391,7 @@ export function updateLocalSettings(settings: (current: Partial<ScreenProfile>) 
 /**
  * Update local settings without triggering server sync (for internal operations like validation)
  */
-export function updateLocalSettingsSilent(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
+function updateLocalSettingsSilent(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	preventServerSync = true
 	try {
 		updateLocalSettings(settings)
@@ -407,7 +407,7 @@ export function updateLocalSettingsSilent(settings: (current: Partial<ScreenProf
  * Update settings for the current context (shared or local screen+theme)
  * This function handles the day/night logic and null checks automatically
  */
-export function updateEditingSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
+function updateEditingSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	if (get(isLocalMode)) {
 		// Update local screen settings for current theme
 		const screen = get(currentScreen) || defaultScreenId
@@ -462,7 +462,7 @@ export function updateEditingSettings(settings: (current: Partial<ScreenProfile>
 /**
  * Check if server sync should be prevented (for SettingsServerUpdate component)
  */
-export function shouldPreventServerSync(): boolean {
+function shouldPreventServerSync(): boolean {
 	return preventServerSync
 }
 
@@ -494,7 +494,7 @@ export function shouldPreventServerSync(): boolean {
 
 // updatingLocally = false;
 
-// export function updateLocal(updateAction: () => void) {
+// function updateLocal(updateAction: () => void) {
 //   if (updatingLocally) return;
 //   updatingLocally = true;
 //   try {
@@ -507,7 +507,7 @@ export function shouldPreventServerSync(): boolean {
 /**
  * Assign screen type based on screen name/context
  */
-export function assignScreenType(screenId: string): ScreenType {
+function assignScreenType(screenId: string): ScreenType {
 	if (screenId.toLowerCase().includes('browser')) {
 		return 'interactive'
 	}
@@ -521,7 +521,7 @@ export function assignScreenType(screenId: string): ScreenType {
 /**
  * Assign a color to a screen from the predefined palette using index-based assignment
  */
-export function assignScreenColor(screenId: string, allScreenIds: string[]): string {
+function assignScreenColor(screenId: string, allScreenIds: string[]): string {
 	// Skip white (index 0) - reserved for shared/home
 	const availableColors = colors.slice(1)
 
@@ -538,7 +538,7 @@ export function assignScreenColor(screenId: string, allScreenIds: string[]): str
 /**
  * Ensure all screens have proper settings (colors and types are now computed, not stored)
  */
-export function normalizeScreenSettings(): void {
+function normalizeScreenSettings(): void {
 	// Colors and types are now computed on-demand, so this function only ensures
 	// that screen settings exist but doesn't store computed values
 	allSettings.update(settings => {
@@ -551,7 +551,7 @@ export function normalizeScreenSettings(): void {
 /**
  * Get formatted screen name based on computed type and ID
  */
-export function getFormattedScreenName(screenId: string): string {
+function getFormattedScreenName(screenId: string): string {
 	// Always compute type from screenId
 	const screenType = assignScreenType(screenId)
 
@@ -567,7 +567,7 @@ export function getFormattedScreenName(screenId: string): string {
 /**
  * Get the current screen's color (computed from screen index)
  */
-export const currentScreenColor = derived([allSettings, currentScreen, isLocalMode], ([$allSettings, $currentScreen, $isLocalMode]) => {
+const currentScreenColor = derived([allSettings, currentScreen, isLocalMode], ([$allSettings, $currentScreen, $isLocalMode]) => {
 	if (!$isLocalMode) {
 		// Shared/home screen uses white
 		return '#ffffff'
@@ -578,7 +578,7 @@ export const currentScreenColor = derived([allSettings, currentScreen, isLocalMo
 	return assignScreenColor($currentScreen, allScreenIds)
 })
 
-export const currentScreenType = derived([currentScreen, isLocalMode], ([$currentScreen, $isLocalMode]) => {
+const currentScreenType = derived([currentScreen, isLocalMode], ([$currentScreen, $isLocalMode]) => {
 	if (!$isLocalMode) {
 		return 'shared'
 	}
@@ -586,63 +586,51 @@ export const currentScreenType = derived([currentScreen, isLocalMode], ([$curren
 	return assignScreenType($currentScreen)
 })
 
-// loadSettings function moved to localStorage service
-// This function is now deprecated - use localStorageService.loadSettings() instead
-export function loadSettings(images: { name: string }[]): string {
-	console.warn('settingsStore.loadSettings() is deprecated. Use localStorageService.loadSettings() instead.')
-	// Fallback: just set default image if available
-	if (images.length > 0) {
-		updateSharedSettings(current => ({
-			...current,
-			selectedImage: images[0].name
-		}))
-		return images[0].name
-	}
-	return ''
-}
-
 // Reset settings to defaults
-export function resetSettings(): void {
+function resetSettings(): void {
 	updateSharedSettings(() => defaultSettings)
 	//localSettings.set(null);
 }
 
-/**
- * Validate and fix selected images when the image list changes
- * Returns true if any settings were changed
- */
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function validateSelectedImages(availableImages: string[]): boolean {
-	const hasChanges = false
-	// const fallbackImage = availableImages.length > 0 ? availableImages[0] : ''
+export const settingsStore = {
+	// Stores
+	currentScreen,
+	isLocalMode,
+	expandSettings,
+	inTransition,
+	transitionSettings,
+	allSettings,
+	currentTheme,
+	isNightMode,
+	screenIds,
+	baseScreenSettings,
+	screenSettings,
+	baseEditingSettings,
+	editingSettings,
+	currentScreenColor,
+	currentScreenType,
 
-	// // Check shared settings
-	// const currentSharedSettings = get(sharedSettings)
-	// if (currentSharedSettings.selectedImage && !availableImages.includes(currentSharedSettings.selectedImage)) {
-	// 	console.log(`📷 Shared selected image "${currentSharedSettings.selectedImage}" no longer exists, switching to "${fallbackImage}"`)
-	// 	updateSharedSettingsSilent((settings) => ({
-	// 		...settings,
-	// 		selectedImage: fallbackImage
-	// 	}))
-	// 	hasChanges = true
-	// }
+	// Getters
+	getCurrentTheme,
+	getScreenDayNightSettings,
+	getScreenSettings,
+	getFormattedScreenName,
+	assignScreenType,
+	assignScreenColor,
+	shouldPreventServerSync,
 
-	// // Check local settings for current screen
-	// const currentLocalSettings = get(localSettings)
-	// if (currentLocalSettings?.selectedImage && !availableImages.includes(currentLocalSettings.selectedImage)) {
-	// 	console.log(`📷 Local selected image "${currentLocalSettings.selectedImage}" no longer exists, clearing override`)
-	// 	updateLocalSettingsSilent((current) => {
-	// 		if (!current) return {}
-	// 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	// 		const { selectedImage, ...rest } = current
-	// 		return Object.keys(rest).length > 0 ? rest : {}
-	// 	})
-	// 	hasChanges = true
-	// }
+	// Setters
+	setCurrentScreen,
+	setCurrentTheme,
+	updateSharedSettings,
+	updateSharedSettingsSilent,
+	updateLocalSettings,
+	updateLocalSettingsSilent,
+	updateEditingSettings,
+	normalizeScreenSettings,
+	resetSettings,
 
-	// validateSelectedImages localStorage logic moved to localStorage service
-	console.warn('settingsStore.validateSelectedImages() localStorage logic is now handled by localStorageService.validateSelectedImages()')
-
-	return hasChanges
+	// Callbacks/Utilities
+	startThemeTransition,
+	toggleDayNightMode
 }

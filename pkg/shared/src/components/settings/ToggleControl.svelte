@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '../../lib/utils'
-	import { currentScreenColor } from '../../stores/settingsStore'
+	import { settingsStore } from '../../stores/settingsStore'
 	import { Icon, Switch } from '../ui'
 
 	const {
@@ -19,6 +19,8 @@
 		overrideValue?: boolean | null
 		disabled?: boolean
 	}>()
+
+	const { currentScreenColor } = settingsStore
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
 	const isGhost = $derived(isOverride && !isOverridden)

@@ -1,5 +1,5 @@
 import type { AppConfig } from '$shared'
-import { debugMenu, toggleDayNightMode, userOptionsStore } from '$shared/stores'
+import { debugMenu, settingsStore, userOptionsStore } from '$shared/stores'
 import { setAppConfig } from '../stores/appConfigStore'
 
 export async function init(): Promise<void> {
@@ -32,7 +32,7 @@ export async function init(): Promise<void> {
 	if (window.electron?.ipcRenderer) {
 		window.electron.ipcRenderer.on('toggle-day-night-mode', async () => {
 			try {
-				toggleDayNightMode()
+				settingsStore.toggleDayNightMode()
 			} catch (error) {
 				console.error('Failed to toggle day/night mode in renderer:', error)
 			}
