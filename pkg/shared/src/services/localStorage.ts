@@ -15,19 +15,19 @@ class LocalStorageService {
 	private unsubscribers: (() => void)[] = []
 
 	/**
-	 * Initialize the localStorage service
-	 * Sets up initial state from localStorage and subscribes to store changes
+	 * Initialize the localStorage service and load settings
+	 * This is the unified method for complete initialization
 	 */
-	init(): void {
+	init(images: { name: string }[]): string {
 		// Only initialize in browser environment
 		if (typeof window === 'undefined' || !checkStorageAvailability()) {
 			console.log('📦 LocalStorage service: Not available, skipping initialization')
-			return
+			return ''
 		}
 
 		if (this.isInitialized) {
 			console.warn('📦 LocalStorage service already initialized')
-			return
+			return ''
 		}
 
 		console.log('📦 Initializing localStorage service...')
@@ -40,6 +40,9 @@ class LocalStorageService {
 
 		this.isInitialized = true
 		console.log('📦 LocalStorage service initialized successfully')
+
+		// Load complete settings
+		return this.loadSettings(images)
 	}
 
 	/**
@@ -53,12 +56,12 @@ class LocalStorageService {
 	}
 
 	/**
-	 * Load initial state from localStorage
+	 * Load initial state from localStorage (non-settings data)
 	 */
 	private loadInitialState(): void {
 		// Load debug state
 		try {
-			const savedDebugState = localStorage.getItem('debug.visible')
+			const savedDebugState = localStorage.getItem('debug')
 			if (savedDebugState !== null) {
 				const isVisible = JSON.parse(savedDebugState)
 				debugMenu.setVisible(isVisible)
@@ -69,7 +72,7 @@ class LocalStorageService {
 
 		// Load API URL
 		try {
-			const savedApiUrl = localStorage.getItem('apiUrl')
+			const savedApiUrl = localStorage.getItem('api')
 			if (savedApiUrl) {
 				apiStore.setServerUrl(savedApiUrl)
 				console.log('🔌 Loaded API URL from localStorage:', savedApiUrl)
@@ -80,7 +83,7 @@ class LocalStorageService {
 
 		// Load current screen
 		try {
-			const savedScreen = localStorage.getItem('currentScreen')
+			const savedScreen = localStorage.getItem('screen')
 			if (savedScreen) {
 				console.log('📦 Loaded saved screen from localStorage:', savedScreen)
 				settingsStore.setCurrentScreen(savedScreen)
@@ -91,7 +94,7 @@ class LocalStorageService {
 	}
 
 	/**
-	 * Load settings from localStorage for a given set of images
+	 * Load complete settings from localStorage and initialize the settings store
 	 */
 	loadSettings(images: { name: string }[]): string {
 		if (typeof window === 'undefined' || !checkStorageAvailability()) {
@@ -107,61 +110,83 @@ class LocalStorageService {
 		}
 
 		try {
-			// Try to load complete settings first (new approach)
-			const savedCompleteSettings = localStorage.getItem('settings.complete')
-			if (savedCompleteSettings) {
-				const parsedCompleteSettings = JSON.parse(savedCompleteSettings)
-				console.log('📦 Loading complete settings from localStorage')
+			// Try to load unified settings first
+			const savedSettings = localStorage.getItem('settings')
+			if (savedSettings) {
+				const parsedSettings = JSON.parse(savedSettings)
+				console.log('📦 Loading settings from localStorage')
 
-				// Validate selected images in the complete settings
-				this.validateAndUpdateImages(parsedCompleteSettings, images)
+				// Validate selected images in the settings
+				this.validateAndUpdateImages(parsedSettings, images)
 
 				// Clean up legacy color/type properties (migration)
-				this.cleanupLegacyColorTypeData(parsedCompleteSettings)
+				this.cleanupLegacyColorTypeData(parsedSettings)
 
-				// Set complete settings directly (like Socket.IO does)
-				settingsStore.allSettings.set(parsedCompleteSettings)
+				// Set settings directly
+				settingsStore.allSettings.set(parsedSettings)
 			} else {
-				// Fallback to legacy loading method
-				console.log('📦 Using legacy settings loading method')
+				// Try legacy settings.complete key
+				const savedCompleteSettings = localStorage.getItem('settings.complete')
+				if (savedCompleteSettings) {
+					const parsedCompleteSettings = JSON.parse(savedCompleteSettings)
+					console.log('📦 Migrating from settings.complete to settings')
 
-				// Load shared settings
-				const savedSharedSettings = localStorage.getItem('settings.shared')
-				if (savedSharedSettings) {
-					const parsedSettings = JSON.parse(savedSharedSettings)
-					const defaultSettings: ScreenProfile = DefaultScreenProfile
+					// Validate and set settings
+					this.validateAndUpdateImages(parsedCompleteSettings, images)
+					this.cleanupLegacyColorTypeData(parsedCompleteSettings)
+					settingsStore.allSettings.set(parsedCompleteSettings)
 
-					settingsStore.updateSharedSettings(() => ({
-						...defaultSettings,
-						opacity: parsedSettings.opacity ?? defaultSettings.opacity,
-						blur: parsedSettings.blur ?? defaultSettings.blur,
-						saturation: parsedSettings.saturation ?? defaultSettings.saturation,
-						hideButton: parsedSettings.hideButton ?? defaultSettings.hideButton,
-						transitionTime: parsedSettings.transitionTime ?? defaultSettings.transitionTime,
-						showTimeDate: parsedSettings.showTimeDate ?? defaultSettings.showTimeDate,
-						showWeather: parsedSettings.showWeather ?? defaultSettings.showWeather,
-						showScreenSwitcher: parsedSettings.showScreenSwitcher ?? defaultSettings.showScreenSwitcher,
-						favorites: parsedSettings.favorites ?? defaultSettings.favorites,
-						selectedImage:
-							parsedSettings.selectedImage && images.some(img => img.name === parsedSettings.selectedImage)
-								? parsedSettings.selectedImage
-								: images.length > 0
-									? images[0].name
-									: '',
-						settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
-					}))
-				} else if (images.length > 0) {
-					settingsStore.updateSharedSettings(current => ({
-						...current,
-						selectedImage: images[0].name
-					}))
-				}
+					// Migrate to new key and clean up old key
+					localStorage.setItem('settings', JSON.stringify(parsedCompleteSettings))
+					localStorage.removeItem('settings.complete')
+					console.log('📦 Migration from settings.complete completed')
+				} else {
+					// Fallback to legacy loading method
+					console.log('📦 Using legacy settings loading method')
 
-				// Load local settings
-				const savedLocalSettings = localStorage.getItem('settings.local')
-				if (savedLocalSettings) {
-					const parsedLocalSettings = JSON.parse(savedLocalSettings)
-					settingsStore.updateLocalSettings(() => parsedLocalSettings)
+					// Load shared settings
+					const savedSharedSettings = localStorage.getItem('settings.shared')
+					if (savedSharedSettings) {
+						const parsedSettings = JSON.parse(savedSharedSettings)
+						const defaultSettings: ScreenProfile = DefaultScreenProfile
+
+						settingsStore.updateSharedSettings(() => ({
+							...defaultSettings,
+							opacity: parsedSettings.opacity ?? defaultSettings.opacity,
+							blur: parsedSettings.blur ?? defaultSettings.blur,
+							saturation: parsedSettings.saturation ?? defaultSettings.saturation,
+							hideButton: parsedSettings.hideButton ?? defaultSettings.hideButton,
+							transitionTime: parsedSettings.transitionTime ?? defaultSettings.transitionTime,
+							showTimeDate: parsedSettings.showTimeDate ?? defaultSettings.showTimeDate,
+							showWeather: parsedSettings.showWeather ?? defaultSettings.showWeather,
+							showScreenSwitcher: parsedSettings.showScreenSwitcher ?? defaultSettings.showScreenSwitcher,
+							favorites: parsedSettings.favorites ?? defaultSettings.favorites,
+							selectedImage:
+								parsedSettings.selectedImage && images.some(img => img.name === parsedSettings.selectedImage)
+									? parsedSettings.selectedImage
+									: images.length > 0
+										? images[0].name
+										: '',
+							settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
+						}))
+					} else if (images.length > 0) {
+						settingsStore.updateSharedSettings(current => ({
+							...current,
+							selectedImage: images[0].name
+						}))
+					}
+
+					// Load local settings
+					const savedLocalSettings = localStorage.getItem('settings.local')
+					if (savedLocalSettings) {
+						const parsedLocalSettings = JSON.parse(savedLocalSettings)
+						settingsStore.updateLocalSettings(() => parsedLocalSettings)
+					}
+
+					// Clean up legacy keys after successful migration
+					localStorage.removeItem('settings.shared')
+					localStorage.removeItem('settings.local')
+					console.log('📦 Legacy settings migration completed')
 				}
 			}
 
@@ -331,7 +356,7 @@ class LocalStorageService {
 
 			// Save cleaned settings back to localStorage if changes were made
 			if (hasChanges) {
-				localStorage.setItem('settings.complete', JSON.stringify(settings))
+				localStorage.setItem('settings', JSON.stringify(settings))
 				console.log('🧹 Saved cleaned settings back to localStorage')
 			}
 		} catch (error) {
@@ -346,7 +371,7 @@ class LocalStorageService {
 		// Subscribe to debug state changes
 		const unsubscribeDebug = debugMenu.visibility.subscribe(visible => {
 			try {
-				localStorage.setItem('debug.visible', JSON.stringify(visible))
+				localStorage.setItem('debug', JSON.stringify(visible))
 			} catch (error) {
 				console.error('Error saving debug state to localStorage:', error)
 			}
@@ -356,7 +381,7 @@ class LocalStorageService {
 		// Subscribe to API URL changes
 		const unsubscribeApi = apiStore.url.subscribe(url => {
 			try {
-				localStorage.setItem('apiUrl', url)
+				localStorage.setItem('api', url)
 			} catch (error) {
 				console.error('Error saving API URL to localStorage:', error)
 			}
@@ -366,7 +391,7 @@ class LocalStorageService {
 		// Subscribe to current screen changes
 		const unsubscribeScreen = settingsStore.currentScreen.subscribe(screenId => {
 			try {
-				localStorage.setItem('currentScreen', screenId)
+				localStorage.setItem('screen', screenId)
 			} catch (error) {
 				console.error('Error saving current screen to localStorage:', error)
 			}
@@ -376,14 +401,8 @@ class LocalStorageService {
 		// Subscribe to settings changes for automatic saving
 		const unsubscribeSettings = settingsStore.allSettings.subscribe(settings => {
 			try {
-				// Save complete settings object for immediate loading
-				localStorage.setItem('settings.complete', JSON.stringify(settings))
-
-				// Keep legacy storage for backward compatibility
-				localStorage.setItem('settings.shared', JSON.stringify(settings.shared))
-				if (Object.keys(settings.screens).length > 0) {
-					localStorage.setItem('settings.local', JSON.stringify(settings.screens))
-				}
+				// Save unified settings object
+				localStorage.setItem('settings', JSON.stringify(settings))
 			} catch (error) {
 				console.error('Error saving settings to localStorage:', error)
 			}

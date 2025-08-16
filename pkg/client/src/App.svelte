@@ -45,11 +45,8 @@
 				const images = await api.getImages()
 				await imagesStore.loadImages(images)
 
-				// Initialize localStorage service (handles loading settings automatically)
-				localStorageService.init()
-
-				// Load settings with current images
-				localStorageService.loadSettings(imagesStore.getCurrentImages())
+				// Initialize localStorage service and load complete settings in one call
+				localStorageService.init(images)
 
 				// Add event listeners
 				window.addEventListener('reconnectApi', handleReconnect)
