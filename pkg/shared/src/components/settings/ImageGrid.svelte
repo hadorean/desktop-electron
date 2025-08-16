@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getImageUrl } from '../../services'
-	import { imagesStore, settingsStore } from '../../stores'
+	import { imagesStore } from '../../stores/imagesStore'
+	import { settingsStore } from '../../stores/settingsStore'
 	import { Card, CardContent, Icon } from '../ui'
 
 	const {

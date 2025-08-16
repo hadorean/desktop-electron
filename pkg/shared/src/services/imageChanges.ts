@@ -3,7 +3,7 @@
  * Consolidates socket event handling, deduplication, and validation logic
  */
 
-import { imagesStore } from '../stores'
+import { imagesStore } from '../stores/imagesStore'
 import { localStorageService } from './localStorage'
 import { socketService } from './socket'
 

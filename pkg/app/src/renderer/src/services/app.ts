@@ -1,5 +1,7 @@
 import type { AppConfig } from '$shared'
-import { debugMenu, settingsStore, userOptionsStore } from '$shared/stores'
+import { debugMenu } from '$shared/stores/debugStore'
+import { settingsStore } from '$shared/stores/settingsStore'
+import { userOptionsStore } from '$shared/stores/userOptionsStore'
 import { setAppConfig } from '../stores/appConfigStore'
 
 export async function init(): Promise<void> {

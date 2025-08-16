@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { settingsStore } from '../../stores'
+	import { settingsStore } from '../../stores/settingsStore'
 	import { Icon } from '../ui'
 
 	let containerRef: HTMLDivElement

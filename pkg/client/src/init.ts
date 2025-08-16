@@ -1,4 +1,4 @@
-import { settingsStore } from '$shared/stores'
+import { settingsStore } from '$shared/stores/settingsStore'
 
 export function setScreenFromRoute(path: string): void {
 	console.log('Parsing route params: ', path)

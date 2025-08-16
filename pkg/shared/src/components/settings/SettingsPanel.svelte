@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Inspect } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
-	import { settingsStore } from '../../stores'
+	import { settingsStore } from '../../stores/settingsStore'
 	import BackgroundModeSelector from './BackgroundModeSelector.svelte'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'

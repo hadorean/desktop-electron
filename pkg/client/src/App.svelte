@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { BackgroundImage, ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate, TimeDisplay, WeatherDisplay } from '$shared/components'
 	import { initializeImageChangeHandling, localStorageService, socketService } from '$shared/services'
-	import { imagesStore, settingsStore } from '$shared/stores'
 	import { debugMenu } from '$shared/stores/debugStore'
+	import { imagesStore } from '$shared/stores/imagesStore'
+	import { settingsStore } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
 
