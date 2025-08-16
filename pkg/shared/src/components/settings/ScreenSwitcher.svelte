@@ -65,9 +65,6 @@
 	}
 
 	onMount(() => {
-		// Ensure screen settings are normalized on mount
-		settingsStore.normalizeScreenSettings()
-
 		// Update underline position after initial render
 		setTimeout(() => {
 			updateUnderlinePosition()
