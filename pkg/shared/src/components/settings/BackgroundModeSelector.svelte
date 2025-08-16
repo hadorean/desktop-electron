@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Select, SelectContent, SelectItem, SelectTrigger } from '../ui/select'
+
 	const {
 		mode = 'image',
 		onModeChange,
@@ -11,9 +13,7 @@
 		onRevert?: () => void
 	}>()
 
-	function handleModeChange(event: Event) {
-		const target = event.target as HTMLSelectElement
-		const value = target.value
+	function handleModeChange(value: string | undefined) {
 		if (value === 'image' || value === 'url') {
 			onModeChange(value)
 		}
@@ -33,10 +33,15 @@
 		{/if}
 	</div>
 
-	<select class="mode-selector" value={mode} onchange={handleModeChange}>
-		<option value="image">Image</option>
-		<option value="url">URL</option>
-	</select>
+	<Select type="single" value={mode} onValueChange={handleModeChange}>
+		<SelectTrigger class="mode-selector">
+			{mode === 'image' ? 'Image' : 'URL'}
+		</SelectTrigger>
+		<SelectContent>
+			<SelectItem value="image" label="Image">Image</SelectItem>
+			<SelectItem value="url" label="URL">URL</SelectItem>
+		</SelectContent>
+	</Select>
 </div>
 
 <style>
@@ -81,23 +86,19 @@
 		transform: scale(1.1);
 	}
 
-	.mode-selector {
+	:global(.mode-selector) {
 		width: 100%;
-		padding: 0.5rem 0.75rem;
-		border-radius: var(--radius-md);
 		background: rgba(0, 0, 0, 0.2);
 		border: 1px solid hsl(var(--border) / 0.3);
 		color: var(--text-primary);
-		font-size: 0.875rem;
 		transition: all 0.2s ease;
 	}
 
-	.mode-selector:hover {
+	:global(.mode-selector:hover) {
 		background: rgba(0, 0, 0, 0.3);
 	}
 
-	.mode-selector:focus {
-		outline: none;
+	:global(.mode-selector:focus) {
 		border-color: var(--primary);
 		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
 	}
