@@ -16,7 +16,7 @@
 
 	let containerRef: HTMLDivElement
 	let underlineRef: HTMLDivElement
-	let tabRefs: HTMLDivElement[] = []
+	let tabRefs: HTMLDivElement[] = $state([])
 
 	// Reactive current tab value based on local mode and current screen
 	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared')
