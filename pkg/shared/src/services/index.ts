@@ -3,13 +3,13 @@
  */
 
 // API service
-export { api, getImageUrl, type ImageInfo, type WeatherData } from './api'
+export { api } from './api'
 
 // Socket.IO service
-export { SocketService, socketService, type SettingsUpdatedResponse } from './socket'
+export { socketService } from './socket'
 
 // Image change handling service
-export { initializeImageChangeHandling, cleanupImageChangeHandling, getLastProcessedEventTimestamp, resetProcessedEventTimestamp } from './imageChanges'
+export { imagesService } from './images'
 
 // localStorage service
-export { localStorageService, LocalStorageService } from './localStorage'
+export { localStorageService } from './localStorage'

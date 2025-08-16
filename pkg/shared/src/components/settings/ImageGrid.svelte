@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getImageUrl } from '../../services'
+	import { api } from '../../services/api'
 	import { imagesStore } from '../../stores/imagesStore'
 	import { settingsStore } from '../../stores/settingsStore'
 	import { Card, CardContent, Icon } from '../ui'
@@ -25,7 +25,7 @@
 
 	// Function to get thumbnail URL
 	function getThumbnailUrl(imageName: string): string {
-		return getImageUrl(imageName, true) // Use thumbnail
+		return api.getImageUrl(imageName, true) // Use thumbnail
 	}
 
 	function handleImageClick(imageName: string): void {

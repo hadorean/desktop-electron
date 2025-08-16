@@ -4,6 +4,7 @@
  */
 
 import { imagesStore } from '../stores/imagesStore'
+import { api } from './api'
 import { localStorageService } from './localStorage'
 import { socketService } from './socket'
 
@@ -30,7 +31,7 @@ let cleanup: (() => void) | null = null
  * @param context - Context name for logging (e.g., 'Client app', 'Desktop app')
  * @returns Cleanup function to remove listeners
  */
-export function initializeImageChangeHandling(context: string): () => void {
+function initializeImageChangeHandling(context: string): () => void {
 	// Clean up any existing listeners
 	if (cleanup) {
 		cleanup()
@@ -51,7 +52,8 @@ export function initializeImageChangeHandling(context: string): () => void {
 		// Refresh for file changes and manual refreshes (like directory changes)
 		if (event.reason === 'file_change' || event.reason === 'manual_refresh') {
 			console.log(`🔄 Processing unique ${event.reason} event`)
-			await imagesStore.loadImages()
+			const images = await api.getImages()
+			await imagesStore.loadImages(images)
 		}
 	}
 
@@ -83,7 +85,7 @@ export function initializeImageChangeHandling(context: string): () => void {
  * Cleanup all image change listeners
  * Call this when the component is destroyed
  */
-export function cleanupImageChangeHandling(): void {
+function cleanupImageChangeHandling(): void {
 	if (cleanup) {
 		cleanup()
 	}
@@ -92,13 +94,20 @@ export function cleanupImageChangeHandling(): void {
 /**
  * Get the last processed event timestamp (for debugging)
  */
-export function getLastProcessedEventTimestamp(): number {
+function getLastProcessedEventTimestamp(): number {
 	return lastProcessedEventTimestamp
 }
 
 /**
  * Reset the processed event timestamp (for testing)
  */
-export function resetProcessedEventTimestamp(): void {
+function resetProcessedEventTimestamp(): void {
 	lastProcessedEventTimestamp = 0
+}
+
+export const imagesService = {
+	initializeImageChangeHandling,
+	cleanupImageChangeHandling,
+	getLastProcessedEventTimestamp,
+	resetProcessedEventTimestamp
 }

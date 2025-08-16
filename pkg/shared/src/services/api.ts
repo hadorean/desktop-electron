@@ -2,6 +2,7 @@
  * API client for making requests to the server
  */
 import { apiStore } from '../stores/apiStore'
+import { ImageInfo, WeatherData } from '../types'
 import { ApiRoutes, buildRoute } from '../types/api'
 
 /**
@@ -71,13 +72,6 @@ function buildUrl(endpoint: string): string {
 	return `/${endpoint.startsWith('/') ? endpoint.substring(1) : endpoint}`
 }
 
-// Types for image data
-export interface ImageInfo {
-	name: string
-	thumbnailUrl: string
-	fullUrl: string
-}
-
 // Server response type for images endpoint
 interface ServerImageResponse {
 	images: Array<{
@@ -89,7 +83,7 @@ interface ServerImageResponse {
 /**
  * Get the URL for an image from the server
  */
-export function getImageUrl(imageName: string, useThumbnail: boolean = false): string {
+function getImageUrl(imageName: string, useThumbnail: boolean = false): string {
 	if (!imageName) return ''
 
 	// Get the base URL from store
@@ -110,23 +104,12 @@ export function getImageUrl(imageName: string, useThumbnail: boolean = false): s
 	return endpoint
 }
 
-// Types for weather data
-export interface WeatherData {
-	current: {
-		temperature: number
-		condition: string
-		icon: string
-	}
-	forecast: {
-		temperature: number
-		condition: string
-	}
-}
-
 /**
  * API client methods
  */
 export const api = {
+	getImageUrl,
+
 	/**
 	 * Get list of available images with thumbnails
 	 */

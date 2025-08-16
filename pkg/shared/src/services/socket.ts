@@ -3,12 +3,12 @@ import { apiStore } from '../stores/apiStore'
 import type { SettingsUpdateEvent } from '../types'
 import { ClientEvents, SocketEvents } from '../types'
 
-export interface SettingsUpdatedResponse {
-	success: boolean
-	settings?: unknown
-	timestamp?: number
-	error?: string
-}
+// interface SettingsUpdatedResponse {
+// 	success: boolean
+// 	settings?: unknown
+// 	timestamp?: number
+// 	error?: string
+// }
 
 export class SocketService {
 	private socket: Socket | null = null

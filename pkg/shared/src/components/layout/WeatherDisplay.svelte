@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte'
 	import { cubicOut } from 'svelte/easing'
 	import { Tween } from 'svelte/motion'
-	import { api, type WeatherData } from '../../services'
+	import { api } from '../../services/api'
+	import type { WeatherData } from '../../types'
 
 	let weather: WeatherData | null = null
 	let currentTime: string = '' // Current time in HH:MM format

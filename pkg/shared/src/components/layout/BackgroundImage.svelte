@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Easing, Tween } from '@tweenjs/tween.js'
 	import { onMount } from 'svelte'
-	import { getImageUrl } from '../../services'
+	import { api } from '../../services'
 	import { settingsStore } from '../../stores/settingsStore'
 
 	const { screenSettings } = settingsStore
@@ -27,7 +27,7 @@
 
 		if (mode === 'image') {
 			const selectedImage = $screenSettings.selectedImage ?? ''
-			backgroundUrl = getImageUrl(selectedImage)
+			backgroundUrl = api.getImageUrl(selectedImage)
 		} else {
 			backgroundUrl = $screenSettings.url ?? ''
 		}
@@ -125,7 +125,7 @@
 		let initialUrl = ''
 
 		if (mode === 'image' && $screenSettings.selectedImage) {
-			initialUrl = getImageUrl($screenSettings.selectedImage)
+			initialUrl = api.getImageUrl($screenSettings.selectedImage)
 		} else if (mode === 'url' && $screenSettings.url) {
 			initialUrl = $screenSettings.url
 		}

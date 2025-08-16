@@ -2,7 +2,7 @@
  * Reactive store for managing images across the application
  */
 import { derived, get, writable } from 'svelte/store'
-import { api, type ImageInfo } from '../services'
+import type { ImageInfo } from '../types'
 
 // Internal store state
 interface ImagesStoreState {
@@ -21,7 +21,6 @@ const imageChangeCallbacks: ImageChangeCallback[] = []
 // Flag to prevent validation cascades during loading
 let isLoadingImages = false
 
-// Initial state
 const initialState: ImagesStoreState = {
 	images: [],
 	isLoading: false,
@@ -29,46 +28,35 @@ const initialState: ImagesStoreState = {
 	lastUpdated: null
 }
 
-// Create the main store
-const imagesStoreInternal = writable<ImagesStoreState>(initialState)
-
-// Derived stores for convenient access
-const images = derived(imagesStoreInternal, $store => $store.images)
-const loading = derived(imagesStoreInternal, $store => $store.isLoading)
-const error = derived(imagesStoreInternal, $store => $store.error)
-const lastUpdated = derived(imagesStoreInternal, $store => $store.lastUpdated)
-const hasImages = derived(images, $images => $images.length > 0)
-
-// Combined derived store for components that need multiple values
-const imagesState = derived(imagesStoreInternal, $store => $store)
+const state = writable<ImagesStoreState>(initialState)
+const images = derived(state, $store => $store.images)
+const loading = derived(state, $store => $store.isLoading)
 
 // Single export object containing all properties and functions
 export const imagesStore = {
 	// Reactive stores
-	images,
-	loading,
-	error,
-	lastUpdated,
-	hasImages,
-	imagesState,
+	images: derived(images, x => x),
+	loading: derived(loading, x => x),
+	error: derived(state, $store => $store.error),
+	lastUpdated: derived(state, $store => $store.lastUpdated),
+	hasImages: derived(images, $images => $images.length > 0),
 
 	// Functions defined directly in the object
-	async loadImages(): Promise<void> {
+	async loadImages(images: ImageInfo[]): Promise<void> {
 		// Prevent validation cascades during loading
 		isLoadingImages = true
 
 		// Set loading state
-		imagesStoreInternal.update(state => ({
+		state.update(state => ({
 			...state,
 			isLoading: true,
 			error: null
 		}))
 
 		try {
-			const images = await api.getImages()
 			const previousImages = this.getCurrentImages()
 
-			imagesStoreInternal.update(state => ({
+			state.update(state => ({
 				...state,
 				images,
 				isLoading: false,
@@ -86,7 +74,7 @@ export const imagesStore = {
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error loading images'
 
-			imagesStoreInternal.update(state => ({
+			state.update(state => ({
 				...state,
 				isLoading: false,
 				error: errorMessage
@@ -99,17 +87,12 @@ export const imagesStore = {
 		}
 	},
 
-	async refreshImages(): Promise<void> {
-		console.log('📷 Force refreshing images')
-		await this.loadImages()
-	},
-
 	clearImages(): void {
-		imagesStoreInternal.set(initialState)
+		state.set(initialState)
 	},
 
 	updateImages(newImages: ImageInfo[]): void {
-		imagesStoreInternal.update(state => ({
+		state.update(state => ({
 			...state,
 			images: newImages,
 			lastUpdated: Date.now()

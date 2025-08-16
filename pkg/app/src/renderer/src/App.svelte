@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
-	import { initializeImageChangeHandling } from '$shared/services'
+	import { api, imagesService } from '$shared/services'
 	import { debugMenu } from '$shared/stores/debugStore'
 	import { imagesStore } from '$shared/stores/imagesStore'
 	import { userOptionsStore } from '$shared/stores/userOptionsStore'
@@ -21,8 +21,9 @@
 		appConfig.subscribe(config => {
 			transparent = config?.window.transparent ?? false
 		})
-		await imagesStore.loadImages()
-		initializeImageChangeHandling('Desktop app')
+		const images = await api.getImages()
+		await imagesStore.loadImages(images)
+		imagesService.initializeImageChangeHandling('Desktop app')
 	})
 
 	const { error: imagesError } = imagesStore

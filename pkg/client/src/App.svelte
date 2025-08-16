@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BackgroundImage, ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate, TimeDisplay, WeatherDisplay } from '$shared/components'
-	import { initializeImageChangeHandling, localStorageService, socketService } from '$shared/services'
+	import { api, imagesService, localStorageService, socketService } from '$shared/services'
 	import { debugMenu } from '$shared/stores/debugStore'
 	import { imagesStore } from '$shared/stores/imagesStore'
 	import { settingsStore } from '$shared/stores/settingsStore'
@@ -25,7 +25,8 @@
 	async function handleReconnect(): Promise<void> {
 		try {
 			console.log('Reconnecting to API...')
-			await imagesStore.loadImages()
+			const images = await api.getImages()
+			await imagesStore.loadImages(images)
 			console.log('Reconnection successful')
 		} catch (error: unknown) {
 			console.error('Reconnection failed:', error)
@@ -41,7 +42,8 @@
 				openSettingsFromUrl = urlParams.get('openSettings') === 'true'
 
 				// First load images using the store
-				await imagesStore.loadImages()
+				const images = await api.getImages()
+				await imagesStore.loadImages(images)
 
 				// Initialize localStorage service (handles loading settings automatically)
 				localStorageService.init()
@@ -61,7 +63,7 @@
 				})
 
 				// Setup image change handling (deduplication, socket events, validation)
-				cleanupImageChanges = initializeImageChangeHandling('Client app')
+				cleanupImageChanges = imagesService.initializeImageChangeHandling('Client app')
 
 				// Return cleanup function
 				return () => {
