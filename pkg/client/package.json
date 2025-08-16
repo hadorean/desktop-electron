@@ -16,8 +16,6 @@
 		"svelte-check": "svelte-check --tsconfig ./tsconfig.app.json"
 	},
 	"dependencies": {
-		"@tailwindcss/postcss": "^4.1.12",
-		"socket.io-client": "^4.8.1",
-		"tailwindcss": "^4.1.12"
+		"socket.io-client": "^4.8.1"
 	}
 }
