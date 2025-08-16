@@ -1,5 +1,5 @@
 import type { AppConfig } from '$shared'
-import { debugMenu, toggleDayNightMode, updateUserOptions } from '$shared/stores'
+import { debugMenu, toggleDayNightMode, userOptionsStore } from '$shared/stores'
 import { setAppConfig } from '../stores/appConfigStore'
 
 export async function init(): Promise<void> {
@@ -20,7 +20,7 @@ export async function init(): Promise<void> {
 	}
 
 	const result = await window.api.getUserOptions()
-	updateUserOptions(current => ({ ...current, ...result.data }))
+	userOptionsStore.update(current => ({ ...current, ...result.data }))
 
 	// Setup IPC listener for debug state changes
 	window.api.onDebugStateChanged(visible => {

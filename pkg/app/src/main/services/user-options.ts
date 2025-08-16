@@ -1,4 +1,4 @@
-import { getCurrentUserOptions, loadUserOptions, shouldPreventUserOptionsSync, userOptions } from '$shared/stores/userOptionsStore'
+import { userOptionsStore } from '$shared/stores/userOptionsStore'
 import type { UserOptions, UserOptionsUpdateEvent } from '$shared/types'
 import { DefaultUserOptions } from '$shared/types/user-options'
 import { app } from 'electron'
@@ -31,19 +31,19 @@ export class UserOptionsService {
 		await this.loadFromFileSystem()
 
 		// Subscribe to store changes for automatic persistence and socket broadcasting
-		userOptions.subscribe(options => {
+		userOptionsStore.userOptions.subscribe(options => {
 			// console.log('🔧 UserOptionsService subscription triggered with options:', options)
-			// console.log('🔧 shouldPreventUserOptionsSync():', shouldPreventUserOptionsSync())
+			// console.log('🔧 shouldPreventSync():', shouldPreventSync())
 			// console.log('🔧 this.hasInitialized:', this.hasInitialized)
 
 			// Skip persistence during initial load and internal operations
-			if (!shouldPreventUserOptionsSync() && this.hasInitialized) {
+			if (!userOptionsStore.isPreventingSync() && this.hasInitialized) {
 				// console.log('🔧 UserOptionsService: Auto-saving options to file system')
 				this.saveToFileSystem(options).catch(error => {
 					console.error('Failed to save user options:', error)
 				})
 			} else {
-				// console.log('🔧 UserOptionsService: Skipping auto-save (preventSync:', shouldPreventUserOptionsSync(), 'initialized:', this.hasInitialized, ')')
+				// console.log('🔧 UserOptionsService: Skipping auto-save (preventSync:', shouldPreventSync(), 'initialized:', this.hasInitialized, ')')
 			}
 
 			// Broadcast image directory changes to clients
@@ -62,19 +62,19 @@ export class UserOptionsService {
 	 * Get current options
 	 */
 	getCurrentOptions(): UserOptions {
-		return getCurrentUserOptions()
+		return userOptionsStore.getCurrent()
 	}
 
 	/**
 	 * Update options and persist to file system
 	 */
 	async updateOptions(newOptions: Partial<UserOptions>, clientId: string): Promise<UserOptionsUpdateEvent> {
-		const currentOptions = getCurrentUserOptions()
+		const currentOptions = userOptionsStore.getCurrent()
 		const updatedOptions = { ...currentOptions, ...newOptions }
 
 		// Update store (this will trigger auto-save via subscription)
 		// Skip prevent sync since this is an intentional update operation
-		loadUserOptions(updatedOptions, true)
+		userOptionsStore.set(updatedOptions, true)
 
 		return {
 			type: 'user_options_update',
@@ -96,17 +96,17 @@ export class UserOptionsService {
 			const options = { ...this.defaultOptions, ...parsedOptions }
 
 			// Load into store
-			loadUserOptions(options)
+			userOptionsStore.set(options)
 
 			console.log('🔧 User options loaded from file system:', this.optionsPath)
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
 				console.log('🔧 User options file not found, using defaults')
-				loadUserOptions(this.defaultOptions)
+				userOptionsStore.set(this.defaultOptions)
 				await this.saveToFileSystem(this.defaultOptions)
 			} else {
 				console.error('Error loading user options:', error)
-				loadUserOptions(this.defaultOptions)
+				userOptionsStore.set(this.defaultOptions)
 			}
 		}
 	}
@@ -130,7 +130,7 @@ export class UserOptionsService {
 	 */
 	async resetOptions(): Promise<UserOptions> {
 		const resetOptions = { ...this.defaultOptions }
-		loadUserOptions(resetOptions)
+		userOptionsStore.set(resetOptions)
 		await this.saveToFileSystem(resetOptions)
 		return resetOptions
 	}
@@ -149,6 +149,6 @@ export const initUserOptions = async () => {
 	await userOptionsService.initialize()
 }
 
-export const updateUserOptions = async (newOptions: Partial<UserOptions>, clientId: string): Promise<UserOptionsUpdateEvent> => {
+export const update = async (newOptions: Partial<UserOptions>, clientId: string): Promise<UserOptionsUpdateEvent> => {
 	return await userOptionsService.updateOptions(newOptions, clientId)
 }

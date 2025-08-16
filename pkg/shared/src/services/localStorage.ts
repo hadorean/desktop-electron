@@ -306,6 +306,7 @@ class LocalStorageService {
 			let hasChanges = false
 
 			// Clean up shared settings (using any for legacy property access)
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const sharedAny = settings.shared as any
 			if (sharedAny && ('color' in sharedAny || 'type' in sharedAny)) {
 				console.log('🧹 Cleaning up legacy color/type from shared settings')
@@ -317,6 +318,7 @@ class LocalStorageService {
 			// Clean up screen settings
 			if (settings.screens) {
 				for (const screenId in settings.screens) {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					const screenSettingsAny = settings.screens[screenId] as any
 					if ('color' in screenSettingsAny || 'type' in screenSettingsAny) {
 						console.log(`🧹 Cleaning up legacy color/type from screen "${screenId}"`)

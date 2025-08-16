@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
 	import { initializeImageChangeHandling } from '$shared/services'
-	import { debugMenu, effectiveApiUrl, imagesStore, userOptions } from '$shared/stores'
+	import { debugMenu, effectiveApiUrl, imagesStore, userOptionsStore } from '$shared/stores'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { ActionButtons, AppVersion, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
@@ -26,6 +26,7 @@
 
 	const { imagesError } = imagesStore
 	const { visibility: debugVisible } = debugMenu
+	const { userOptions } = userOptionsStore
 </script>
 
 <KeyboardShortcuts

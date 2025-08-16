@@ -3,7 +3,7 @@
  *
  */
 
-import { onUserOptionsChanged } from '$shared/stores/userOptionsStore'
+import { userOptionsStore } from '$shared/stores/userOptionsStore'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow } from 'electron'
 import { getBg, getLocalServer, setIsQuitting } from '../stores/appStore'
@@ -63,7 +63,7 @@ export async function initApp(): Promise<void> {
 		}
 	})
 
-	onUserOptionsChanged((options, previousOptions) => {
+	userOptionsStore.onChanged((options, previousOptions) => {
 		if (options.autoStart !== previousOptions.autoStart) {
 			app.setLoginItemSettings({
 				openAtLogin: options.autoStart,

@@ -1,8 +1,8 @@
-import { readdir } from 'fs/promises'
-import { watch } from 'fs'
-import { join } from 'path'
+import { userOptionsStore } from '$shared/stores/userOptionsStore'
 import { EventEmitter } from 'events'
-import { getCurrentImageDirectory, onUserOptionsChanged } from '$shared/stores/userOptionsStore'
+import { watch } from 'fs'
+import { readdir } from 'fs/promises'
+import { join } from 'path'
 
 export class ImageService extends EventEmitter {
 	private imagesPathValue: string
@@ -19,10 +19,10 @@ export class ImageService extends EventEmitter {
 		super()
 
 		// Initialize with current image directory from store
-		this.imagesPathValue = getCurrentImageDirectory()
+		this.imagesPathValue = userOptionsStore.getCurrentImageDirectory()
 
 		// Subscribe to image directory changes
-		this.userOptionsUnsubscribe = onUserOptionsChanged((newOptions, previousOptions) => {
+		this.userOptionsUnsubscribe = userOptionsStore.onChanged((newOptions, previousOptions) => {
 			if (newOptions.imageDirectory !== previousOptions.imageDirectory) {
 				console.log('🔧 ImageService: Image directory changed from', previousOptions.imageDirectory, 'to', newOptions.imageDirectory)
 				this.setImagesPath(newOptions.imageDirectory)

@@ -47,7 +47,7 @@ declare global {
 			}) => Promise<{ success: boolean; data?: { canceled: boolean; filePaths: string[] }; error?: string }>
 			// User options APIs
 			getUserOptions: () => Promise<{ success: boolean; data?: UserOptions; error?: string }>
-			updateUserOptions: (options: Partial<UserOptions>) => Promise<{ success: boolean; error?: string }>
+			update: (options: Partial<UserOptions>) => Promise<{ success: boolean; error?: string }>
 		}
 	}
 }

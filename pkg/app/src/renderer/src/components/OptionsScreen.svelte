@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button, Card, CardContent, CardHeader, Icon, Slider, Switch } from '$shared/components/ui'
-	import { updateUserOptions } from '$shared/stores'
+	import { userOptionsStore } from '$shared/stores'
 	import { onMount } from 'svelte'
 	import BackButton from './BackButton.svelte'
 
@@ -30,27 +30,30 @@
 	let statusCheckInterval: ReturnType<typeof setInterval> | null = null
 
 	// Load user options on mount
-	onMount(async () => {
-		try {
-			const result = await window.api.getUserOptions()
-
-			if (result.success && result.data) {
-				selectedFolder = result.data.imageDirectory
-				port = result.data.port || 8080
-				originalPort = port
-				autoStart = result.data.autoStart ?? true
-				openWindowOnStart = result.data.openWindowOnStart ?? false
-				windowOpacity = result.data.windowOpacity ?? 1.0
-			}
-			await checkServerStatus()
-		} catch (error) {
-			console.error('Error loading user options:', error)
-		} finally {
-			isLoading = false
-		}
-
+	onMount(() => {
 		// Start periodic server status checking
 		startStatusMonitoring()
+
+		// Load options asynchronously
+		;(async () => {
+			try {
+				const result = await window.api.getUserOptions()
+
+				if (result.success && result.data) {
+					selectedFolder = result.data.imageDirectory
+					port = result.data.port || 8080
+					originalPort = port
+					autoStart = result.data.autoStart ?? true
+					openWindowOnStart = result.data.openWindowOnStart ?? false
+					windowOpacity = result.data.windowOpacity ?? 1.0
+				}
+				await checkServerStatus()
+			} catch (error) {
+				console.error('Error loading user options:', error)
+			} finally {
+				isLoading = false
+			}
+		})()
 
 		// Cleanup on unmount
 		return () => {
@@ -78,7 +81,7 @@
 				windowOpacity,
 				...partialOptions
 			}
-			const result = await window.api.updateUserOptions(options)
+			const result = await window.api.update(options)
 			if (result.success) {
 				console.log('User options updated successfully')
 			} else {
@@ -271,7 +274,7 @@
 			windowOpacity: number
 		}>
 	) {
-		updateUserOptions(current => ({ ...current, ...options }))
+		userOptionsStore.update(current => ({ ...current, ...options }))
 		if (saveTimeout) {
 			clearTimeout(saveTimeout)
 		}

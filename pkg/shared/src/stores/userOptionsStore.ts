@@ -24,7 +24,6 @@ let isLoadingOptions = false
 // Flag to prevent server sync during internal operations
 let preventServerSync = false
 
-// Initial state
 const initialState: UserOptionsStoreState = {
 	options: DefaultUserOptions,
 	isLoading: false,
@@ -32,22 +31,23 @@ const initialState: UserOptionsStoreState = {
 	lastUpdated: null
 }
 
-// Create the main store
-const userOptionsStoreInternal = writable<UserOptionsStoreState>(initialState)
+const state = writable<UserOptionsStoreState>(initialState)
+const userOptions = derived(state, $store => $store.options)
+const imageDirectory = derived(userOptions, $options => $options.imageDirectory)
 
 /**
  * Load options from external source (will be called by service)
  */
-export function loadUserOptions(options: UserOptions, skipPreventSync = false): void {
+function set(options: UserOptions, skipPreventSync = false): void {
 	// Prevent sync cascades during loading, unless this is an update operation
 	isLoadingOptions = true
 	if (!skipPreventSync) {
 		preventServerSync = true
 	}
 
-	const previousOptions = getCurrentUserOptions()
+	const previousOptions = getCurrent()
 
-	userOptionsStoreInternal.update(state => ({
+	state.update(state => ({
 		...state,
 		options,
 		isLoading: false,
@@ -71,12 +71,12 @@ export function loadUserOptions(options: UserOptions, skipPreventSync = false): 
 /**
  * Update user options
  */
-export function updateUserOptions(updater: (current: UserOptions) => UserOptions): void {
+function update(updater: (current: UserOptions) => UserOptions): void {
 	if (isLoadingOptions) return
 
-	const previousOptions = getCurrentUserOptions()
+	const previousOptions = getCurrent()
 
-	userOptionsStoreInternal.update(state => {
+	state.update(state => {
 		const updatedOptions = updater(state.options)
 		return {
 			...state,
@@ -85,92 +85,37 @@ export function updateUserOptions(updater: (current: UserOptions) => UserOptions
 		}
 	})
 
-	const newOptions = getCurrentUserOptions()
+	const newOptions = getCurrent()
 
 	// Notify callbacks of options changes
 	notifyOptionsChangeCallbacks(newOptions, previousOptions)
 }
 
 /**
- * Update user options without triggering sync (for internal operations)
- */
-export function updateUserOptionsSilent(updater: (current: UserOptions) => UserOptions): void {
-	preventServerSync = true
-	try {
-		updateUserOptions(updater)
-	} finally {
-		// Reset flag after a microtask to ensure all synchronous effects complete
-		Promise.resolve().then(() => {
-			preventServerSync = false
-		})
-	}
-}
-
-/**
- * Set loading state
- */
-export function setUserOptionsLoading(loading: boolean): void {
-	userOptionsStoreInternal.update(state => ({
-		...state,
-		isLoading: loading
-	}))
-}
-
-/**
- * Set error state
- */
-export function setUserOptionsError(error: string | null): void {
-	userOptionsStoreInternal.update(state => ({
-		...state,
-		error,
-		isLoading: false
-	}))
-}
-
-/**
  * Clear the store (useful for cleanup)
  */
-export function clearUserOptions(): void {
-	userOptionsStoreInternal.set(initialState)
+function clear(): void {
+	state.set(initialState)
 }
-
-// Derived stores for convenient access
-export const userOptions = derived(userOptionsStoreInternal, $store => $store.options)
-export const userOptionsLoading = derived(userOptionsStoreInternal, $store => $store.isLoading)
-export const userOptionsError = derived(userOptionsStoreInternal, $store => $store.error)
-export const userOptionsLastUpdated = derived(userOptionsStoreInternal, $store => $store.lastUpdated)
-
-// Specific derived stores for individual options
-export const imageDirectory = derived(userOptions, $options => $options.imageDirectory)
-
-// Combined derived store for components that need multiple values
-export const userOptionsState = derived(userOptionsStoreInternal, $store => $store)
 
 /**
  * Get current user options synchronously (useful for imperative code)
  */
-export function getCurrentUserOptions(): UserOptions {
+function getCurrent(): UserOptions {
 	return get(userOptions)
 }
 
 /**
  * Get current image directory synchronously
  */
-export function getCurrentImageDirectory(): string {
+function getCurrentImageDirectory(): string {
 	return get(imageDirectory)
-}
-
-/**
- * Get current loading state synchronously
- */
-export function isUserOptionsLoading(): boolean {
-	return get(userOptionsLoading)
 }
 
 /**
  * Register a callback to be notified when options change
  */
-export function onUserOptionsChanged(callback: OptionsChangeCallback): () => void {
+function onChanged(callback: OptionsChangeCallback): () => void {
 	optionsChangeCallbacks.push(callback)
 
 	// Return unsubscribe function
@@ -198,57 +143,28 @@ function notifyOptionsChangeCallbacks(newOptions: UserOptions, previousOptions: 
 /**
  * Check if server sync should be prevented (for service components)
  */
-export function shouldPreventUserOptionsSync(): boolean {
+function isPreventingSync(): boolean {
 	return preventServerSync
-}
-
-/**
- * Check if we're currently loading options (to prevent cascades)
- */
-export function getIsLoadingUserOptions(): boolean {
-	return isLoadingOptions
-}
-
-/**
- * Update image directory specifically
- */
-export function updateImageDirectory(directory: string): void {
-	updateUserOptions(current => ({
-		...current,
-		imageDirectory: directory
-	}))
 }
 
 // Export object with all functions for convenient importing
 export const userOptionsStore = {
-	// Core functions
-	loadUserOptions,
-	updateUserOptions,
-	updateUserOptionsSilent,
-	setUserOptionsLoading,
-	setUserOptionsError,
-	clearUserOptions,
-
-	// Getter functions
-	getCurrentUserOptions,
-	getCurrentImageDirectory,
-	isUserOptionsLoading,
-	shouldPreventUserOptionsSync,
-	getIsLoadingUserOptions,
-
-	// Callback management
-	onUserOptionsChanged,
-
-	// Specific update functions
-	updateImageDirectory,
-
 	// Stores
 	userOptions,
-	userOptionsLoading,
-	userOptionsError,
-	userOptionsLastUpdated,
 	imageDirectory,
-	userOptionsState
+
+	// Setter
+	set,
+	update,
+	clear,
+
+	// Getter
+	getCurrent,
+	getCurrentImageDirectory,
+	isPreventingSync,
+
+	// Callbacks
+	onChanged
 }
 
 export type UserOptionsStore = typeof userOptionsStore

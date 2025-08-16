@@ -53,7 +53,7 @@ const api = {
 	showOpenDialog: (options?: Electron.OpenDialogOptions) => ipcRenderer.invoke(IpcEvents.ShowOpenDialog, options),
 	// User Options API
 	getUserOptions: () => ipcRenderer.invoke(IpcEvents.GetUserOptions),
-	updateUserOptions: (options: Partial<UserOptions>) => ipcRenderer.invoke(IpcEvents.UpdateUserOptions, options)
+	update: (options: Partial<UserOptions>) => ipcRenderer.invoke(IpcEvents.UpdateUserOptions, options)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

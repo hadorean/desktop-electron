@@ -1,5 +1,5 @@
+import { userOptionsStore } from '$shared/stores/userOptionsStore'
 import { ServerEventMap, ServerEvents } from '$shared/types/sockets'
-import { onUserOptionsChanged } from '$shared/stores/userOptionsStore'
 import cors from 'cors'
 import express from 'express'
 import { createServer } from 'http'
@@ -172,7 +172,7 @@ export class LocalServer {
 
 	private setupPortWatcher(): void {
 		// Watch for port changes in user options
-		this.unsubscribeOptionsWatcher = onUserOptionsChanged((newOptions, previousOptions) => {
+		this.unsubscribeOptionsWatcher = userOptionsStore.onChanged((newOptions, previousOptions) => {
 			if (newOptions.port !== previousOptions.port) {
 				console.log(`🔧 Port change detected: ${previousOptions.port} → ${newOptions.port}`)
 				this.updatePort(newOptions.port)

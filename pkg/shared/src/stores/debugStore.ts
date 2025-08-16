@@ -2,7 +2,7 @@ import { createStore } from '../utils'
 
 const visible = createStore<boolean>(false)
 
-export const debugMenu = new (class DebugMenu {
+class DebugMenu {
 	public visibility = visible.store
 
 	get isVisible(): boolean {
@@ -21,4 +21,6 @@ export const debugMenu = new (class DebugMenu {
 		visible.update(current => !current)
 		return visible.get()
 	}
-})()
+}
+
+export const debugMenu = new DebugMenu()

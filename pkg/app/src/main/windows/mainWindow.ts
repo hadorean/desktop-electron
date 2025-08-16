@@ -1,4 +1,4 @@
-import { getCurrentUserOptions } from '$shared/stores/userOptionsStore'
+import { userOptionsStore } from '$shared/stores/userOptionsStore'
 import { appConfig } from '$shared/types/config'
 import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, screen, shell } from 'electron'
@@ -59,7 +59,7 @@ export function createWindow(): BrowserWindow {
 		if (!window) return
 		//snapToRight()
 
-		if (getCurrentUserOptions().openWindowOnStart) {
+		if (userOptionsStore.getCurrent().openWindowOnStart) {
 			window.show()
 		}
 	})

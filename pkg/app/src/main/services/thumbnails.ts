@@ -1,9 +1,9 @@
-import sharp from 'sharp'
-import { join, dirname, basename, extname } from 'path'
-import { mkdir, access, stat } from 'fs/promises'
-import { constants } from 'fs'
+import { userOptionsStore } from '$shared/stores/userOptionsStore'
 import { app } from 'electron'
-import { getCurrentImageDirectory, onUserOptionsChanged } from '$shared/stores/userOptionsStore'
+import { constants } from 'fs'
+import { access, mkdir, stat } from 'fs/promises'
+import { basename, dirname, extname, join } from 'path'
+import sharp from 'sharp'
 
 interface ThumbnailRequest {
 	imagePath: string
@@ -24,14 +24,14 @@ export class ThumbnailService {
 
 	constructor() {
 		// Initialize with current image directory from store
-		this.imagesPath = getCurrentImageDirectory()
+		this.imagesPath = userOptionsStore.getCurrentImageDirectory()
 
 		// Store thumbnails in app's userData directory
 		this.thumbnailsDir = join(app.getPath('userData'), 'thumbnails')
 		this.ensureThumbnailsDirectory()
 
 		// Subscribe to image directory changes
-		this.userOptionsUnsubscribe = onUserOptionsChanged((newOptions, previousOptions) => {
+		this.userOptionsUnsubscribe = userOptionsStore.onChanged((newOptions, previousOptions) => {
 			if (newOptions.imageDirectory !== previousOptions.imageDirectory) {
 				console.log('🔧 ThumbnailService: Image directory changed from', previousOptions.imageDirectory, 'to', newOptions.imageDirectory)
 				this.imagesPath = newOptions.imageDirectory
