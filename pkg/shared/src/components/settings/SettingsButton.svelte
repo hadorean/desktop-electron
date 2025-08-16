@@ -40,6 +40,8 @@
 		width: 48px;
 		height: 48px;
 		border-radius: 50%;
+		right: 1rem;
+		bottom: 1rem;
 		color: var(--text-primary);
 		background: none;
 		border: none;
