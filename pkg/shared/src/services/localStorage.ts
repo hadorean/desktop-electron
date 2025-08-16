@@ -7,7 +7,7 @@ import { get } from 'svelte/store'
 import { apiStore } from '../stores/apiStore'
 import { debugMenu } from '../stores/debugStore'
 import { settingsStore } from '../stores/settingsStore'
-import { type ScreenProfile, type UserSettings, DefaultScreenProfile } from '../types'
+import { type UserSettings } from '../types'
 import { checkStorageAvailability } from '../utils'
 
 class LocalStorageService {
@@ -124,70 +124,6 @@ class LocalStorageService {
 
 				// Set settings directly
 				settingsStore.allSettings.set(parsedSettings)
-			} else {
-				// Try legacy settings.complete key
-				const savedCompleteSettings = localStorage.getItem('settings.complete')
-				if (savedCompleteSettings) {
-					const parsedCompleteSettings = JSON.parse(savedCompleteSettings)
-					console.log('📦 Migrating from settings.complete to settings')
-
-					// Validate and set settings
-					this.validateAndUpdateImages(parsedCompleteSettings, images)
-					this.cleanupLegacyColorTypeData(parsedCompleteSettings)
-					settingsStore.allSettings.set(parsedCompleteSettings)
-
-					// Migrate to new key and clean up old key
-					localStorage.setItem('settings', JSON.stringify(parsedCompleteSettings))
-					localStorage.removeItem('settings.complete')
-					console.log('📦 Migration from settings.complete completed')
-				} else {
-					// Fallback to legacy loading method
-					console.log('📦 Using legacy settings loading method')
-
-					// Load shared settings
-					const savedSharedSettings = localStorage.getItem('settings.shared')
-					if (savedSharedSettings) {
-						const parsedSettings = JSON.parse(savedSharedSettings)
-						const defaultSettings: ScreenProfile = DefaultScreenProfile
-
-						settingsStore.updateSharedSettings(() => ({
-							...defaultSettings,
-							opacity: parsedSettings.opacity ?? defaultSettings.opacity,
-							blur: parsedSettings.blur ?? defaultSettings.blur,
-							saturation: parsedSettings.saturation ?? defaultSettings.saturation,
-							hideButton: parsedSettings.hideButton ?? defaultSettings.hideButton,
-							transitionTime: parsedSettings.transitionTime ?? defaultSettings.transitionTime,
-							showTimeDate: parsedSettings.showTimeDate ?? defaultSettings.showTimeDate,
-							showWeather: parsedSettings.showWeather ?? defaultSettings.showWeather,
-							showScreenSwitcher: parsedSettings.showScreenSwitcher ?? defaultSettings.showScreenSwitcher,
-							favorites: parsedSettings.favorites ?? defaultSettings.favorites,
-							selectedImage:
-								parsedSettings.selectedImage && images.some(img => img.name === parsedSettings.selectedImage)
-									? parsedSettings.selectedImage
-									: images.length > 0
-										? images[0].name
-										: '',
-							settingsButtonPosition: parsedSettings.settingsButtonPosition ?? defaultSettings.settingsButtonPosition
-						}))
-					} else if (images.length > 0) {
-						settingsStore.updateSharedSettings(current => ({
-							...current,
-							selectedImage: images[0].name
-						}))
-					}
-
-					// Load local settings
-					const savedLocalSettings = localStorage.getItem('settings.local')
-					if (savedLocalSettings) {
-						const parsedLocalSettings = JSON.parse(savedLocalSettings)
-						settingsStore.updateLocalSettings(() => parsedLocalSettings)
-					}
-
-					// Clean up legacy keys after successful migration
-					localStorage.removeItem('settings.shared')
-					localStorage.removeItem('settings.local')
-					console.log('📦 Legacy settings migration completed')
-				}
 			}
 
 			// Initialize screen from server data if available (after settings are loaded)
