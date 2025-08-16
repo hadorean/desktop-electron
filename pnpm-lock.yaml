@@ -192,9 +192,15 @@ importers:
 
   pkg/client:
     dependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.1.12
+        version: 4.1.12
       socket.io-client:
         specifier: ^4.8.1
         version: 4.8.1
+      tailwindcss:
+        specifier: ^4.1.12
+        version: 4.1.12
 
   pkg/shared:
     dependencies:
