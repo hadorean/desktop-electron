@@ -1,0 +1,6 @@
+@import './base.css';
+@import '$shared/assets/app.css';
+
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@source "../../shared/src";

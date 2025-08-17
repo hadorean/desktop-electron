@@ -1,4 +1,5 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 import { join, resolve } from 'path'
@@ -112,7 +113,7 @@ export default defineConfig({
 		}
 	},
 	renderer: {
-		plugins: [svelte(), copyRendererAssetsPlugin()],
+		plugins: [tailwindcss(), svelte(), copyRendererAssetsPlugin()],
 		resolve: {
 			alias: {
 				$shared: resolve(__dirname, '../shared/src'),

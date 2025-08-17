@@ -1,6 +1,6 @@
-import '$shared/assets/app.css'
 import '@hgrandry/dbg/styles.css'
 import { mount } from 'svelte'
+import './app.css'
 import App from './App.svelte'
 import { setScreenFromRoute } from './init'
 
