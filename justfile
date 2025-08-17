@@ -58,8 +58,8 @@ run:
 # Shad components library
 
 # Add a shadcn component
-shad command="add":
-	cd pkg/shadcn && pnpm dlx shadcn-svelte@latest {{command}}
+shad command="add" component="":
+	cd pkg/shadcn && pnpm dlx shadcn-svelte@latest {{command}} {{component}}
 
 # Run the shadcn demo
 demo-shad:
