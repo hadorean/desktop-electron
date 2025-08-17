@@ -97,7 +97,8 @@ export default defineConfig({
 		plugins: [externalizeDepsPlugin(), copyAssetsPlugin()],
 		resolve: {
 			alias: {
-				$shared: resolve(__dirname, '../shared/src')
+				$shared: resolve(__dirname, '../shared/src'),
+				$lib: resolve(__dirname, '../shared/src/lib')
 			}
 		}
 	},
@@ -105,7 +106,8 @@ export default defineConfig({
 		plugins: [externalizeDepsPlugin()],
 		resolve: {
 			alias: {
-				$shared: resolve(__dirname, '../shared/src')
+				$shared: resolve(__dirname, '../shared/src'),
+				$lib: resolve(__dirname, '../shared/src/lib')
 			}
 		}
 	},
@@ -113,7 +115,8 @@ export default defineConfig({
 		plugins: [svelte(), copyRendererAssetsPlugin()],
 		resolve: {
 			alias: {
-				$shared: resolve(__dirname, '../shared/src')
+				$shared: resolve(__dirname, '../shared/src'),
+				$lib: resolve(__dirname, '../shared/src/lib')
 			}
 		},
 		assetsInclude: ['**/*.svg'],

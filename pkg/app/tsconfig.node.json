@@ -8,13 +8,18 @@
 		"../shared/src/**/*.ts"
 	],
 	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
 		"composite": true,
 		"types": ["electron-vite/node"],
 		"moduleResolution": "bundler",
+		"moduleDetection": "force",
 		"baseUrl": ".",
 		"paths": {
 			"$shared": ["../shared/src"],
-			"$shared/*": ["../shared/src/*"]
+			"$shared/*": ["../shared/src/*"],
+			"$lib": ["../shared/src/lib"],
+			"$lib/*": ["../shared/src/lib/*"]
 		}
 	}
 }

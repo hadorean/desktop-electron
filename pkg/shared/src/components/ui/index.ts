@@ -1,13 +1,15 @@
 export { default as Button } from './button/button.svelte'
-export { type Variant as ButtonVariant, type Size as ButtonSize } from './button/index.js'
+export { type Size as ButtonSize, type Variant as ButtonVariant } from './button/index.js'
 
 export { default as Slider } from './slider/slider.svelte'
 
 export { default as Switch } from './switch/switch.svelte'
 
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
+export { Separator } from './separator'
 
-export { Card, CardHeader, CardTitle, CardContent } from './card'
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
+
+export { Card, CardContent, CardHeader, CardTitle } from './card'
 
 export { Carousel, CarouselContent, CarouselItem } from './carousel'
 

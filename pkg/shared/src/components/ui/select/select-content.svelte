@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { cn, type WithoutChild } from '$lib/utils'
 	import { Select as SelectPrimitive } from 'bits-ui'
-	import { cn, type WithoutChild } from '../../../lib/utils'
 	import SelectScrollDownButton from './select-scroll-down-button.svelte'
 	import SelectScrollUpButton from './select-scroll-up-button.svelte'
 
@@ -21,86 +21,18 @@
 		bind:ref
 		{sideOffset}
 		data-slot="select-content"
-		class={cn('select-content', className)}
+		class={cn(
+			'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 max-h-(--bits-select-content-available-height) origin-(--bits-select-content-transform-origin) relative z-50 min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border shadow-md data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
+			className
+		)}
 		{...restProps}
 	>
 		<SelectScrollUpButton />
-		<SelectPrimitive.Viewport class="select-viewport">
+		<SelectPrimitive.Viewport
+			class={cn('h-(--bits-select-anchor-height) min-w-(--bits-select-anchor-width) w-full scroll-my-1 p-1')}
+		>
 			{@render children?.()}
 		</SelectPrimitive.Viewport>
 		<SelectScrollDownButton />
 	</SelectPrimitive.Content>
 </SelectPrimitive.Portal>
-
-<style>
-	.select-content {
-		position: relative;
-		z-index: 50;
-		min-width: 8rem;
-		max-height: var(--bits-select-content-available-height);
-		overflow-y: auto;
-		overflow-x: hidden;
-		border-radius: var(--radius);
-		border: 1px solid hsl(var(--border));
-		background: hsl(var(--popover));
-		color: hsl(var(--popover-foreground));
-		box-shadow:
-			0 4px 6px -1px rgba(0, 0, 0, 0.1),
-			0 2px 4px -1px rgba(0, 0, 0, 0.06);
-		transform-origin: var(--bits-select-content-transform-origin);
-	}
-
-	.select-content[data-state='open'] {
-		animation: select-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	.select-content[data-state='closed'] {
-		animation: select-out 100ms ease-in;
-	}
-
-	.select-content[data-side='bottom'] {
-		transform: translateY(0.25rem);
-	}
-
-	.select-content[data-side='left'] {
-		transform: translateX(-0.25rem);
-	}
-
-	.select-content[data-side='right'] {
-		transform: translateX(0.25rem);
-	}
-
-	.select-content[data-side='top'] {
-		transform: translateY(-0.25rem);
-	}
-
-	.select-viewport {
-		width: 100%;
-		min-width: var(--bits-select-anchor-width);
-		height: var(--bits-select-anchor-height);
-		padding: 0.25rem;
-		scroll-margin: 0.25rem 0;
-	}
-
-	@keyframes select-in {
-		from {
-			opacity: 0;
-			transform: scale(0.95);
-		}
-		to {
-			opacity: 1;
-			transform: scale(1);
-		}
-	}
-
-	@keyframes select-out {
-		from {
-			opacity: 1;
-			transform: scale(1);
-		}
-		to {
-			opacity: 0;
-			transform: scale(0.95);
-		}
-	}
-</style>

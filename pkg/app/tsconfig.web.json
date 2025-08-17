@@ -21,7 +21,9 @@
 		"baseUrl": ".",
 		"paths": {
 			"$shared": ["../shared/src"],
-			"$shared/*": ["../shared/src/*"]
+			"$shared/*": ["../shared/src/*"],
+			"$lib": ["../shared/src/lib"],
+			"$lib/*": ["../shared/src/lib/*"]
 		}
 	}
 }

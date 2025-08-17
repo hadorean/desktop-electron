@@ -19,8 +19,17 @@
 		"paths": {
 			"$shared": ["../shared/src"],
 			"$shared/*": ["../shared/src/*"],
-			"$stores/*": ["./src/lib/stores/*"]
+			"$stores/*": ["./src/lib/stores/*"],
+			"$lib": ["../shared/src/lib"],
+			"$lib/*": ["../shared/src/lib/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "../shared/src/**/*.ts", "../shared/src/**/*.svelte"]
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.js",
+		"src/**/*.svelte",
+		"../shared/src/**/*.js",
+		"../shared/src/**/*.ts",
+		"../shared/src/**/*.svelte"
+	]
 }

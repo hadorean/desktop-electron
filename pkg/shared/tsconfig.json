@@ -19,7 +19,9 @@
 		"lib": ["ES2022", "DOM"],
 		"types": ["node", "svelte"],
 		"paths": {
-			"$stores/*": ["./src/stores/*", "node_modules/*", "src/types/*"]
+			"$stores/*": ["./src/stores/*", "node_modules/*", "src/types/*"],
+			"$lib": ["./src/lib"],
+			"$lib/*": ["./src/lib/*"]
 		}
 	},
 	"include": ["src/**/*.ts", "src/**/*.js", "src/**/*.d.ts", "src/**/*.svelte"],

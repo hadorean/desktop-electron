@@ -12,7 +12,9 @@
 		"baseUrl": ".",
 		"paths": {
 			"$shared": ["./pkg/shared/src"],
-			"$shared/*": ["./pkg/shared/src/*"]
+			"$shared/*": ["./pkg/shared/src/*"],
+			"$lib": ["./pkg/shared/src/lib"],
+			"$lib/*": ["./pkg/shared/src/lib/*"]
 		}
 	},
 	"include": [
