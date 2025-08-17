@@ -220,6 +220,12 @@ importers:
         specifier: ^5.0.0
         version: 5.38.1
 
+  pkg/test:
+    dependencies:
+      mode-watcher:
+        specifier: ^1.1.0
+        version: 1.1.0(svelte@5.38.1)
+
 packages:
 
   7zip-bin@5.2.0:
