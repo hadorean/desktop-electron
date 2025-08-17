@@ -2,7 +2,6 @@
 	import { Inspect } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
 	import { settingsStore } from '../../stores/settingsStore'
-	import BackgroundModeSelector from './BackgroundModeSelector.svelte'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
 	import SliderControl from './SliderControl.svelte'
@@ -78,12 +77,12 @@
 			<!-- Background Selection -->
 			<div class="setting-section">
 				<!-- Background Mode Selector -->
-				<BackgroundModeSelector
+				<!-- <BackgroundModeSelector
 					mode={$editingSettings.mode ?? $screenSettings.mode ?? 'image'}
 					onModeChange={(newMode: 'image' | 'url') => handleSettingChange('mode', newMode)}
 					canRevert={$isLocalMode && $editingSettings.mode !== undefined}
 					onRevert={() => handleSettingChange('mode', null)}
-				/>
+				/> -->
 
 				<!-- Conditional Background Input -->
 				{#if ($editingSettings.mode ?? $screenSettings.mode ?? 'image') === 'image'}
