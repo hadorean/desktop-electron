@@ -125,7 +125,8 @@ class LocalStorageService {
 
 			// Initialize screen from server data if available (after settings are loaded)
 			const serverData = (window as { __SERVER_DATA__?: { screenId?: string } }).__SERVER_DATA__
-			const initialScreenId = (window as { __INITIAL_SCREEN_ID__?: string }).__INITIAL_SCREEN_ID__ || serverData?.screenId
+			const initialScreenId =
+				(window as { __INITIAL_SCREEN_ID__?: string }).__INITIAL_SCREEN_ID__ || serverData?.screenId
 
 			console.log('📦 Checking for screen data:')
 			console.log('  - __SERVER_DATA__:', serverData)
@@ -215,14 +216,18 @@ class LocalStorageService {
 
 					// Check day settings
 					if (screenSettings.day?.selectedImage && !availableImages.includes(screenSettings.day.selectedImage)) {
-						console.log(`📷 Screen "${screenId}" day selected image "${screenSettings.day.selectedImage}" no longer exists, clearing override`)
+						console.log(
+							`📷 Screen "${screenId}" day selected image "${screenSettings.day.selectedImage}" no longer exists, clearing override`
+						)
 						delete screenSettings.day.selectedImage
 						localSettingsChanged = true
 					}
 
 					// Check night settings
 					if (screenSettings.night?.selectedImage && !availableImages.includes(screenSettings.night.selectedImage)) {
-						console.log(`📷 Screen "${screenId}" night selected image "${screenSettings.night.selectedImage}" no longer exists, clearing override`)
+						console.log(
+							`📷 Screen "${screenId}" night selected image "${screenSettings.night.selectedImage}" no longer exists, clearing override`
+						)
 						delete screenSettings.night.selectedImage
 						localSettingsChanged = true
 					}

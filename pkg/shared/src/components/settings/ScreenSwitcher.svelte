@@ -27,7 +27,8 @@
 				color,
 				type,
 				name: tabId === 'shared' ? '' : settingsStore.getFormattedScreenName(tabId),
-				icon: tabId === 'shared' ? ('home' as const) : type === 'interactive' ? ('browser' as const) : ('monitor' as const)
+				icon:
+					tabId === 'shared' ? ('home' as const) : type === 'interactive' ? ('browser' as const) : ('monitor' as const)
 			}
 		})
 	})

@@ -75,7 +75,9 @@
 				{max}
 				{step}
 				onValueChange={handleValueChange}
-				class="slider-control-input {isGhost ? 'ghost-slider' : ''} {isOverridden ? 'override-slider' : ''} {disabled ? 'disabled-slider' : ''}"
+				class="slider-control-input {isGhost ? 'ghost-slider' : ''} {isOverridden ? 'override-slider' : ''} {disabled
+					? 'disabled-slider'
+					: ''}"
 				{disabled}
 			/>
 		</div>

@@ -38,40 +38,59 @@ const screenIds = derived(allSettings, $allSettings =>
 )
 
 // Base screen settings without transitions (for syncing to other clients)
-const baseScreenSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
-	const currentTheme = theme as 'day' | 'night'
-	const themeShared = getThemeScreenSettings(all.shared, currentTheme)
-	return isLocal ? { ...themeShared, ...getThemeScreenSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme) } : themeShared
-})
+const baseScreenSettings = derived(
+	[allSettings, currentScreen, currentTheme, isLocalMode],
+	([all, screen, theme, isLocal]) => {
+		const currentTheme = theme as 'day' | 'night'
+		const themeShared = getThemeScreenSettings(all.shared, currentTheme)
+		return isLocal
+			? { ...themeShared, ...getThemeScreenSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme) }
+			: themeShared
+	}
+)
 
 // Settings to use to render the current screen image (includes transitions for UI)
-const screenSettings = derived([baseScreenSettings, inTransition, transitionSettings], ([base, isTransitioning, transition]) => {
-	// During transition, return the interpolated transition settings for UI display
-	return isTransitioning ? transition : base
-})
+const screenSettings = derived(
+	[baseScreenSettings, inTransition, transitionSettings],
+	([base, isTransitioning, transition]) => {
+		// During transition, return the interpolated transition settings for UI display
+		return isTransitioning ? transition : base
+	}
+)
 
 // Base editing settings without transitions (for syncing to other clients)
-const baseEditingSettings = derived([allSettings, currentScreen, currentTheme, isLocalMode], ([all, screen, theme, isLocal]) => {
-	const currentTheme = theme as 'day' | 'night'
-	return isLocal ? getThemeEditingSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme) : getThemeEditingSettings(all.shared, currentTheme)
-})
+const baseEditingSettings = derived(
+	[allSettings, currentScreen, currentTheme, isLocalMode],
+	([all, screen, theme, isLocal]) => {
+		const currentTheme = theme as 'day' | 'night'
+		return isLocal
+			? getThemeEditingSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme)
+			: getThemeEditingSettings(all.shared, currentTheme)
+	}
+)
 
 // Settings to use in the settings panel (includes transitions for UI display)
-const editingSettings = derived([baseEditingSettings, inTransition, transitionSettings], ([base, isTransitioning, transition]) => {
-	// During transition, return the interpolated transition settings for UI display
-	return isTransitioning ? transition : base
-})
-
-const currentScreenColor = derived([allSettings, currentScreen, isLocalMode], ([$allSettings, $currentScreen, $isLocalMode]) => {
-	if (!$isLocalMode) {
-		// Shared/home screen uses white
-		return '#ffffff'
+const editingSettings = derived(
+	[baseEditingSettings, inTransition, transitionSettings],
+	([base, isTransitioning, transition]) => {
+		// During transition, return the interpolated transition settings for UI display
+		return isTransitioning ? transition : base
 	}
+)
 
-	// Compute color based on screen index in the sorted list
-	const allScreenIds = Object.keys($allSettings.screens).sort()
-	return assignScreenColor($currentScreen, allScreenIds)
-})
+const currentScreenColor = derived(
+	[allSettings, currentScreen, isLocalMode],
+	([$allSettings, $currentScreen, $isLocalMode]) => {
+		if (!$isLocalMode) {
+			// Shared/home screen uses white
+			return '#ffffff'
+		}
+
+		// Compute color based on screen index in the sorted list
+		const allScreenIds = Object.keys($allSettings.screens).sort()
+		return assignScreenColor($currentScreen, allScreenIds)
+	}
+)
 
 const currentScreenType = derived([currentScreen, isLocalMode], ([$currentScreen, $isLocalMode]) => {
 	if (!$isLocalMode) {

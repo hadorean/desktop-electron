@@ -21,7 +21,9 @@ export class SocketService {
 	private onSettingsUpdateCallback: ((event: SettingsUpdateEvent) => void) | null = null
 	private onConnectionStatusCallback: ((connected: boolean) => void) | null = null
 	private onDebugStateChangedCallback: ((visible: boolean) => void) | null = null
-	private onImagesUpdatedCallback: ((event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void) | null = null
+	private onImagesUpdatedCallback:
+		| ((event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void)
+		| null = null
 
 	constructor() {
 		this.delayedInitialize()
@@ -97,10 +99,13 @@ export class SocketService {
 		})
 
 		// Handle images updated events
-		this.socket.on(SocketEvents.ImagesUpdated, (data: { timestamp: number; reason: string; filename?: string; eventType?: string }) => {
-			console.log('🔌 Received images updated event:', data)
-			this.onImagesUpdatedCallback?.(data)
-		})
+		this.socket.on(
+			SocketEvents.ImagesUpdated,
+			(data: { timestamp: number; reason: string; filename?: string; eventType?: string }) => {
+				console.log('🔌 Received images updated event:', data)
+				this.onImagesUpdatedCallback?.(data)
+			}
+		)
 	}
 
 	/**
@@ -184,7 +189,9 @@ export class SocketService {
 	/**
 	 * Set callback for images updated events
 	 */
-	public onImagesUpdated(callback: (event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void): void {
+	public onImagesUpdated(
+		callback: (event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void
+	): void {
 		this.onImagesUpdatedCallback = callback
 	}
 

@@ -47,9 +47,18 @@ export class UserOptionsService {
 			}
 
 			// Broadcast image directory changes to clients
-			if (this.hasInitialized && this.localServer && this.previousImageDirectory && this.previousImageDirectory !== options.imageDirectory) {
+			if (
+				this.hasInitialized &&
+				this.localServer &&
+				this.previousImageDirectory &&
+				this.previousImageDirectory !== options.imageDirectory
+			) {
 				// console.log('🔄 UserOptionsService: Broadcasting image directory change to clients')
-				this.localServer.sockets.broadcastImagesUpdated('manual_refresh', 'image-directory-changed', 'user_options_change')
+				this.localServer.sockets.broadcastImagesUpdated(
+					'manual_refresh',
+					'image-directory-changed',
+					'user_options_change'
+				)
 			}
 			this.previousImageDirectory = options.imageDirectory
 		})

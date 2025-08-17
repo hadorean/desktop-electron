@@ -19,7 +19,9 @@ export class BackgroundManager {
 		console.log(`Setting up background windows for ${displays.length} monitor(s)`)
 
 		displays.forEach((display, index) => {
-			console.log(`Monitor ${index}: ${display.bounds.width}x${display.bounds.height} at (${display.bounds.x}, ${display.bounds.y})`)
+			console.log(
+				`Monitor ${index}: ${display.bounds.width}x${display.bounds.height} at (${display.bounds.x}, ${display.bounds.y})`
+			)
 
 			// Platform-specific window configuration
 			const windowConfig: Electron.BrowserWindowConstructorOptions = {

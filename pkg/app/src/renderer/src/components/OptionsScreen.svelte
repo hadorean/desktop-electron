@@ -369,7 +369,11 @@
 									<label for="open-window-switch" class="option-label">Open window on start</label>
 									<p class="option-description">Show the main window when application starts</p>
 								</div>
-								<Switch id="open-window-switch" checked={openWindowOnStart} onCheckedChange={handleOpenWindowOnStartChange} />
+								<Switch
+									id="open-window-switch"
+									checked={openWindowOnStart}
+									onCheckedChange={handleOpenWindowOnStartChange}
+								/>
 							</div>
 						</div>
 					{/if}
@@ -417,9 +421,16 @@
 
 						{#if portPendingRestart}
 							<div class="port-actions">
-								<p class="port-warning">Changing the port requires restarting the server and will reload all background windows.</p>
+								<p class="port-warning">
+									Changing the port requires restarting the server and will reload all background windows.
+								</p>
 								<div class="button-row">
-									<Button variant="outline" onclick={cancelPortChange} disabled={isRestartingServer} class="cancel-button">Cancel</Button>
+									<Button
+										variant="outline"
+										onclick={cancelPortChange}
+										disabled={isRestartingServer}
+										class="cancel-button">Cancel</Button
+									>
 									<Button onclick={applyPortChange} disabled={isRestartingServer} class="apply-button">
 										{isRestartingServer ? 'Restarting...' : 'Apply Changes'}
 									</Button>
@@ -446,7 +457,14 @@
 						<div class="option-section">
 							<label for="window-opacity-slider" class="option-label">Window Opacity:</label>
 							<div class="slider-section">
-								<Slider value={[windowOpacity]} min={0} max={1} step={0.01} onValueChange={handleOpacityChange} class="opacity-slider" />
+								<Slider
+									value={[windowOpacity]}
+									min={0}
+									max={1}
+									step={0.01}
+									onValueChange={handleOpacityChange}
+									class="opacity-slider"
+								/>
 								<span class="slider-value">{(windowOpacity * 100).toFixed(0)}%</span>
 							</div>
 							<p class="option-description">Adjust the transparency of application windows</p>

@@ -78,7 +78,9 @@
 		</div>
 		<div class="weather-temp">
 			<span class="weather-icon">
-				{#if weather.current.condition.toLowerCase().includes('sunny') || weather.current.condition.toLowerCase().includes('clear')}
+				{#if weather.current.condition.toLowerCase().includes('sunny') || weather.current.condition
+						.toLowerCase()
+						.includes('clear')}
 					{#if parseInt(currentTime.split(':')[0]) >= 18 || parseInt(currentTime.split(':')[0]) < 6}
 						🌙
 					{:else}
@@ -86,13 +88,19 @@
 					{/if}
 				{:else if weather.current.condition.toLowerCase().includes('cloud')}
 					☁️
-				{:else if weather.current.condition.toLowerCase().includes('rain') || weather.current.condition.toLowerCase().includes('shower')}
+				{:else if weather.current.condition.toLowerCase().includes('rain') || weather.current.condition
+						.toLowerCase()
+						.includes('shower')}
 					🌧️
 				{:else if weather.current.condition.toLowerCase().includes('snow')}
 					❄️
-				{:else if weather.current.condition.toLowerCase().includes('storm') || weather.current.condition.toLowerCase().includes('thunder')}
+				{:else if weather.current.condition.toLowerCase().includes('storm') || weather.current.condition
+						.toLowerCase()
+						.includes('thunder')}
 					⛈️
-				{:else if weather.current.condition.toLowerCase().includes('fog') || weather.current.condition.toLowerCase().includes('mist')}
+				{:else if weather.current.condition.toLowerCase().includes('fog') || weather.current.condition
+						.toLowerCase()
+						.includes('mist')}
 					🌫️
 				{:else}
 					🌙

@@ -3,7 +3,14 @@
 	import { Select as SelectPrimitive } from 'bits-ui'
 	import { cn, type WithoutChild } from '../../../lib/utils'
 
-	let { ref = $bindable(null), class: className, value, label, children: childrenProp, ...restProps }: WithoutChild<SelectPrimitive.ItemProps> = $props()
+	let {
+		ref = $bindable(null),
+		class: className,
+		value,
+		label,
+		children: childrenProp,
+		...restProps
+	}: WithoutChild<SelectPrimitive.ItemProps> = $props()
 </script>
 
 <SelectPrimitive.Item bind:ref {value} data-slot="select-item" class={cn('select-item', className)} {...restProps}>

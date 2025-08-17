@@ -16,7 +16,8 @@ const api = {
 	reloadAllBackgrounds: () => ipcRenderer.invoke(IpcEvents.ReloadAllBackgrounds),
 	makeBackgroundInteractive: (monitorId: number) => ipcRenderer.invoke(IpcEvents.MakeBackgroundInteractive, monitorId),
 	makeAllBackgroundsInteractive: () => ipcRenderer.invoke(IpcEvents.MakeAllBackgroundsInteractive),
-	makeBackgroundNonInteractive: (monitorId: number) => ipcRenderer.invoke(IpcEvents.MakeBackgroundNonInteractive, monitorId),
+	makeBackgroundNonInteractive: (monitorId: number) =>
+		ipcRenderer.invoke(IpcEvents.MakeBackgroundNonInteractive, monitorId),
 	makeAllBackgroundsNonInteractive: () => ipcRenderer.invoke(IpcEvents.MakeAllBackgroundsNonInteractive),
 	// Auto-update APIs
 	checkForUpdates: () => ipcRenderer.invoke(IpcEvents.CheckForUpdates),
@@ -34,8 +35,10 @@ const api = {
 	},
 	// Settings APIs
 	getSettings: () => ipcRenderer.invoke(IpcEvents.SettingsGet),
-	updateSharedSettings: (settings: Partial<ScreenProfile>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
-	updateLocalSettings: (screenId: string, settings: Partial<ScreenProfile>) => ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
+	updateSharedSettings: (settings: Partial<ScreenProfile>) =>
+		ipcRenderer.invoke(IpcEvents.SettingsUpdateShared, settings),
+	updateLocalSettings: (screenId: string, settings: Partial<ScreenProfile>) =>
+		ipcRenderer.invoke(IpcEvents.SettingsUpdateLocal, screenId, settings),
 	isSettingsAvailable: () => ipcRenderer.invoke(IpcEvents.SettingsIsAvailable),
 	// Debug menu API
 	getDebugState: () => ipcRenderer.invoke(IpcEvents.GetDebugState),

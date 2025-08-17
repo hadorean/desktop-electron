@@ -220,7 +220,9 @@ class TagCleaner {
 
 		const allTags = new Set([...localTags, ...remoteTags])
 		const totalTags = allTags.size
-		const question = chalk.yellow(`\n⚠️  This will delete ${totalTags} tags matching "${this.tagPattern}". Continue? (y/N): `)
+		const question = chalk.yellow(
+			`\n⚠️  This will delete ${totalTags} tags matching "${this.tagPattern}". Continue? (y/N): `
+		)
 
 		rl.question(question, answer => {
 			rl.close()

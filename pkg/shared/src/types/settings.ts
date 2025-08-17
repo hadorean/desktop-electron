@@ -26,14 +26,20 @@ export interface ScreenSettings {
 	night: Partial<ScreenProfile> | null
 }
 
-export function getThemeScreenSettings(settings: ScreenSettings | undefined, theme: DayNightMode): Partial<ScreenProfile> {
+export function getThemeScreenSettings(
+	settings: ScreenSettings | undefined,
+	theme: DayNightMode
+): Partial<ScreenProfile> {
 	if (!settings) {
 		return DefaultScreenSettings.day
 	}
 	return theme === 'day' || settings.night === null ? settings.day : { ...settings.day, ...settings.night }
 }
 
-export function getThemeEditingSettings(settings: ScreenSettings | undefined, theme: DayNightMode): Partial<ScreenProfile> {
+export function getThemeEditingSettings(
+	settings: ScreenSettings | undefined,
+	theme: DayNightMode
+): Partial<ScreenProfile> {
 	if (!settings) {
 		return {}
 	}

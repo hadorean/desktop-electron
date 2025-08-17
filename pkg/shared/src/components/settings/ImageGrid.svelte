@@ -49,7 +49,9 @@
 		settingsStore.updateSharedSettings(current => {
 			const currentFavorites = current.favorites ?? []
 			return {
-				favorites: currentFavorites.includes(imageName) ? currentFavorites.filter((name: string) => name !== imageName) : [...currentFavorites, imageName]
+				favorites: currentFavorites.includes(imageName)
+					? currentFavorites.filter((name: string) => name !== imageName)
+					: [...currentFavorites, imageName]
 			}
 		})
 	}
@@ -111,7 +113,9 @@
 					{#each sortedImages as image (image.name)}
 						<div class="card-container">
 							<div
-								class="image-thumbnail-card group {effectiveImage === image.name ? 'selected' : ''} {isGhost ? 'ghost-thumbnail' : ''}"
+								class="image-thumbnail-card group {effectiveImage === image.name ? 'selected' : ''} {isGhost
+									? 'ghost-thumbnail'
+									: ''}"
 								onclick={() => handleImageClick(image.name)}
 								onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleImageClick(image.name)}
 								tabindex="0"
@@ -140,9 +144,13 @@
 										</div>
 									</div>
 									<button
-										class="favorite-button {($screenSettings.favorites ?? []).includes(image.name) ? 'is-favorite' : ''}"
+										class="favorite-button {($screenSettings.favorites ?? []).includes(image.name)
+											? 'is-favorite'
+											: ''}"
 										onclick={(e: Event) => toggleFavorite(image.name, e)}
-										title={($screenSettings.favorites ?? []).includes(image.name) ? 'Remove from favorites' : 'Add to favorites'}
+										title={($screenSettings.favorites ?? []).includes(image.name)
+											? 'Remove from favorites'
+											: 'Add to favorites'}
 									>
 										{#if ($screenSettings.favorites ?? []).includes(image.name)}
 											★

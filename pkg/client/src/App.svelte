@@ -1,5 +1,13 @@
 <script lang="ts">
-	import { BackgroundImage, ErrorMessage, SettingsButton, SettingsPanel, SettingsServerUpdate, TimeDisplay, WeatherDisplay } from '$shared/components'
+	import {
+		BackgroundImage,
+		ErrorMessage,
+		SettingsButton,
+		SettingsPanel,
+		SettingsServerUpdate,
+		TimeDisplay,
+		WeatherDisplay
+	} from '$shared/components'
 	import { api, imagesService, localStorageService, socketService } from '$shared/services'
 	import { debugMenu } from '$shared/stores/debugStore'
 	import { imagesStore } from '$shared/stores/imagesStore'

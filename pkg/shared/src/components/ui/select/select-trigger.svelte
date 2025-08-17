@@ -14,7 +14,13 @@
 	} = $props()
 </script>
 
-<SelectPrimitive.Trigger bind:ref data-slot="select-trigger" data-size={size} class={cn('select-trigger', className)} {...restProps}>
+<SelectPrimitive.Trigger
+	bind:ref
+	data-slot="select-trigger"
+	data-size={size}
+	class={cn('select-trigger', className)}
+	{...restProps}
+>
 	{@render children?.()}
 	<ChevronDownIcon class="chevron-icon" />
 </SelectPrimitive.Trigger>

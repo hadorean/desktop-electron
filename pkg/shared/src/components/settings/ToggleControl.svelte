@@ -45,7 +45,13 @@
 	<div class="toggle-row">
 		<span class="label-text">{label}</span>
 		{#if isOverride && canRevert}
-			<button class="revert-button" class:disabled onclick={handleRevert} title="Clear override" aria-label="Clear override">
+			<button
+				class="revert-button"
+				class:disabled
+				onclick={handleRevert}
+				title="Clear override"
+				aria-label="Clear override"
+			>
 				<Icon name="revert" size="sm" />
 			</button>
 		{:else}
@@ -56,7 +62,12 @@
 				id={`toggle-${label}`}
 				checked={displayChecked}
 				onCheckedChange={handleToggleChange}
-				class={cn('switch-element', isGhost && 'ghost-toggle', isOverridden && 'override-toggle', disabled && 'disabled-toggle')}
+				class={cn(
+					'switch-element',
+					isGhost && 'ghost-toggle',
+					isOverridden && 'override-toggle',
+					disabled && 'disabled-toggle'
+				)}
 				{disabled}
 			/>
 		</div>

@@ -9,7 +9,16 @@
 		onValueChange?: (value: number[]) => void
 	}
 
-	let { class: className, value = $bindable([0]), max = 100, min = 0, step = 1, disabled = false, onValueChange, ...restProps }: Props = $props()
+	let {
+		class: className,
+		value = $bindable([0]),
+		max = 100,
+		min = 0,
+		step = 1,
+		disabled = false,
+		onValueChange,
+		...restProps
+	}: Props = $props()
 
 	let sliderRef: HTMLInputElement
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -75,7 +75,13 @@
 	{#if updateAvailable || updateDownloaded || updateProgress > 0}
 		<div class="update-section">
 			{#if updateAvailable && !updateDownloaded && updateProgress === 0}
-				<div class="update-available" role="button" tabindex="0" on:mouseenter={() => (showInfo = true)} on:mouseleave={() => (showInfo = false)}>
+				<div
+					class="update-available"
+					role="button"
+					tabindex="0"
+					on:mouseenter={() => (showInfo = true)}
+					on:mouseleave={() => (showInfo = false)}
+				>
 					{#if showInfo && newVersionInfo && updateProgress === 0}
 						<div class="update-info">
 							<h3>Version: {newVersionInfo?.version}</h3>

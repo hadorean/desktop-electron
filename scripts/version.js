@@ -66,7 +66,9 @@ function updateVersion(versionArg, shouldCommit = true) {
 			// Validate version format (semantic versioning)
 			const versionRegex = /^\d+\.\d+\.\d+$/
 			if (!versionRegex.test(version)) {
-				console.error('❌ Invalid version format. Please use semantic versioning (e.g., 1.0.1) or a semantic keyword (patch, minor, major)')
+				console.error(
+					'❌ Invalid version format. Please use semantic versioning (e.g., 1.0.1) or a semantic keyword (patch, minor, major)'
+				)
 				process.exit(1)
 			}
 

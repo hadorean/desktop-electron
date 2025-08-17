@@ -1,7 +1,28 @@
 <script lang="ts">
-	import { BackArrowIcon, BrowserIcon, CogIcon, HomeIcon, MonitorIcon, MoonIcon, RevertIcon, SunIcon, WarningCircleIcon, XMarkIcon } from '../../assets/icons'
+	import {
+		BackArrowIcon,
+		BrowserIcon,
+		CogIcon,
+		HomeIcon,
+		MonitorIcon,
+		MoonIcon,
+		RevertIcon,
+		SunIcon,
+		WarningCircleIcon,
+		XMarkIcon
+	} from '../../assets/icons'
 
-	export let name: 'warning-circle' | 'x-mark' | 'cog' | 'back-arrow' | 'monitor' | 'browser' | 'moon' | 'sun' | 'home' | 'revert'
+	export let name:
+		| 'warning-circle'
+		| 'x-mark'
+		| 'cog'
+		| 'back-arrow'
+		| 'monitor'
+		| 'browser'
+		| 'moon'
+		| 'sun'
+		| 'home'
+		| 'revert'
 	export let size: 'sm' | 'md' | 'lg' = 'md'
 	export let className: string = ''
 

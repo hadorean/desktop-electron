@@ -8,8 +8,14 @@ declare global {
 		api: {
 			getServerUrl: () => Promise<string>
 			isServerRunning: () => Promise<boolean>
-			restartServerWithPort: (port: number) => Promise<{ success: boolean; data?: { port: number; url: string }; error?: string }>
-			getServerStatus: () => Promise<{ success: boolean; data?: { status: string; port: number | null; url: string | null }; error?: string }>
+			restartServerWithPort: (
+				port: number
+			) => Promise<{ success: boolean; data?: { port: number; url: string }; error?: string }>
+			getServerStatus: () => Promise<{
+				success: boolean
+				data?: { status: string; port: number | null; url: string | null }
+				error?: string
+			}>
 			getAppVersion: () => Promise<string>
 			reloadBackground: (monitorId: number) => Promise<void>
 			reloadAllBackgrounds: () => Promise<void>
@@ -26,8 +32,13 @@ declare global {
 			onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => void
 			// Settings APIs
 			getSettings: () => Promise<{ success: boolean; data?: UserSettings; error?: string }>
-			updateSharedSettings: (settings: Partial<ScreenProfile>) => Promise<{ success: boolean; data?: UserSettings; error?: string }>
-			updateLocalSettings: (screenId: string, settings: Partial<ScreenProfile>) => Promise<{ success: boolean; data?: UserSettings; error?: string }>
+			updateSharedSettings: (
+				settings: Partial<ScreenProfile>
+			) => Promise<{ success: boolean; data?: UserSettings; error?: string }>
+			updateLocalSettings: (
+				screenId: string,
+				settings: Partial<ScreenProfile>
+			) => Promise<{ success: boolean; data?: UserSettings; error?: string }>
 			isSettingsAvailable: () => Promise<{ success: boolean; data: boolean }>
 			// Debug menu APIs
 			getDebugState: () => Promise<{ success: boolean; visible?: boolean; error?: string }>

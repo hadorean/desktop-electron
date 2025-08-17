@@ -50,8 +50,19 @@
 				<span class="label-text">API Server URL</span>
 			</label>
 			<div class="input-group">
-				<input id="api-url" type="text" class="url-input" bind:value={localApiUrl} on:input={handleApiUrlChange} placeholder="http://localhost:8080" />
-				<button class="reconnect-btn {isReconnecting ? 'loading' : ''}" on:click={handleReconnect} disabled={isReconnecting}>
+				<input
+					id="api-url"
+					type="text"
+					class="url-input"
+					bind:value={localApiUrl}
+					on:input={handleApiUrlChange}
+					placeholder="http://localhost:8080"
+				/>
+				<button
+					class="reconnect-btn {isReconnecting ? 'loading' : ''}"
+					on:click={handleReconnect}
+					disabled={isReconnecting}
+				>
 					{isReconnecting ? 'Reconnecting...' : 'Reconnect'}
 				</button>
 			</div>

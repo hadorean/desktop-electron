@@ -65,6 +65,7 @@
 
 	.options-icon {
 		color: #e5e5e5; /* text-gray-200 */
-		filter: brightness(0) saturate(100%) invert(90%) sepia(5%) saturate(140%) hue-rotate(202deg) brightness(95%) contrast(86%);
+		filter: brightness(0) saturate(100%) invert(90%) sepia(5%) saturate(140%) hue-rotate(202deg) brightness(95%)
+			contrast(86%);
 	}
 </style>

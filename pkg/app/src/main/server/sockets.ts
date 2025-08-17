@@ -20,7 +20,11 @@ export class SocketManager {
 	/**
 	 * Type-safe wrapper for handling client-to-server events
 	 */
-	private onClientEvent<T extends ClientEvents>(socket: Socket, event: T, handler: (data: ClientEventMap[T]) => void | Promise<void>): void {
+	private onClientEvent<T extends ClientEvents>(
+		socket: Socket,
+		event: T,
+		handler: (data: ClientEventMap[T]) => void | Promise<void>
+	): void {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		socket.on(event, handler as any)
 	}
@@ -81,7 +85,11 @@ export class SocketManager {
 	/**
 	 * Broadcast images updated event to all clients
 	 */
-	public broadcastImagesUpdated(reason: 'file_change' | 'manual_refresh' | 'startup', filename?: string, eventType?: string): void {
+	public broadcastImagesUpdated(
+		reason: 'file_change' | 'manual_refresh' | 'startup',
+		filename?: string,
+		eventType?: string
+	): void {
 		console.log(`🔌 Broadcasting images updated: ${reason} ${filename ? `(${filename})` : ''}`)
 		this.emit(SocketEvents.ImagesUpdated, {
 			timestamp: Date.now(),

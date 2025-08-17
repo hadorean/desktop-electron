@@ -6,7 +6,16 @@
 	import { userOptionsStore } from '$shared/stores/userOptionsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onMount } from 'svelte'
-	import { ActionButtons, AppVersion, CustomHeader, OptionsButton, OptionsScreen, PageContainer, ServerInfo, Versions } from './components'
+	import {
+		ActionButtons,
+		AppVersion,
+		CustomHeader,
+		OptionsButton,
+		OptionsScreen,
+		PageContainer,
+		ServerInfo,
+		Versions
+	} from './components'
 	import { init } from './services/app'
 	import { appConfig } from './stores/appConfigStore'
 	import { currentPage, gotoPage } from './stores/pageStore'

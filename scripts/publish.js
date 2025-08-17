@@ -50,7 +50,17 @@ function main() {
 		const tagName = `v${version}`
 		const releaseTitle = `Release ${version}`
 
-		const command = ['gh', 'release', 'create', tagName, ...filesToUpload.map(f => `"${f}"`), '--title', `"${releaseTitle}"`, '--notes', `""`].join(' ')
+		const command = [
+			'gh',
+			'release',
+			'create',
+			tagName,
+			...filesToUpload.map(f => `"${f}"`),
+			'--title',
+			`"${releaseTitle}"`,
+			'--notes',
+			`""`
+		].join(' ')
 
 		console.log(`\n🚀 Creating GitHub release...`)
 		console.log(`Command: ${command}\n`)

@@ -39,7 +39,10 @@ export interface ClientEventMap {
 }
 
 // Type for server-to-client events (events that servers emit)
-export type ServerEvents = typeof SocketEvents.SettingsUpdate | typeof SocketEvents.DebugStateChanged | typeof SocketEvents.ImagesUpdated
+export type ServerEvents =
+	| typeof SocketEvents.SettingsUpdate
+	| typeof SocketEvents.DebugStateChanged
+	| typeof SocketEvents.ImagesUpdated
 
 // Type for client-to-server events (events that clients emit)
 export type ClientEvents = typeof SocketEvents.ClientUpdatedSettings

@@ -9,7 +9,14 @@
 		id?: string
 	}
 
-	let { class: className, checked = $bindable(false), disabled = false, onCheckedChange, id, ...restProps }: Props = $props()
+	let {
+		class: className,
+		checked = $bindable(false),
+		disabled = false,
+		onCheckedChange,
+		id,
+		...restProps
+	}: Props = $props()
 
 	let mounted = $state(false)
 

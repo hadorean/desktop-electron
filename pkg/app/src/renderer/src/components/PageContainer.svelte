@@ -12,7 +12,14 @@
 		easing?: (t: number) => number
 	}
 
-	let { settingsContent, optionsContent, class: className = '', duration = 300, easing = quartOut, ...restProps }: Props = $props()
+	let {
+		settingsContent,
+		optionsContent,
+		class: className = '',
+		duration = 300,
+		easing = quartOut,
+		...restProps
+	}: Props = $props()
 
 	// Track previous page to determine slide direction
 	let previousPage = $state<string | null>(null)
@@ -25,7 +32,10 @@
 	})
 
 	// Custom slide transition that moves full width + fade
-	function slideTransition(node: Element, { direction, duration = 500 }: { direction: 'from-left' | 'from-right'; duration?: number }) {
+	function slideTransition(
+		node: Element,
+		{ direction, duration = 500 }: { direction: 'from-left' | 'from-right'; duration?: number }
+	) {
 		const style = getComputedStyle(node)
 		const opacity = +style.opacity
 		const width = node.clientWidth
@@ -49,7 +59,10 @@
 	}
 
 	// Exit transition - slide out in opposite direction
-	function slideOutTransition(node: Element, { direction, duration = 400 }: { direction: 'to-left' | 'to-right'; duration?: number }) {
+	function slideOutTransition(
+		node: Element,
+		{ direction, duration = 400 }: { direction: 'to-left' | 'to-right'; duration?: number }
+	) {
 		const style = getComputedStyle(node)
 		const opacity = +style.opacity
 		const width = node.clientWidth

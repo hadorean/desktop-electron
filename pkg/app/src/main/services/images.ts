@@ -24,7 +24,12 @@ export class ImageService extends EventEmitter {
 		// Subscribe to image directory changes
 		this.userOptionsUnsubscribe = userOptionsStore.onChanged((newOptions, previousOptions) => {
 			if (newOptions.imageDirectory !== previousOptions.imageDirectory) {
-				console.log('🔧 ImageService: Image directory changed from', previousOptions.imageDirectory, 'to', newOptions.imageDirectory)
+				console.log(
+					'🔧 ImageService: Image directory changed from',
+					previousOptions.imageDirectory,
+					'to',
+					newOptions.imageDirectory
+				)
 				this.setImagesPath(newOptions.imageDirectory)
 			}
 		})

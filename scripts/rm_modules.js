@@ -82,7 +82,9 @@ async function getDirectorySize(dirPath) {
 	try {
 		if (isWindows) {
 			// Use PowerShell on Windows for better performance with large directories
-			const { stdout } = await execAsync(`powershell "(Get-ChildItem -Recurse -File '${dirPath}' | Measure-Object -Property Length -Sum).Sum"`)
+			const { stdout } = await execAsync(
+				`powershell "(Get-ChildItem -Recurse -File '${dirPath}' | Measure-Object -Property Length -Sum).Sum"`
+			)
 			return parseInt(stdout.trim()) || 0
 		} else {
 			const { stdout } = await execAsync(`du -sb "${dirPath}" | cut -f1`)
@@ -219,7 +221,10 @@ async function findPackageLockFiles(startPath) {
 			for (const entry of entries) {
 				const fullPath = path.join(currentPath, entry.name)
 
-				if (entry.isFile() && (entry.name === 'package-lock.json' || entry.name === 'pnpm-lock.yaml' || entry.name === 'yarn.lock')) {
+				if (
+					entry.isFile() &&
+					(entry.name === 'package-lock.json' || entry.name === 'pnpm-lock.yaml' || entry.name === 'yarn.lock')
+				) {
 					results.push(fullPath)
 				} else if (entry.isDirectory() && entry.name !== 'node_modules' && !entry.name.startsWith('.')) {
 					await traverse(fullPath)
@@ -274,7 +279,9 @@ async function cleanup() {
 			const size = CONFIG.dryRun || CONFIG.verbose ? await getDirectorySize(dir) : 0
 
 			if (CONFIG.verbose || CONFIG.dryRun) {
-				console.log(`  ${colorize('📁', 'blue')} ${relativePath} ${size > 0 ? colorize(`(${formatBytes(size)})`, 'cyan') : ''}`)
+				console.log(
+					`  ${colorize('📁', 'blue')} ${relativePath} ${size > 0 ? colorize(`(${formatBytes(size)})`, 'cyan') : ''}`
+				)
 			}
 
 			if (!CONFIG.dryRun) {
@@ -349,7 +356,9 @@ async function cleanup() {
 				const size = CONFIG.dryRun || CONFIG.verbose ? await getDirectorySize(dir) : 0
 
 				if (CONFIG.verbose || CONFIG.dryRun) {
-					console.log(`  ${colorize('🏗️', 'blue')} ${relativePath} ${size > 0 ? colorize(`(${formatBytes(size)})`, 'cyan') : ''}`)
+					console.log(
+						`  ${colorize('🏗️', 'blue')} ${relativePath} ${size > 0 ? colorize(`(${formatBytes(size)})`, 'cyan') : ''}`
+					)
 				}
 
 				if (!CONFIG.dryRun) {

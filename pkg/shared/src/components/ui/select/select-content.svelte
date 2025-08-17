@@ -17,7 +17,13 @@
 </script>
 
 <SelectPrimitive.Portal {...portalProps}>
-	<SelectPrimitive.Content bind:ref {sideOffset} data-slot="select-content" class={cn('select-content', className)} {...restProps}>
+	<SelectPrimitive.Content
+		bind:ref
+		{sideOffset}
+		data-slot="select-content"
+		class={cn('select-content', className)}
+		{...restProps}
+	>
 		<SelectScrollUpButton />
 		<SelectPrimitive.Viewport class="select-viewport">
 			{@render children?.()}

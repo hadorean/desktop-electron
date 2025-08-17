@@ -168,7 +168,12 @@
 	{/each}
 	{#if activeBackground}
 		{#if activeBackground.mode === 'image'}
-			<img src={activeBackground.url} alt="Background" class="background-image" style="opacity: {activeBackground.opacity};" />
+			<img
+				src={activeBackground.url}
+				alt="Background"
+				class="background-image"
+				style="opacity: {activeBackground.opacity};"
+			/>
 		{:else if activeBackground.mode === 'url' && activeBackground.url}
 			<iframe
 				src={activeBackground.url}

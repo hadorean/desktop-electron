@@ -224,7 +224,9 @@ export function initIpc(): void {
 				properties: ['openDirectory'],
 				...options
 			}
-			const result = window ? await dialog.showOpenDialog(window, dialogOptions) : await dialog.showOpenDialog(dialogOptions)
+			const result = window
+				? await dialog.showOpenDialog(window, dialogOptions)
+				: await dialog.showOpenDialog(dialogOptions)
 			return { success: true, data: result }
 		} catch (error) {
 			console.error('IPC show-open-dialog error:', error)

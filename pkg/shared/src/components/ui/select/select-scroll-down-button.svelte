@@ -3,7 +3,11 @@
 	import { Select as SelectPrimitive } from 'bits-ui'
 	import { cn, type WithoutChildrenOrChild } from '../../../lib/utils'
 
-	let { ref = $bindable(null), class: className, ...restProps }: WithoutChildrenOrChild<SelectPrimitive.ScrollDownButtonProps> = $props()
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: WithoutChildrenOrChild<SelectPrimitive.ScrollDownButtonProps> = $props()
 </script>
 
 <SelectPrimitive.ScrollDownButton

@@ -42,7 +42,10 @@
 		}
 	})
 
-	function handleSettingChange<K extends keyof typeof $editingSettings>(key: K, value: (typeof $editingSettings)[K] | null): void {
+	function handleSettingChange<K extends keyof typeof $editingSettings>(
+		key: K,
+		value: (typeof $editingSettings)[K] | null
+	): void {
 		settingsStore.updateEditingSettings(current => {
 			if (value === null) {
 				// Remove property (reset to default)

@@ -33,7 +33,12 @@ export class ThumbnailService {
 		// Subscribe to image directory changes
 		this.userOptionsUnsubscribe = userOptionsStore.onChanged((newOptions, previousOptions) => {
 			if (newOptions.imageDirectory !== previousOptions.imageDirectory) {
-				console.log('🔧 ThumbnailService: Image directory changed from', previousOptions.imageDirectory, 'to', newOptions.imageDirectory)
+				console.log(
+					'🔧 ThumbnailService: Image directory changed from',
+					previousOptions.imageDirectory,
+					'to',
+					newOptions.imageDirectory
+				)
 				this.imagesPath = newOptions.imageDirectory
 				// Note: We don't need to regenerate thumbnails as they use relative paths
 			}
