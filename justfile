@@ -55,6 +55,17 @@ doc:
 run:
 	./pkg/app/dist/*.exe
 
+# Shad components library
+
+# Add a shadcn component
+shad command="add":
+	cd pkg/shadcn && pnpm dlx shadcn-svelte@latest {{command}}
+
+# Run the shadcn demo
+demo-shad:
+	cd pkg/shadcn && pnpm dev
+	
+
 [confirm("Are you sure you want to clean the node_modules (y/n)?")]
 clean:
 	node scripts/rm_modules.js
