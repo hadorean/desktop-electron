@@ -63,7 +63,7 @@ export class BackgroundManager {
 
 	private async addDisplay(display: Electron.Display) {
 		const displays = screen.getAllDisplays()
-		var index = displays.findIndex(d => d.id === display.id)
+		const index = displays.findIndex(d => d.id === display.id)
 		if (index !== -1) {
 			const id = `monitor${index + 1}`
 			console.log('display-added', id)
@@ -76,7 +76,7 @@ export class BackgroundManager {
 	}
 
 	private removeDisplay(display: Electron.Display) {
-		var bg = this.backgrounds.values().find(bg => bg.display.id === display.id)
+		const bg = this.first(this.backgrounds, x => x.display.id === display.id)
 		if (bg) {
 			console.log('display-removed', bg.id)
 			this.disableBg(bg)
@@ -84,8 +84,17 @@ export class BackgroundManager {
 		}
 	}
 
+	private first<T>(map: Map<string, T>, predicate: (value: T) => boolean): T | null {
+		for (const value of map.values()) {
+			if (predicate(value)) {
+				return value
+			}
+		}
+		return null
+	}
+
 	private reloadDisplay(display: Electron.Display) {
-		var bg = this.backgrounds.values().find(bg => bg.display.id === display.id)
+		const bg = this.first(this.backgrounds, x => x.display.id === display.id)
 		if (bg) {
 			console.log('display-metrics-changed', bg.id)
 			this.removeDisplay(display)

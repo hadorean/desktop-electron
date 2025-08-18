@@ -20,7 +20,8 @@
 	const {
 		screenSettings,
 		editingSettings,
-		inTransition,
+		rootSettings,
+		transitionTime,
 		isLocalMode,
 		currentScreen,
 		currentScreenId,
@@ -84,18 +85,6 @@
 		<div class="settings-groups">
 			<!-- Background Selection -->
 			<div class="setting-section">
-				{#if $currentScreenType === 'static'}
-					<ToggleControl
-						label="Enable background"
-						checked={$currentScreen.monitorEnabled}
-						onChange={(newMonitorEnabled: boolean | null) => {
-							settingsStore.setMonitorEnabled(newMonitorEnabled ?? true)
-						}}
-						defaultValue={true}
-						disabled={$inTransition}
-					/>
-				{/if}
-
 				<!-- Background Mode Selector -->
 				<!-- <BackgroundModeSelector
 					mode={$editingSettings.mode ?? $screenSettings.mode ?? 'image'}
@@ -130,9 +119,9 @@
 					onChange={(newOpacity: number | null) => updateProfile('opacity', newOpacity)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={1}
+					defaultValue={$rootSettings.opacity}
 					overrideValue={$editingSettings.opacity}
-					disabled={$inTransition}
+					transition={$transitionTime}
 				/>
 
 				<SliderControl
@@ -144,9 +133,9 @@
 					onChange={(newSaturation: number | null) => updateProfile('saturation', newSaturation)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={1}
+					defaultValue={$rootSettings.saturation}
 					overrideValue={$editingSettings.saturation}
-					disabled={$inTransition}
+					transition={$transitionTime}
 				/>
 
 				<SliderControl
@@ -158,9 +147,9 @@
 					onChange={(newBlur: number | null) => updateProfile('blur', newBlur)}
 					formatValue={(v: number) => `${v.toFixed(1)}px`}
 					isOverride={$isLocalMode}
-					defaultValue={0}
+					defaultValue={$rootSettings.blur}
 					overrideValue={$editingSettings.blur}
-					disabled={$inTransition}
+					transition={$transitionTime}
 				/>
 
 				<SliderControl
@@ -172,9 +161,9 @@
 					onChange={(newTransitionTime: number | null) => updateProfile('transitionTime', newTransitionTime)}
 					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
-					defaultValue={1}
+					defaultValue={$rootSettings.transitionTime}
 					overrideValue={$editingSettings.transitionTime}
-					disabled={$inTransition}
+					transition={$transitionTime}
 				/>
 			</div>
 
@@ -184,8 +173,7 @@
 				onChange={(newShowTimeDate: boolean | null) => updateProfile('showTimeDate', newShowTimeDate)}
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.showTimeDate}
-				defaultValue={true}
-				disabled={$inTransition}
+				defaultValue={$rootSettings.showTimeDate}
 			/>
 
 			<ToggleControl
@@ -194,8 +182,7 @@
 				onChange={(newShowWeather: boolean | null) => updateProfile('showWeather', newShowWeather)}
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.showWeather}
-				defaultValue={false}
-				disabled={$inTransition}
+				defaultValue={$rootSettings.showWeather}
 			/>
 
 			{#if $currentScreenType === 'interactive'}
@@ -205,8 +192,18 @@
 					onChange={(newHideButton: boolean | null) => updateProfile('hideButton', newHideButton)}
 					isOverride={$isLocalMode}
 					overrideValue={$editingSettings.hideButton}
-					defaultValue={false}
-					disabled={$inTransition}
+					defaultValue={$rootSettings.hideButton}
+				/>
+			{/if}
+
+			{#if $currentScreenType === 'static'}
+				<ToggleControl
+					label="Enable background"
+					checked={$currentScreen.monitorEnabled}
+					onChange={(newMonitorEnabled: boolean | null) => {
+						settingsStore.setMonitorEnabled(newMonitorEnabled ?? true)
+					}}
+					defaultValue={true}
 				/>
 			{/if}
 		</div>

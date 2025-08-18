@@ -35,7 +35,7 @@ export function getThemeScreenSettings(
 	if (!settings) {
 		return DefaultScreenSettings.day
 	}
-	return theme === 'day' || settings.night === null ? settings.day : { ...settings.day, ...settings.night }
+	return theme === 'day' ? settings.day : (settings.night ?? {})
 }
 
 export function getThemeEditingSettings(

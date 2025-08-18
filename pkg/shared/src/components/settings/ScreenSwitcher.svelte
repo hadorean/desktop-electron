@@ -35,10 +35,10 @@
 
 	function handleTabClick(tabId: string): void {
 		if (tabId === 'shared') {
-			isLocalMode.set(false)
+			settingsStore.setLocalMode(false)
 		} else {
-			currentScreenId.set(tabId)
-			isLocalMode.set(true)
+			settingsStore.setCurrentScreen(tabId)
+			settingsStore.setLocalMode(true)
 		}
 		updateUnderlinePosition()
 	}

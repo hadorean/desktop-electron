@@ -95,14 +95,14 @@
 			const isClickInside = settingsPanel.contains(target) || settingsButton.contains(target)
 
 			if (!isClickInside) {
-				expandSettings.set(false)
+				settingsStore.setExpandSettings(false)
 			}
 		}
 	}
 
 	// Function to handle settings toggle
 	function toggleSettings(): void {
-		expandSettings.update(current => !current)
+		settingsStore.toggleExpandSettings()
 	}
 
 	// Handle expandSettings changes with explicit subscription to avoid reactive loops

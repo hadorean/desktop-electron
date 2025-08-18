@@ -13,7 +13,8 @@
 		isOverride = false,
 		defaultValue = 0,
 		overrideValue = null,
-		disabled = false
+		disabled = false,
+		transition = 0
 	} = $props<{
 		label: string
 		value: number | null
@@ -26,15 +27,21 @@
 		defaultValue: number
 		overrideValue?: number | null
 		disabled?: boolean
+		transition?: number
 	}>()
 
-	const { currentScreenColor } = settingsStore
+	const { currentScreenColor, transitionTime } = settingsStore
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
 	const isGhost = $derived(isOverride && !isOverridden)
 	const currentValue = $derived(value ?? defaultValue)
 	const displayValue = $derived(isOverridden ? (overrideValue ?? min) : currentValue)
 	const canRevert = $derived(isOverridden || displayValue !== defaultValue)
+
+	let currentTransition = $state(transition)
+	settingsStore.currentTheme.subscribe(theme => {
+		currentTransition = settingsStore.getTransitionTime()
+	})
 
 	function handleRevert(): void {
 		if (disabled || !canRevert) return
@@ -49,7 +56,9 @@
 	}
 
 	function handleValueChange(newValues: number[]): void {
-		if (disabled) return
+		console.log('handleValueChange', newValues)
+		currentTransition = 0
+		if (currentTransition) return
 
 		const newValue = newValues[0]
 		onChange(newValue)
@@ -70,6 +79,7 @@
 		</button>
 		<div class="slider-wrapper" style="--slider-color: {$currentScreenColor}">
 			<Slider
+				transition={currentTransition}
 				value={[displayValue]}
 				{min}
 				{max}
@@ -148,10 +158,6 @@
 	}
 
 	/* Slider control input styling */
-	:global(.slider-control-input) {
-		width: 100%;
-		transition: all 0.3s ease;
-	}
 
 	/* Override mode styling - make more visible */
 	:global(.override-slider) {
@@ -161,13 +167,13 @@
 	:global(.override-slider .slider-track) {
 		background-color: rgba(255, 255, 255, 0.2) !important;
 		border: 1px solid var(--slider-color, var(--primary)) !important;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+		/* transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; */
 	}
 
 	:global(.override-slider .slider-progress) {
 		background-color: var(--slider-color, var(--primary)) !important;
 		box-shadow: 0 0 8px rgba(var(--slider-color, var(--primary)), 0.3) !important;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+		/* transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; */
 	}
 
 	:global(.override-slider .slider-thumb) {
@@ -175,7 +181,7 @@
 		border: 2px solid white !important;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 		scale: 1.1;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+		/* transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; */
 	}
 
 	/* Ghost mode styling */

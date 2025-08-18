@@ -1,4 +1,4 @@
-import { derived, get, writable } from 'svelte/store'
+import { derived, get, readonly, writable } from 'svelte/store'
 import {
 	colors,
 	DefaultScreenProfile,
@@ -17,49 +17,59 @@ const defaultScreenId = 'monitor1'
 
 const currentScreenId = writable(defaultScreenId)
 
-const defaultSettings: ScreenProfile = DefaultScreenProfile
-const defaultUserSettings: UserSettings = DefaultUserSettings
-
 const isLocalMode = writable(false)
 
 // Settings panel expansion state
 const expandSettings = writable(false)
 
+function setExpandSettings(value: boolean): void {
+	expandSettings.set(value)
+}
+
+function toggleExpandSettings(): void {
+	expandSettings.update(current => !current)
+}
+
 // Transition state stores
 const inTransition = writable<boolean>(false)
 const transitionSettings = writable<Partial<ScreenProfile>>({})
 
-const allSettings = writable<UserSettings>(defaultUserSettings)
-const currentTheme = derived(allSettings, settings => settings.currentTheme)
-const isNightMode = derived(currentTheme, theme => theme === 'night')
+const allSettings = writable<UserSettings>(DefaultUserSettings)
+const currentTheme = derived(allSettings, settings => {
+	return settings.currentTheme
+})
+const isNightMode = derived(currentTheme, theme => {
+	return theme === 'night'
+})
 
 const screenIds = derived(allSettings, $allSettings =>
 	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreenId), get(currentScreenId)])).sort()
 )
 
+const rootSettings = derived([allSettings, currentTheme, isLocalMode], ([all, theme, isLocal]) => {
+	const currentTheme = theme as 'day' | 'night'
+	return isLocal
+		? { ...DefaultScreenProfile, ...getThemeEditingSettings(all.shared, currentTheme) }
+		: DefaultScreenProfile
+})
+
 // Base screen settings without transitions (for syncing to other clients)
-const baseScreenSettings = derived(
+const screenSettings = derived(
 	[allSettings, currentScreenId, currentTheme, isLocalMode],
 	([all, screen, theme, isLocal]) => {
 		const currentTheme = theme as 'day' | 'night'
 		const themeShared = getThemeScreenSettings(all.shared, currentTheme)
 		return isLocal
-			? { ...themeShared, ...getThemeScreenSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme) }
-			: themeShared
-	}
-)
-
-// Settings to use to render the current screen image (includes transitions for UI)
-const screenSettings = derived(
-	[baseScreenSettings, inTransition, transitionSettings],
-	([base, isTransitioning, transition]) => {
-		// During transition, return the interpolated transition settings for UI display
-		return isTransitioning ? transition : base
+			? ({
+					...rootSettings,
+					...getThemeScreenSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme)
+				} as ScreenProfile)
+			: ({ ...rootSettings, ...themeShared } as ScreenProfile)
 	}
 )
 
 // Base editing settings without transitions (for syncing to other clients)
-const baseEditingSettings = derived(
+const editingSettings = derived(
 	[allSettings, currentScreenId, currentTheme, isLocalMode],
 	([all, screen, theme, isLocal]) => {
 		const currentTheme = theme as 'day' | 'night'
@@ -69,17 +79,12 @@ const baseEditingSettings = derived(
 	}
 )
 
-// Settings to use in the settings panel (includes transitions for UI display)
-const editingSettings = derived(
-	[baseEditingSettings, inTransition, transitionSettings],
-	([base, isTransitioning, transition]) => {
-		// During transition, return the interpolated transition settings for UI display
-		return isTransitioning ? transition : base
-	}
-)
-
 const currentScreen = derived([allSettings, currentScreenId], ([all, screenId]) => {
 	return all.screens[screenId] ?? DefaultScreenSettings
+})
+
+const transitionTime = derived([screenSettings], ([screen]) => {
+	return screen.transitionTime ?? 1
 })
 
 const currentScreenColor = derived(
@@ -123,6 +128,10 @@ function easeQuadraticOut(t: number): number {
 function setCurrentScreen(screenId: string): void {
 	console.log('Setting current screen to', screenId)
 	currentScreenId.set(screenId)
+}
+
+function setLocalMode(local: boolean): void {
+	isLocalMode.set(local)
 }
 
 // Function to start a smooth theme transition
@@ -578,7 +587,7 @@ function getFormattedScreenName(screenId: string): string {
 
 // Reset settings to defaults
 function resetSettings(): void {
-	updateSharedSettings(() => defaultSettings)
+	updateSharedSettings(() => DefaultScreenProfile)
 	//localSettings.set(null);
 }
 
@@ -588,24 +597,23 @@ function updateSettings(settings: UserSettings): void {
 
 export const settingsStore = {
 	// Stores
-	screenIds,
-	currentScreen,
-	currentScreenId,
-	currentScreenColor,
-	currentScreenType,
-	currentTheme,
+	screenIds: readonly(screenIds),
+	currentScreen: readonly(currentScreen),
+	currentScreenId: readonly(currentScreenId),
+	currentScreenColor: readonly(currentScreenColor),
+	currentScreenType: readonly(currentScreenType),
+	currentTheme: readonly(currentTheme),
+	transitionTime: readonly(transitionTime),
 
-	isLocalMode,
-	isNightMode,
+	isLocalMode: readonly(isLocalMode),
+	isNightMode: readonly(isNightMode),
 
-	allSettings: derived(allSettings, settings => settings),
-	inTransition,
-	transitionSettings,
-	expandSettings,
-	baseScreenSettings,
-	baseEditingSettings,
-	screenSettings,
-	editingSettings,
+	allSettings: readonly(allSettings),
+	transitionSettings: readonly(transitionSettings),
+	rootSettings: readonly(rootSettings),
+	expandSettings: readonly(expandSettings),
+	screenSettings: readonly(screenSettings),
+	editingSettings: readonly(editingSettings),
 
 	// Getters
 	getCurrentTheme,
@@ -613,11 +621,13 @@ export const settingsStore = {
 	getScreenSettings,
 	getFormattedScreenName,
 	shouldPreventServerSync,
+	getTransitionTime: () => get(transitionTime),
 
 	// Setters
 	assignScreenType,
 	assignScreenColor,
 	setCurrentScreen,
+	setLocalMode,
 	setCurrentTheme,
 	setMonitorEnabled,
 	toggleDayNightMode,
@@ -628,5 +638,7 @@ export const settingsStore = {
 	updateEditingSettings,
 	normalizeScreenSettings,
 	resetSettings,
-	updateSettings
+	updateSettings,
+	setExpandSettings,
+	toggleExpandSettings
 }

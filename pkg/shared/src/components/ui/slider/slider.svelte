@@ -7,6 +7,7 @@
 		step?: number
 		disabled?: boolean
 		onValueChange?: (value: number[]) => void
+		transition?: number
 	}
 
 	let {
@@ -17,6 +18,7 @@
 		step = 1,
 		disabled = false,
 		onValueChange,
+		transition = 0,
 		...restProps
 	}: Props = $props()
 
@@ -67,11 +69,11 @@
 	}
 </script>
 
-<div class="slider-container {className || ''}" {...restProps}>
+<div class="slider-container {className || ''}" {...restProps} style="--transition: {transition}s">
 	<!-- Track -->
 	<div class="slider-track">
 		<!-- Progress fill -->
-		<div class="slider-progress" style="width: {percentage}%"></div>
+		<div class="slider-progress stuff" style="width: {percentage}%;"></div>
 		<!-- Slider input -->
 		<input
 			bind:this={sliderRef}
@@ -89,7 +91,7 @@
 			class="slider-input"
 		/>
 		<!-- Thumb -->
-		<div class="slider-thumb" style="left: calc({percentage}% - 8px)"></div>
+		<div class="slider-thumb" style="left: calc({percentage}% - 8px);"></div>
 	</div>
 </div>
 
@@ -117,6 +119,7 @@
 		position: absolute;
 		height: 0.5rem; /* 8px */
 		border-radius: var(--radius-xl);
+		transition: width var(--transition) ease;
 	}
 
 	.slider-input {
@@ -145,6 +148,7 @@
 		border-radius: 50%;
 		box-shadow: var(--shadow-lg);
 		pointer-events: none; /* Allow clicks to pass through to the input underneath */
+		transition: left var(--transition) ease;
 	}
 
 	.slider-thumb:hover {

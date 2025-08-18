@@ -135,8 +135,8 @@ class LocalStorageService {
 
 			if (initialScreenId) {
 				console.log('🖥️  Using initial screen from server data:', initialScreenId)
-				settingsStore.currentScreenId.set(initialScreenId)
-				settingsStore.isLocalMode.set(true)
+				settingsStore.setCurrentScreen(initialScreenId)
+				settingsStore.setLocalMode(true)
 				console.log('🖥️  Screen initialized:', initialScreenId, 'local mode: true')
 				// Clear the server data to avoid reuse
 				delete (window as { __INITIAL_SCREEN_ID__?: string }).__INITIAL_SCREEN_ID__
