@@ -1,26 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 
-	interface Shortcut {
+	interface Props {
 		key: string
 		action: ((e: KeyboardEvent) => void) | (() => void)
 		description?: string
 		preventDefault?: boolean
 	}
 
-	interface Props {
-		shortcuts: Shortcut[]
-	}
-
-	let { shortcuts }: Props = $props()
+	let { key, action, preventDefault }: Props = $props()
 
 	function handleKeydown(event: KeyboardEvent): void {
-		const shortcut = shortcuts.find(s => s.key === event.key)
-		if (shortcut) {
-			if (shortcut.preventDefault) {
+		if (key == event.key) {
+			if (preventDefault) {
 				event.preventDefault()
 			}
-			shortcut.action(event)
+			action(event)
 		}
 	}
 

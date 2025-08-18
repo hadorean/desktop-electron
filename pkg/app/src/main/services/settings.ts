@@ -9,8 +9,11 @@ export class SettingsService {
 	private settingsPath: string
 	private defaultSettings: UserSettings = DefaultUserSettings
 
+	static count = 0
+
 	constructor() {
-		this.settingsPath = join(app.getPath('userData'), 'settings.json')
+		this.settingsPath = join(app.getPath('userData'), `settings.json`)
+		console.log('SettingsService constructor', SettingsService.count++)
 	}
 
 	/**
@@ -18,7 +21,7 @@ export class SettingsService {
 	 */
 	async getSettings(): Promise<UserSettings> {
 		if (this.settings === null) {
-			await this.loadFromFileSystem()
+			this.settings = await this.loadFromFileSystem()
 		}
 		return this.settings || this.defaultSettings
 	}
@@ -34,7 +37,7 @@ export class SettingsService {
 		this.settings = updatedSettings
 
 		// Persist to file system
-		await this.saveToFileSystem()
+		await this.saveToFileSystem(updatedSettings)
 
 		return {
 			type: 'settings_update',
@@ -47,23 +50,24 @@ export class SettingsService {
 	/**
 	 * Load settings from file system
 	 */
-	private async loadFromFileSystem(): Promise<void> {
+	private async loadFromFileSystem(): Promise<UserSettings> {
 		try {
 			const settingsData = await fs.readFile(this.settingsPath, 'utf-8')
 			const parsedSettings = JSON.parse(settingsData)
 
 			// Merge with defaults to ensure all required properties exist
-			this.settings = { ...this.defaultSettings, ...parsedSettings }
-
+			const settings = { ...this.defaultSettings, ...parsedSettings }
 			console.log('Settings loaded from file system:', this.settingsPath)
+			return settings
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
 				console.log('Settings file not found, using defaults')
-				this.settings = this.defaultSettings
-				await this.saveToFileSystem()
+				const settings = this.defaultSettings
+				await this.saveToFileSystem(settings)
+				return settings
 			} else {
 				console.error('Error loading settings:', error)
-				this.settings = this.defaultSettings
+				return this.defaultSettings
 			}
 		}
 	}
@@ -71,9 +75,9 @@ export class SettingsService {
 	/**
 	 * Save current settings to file system
 	 */
-	private async saveToFileSystem(): Promise<void> {
+	private async saveToFileSystem(settings: UserSettings): Promise<void> {
 		try {
-			const settingsJson = JSON.stringify(this.settings, null, 2)
+			const settingsJson = JSON.stringify(settings, null, 2)
 			await fs.writeFile(this.settingsPath, settingsJson, 'utf-8')
 			console.log('Settings saved to file system:', this.settingsPath)
 		} catch (error) {
@@ -87,7 +91,7 @@ export class SettingsService {
 	 */
 	async resetSettings(): Promise<UserSettings> {
 		this.settings = { ...this.defaultSettings }
-		await this.saveToFileSystem()
+		await this.saveToFileSystem(this.settings)
 		return this.settings
 	}
 

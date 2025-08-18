@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { ErrorMessage, KeyboardShortcuts, SettingsPanel, SettingsServerUpdate } from '$shared'
+	import { ErrorMessage, SettingsPanel, SettingsServerUpdate } from '$shared'
+	import KeyboardShortcut from '$shared/components/utils/KeyboardShortcut.svelte'
 	import { api, imagesService } from '$shared/services'
 	import { debugMenu } from '$shared/stores/debugStore'
 	import { imagesStore } from '$shared/stores/imagesStore'
@@ -35,25 +36,20 @@
 		imagesService.initializeImageChangeHandling('Desktop app')
 	})
 
+	function togglePage(): void {
+		if ($currentPage === 'main') {
+			gotoPage('options')
+		} else {
+			gotoPage('main')
+		}
+	}
+
 	const { error: imagesError } = imagesStore
 	const { visibility: debugVisible } = debugMenu
 	const { userOptions } = userOptionsStore
 </script>
 
-<KeyboardShortcuts
-	shortcuts={[
-		{
-			key: 'Escape',
-			action: () => {
-				if ($currentPage === 'main') {
-					gotoPage('options')
-				} else {
-					gotoPage('main')
-				}
-			}
-		}
-	]}
-/>
+<KeyboardShortcut key="Escape" action={togglePage} />
 
 <div class:transparent class="flex h-full flex-col" style="--opacity: {transparent ? $userOptions.windowOpacity : 1}">
 	{#if transparent}

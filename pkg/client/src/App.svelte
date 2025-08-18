@@ -8,6 +8,7 @@
 		TimeDisplay,
 		WeatherDisplay
 	} from '$shared/components'
+	import KeyboardShortcut from '$shared/components/utils/KeyboardShortcut.svelte'
 	import { api, imagesService, localStorageService, socketService } from '$shared/services'
 	import { debugMenu } from '$shared/stores/debugStore'
 	import { imagesStore } from '$shared/stores/imagesStore'
@@ -19,7 +20,6 @@
 
 	let showSettings: boolean = false
 	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null
-	let buttonHovered: boolean = false
 	let settingsPanel: HTMLElement | null = null
 	let settingsButton: HTMLElement | null = null
 
@@ -58,7 +58,6 @@
 
 				// Add event listeners
 				window.addEventListener('reconnectApi', handleReconnect)
-				window.addEventListener('keydown', handleKeyDown)
 				document.addEventListener('mousedown', handleClickOutside)
 
 				// Setup socket listener for debug state changes
@@ -73,7 +72,6 @@
 				// Return cleanup function
 				return () => {
 					window.removeEventListener('reconnectApi', handleReconnect)
-					window.removeEventListener('keydown', handleKeyDown)
 					document.removeEventListener('mousedown', handleClickOutside)
 				}
 			} catch (error: unknown) {
@@ -132,17 +130,11 @@
 		cleanupImageChanges?.()
 	})
 
-	function handleButtonMouseEnter(): void {
-		buttonHovered = true
-	}
-
-	function handleButtonMouseLeave(): void {
-		buttonHovered = false
-	}
-
 	const { error: imagesError } = imagesStore
 	const { visibility: debugVisible } = debugMenu
 </script>
+
+<KeyboardShortcut key="Escape" action={toggleSettings} preventDefault={false} />
 
 <div class="full-page-container">
 	<DebugMenu visible={$debugVisible} open={true} />
@@ -161,10 +153,7 @@
 
 	<SettingsButton
 		hideButton={$screenSettings.hideButton || $currentScreenType === 'static'}
-		{buttonHovered}
 		onToggle={toggleSettings}
-		onMouseEnter={handleButtonMouseEnter}
-		onMouseLeave={handleButtonMouseLeave}
 		bind:buttonRef={settingsButton}
 	/>
 

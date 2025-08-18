@@ -1,6 +1,6 @@
 import { BrowserWindow, screen } from 'electron'
 import { attach, detach, reset } from 'electron-as-wallpaper'
-import { getLocalServer, setBg, localServer } from '../stores/appStore'
+import { getLocalServer, localServer, setBg } from '../stores/appStore'
 
 export class BackgroundManager {
 	private backgroundWindows: Map<number, BrowserWindow> = new Map()
@@ -19,84 +19,89 @@ export class BackgroundManager {
 		console.log(`Setting up background windows for ${displays.length} monitor(s)`)
 
 		displays.forEach((display, index) => {
-			console.log(
-				`Monitor ${index}: ${display.bounds.width}x${display.bounds.height} at (${display.bounds.x}, ${display.bounds.y})`
-			)
-
-			// Platform-specific window configuration
-			const windowConfig: Electron.BrowserWindowConstructorOptions = {
-				x: display.bounds.x,
-				y: display.bounds.y,
-				width: display.bounds.width,
-				height: display.bounds.height,
-				backgroundColor: '#000000',
-				alwaysOnTop: false,
-				focusable: true,
-				skipTaskbar: true,
-				show: false,
-				frame: false,
-				// transparent: true, // Make transparent for wallpaper attachment
-				resizable: false, // Prevent resizing
-				minimizable: false, // Prevent minimizing
-				maximizable: false, // Prevent maximizing
-				closable: false, // Prevent closing
-				movable: false, // Prevent moving
-				webPreferences: {
-					nodeIntegration: false,
-					contextIsolation: true,
-					webSecurity: true,
-					allowRunningInsecureContent: false
-					// No preload script needed for web content
-				}
-			}
-
-			const backgroundWindow = new BrowserWindow(windowConfig)
-
-			// Load the background webview
 			const monitorUrl = `monitor${index + 1}`
-			const backgroundUrl = `${this.serverUrl}/app/${monitorUrl}`
-			console.log(`Loading background for monitor ${index}: ${backgroundUrl}`)
-
-			backgroundWindow.loadURL(backgroundUrl)
-
-			// Show the window after it's loaded and attach to wallpaper
-			backgroundWindow.once('ready-to-show', () => {
-				backgroundWindow.show()
-				//backgroundWindow.wallpaperState.isForwardMouseInput = true
-				// Attach the window to the desktop wallpaper
-				try {
-					attach(backgroundWindow, {
-						transparent: false,
-						forwardKeyboardInput: false, // Disable to prevent input interference
-						forwardMouseInput: false // Disable to prevent input interference
-					})
-					console.log(`Background window ${index} attached to wallpaper`)
-				} catch (error) {
-					console.error(`Failed to attach background window ${index} to wallpaper:`, error)
-					// Fallback to the old method
-					//this.setWindowBehindOthers(backgroundWindow)
-				}
-
-				console.log(`Background window ${index} is ready`)
-			})
-
-			// Handle window errors
-			backgroundWindow.webContents.on('did-fail-load', (_event, _errorCode, errorDescription) => {
-				console.error(`Failed to load background for monitor ${index}:`, errorDescription)
-			})
-
-			// Ensure window stays behind when it gains focus
-			//   backgroundWindow.on('focus', () => {
-			//     this.setWindowBehindOthers(backgroundWindow)
-			//   })
-
-			//   // Ensure window stays behind when shown
-			//   backgroundWindow.on('show', () => {
-			//     this.setWindowBehindOthers(backgroundWindow)
-			//   })
-
+			const backgroundWindow = this.createBackgroundWindow(monitorUrl, index, display)
 			this.backgroundWindows.set(index, backgroundWindow)
 		})
+	}
+
+	private createBackgroundWindow(monitorUrl: string, index: number, display: Electron.Display) {
+		console.log(
+			`Monitor ${index}: ${display.bounds.width}x${display.bounds.height} at (${display.bounds.x}, ${display.bounds.y})`
+		)
+
+		// Platform-specific window configuration
+		const windowConfig: Electron.BrowserWindowConstructorOptions = {
+			x: display.bounds.x,
+			y: display.bounds.y,
+			width: display.bounds.width,
+			height: display.bounds.height,
+			backgroundColor: '#000000',
+			alwaysOnTop: false,
+			focusable: true,
+			skipTaskbar: true,
+			show: false,
+			frame: false,
+			// transparent: true, // Make transparent for wallpaper attachment
+			resizable: false, // Prevent resizing
+			minimizable: false, // Prevent minimizing
+			maximizable: false, // Prevent maximizing
+			closable: false, // Prevent closing
+			movable: false, // Prevent moving
+			webPreferences: {
+				nodeIntegration: false,
+				contextIsolation: true,
+				webSecurity: true,
+				allowRunningInsecureContent: false
+				// No preload script needed for web content
+			}
+		}
+
+		const backgroundWindow = new BrowserWindow(windowConfig)
+
+		// Load the background webview
+		const backgroundUrl = `${this.serverUrl}/app/${monitorUrl}`
+		console.log(`Loading background for monitor ${index}: ${backgroundUrl}`)
+
+		backgroundWindow.loadURL(backgroundUrl)
+
+		// Show the window after it's loaded and attach to wallpaper
+		backgroundWindow.once('ready-to-show', () => {
+			backgroundWindow.show()
+			//backgroundWindow.wallpaperState.isForwardMouseInput = true
+			// Attach the window to the desktop wallpaper
+			try {
+				attach(backgroundWindow, {
+					transparent: false,
+					forwardKeyboardInput: false, // Disable to prevent input interference
+					forwardMouseInput: false // Disable to prevent input interference
+				})
+				console.log(`Background window ${index} attached to wallpaper`)
+			} catch (error) {
+				console.error(`Failed to attach background window ${index} to wallpaper:`, error)
+				// Fallback to the old method
+				//this.setWindowBehindOthers(backgroundWindow)
+			}
+
+			console.log(`Background window ${index} is ready`)
+		})
+
+		// Handle window errors
+		backgroundWindow.webContents.on('did-fail-load', (_event, _errorCode, errorDescription) => {
+			console.error(`Failed to load background for monitor ${index}:`, errorDescription)
+		})
+
+		// Ensure window stays behind when it gains focus
+		//   backgroundWindow.on('focus', () => {
+		//     this.setWindowBehindOthers(backgroundWindow)
+		//   })
+
+		//   // Ensure window stays behind when shown
+		//   backgroundWindow.on('show', () => {
+		//     this.setWindowBehindOthers(backgroundWindow)
+		//   })
+
+		return backgroundWindow
 	}
 
 	//   private setWindowBehindOthers(window: BrowserWindow): void {

@@ -31,4 +31,5 @@ What's left to ship?
 
 ## Nice to have
 
+- [ ] Scheduling
 - [ ] Set Url as background

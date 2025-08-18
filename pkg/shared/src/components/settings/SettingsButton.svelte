@@ -3,13 +3,12 @@
 	import { Icon } from '../ui'
 
 	export let hideButton: boolean = false
-	export let buttonHovered: boolean = false
 	export let onToggle: () => void
-	export let onMouseEnter: () => void
-	export let onMouseLeave: () => void
 	export let buttonRef: HTMLElement | null = null
 
 	const { screenSettings } = settingsStore
+
+	let buttonHovered: boolean = false
 
 	$: position = $screenSettings.settingsButtonPosition ?? 'bottom-right'
 	$: positionClasses = {
@@ -18,13 +17,21 @@
 		'bottom-left': 'bottom-4 left-4',
 		'top-left': 'top-4 left-4'
 	}[position]
+
+	function handleButtonMouseEnter(): void {
+		buttonHovered = true
+	}
+
+	function handleButtonMouseLeave(): void {
+		buttonHovered = false
+	}
 </script>
 
 <button
 	class="settings-btn {hideButton && !buttonHovered ? 'hidden' : 'visible'} {positionClasses}"
 	on:click={onToggle}
-	on:mouseenter={onMouseEnter}
-	on:mouseleave={onMouseLeave}
+	on:mouseenter={handleButtonMouseEnter}
+	on:mouseleave={handleButtonMouseLeave}
 	bind:this={buttonRef}
 	aria-label="Settings"
 >
