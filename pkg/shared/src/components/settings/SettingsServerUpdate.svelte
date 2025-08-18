@@ -11,7 +11,7 @@
 	let initialSubscribeHandled = false
 	let unsubscribeSettings: (() => void) | null = null
 
-	const { allSettings, currentScreen } = settingsStore
+	const { allSettings, currentScreenId } = settingsStore
 
 	onMount(() => {
 		// Setup Socket.IO connection status monitoring
@@ -28,10 +28,9 @@
 				const newSettings = event.settings
 
 				// Check if current screen exists in server settings
-				const currentScreenId = $currentScreen
-				if (newSettings.screens && !newSettings.screens[currentScreenId]) {
+				if (newSettings.screens && !newSettings.screens[$currentScreenId]) {
 					// Add current screen to settings (empty object, colors are computed)
-					newSettings.screens[currentScreenId] = { day: {}, night: {} }
+					newSettings.screens[$currentScreenId] = { day: {}, night: {}, monitorIndex: null, monitorEnabled: true }
 					updatingSettingsFromServer = false // we want to update the server settings with the new screen
 				}
 

@@ -17,7 +17,15 @@
 	// Reference to ScreenSwitcher component
 	let screenSwitcher: ScreenSwitcher
 
-	const { screenSettings, editingSettings, inTransition, isLocalMode, currentScreen, currentScreenType } = settingsStore
+	const {
+		screenSettings,
+		editingSettings,
+		inTransition,
+		isLocalMode,
+		currentScreen,
+		currentScreenId,
+		currentScreenType
+	} = settingsStore
 
 	// Document-level keyboard handler for Tab key
 	function handleDocumentKeyDown(event: KeyboardEvent): void {
@@ -41,7 +49,7 @@
 		}
 	})
 
-	function handleSettingChange<K extends keyof typeof $editingSettings>(
+	function updateProfile<K extends keyof typeof $editingSettings>(
 		key: K,
 		value: (typeof $editingSettings)[K] | null
 	): void {
@@ -67,7 +75,7 @@
 	<div class="settings-content">
 		<Inspect>
 			{#if $isLocalMode}
-				Settings - {$currentScreen}
+				Settings - {$currentScreenId}
 			{:else}
 				Settings - Shared
 			{/if}
@@ -76,6 +84,18 @@
 		<div class="settings-groups">
 			<!-- Background Selection -->
 			<div class="setting-section">
+				{#if $currentScreenType === 'static'}
+					<ToggleControl
+						label="Enable background"
+						checked={$currentScreen.monitorEnabled}
+						onChange={(newMonitorEnabled: boolean | null) => {
+							settingsStore.setMonitorEnabled(newMonitorEnabled ?? true)
+						}}
+						defaultValue={true}
+						disabled={$inTransition}
+					/>
+				{/if}
+
 				<!-- Background Mode Selector -->
 				<!-- <BackgroundModeSelector
 					mode={$editingSettings.mode ?? $screenSettings.mode ?? 'image'}
@@ -90,14 +110,14 @@
 						selectedImage={$screenSettings.selectedImage ?? ''}
 						isOverride={$isLocalMode}
 						overrideValue={$editingSettings.selectedImage}
-						onImageChange={(newImage: string | null) => handleSettingChange('selectedImage', newImage)}
+						onImageChange={(newImage: string | null) => updateProfile('selectedImage', newImage)}
 					/>
 				{:else}
 					<UrlInput
 						url={$screenSettings.url ?? ''}
 						isOverride={$isLocalMode}
 						overrideValue={$editingSettings.url}
-						onUrlChange={(newUrl: string | null) => handleSettingChange('url', newUrl)}
+						onUrlChange={(newUrl: string | null) => updateProfile('url', newUrl)}
 					/>
 				{/if}
 
@@ -107,7 +127,7 @@
 					min={0}
 					max={1}
 					step={0.01}
-					onChange={(newOpacity: number | null) => handleSettingChange('opacity', newOpacity)}
+					onChange={(newOpacity: number | null) => updateProfile('opacity', newOpacity)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
 					defaultValue={1}
@@ -121,7 +141,7 @@
 					min={0}
 					max={2}
 					step={0.01}
-					onChange={(newSaturation: number | null) => handleSettingChange('saturation', newSaturation)}
+					onChange={(newSaturation: number | null) => updateProfile('saturation', newSaturation)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
 					defaultValue={1}
@@ -135,7 +155,7 @@
 					min={0}
 					max={50}
 					step={0.1}
-					onChange={(newBlur: number | null) => handleSettingChange('blur', newBlur)}
+					onChange={(newBlur: number | null) => updateProfile('blur', newBlur)}
 					formatValue={(v: number) => `${v.toFixed(1)}px`}
 					isOverride={$isLocalMode}
 					defaultValue={0}
@@ -149,7 +169,7 @@
 					min={0}
 					max={10}
 					step={0.1}
-					onChange={(newTransitionTime: number | null) => handleSettingChange('transitionTime', newTransitionTime)}
+					onChange={(newTransitionTime: number | null) => updateProfile('transitionTime', newTransitionTime)}
 					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
 					defaultValue={1}
@@ -161,7 +181,7 @@
 			<ToggleControl
 				label="Time and date"
 				checked={$editingSettings.showTimeDate ?? $screenSettings.showTimeDate ?? true}
-				onChange={(newShowTimeDate: boolean | null) => handleSettingChange('showTimeDate', newShowTimeDate)}
+				onChange={(newShowTimeDate: boolean | null) => updateProfile('showTimeDate', newShowTimeDate)}
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.showTimeDate}
 				defaultValue={true}
@@ -171,7 +191,7 @@
 			<ToggleControl
 				label="Weather"
 				checked={$editingSettings.showWeather ?? $screenSettings.showWeather ?? false}
-				onChange={(newShowWeather: boolean | null) => handleSettingChange('showWeather', newShowWeather)}
+				onChange={(newShowWeather: boolean | null) => updateProfile('showWeather', newShowWeather)}
 				isOverride={$isLocalMode}
 				overrideValue={$editingSettings.showWeather}
 				defaultValue={false}
@@ -182,7 +202,7 @@
 				<ToggleControl
 					label="Auto-hide settings button"
 					checked={$editingSettings.hideButton ?? $screenSettings.hideButton ?? false}
-					onChange={(newHideButton: boolean | null) => handleSettingChange('hideButton', newHideButton)}
+					onChange={(newHideButton: boolean | null) => updateProfile('hideButton', newHideButton)}
 					isOverride={$isLocalMode}
 					overrideValue={$editingSettings.hideButton}
 					defaultValue={false}

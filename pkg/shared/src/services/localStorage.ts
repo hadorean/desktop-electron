@@ -37,7 +37,7 @@ class LocalStorageService {
 		this.setupStoreSubscriptions([
 			{ store: debugMenu.visibility, key: 'debug' },
 			{ store: apiStore.url, key: 'api' },
-			{ store: settingsStore.currentScreen, key: 'screen' },
+			{ store: settingsStore.currentScreenId, key: 'screen' },
 			{ store: settingsStore.allSettings, key: 'settings' }
 		])
 
@@ -135,7 +135,7 @@ class LocalStorageService {
 
 			if (initialScreenId) {
 				console.log('🖥️  Using initial screen from server data:', initialScreenId)
-				settingsStore.currentScreen.set(initialScreenId)
+				settingsStore.currentScreenId.set(initialScreenId)
 				settingsStore.isLocalMode.set(true)
 				console.log('🖥️  Screen initialized:', initialScreenId, 'local mode: true')
 				// Clear the server data to avoid reuse

@@ -7,10 +7,10 @@
 	let underlineRef: HTMLDivElement
 	let tabRefs: HTMLDivElement[] = $state([])
 
-	const { allSettings, currentScreen, isLocalMode, isNightMode, screenIds } = settingsStore
+	const { allSettings, currentScreenId, isLocalMode, isNightMode, screenIds } = settingsStore
 
 	// Reactive current tab value based on local mode and current screen
-	const currentTab = $derived($isLocalMode ? $currentScreen : 'shared')
+	const currentTab = $derived($isLocalMode ? $currentScreenId : 'shared')
 
 	// Get all available tabs with their settings
 	const allTabs = $derived(() => {
@@ -37,7 +37,7 @@
 		if (tabId === 'shared') {
 			isLocalMode.set(false)
 		} else {
-			currentScreen.set(tabId)
+			currentScreenId.set(tabId)
 			isLocalMode.set(true)
 		}
 		updateUnderlinePosition()

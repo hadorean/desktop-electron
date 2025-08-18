@@ -15,7 +15,7 @@ import {
 
 const defaultScreenId = 'monitor1'
 
-const currentScreen = writable(defaultScreenId)
+const currentScreenId = writable(defaultScreenId)
 
 const defaultSettings: ScreenProfile = DefaultScreenProfile
 const defaultUserSettings: UserSettings = DefaultUserSettings
@@ -34,12 +34,12 @@ const currentTheme = derived(allSettings, settings => settings.currentTheme)
 const isNightMode = derived(currentTheme, theme => theme === 'night')
 
 const screenIds = derived(allSettings, $allSettings =>
-	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreen), get(currentScreen)])).sort()
+	Array.from(new Set([...Object.keys($allSettings.screens), get(currentScreenId), get(currentScreenId)])).sort()
 )
 
 // Base screen settings without transitions (for syncing to other clients)
 const baseScreenSettings = derived(
-	[allSettings, currentScreen, currentTheme, isLocalMode],
+	[allSettings, currentScreenId, currentTheme, isLocalMode],
 	([all, screen, theme, isLocal]) => {
 		const currentTheme = theme as 'day' | 'night'
 		const themeShared = getThemeScreenSettings(all.shared, currentTheme)
@@ -60,7 +60,7 @@ const screenSettings = derived(
 
 // Base editing settings without transitions (for syncing to other clients)
 const baseEditingSettings = derived(
-	[allSettings, currentScreen, currentTheme, isLocalMode],
+	[allSettings, currentScreenId, currentTheme, isLocalMode],
 	([all, screen, theme, isLocal]) => {
 		const currentTheme = theme as 'day' | 'night'
 		return isLocal
@@ -78,9 +78,13 @@ const editingSettings = derived(
 	}
 )
 
+const currentScreen = derived([allSettings, currentScreenId], ([all, screenId]) => {
+	return all.screens[screenId] ?? DefaultScreenSettings
+})
+
 const currentScreenColor = derived(
-	[allSettings, currentScreen, isLocalMode],
-	([$allSettings, $currentScreen, $isLocalMode]) => {
+	[allSettings, currentScreenId, isLocalMode],
+	([$allSettings, $currentScreenId, $isLocalMode]) => {
 		if (!$isLocalMode) {
 			// Shared/home screen uses white
 			return '#ffffff'
@@ -88,16 +92,16 @@ const currentScreenColor = derived(
 
 		// Compute color based on screen index in the sorted list
 		const allScreenIds = Object.keys($allSettings.screens).sort()
-		return assignScreenColor($currentScreen, allScreenIds)
+		return assignScreenColor($currentScreenId, allScreenIds)
 	}
 )
 
-const currentScreenType = derived([currentScreen, isLocalMode], ([$currentScreen, $isLocalMode]) => {
-	if (!$isLocalMode) {
+const currentScreenType = derived([currentScreenId, isLocalMode], ([screenId, local]) => {
+	if (!local) {
 		return 'shared'
 	}
 	// Compute type based on screenId pattern
-	return assignScreenType($currentScreen)
+	return assignScreenType(screenId)
 })
 
 let transitionStartTime = 0
@@ -118,13 +122,13 @@ function easeQuadraticOut(t: number): number {
 
 function setCurrentScreen(screenId: string): void {
 	console.log('Setting current screen to', screenId)
-	currentScreen.set(screenId)
+	currentScreenId.set(screenId)
 }
 
 // Function to start a smooth theme transition
 function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightMode): void {
 	// Get the current screen settings to determine transition duration
-	const currentScreenId = get(currentScreen) || defaultScreenId
+	const screenId = get(currentScreenId) || defaultScreenId
 	const isLocal = get(isLocalMode)
 	const allSettingsValue = get(allSettings)
 
@@ -137,7 +141,7 @@ function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightMode): v
 	// Get transition duration from current screen's transitionTime
 	let duration = 1000 // Default 1 second
 	if (isLocal) {
-		const screenDayNightSettings = allSettingsValue.screens[currentScreenId]
+		const screenDayNightSettings = allSettingsValue.screens[screenId]
 		if (screenDayNightSettings) {
 			const currentSettings = getThemeScreenSettings(screenDayNightSettings, fromTheme)
 			duration = (currentSettings.transitionTime ?? 1) * 1000
@@ -153,14 +157,14 @@ function startThemeTransition(fromTheme: DayNightMode, toTheme: DayNightMode): v
 		: isLocal
 			? {
 					...getThemeScreenSettings(allSettingsValue.shared, fromTheme),
-					...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultScreenSettings, fromTheme)
+					...getThemeScreenSettings(allSettingsValue.screens[screenId] ?? DefaultScreenSettings, fromTheme)
 				}
 			: getThemeScreenSettings(allSettingsValue.shared, fromTheme)
 
 	const toSettings = isLocal
 		? {
 				...getThemeScreenSettings(allSettingsValue.shared, toTheme),
-				...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultScreenSettings, toTheme)
+				...getThemeScreenSettings(allSettingsValue.screens[screenId] ?? DefaultScreenSettings, toTheme)
 			}
 		: getThemeScreenSettings(allSettingsValue.shared, toTheme)
 
@@ -253,14 +257,14 @@ function startThemeTransitionWithoutThemeUpdate(fromTheme: DayNightMode, toTheme
 	}
 
 	// Get the current screen settings to determine transition duration
-	const currentScreenId = get(currentScreen) || defaultScreenId
+	const screenId = get(currentScreenId) || defaultScreenId
 	const isLocal = get(isLocalMode)
 	const allSettingsValue = get(allSettings)
 
 	// Get transition duration from current screen's transitionTime
 	let duration = 1000 // Default 1 second
 	if (isLocal) {
-		const screenDayNightSettings = allSettingsValue.screens[currentScreenId]
+		const screenDayNightSettings = allSettingsValue.screens[screenId]
 		if (screenDayNightSettings) {
 			const currentSettings = getThemeScreenSettings(screenDayNightSettings, fromTheme)
 			duration = (currentSettings.transitionTime ?? 1) * 1000
@@ -276,14 +280,14 @@ function startThemeTransitionWithoutThemeUpdate(fromTheme: DayNightMode, toTheme
 		: isLocal
 			? {
 					...getThemeScreenSettings(allSettingsValue.shared, fromTheme),
-					...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultScreenSettings, fromTheme)
+					...getThemeScreenSettings(allSettingsValue.screens[screenId] ?? DefaultScreenSettings, fromTheme)
 				}
 			: getThemeScreenSettings(allSettingsValue.shared, fromTheme)
 
 	const toSettings = isLocal
 		? {
 				...getThemeScreenSettings(allSettingsValue.shared, toTheme),
-				...getThemeScreenSettings(allSettingsValue.screens[currentScreenId] ?? DefaultScreenSettings, toTheme)
+				...getThemeScreenSettings(allSettingsValue.screens[screenId] ?? DefaultScreenSettings, toTheme)
 			}
 		: getThemeScreenSettings(allSettingsValue.shared, toTheme)
 
@@ -352,6 +356,17 @@ function setCurrentTheme(theme: DayNightMode): void {
 	}))
 }
 
+function setMonitorEnabled(enabled: boolean): void {
+	const screenId = get(currentScreenId)
+	allSettings.update(settings => ({
+		...settings,
+		screens: {
+			...settings.screens,
+			[screenId]: { ...settings.screens[get(currentScreenId)], monitorEnabled: enabled }
+		}
+	}))
+}
+
 function getCurrentTheme(): DayNightMode {
 	return get(allSettings).currentTheme
 }
@@ -404,7 +419,7 @@ function updateSharedSettingsSilent(settings: (current: Partial<ScreenProfile>) 
 
 function updateLocalSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	allSettings.update(value => {
-		const screen = get(currentScreen) || defaultScreenId
+		const screen = get(currentScreenId) || defaultScreenId
 		const theme = getCurrentTheme() as 'day' | 'night'
 		const currentScreenSettings = value.screens[screen] ?? { day: {}, night: {} }
 		const currentThemeSettings = currentScreenSettings[theme] ?? {}
@@ -445,11 +460,11 @@ function updateLocalSettingsSilent(settings: (current: Partial<ScreenProfile>) =
 function updateEditingSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
 	if (get(isLocalMode)) {
 		// Update local screen settings for current theme
-		const screen = get(currentScreen) || defaultScreenId
+		const screenId = get(currentScreenId) || defaultScreenId
 		const theme = getCurrentTheme() as 'day' | 'night'
 
 		allSettings.update(value => {
-			const currentScreenSettings = value.screens[screen] ?? DefaultScreenSettings
+			const currentScreenSettings = value.screens[screenId] ?? DefaultScreenSettings
 			const currentThemeSettings = currentScreenSettings[theme] ?? {}
 			const updatedSettings = settings(currentThemeSettings)
 
@@ -462,7 +477,7 @@ function updateEditingSettings(settings: (current: Partial<ScreenProfile>) => Pa
 				...value,
 				screens: {
 					...value.screens,
-					[screen]: {
+					[screenId]: {
 						...currentScreenSettings,
 						[theme]: updatedSettings
 					}
@@ -571,6 +586,7 @@ export const settingsStore = {
 	// Stores
 	screenIds,
 	currentScreen,
+	currentScreenId,
 	currentScreenColor,
 	currentScreenType,
 	currentTheme,
@@ -599,6 +615,7 @@ export const settingsStore = {
 	assignScreenColor,
 	setCurrentScreen,
 	setCurrentTheme,
+	setMonitorEnabled,
 	toggleDayNightMode,
 	updateSharedSettings,
 	updateSharedSettingsSilent,

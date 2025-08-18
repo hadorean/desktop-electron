@@ -25,6 +25,7 @@ export interface ScreenSettings {
 	day: Partial<ScreenProfile>
 	night: Partial<ScreenProfile> | null
 	monitorIndex: number | null
+	monitorEnabled: boolean
 }
 
 export function getThemeScreenSettings(
@@ -79,7 +80,9 @@ export const DefaultScreenProfile: ScreenProfile = {
 
 export const DefaultScreenSettings: ScreenSettings = {
 	day: {},
-	night: null
+	night: null,
+	monitorIndex: null,
+	monitorEnabled: true
 }
 
 export const DefaultUserSettings: UserSettings = {
