@@ -220,7 +220,6 @@ html body {
 
 body {
 	overflow: hidden;
-	background-image: url('./wavy-lines.svg');
 	background-size: cover;
 	user-select: none;
 	height: 100%;
