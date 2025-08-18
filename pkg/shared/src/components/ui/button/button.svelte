@@ -13,7 +13,15 @@
 		[key: string]: unknown
 	}
 
-	let { class: className, variant = 'default', size = 'default', disabled = false, onclick, children, ...restProps }: Props = $props()
+	let {
+		class: className,
+		variant = 'default',
+		size = 'default',
+		disabled = false,
+		onclick,
+		children,
+		...restProps
+	}: Props = $props()
 </script>
 
 <!-- svelte-ignore slot_element_deprecated -->
