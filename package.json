@@ -8,6 +8,7 @@
 		"dev": "concurrently --kill-others --names \"SHARED,CLIENT,ELECTRON\" --prefix-colors \"yellow,blue,green\" \"pnpm dev:shared\" \"pnpm dev:client\" \"pnpm dev:app\"",
 		"dev:shared": "cd pkg/shared && pnpm dev",
 		"dev:client": "cd pkg/client && pnpm dev",
+		"dev:web": "concurrently --kill-others --names \"SHARED,CLIENT\" --prefix-colors \"yellow,blue\" \"pnpm dev:shared\" \"pnpm dev:client\"",
 		"dev:app": "cd pkg/app && pnpm dev:electron:start",
 		"format": "prettier --plugin prettier-plugin-svelte --write .",
 		"lint": "eslint --cache .",

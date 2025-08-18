@@ -8,6 +8,14 @@ dev:
 	clear
 	pnpm dev
 
+app:
+	clear
+	pnpm dev:app
+
+web:
+	clear
+	pnpm dev:web
+
 # all, shared, client, app
 check what="all": 
 	clear
