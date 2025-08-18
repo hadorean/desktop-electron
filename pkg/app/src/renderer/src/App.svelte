@@ -74,6 +74,7 @@
 					<footer>
 						<AppVersion />
 						<OptionsButton onclick={() => gotoPage('options')} />
+						<DebugMenu visible={$debugVisible} align="bottom-left" margin={{ x: '1.5rem', y: '1.5rem' }} />
 					</footer>
 				{/if}
 			</div>
@@ -83,8 +84,6 @@
 			<OptionsScreen {transparent} onBack={() => gotoPage('main')} />
 		{/snippet}
 	</PageContainer>
-
-	<DebugMenu visible={$debugVisible} align="bottom-right" margin={{ x: '1rem', y: '3rem' }} />
 </div>
 
 <style>
