@@ -88,7 +88,7 @@ export function initIpc(): void {
 
 	// IPC handlers for background management
 	handleIpc(IpcEvents.ReloadBackground, (...args: unknown[]) => {
-		const monitorId = args[1] as number
+		const monitorId = args[1] as string
 		bg?.reloadBackground(monitorId)
 	})
 
@@ -98,7 +98,7 @@ export function initIpc(): void {
 
 	// IPC handlers for background interactivity
 	handleIpc(IpcEvents.MakeBackgroundInteractive, (...args: unknown[]) => {
-		const monitorId = args[1] as number
+		const monitorId = args[1] as string
 		bg?.makeInteractive(monitorId)
 	})
 
@@ -107,7 +107,7 @@ export function initIpc(): void {
 	})
 
 	handleIpc(IpcEvents.MakeBackgroundNonInteractive, (...args: unknown[]) => {
-		const monitorId = args[1] as number
+		const monitorId = args[1] as string
 		bg?.makeNonInteractive(monitorId)
 	})
 

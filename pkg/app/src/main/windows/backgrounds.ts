@@ -1,11 +1,19 @@
+import { settingsStore } from '$shared/stores/settingsStore'
 import { DefaultScreenSettings } from '$shared/types/settings'
 import { BrowserWindow, screen } from 'electron'
 import { attach, detach, reset } from 'electron-as-wallpaper'
 import { settingsService } from '../services/settings'
 import { getLocalServer, localServer, setBg } from '../stores/appStore'
 
+type Background = {
+	id: string
+	index: number
+	display: Electron.Display
+	window: BrowserWindow | null
+}
+
 export class BackgroundManager {
-	private backgroundWindows: Map<number, BrowserWindow> = new Map()
+	private backgrounds: Map<string, Background> = new Map()
 	private serverUrl: string | null = null
 	private serverUnsubscribe: (() => void) | null = null
 
@@ -15,16 +23,44 @@ export class BackgroundManager {
 		this.start()
 	}
 
-	public start(): void {
+	start(): void {
 		const displays = screen.getAllDisplays()
 
 		console.log(`Setting up background windows for ${displays.length} monitor(s)`)
 
-		displays.forEach(async (display, index) => {
-			const monitorId = `monitor${index + 1}`
-			await this.saveMonitorIndex(monitorId, index)
-			const backgroundWindow = this.createBackgroundWindow(display, index, monitorId)
-			this.backgroundWindows.set(index, backgroundWindow)
+		displays.forEach((display, index) => {
+			const id = `monitor${index + 1}`
+			this.backgrounds.set(id, { id, index, display } as Background)
+		})
+
+		settingsStore.allSettings.subscribe(settings => {
+			for (const screenId in settings.screens) {
+				if (!screenId.startsWith('monitor')) continue
+				const screenSettings = settings.screens[screenId]
+
+				const bg = this.backgrounds.get(screenId)
+				if (!bg) {
+					console.error(`Background not found for screen ${screenId}`)
+					continue
+				}
+				if (screenSettings.monitorEnabled) {
+					if (bg.window == null) {
+						const window = this.createWindow(bg)
+						bg.window = window
+					} else {
+						bg.window.show()
+					}
+				} else {
+					if (bg.window) {
+						bg.window.destroy()
+						bg.window = null
+					}
+				}
+			}
+		})
+
+		this.backgrounds.forEach(async bg => {
+			await this.saveMonitorIndex(bg.id, bg.index)
 		})
 	}
 
@@ -40,7 +76,9 @@ export class BackgroundManager {
 		}
 	}
 
-	private createBackgroundWindow(display: Electron.Display, index: number, monitorId: string) {
+	private createWindow(bg: Background): BrowserWindow {
+		const { display, index, id } = bg
+
 		console.log(
 			`Monitor ${index}: ${display.bounds.width}x${display.bounds.height} at (${display.bounds.x}, ${display.bounds.y})`
 		)
@@ -72,21 +110,21 @@ export class BackgroundManager {
 			}
 		}
 
-		const backgroundWindow = new BrowserWindow(windowConfig)
+		const window = new BrowserWindow(windowConfig)
 
 		// Load the background webview
-		const backgroundUrl = `${this.serverUrl}/app/${monitorId}`
+		const backgroundUrl = `${this.serverUrl}/app/${id}`
 		console.log(`Loading background for monitor ${index}: ${backgroundUrl}`)
 
-		backgroundWindow.loadURL(backgroundUrl)
+		window.loadURL(backgroundUrl)
 
 		// Show the window after it's loaded and attach to wallpaper
-		backgroundWindow.once('ready-to-show', () => {
-			backgroundWindow.show()
+		window.once('ready-to-show', () => {
+			window.show()
 			//backgroundWindow.wallpaperState.isForwardMouseInput = true
 			// Attach the window to the desktop wallpaper
 			try {
-				attach(backgroundWindow, {
+				attach(window, {
 					transparent: false,
 					forwardKeyboardInput: false, // Disable to prevent input interference
 					forwardMouseInput: false // Disable to prevent input interference
@@ -102,7 +140,7 @@ export class BackgroundManager {
 		})
 
 		// Handle window errors
-		backgroundWindow.webContents.on('did-fail-load', (_event, _errorCode, errorDescription) => {
+		window.webContents.on('did-fail-load', (_event, _errorCode, errorDescription) => {
 			console.error(`Failed to load background for monitor ${index}:`, errorDescription)
 		})
 
@@ -116,7 +154,7 @@ export class BackgroundManager {
 		//     this.setWindowBehindOthers(backgroundWindow)
 		//   })
 
-		return backgroundWindow
+		return window
 	}
 
 	//   private setWindowBehindOthers(window: BrowserWindow): void {
@@ -136,51 +174,55 @@ export class BackgroundManager {
 	//     }
 	//   }
 
-	public getBackgroundWindow(monitorId: number): BrowserWindow | undefined {
-		return this.backgroundWindows.get(monitorId)
+	public getBackgroundWindow(monitorId: string): BrowserWindow | null {
+		return this.backgrounds.get(monitorId)?.window ?? null
 	}
 
 	public getAllBackgroundWindows(): BrowserWindow[] {
-		return Array.from(this.backgroundWindows.values())
+		return Array.from(this.backgrounds.values())
+			.map(bg => bg.window ?? null)
+			.filter(window => window != null)
 	}
 
-	public reloadBackground(monitorId: number): void {
-		const window = this.backgroundWindows.get(monitorId)
-		if (window) {
-			window.reload()
+	public reloadBackground(monitorId: string): void {
+		const bg = this.backgrounds.get(monitorId)
+		if (bg?.window) {
+			bg.window.reload()
 			console.log(`Reloaded background for monitor ${monitorId}`)
 		}
 	}
 
 	public reloadAllBackgrounds(): void {
-		this.backgroundWindows.forEach((window, monitorId) => {
-			window.reload()
+		this.backgrounds.forEach((bg, monitorId) => {
+			bg.window?.reload()
 			console.log(`Reloaded background for monitor ${monitorId}`)
 		})
 	}
 
 	public closeAllBackgrounds(): void {
-		console.log(`Closing ${this.backgroundWindows.size} background windows...`)
+		console.log(`Closing ${this.backgrounds.size} background windows...`)
 
-		this.backgroundWindows.forEach((window, monitorId) => {
+		this.backgrounds.forEach((bg, monitorId) => {
 			try {
-				// Detach from wallpaper before closing
-				detach(window)
+				if (bg.window) {
+					// Detach from wallpaper before closing
+					detach(bg.window)
+				}
 				console.log(`Detached background window ${monitorId} from wallpaper`)
 			} catch (error) {
 				console.error(`Failed to detach background window ${monitorId} from wallpaper:`, error)
 			}
 
 			// Force close the window
-			if (!window.isDestroyed()) {
-				window.destroy()
+			if (bg.window && !bg.window.isDestroyed()) {
+				bg.window.destroy()
 				console.log(`Destroyed background window ${monitorId}`)
 			} else {
 				console.log(`Background window ${monitorId} was already destroyed`)
 			}
 		})
 
-		this.backgroundWindows.clear()
+		this.backgrounds.clear()
 		console.log('All background windows closed and cleared')
 	}
 
@@ -201,12 +243,12 @@ export class BackgroundManager {
 	}
 
 	// Method to make a specific background window interactive
-	public makeInteractive(monitorId: number): void {
-		const window = this.backgroundWindows.get(monitorId)
-		if (window && !window.isDestroyed()) {
+	public makeInteractive(monitorId: string): void {
+		const bg = this.backgrounds.get(monitorId)
+		if (bg?.window && !bg.window.isDestroyed()) {
 			try {
 				// Detach from wallpaper for interaction
-				detach(window)
+				detach(bg.window)
 				console.log(`Made background window ${monitorId} interactive (detached from wallpaper)`)
 			} catch (error) {
 				console.error(`Failed to make background window ${monitorId} interactive:`, error)
@@ -217,18 +259,18 @@ export class BackgroundManager {
 	// Method to make all background windows interactive
 	public makeAllInteractive(): void {
 		console.log('Making all background windows interactive...')
-		this.backgroundWindows.forEach((_window, monitorId) => {
+		this.backgrounds.forEach((_window, monitorId) => {
 			this.makeInteractive(monitorId)
 		})
 	}
 
 	// Method to make a specific background window non-interactive (behind others)
-	public makeNonInteractive(monitorId: number): void {
-		const window = this.backgroundWindows.get(monitorId)
-		if (window && !window.isDestroyed()) {
+	public makeNonInteractive(monitorId: string): void {
+		const bg = this.backgrounds.get(monitorId)
+		if (bg?.window && !bg.window.isDestroyed()) {
 			try {
 				// Re-attach to wallpaper
-				attach(window, {
+				attach(bg.window, {
 					transparent: false,
 					forwardKeyboardInput: false, // Disable to prevent input interference
 					forwardMouseInput: false // Disable to prevent input interference
@@ -242,7 +284,7 @@ export class BackgroundManager {
 
 	// Method to make all background windows non-interactive
 	public makeAllNonInteractive(): void {
-		this.backgroundWindows.forEach((_window, monitorId) => {
+		this.backgrounds.forEach((_window, monitorId) => {
 			this.makeNonInteractive(monitorId)
 		})
 	}
@@ -268,12 +310,12 @@ export class BackgroundManager {
 		}
 
 		console.log('🔄 Reloading all background windows with new server URL...')
-		this.backgroundWindows.forEach((window, index) => {
-			if (!window.isDestroyed()) {
+		this.backgrounds.forEach((bg, index) => {
+			if (bg.window && !bg.window.isDestroyed()) {
 				const monitorUrl = `monitor${index + 1}`
 				const backgroundUrl = `${this.serverUrl}/app/${monitorUrl}`
 				console.log(`🔄 Reloading monitor ${index}: ${backgroundUrl}`)
-				window.loadURL(backgroundUrl)
+				bg.window.loadURL(backgroundUrl)
 			}
 		})
 	}

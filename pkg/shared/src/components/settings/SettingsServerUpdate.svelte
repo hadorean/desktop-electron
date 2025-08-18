@@ -34,7 +34,7 @@
 					updatingSettingsFromServer = false // we want to update the server settings with the new screen
 				}
 
-				allSettings.set(newSettings)
+				settingsStore.updateSettings(newSettings)
 			} catch (error) {
 				console.error('Error updating settings from server:', error)
 			}

@@ -120,7 +120,7 @@ class LocalStorageService {
 				this.cleanupLegacyColorTypeData(parsedSettings)
 
 				// Set settings directly
-				settingsStore.allSettings.set(parsedSettings)
+				settingsStore.updateSettings(parsedSettings)
 			}
 
 			// Initialize screen from server data if available (after settings are loaded)

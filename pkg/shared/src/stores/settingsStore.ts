@@ -582,6 +582,10 @@ function resetSettings(): void {
 	//localSettings.set(null);
 }
 
+function updateSettings(settings: UserSettings): void {
+	allSettings.set(settings)
+}
+
 export const settingsStore = {
 	// Stores
 	screenIds,
@@ -594,7 +598,7 @@ export const settingsStore = {
 	isLocalMode,
 	isNightMode,
 
-	allSettings,
+	allSettings: derived(allSettings, settings => settings),
 	inTransition,
 	transitionSettings,
 	expandSettings,
@@ -623,5 +627,6 @@ export const settingsStore = {
 	updateLocalSettingsSilent,
 	updateEditingSettings,
 	normalizeScreenSettings,
-	resetSettings
+	resetSettings,
+	updateSettings
 }

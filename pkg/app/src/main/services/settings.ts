@@ -1,3 +1,4 @@
+import { settingsStore } from '$shared/stores/settingsStore'
 import type { SettingsUpdateEvent, UserSettings } from '$shared/types'
 import { DefaultUserSettings } from '$shared/types/settings'
 import { app } from 'electron'
@@ -14,6 +15,9 @@ export class SettingsService {
 	constructor() {
 		this.settingsPath = join(app.getPath('userData'), `settings.json`)
 		console.log('SettingsService constructor', SettingsService.count++)
+		this.getSettings().then(settings => {
+			settingsStore.updateSettings(settings)
+		})
 	}
 
 	/**
@@ -35,6 +39,7 @@ export class SettingsService {
 
 		// Update memory
 		this.settings = updatedSettings
+		settingsStore.updateSettings(updatedSettings)
 
 		// Persist to file system
 		await this.saveToFileSystem(updatedSettings)
