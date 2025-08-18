@@ -5,7 +5,7 @@
 		"module": "ESNext",
 		"baseUrl": ".", // Added to ensure proper module resolution
 		"skipLibCheck": true, // Moved here to ensure it applies to all type checks
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"isolatedModules": true,
 		"noEmit": false,
 		"strict": true,
