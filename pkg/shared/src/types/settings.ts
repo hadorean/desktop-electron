@@ -24,6 +24,7 @@ export interface ScreenProfile {
 export interface ScreenSettings {
 	day: Partial<ScreenProfile>
 	night: Partial<ScreenProfile> | null
+	monitorIndex: number | null
 }
 
 export function getThemeScreenSettings(

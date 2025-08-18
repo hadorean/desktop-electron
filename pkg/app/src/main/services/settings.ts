@@ -29,7 +29,7 @@ export class SettingsService {
 	/**
 	 * Update settings and persist to file system
 	 */
-	async updateSettings(newSettings: Partial<UserSettings>, clientId: string): Promise<SettingsUpdateEvent> {
+	async updateSettings(newSettings: Partial<UserSettings>, clientId: string = 'notset'): Promise<SettingsUpdateEvent> {
 		const currentSettings = await this.getSettings()
 		const updatedSettings = { ...currentSettings, ...newSettings }
 

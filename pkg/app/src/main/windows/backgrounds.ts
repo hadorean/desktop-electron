@@ -1,5 +1,7 @@
+import { DefaultScreenSettings } from '$shared/types/settings'
 import { BrowserWindow, screen } from 'electron'
 import { attach, detach, reset } from 'electron-as-wallpaper'
+import { settingsService } from '../services/settings'
 import { getLocalServer, localServer, setBg } from '../stores/appStore'
 
 export class BackgroundManager {
@@ -18,14 +20,27 @@ export class BackgroundManager {
 
 		console.log(`Setting up background windows for ${displays.length} monitor(s)`)
 
-		displays.forEach((display, index) => {
-			const monitorUrl = `monitor${index + 1}`
-			const backgroundWindow = this.createBackgroundWindow(monitorUrl, index, display)
+		displays.forEach(async (display, index) => {
+			const monitorId = `monitor${index + 1}`
+			await this.saveMonitorIndex(monitorId, index)
+			const backgroundWindow = this.createBackgroundWindow(display, index, monitorId)
 			this.backgroundWindows.set(index, backgroundWindow)
 		})
 	}
 
-	private createBackgroundWindow(monitorUrl: string, index: number, display: Electron.Display) {
+	private async saveMonitorIndex(monitorId: string, index: number) {
+		const settings = await settingsService.getSettings()
+		let screenSettings = settings.screens[monitorId]
+		if (!screenSettings) {
+			screenSettings = settings.screens[monitorId] = { ...DefaultScreenSettings, monitorIndex: index }
+			settingsService.updateSettings(settings)
+		} else if (screenSettings.monitorIndex !== index) {
+			screenSettings.monitorIndex = index
+			settingsService.updateSettings(settings)
+		}
+	}
+
+	private createBackgroundWindow(display: Electron.Display, index: number, monitorId: string) {
 		console.log(
 			`Monitor ${index}: ${display.bounds.width}x${display.bounds.height} at (${display.bounds.x}, ${display.bounds.y})`
 		)
@@ -60,7 +75,7 @@ export class BackgroundManager {
 		const backgroundWindow = new BrowserWindow(windowConfig)
 
 		// Load the background webview
-		const backgroundUrl = `${this.serverUrl}/app/${monitorUrl}`
+		const backgroundUrl = `${this.serverUrl}/app/${monitorId}`
 		console.log(`Loading background for monitor ${index}: ${backgroundUrl}`)
 
 		backgroundWindow.loadURL(backgroundUrl)
