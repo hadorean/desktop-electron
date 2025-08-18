@@ -90,9 +90,9 @@
 	</div>
 {/snippet}
 
-<div class="image-grid-container no-drag">
-	<div class="header-section drag">
-		<h3 class="section-title drag">Background image</h3>
+<div class="image-grid-container">
+	<div class="header-section">
+		<h3 class="section-title">Background image</h3>
 		{#if isOverride && canRevert}
 			<button class="revert-button" onclick={handleRevert} title="Clear override" aria-label="Clear override">
 				<Icon name="revert" size="sm" />

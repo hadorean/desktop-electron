@@ -4,12 +4,12 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ========================================
-   SHADCN DEFAULT THEME (LIGHT)
+   SHADCN DEFAULT THEME (LIGHT) - MERGED WITH HEYKETSU
    ======================================== */
 
 :root {
 	/* === BORDER RADIUS === */
-	--radius: 0.625rem;
+	--radius: 0.5rem; /* 8px - HEYKETSU override */
 
 	/* === BACKGROUNDS === */
 	--background: oklch(1 0 0);
@@ -23,19 +23,19 @@
 	--muted-foreground: oklch(0.554 0.046 257.417);
 
 	/* === INTERACTIVE ELEMENTS === */
-	--primary: oklch(0.208 0.042 265.755);
-	--primary-foreground: oklch(0.984 0.003 247.858);
+	--primary: #8ba1a7; /* HEYKETSU override */
+	--primary-foreground: #ffffff; /* HEYKETSU override */
 	--secondary: oklch(0.968 0.007 247.896);
-	--secondary-foreground: oklch(0.208 0.042 265.755);
-	--muted: oklch(0.968 0.007 247.896);
-	--accent: oklch(0.968 0.007 247.896);
+	--secondary-foreground: #334155; /* HEYKETSU override */
+	--muted: #f8fafc; /* HEYKETSU override */
+	--accent: #f8fafc; /* HEYKETSU override */
 	--accent-foreground: oklch(0.208 0.042 265.755);
-	--destructive: oklch(0.577 0.245 27.325);
+	--destructive: #ef4444; /* HEYKETSU override */
 
 	/* === BORDERS & INPUTS === */
 	--border: oklch(0.929 0.013 255.508);
 	--input: oklch(0.929 0.013 255.508);
-	--ring: oklch(0.704 0.04 256.788);
+	--ring: #8ba1a7; /* HEYKETSU override */
 
 	/* === CHART COLORS === */
 	--chart-1: oklch(0.646 0.222 41.116);
@@ -53,37 +53,75 @@
 	--sidebar-accent-foreground: oklch(0.208 0.042 265.755);
 	--sidebar-border: oklch(0.929 0.013 255.508);
 	--sidebar-ring: oklch(0.704 0.04 256.788);
+
+	/* CUSTOMS */
+
+	/* === BRAND COLORS === */
+	--brand-accent: #06b6d4; /* Cyan 500 - accent/hover states */
+
+	/* === CUSTOM SEMANTIC COLORS === */
+	--text-secondary: #475569; /* Slate 600 - body text, descriptions */
+	--text-disabled: #94a3b8; /* Slate 400 - disabled states */
+
+	/* === CUSTOM INTERACTIVE ELEMENTS === */
+	--primary-hover: #0e7490; /* Cyan 700 - hover state */
+	--secondary-hover: #e2e8f0; /* Slate 200 - secondary hover */
+
+	/* === CUSTOM BORDERS & INPUTS === */
+	--border-hover: #cbd5e1; /* Slate 300 - focused borders */
+	--input-border: #d1d5db; /* Gray 300 - input borders */
+
+	/* === STATUS COLORS === */
+	--success: #10b981; /* Emerald 500 */
+	--success-text: #ffffff; /* White text on success */
+	--warning: #f59e0b; /* Amber 500 */
+	--warning-text: #ffffff; /* White text on warning */
+	--danger: #ef4444; /* Red 500 */
+	--danger-text: #ffffff; /* White text on danger */
+
+	/* === SHADOWS & EFFECTS === */
+	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+	/* === CUSTOM BORDER RADIUS === */
+	--radius-sm: 0.375rem; /* 6px */
+	--radius-lg: 0.75rem; /* 12px */
+	--radius-xl: 1rem; /* 16px */
+
+	/* === ADDITIONAL SHADCN MAPPINGS === */
+	--destructive-foreground: #ffffff;
 }
 
 /* ========================================
-   SHADCN DEFAULT THEME (DARK)
+   SHADCN DEFAULT THEME (DARK) - MERGED WITH HEYKETSU
    ======================================== */
 
 .dark {
 	/* === BACKGROUNDS === */
-	--background: oklch(0.129 0.042 264.695);
-	--card: oklch(0.208 0.042 265.755);
-	--popover: oklch(0.208 0.042 265.755);
+	--background: #1b1d24; /* HEYKETSU override */
+	--card: rgba(27, 30, 34, 0.596); /* HEYKETSU override */
+	--popover: rgb(31, 32, 34); /* HEYKETSU override */
 
 	/* === TEXT COLORS === */
-	--foreground: oklch(0.984 0.003 247.858);
-	--card-foreground: oklch(0.984 0.003 247.858);
-	--popover-foreground: oklch(0.984 0.003 247.858);
+	--foreground: #cfcfcf; /* HEYKETSU override */
+	--card-foreground: #cfcfcf; /* HEYKETSU override */
+	--popover-foreground: #cfcfcf; /* HEYKETSU override */
 	--muted-foreground: oklch(0.704 0.04 256.788);
 
 	/* === INTERACTIVE ELEMENTS === */
-	--primary: oklch(0.929 0.013 255.508);
-	--primary-foreground: oklch(0.208 0.042 265.755);
-	--secondary: oklch(0.279 0.041 260.031);
-	--secondary-foreground: oklch(0.984 0.003 247.858);
-	--muted: oklch(0.279 0.041 260.031);
-	--accent: oklch(0.279 0.041 260.031);
-	--accent-foreground: oklch(0.984 0.003 247.858);
+	--primary: #8ba1a7; /* HEYKETSU override */
+	--primary-foreground: #ffffff; /* HEYKETSU override */
+	--secondary: #475266; /* HEYKETSU override */
+	--secondary-foreground: #f9fafb; /* HEYKETSU override */
+	--muted: #334155; /* HEYKETSU override */
+	--accent: #222933; /* HEYKETSU override */
+	--accent-foreground: #cfcfcf; /* HEYKETSU override */
 	--destructive: oklch(0.704 0.191 22.216);
 
 	/* === BORDERS & INPUTS === */
-	--border: oklch(1 0 0 / 10%);
-	--input: oklch(1 0 0 / 15%);
+	--border: #37415194; /* HEYKETSU override */
+	--input: #303842; /* HEYKETSU override */
 	--ring: oklch(0.551 0.027 264.364);
 
 	/* === CHART COLORS === */
@@ -102,6 +140,20 @@
 	--sidebar-accent-foreground: oklch(0.984 0.003 247.858);
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.551 0.027 264.364);
+
+	/* CUSTOMS */
+
+	/* === CUSTOM DARK TEXT COLORS === */
+	--text-secondary: #cbd5e1; /* Slate 300 - body text */
+	--text-disabled: #64748b; /* Slate 500 - disabled states */
+
+	/* === CUSTOM DARK INTERACTIVE ELEMENTS === */
+	--primary-hover: #06b6d4; /* Use brand-accent value directly */
+	--secondary-hover: #4b5563; /* Gray 600 - secondary hover */
+
+	/* === CUSTOM DARK BORDERS & INPUTS === */
+	--border-hover: #4b5563; /* Gray 600 - focused borders */
+	--input-border: #374151; /* Gray 700 - input borders */
 }
 
 @theme inline {
@@ -142,125 +194,14 @@
 	--color-sidebar-ring: var(--sidebar-ring);
 }
 
-@layer base {
+/* @layer base {
 	* {
 		@apply border-border outline-ring/50;
 	}
 	body {
 		@apply bg-background text-foreground;
 	}
-}
-
-/* ========================================
-   HEYKETSU CUSTOM OVERRIDES
-   Only values that differ from shadcn defaults
-   ======================================== */
-
-:root {
-	/* === BRAND COLORS === */
-	--brand-primary: #8ba1a7; /* Cyan 600 - main brand color */
-	--brand-accent: #06b6d4; /* Cyan 500 - accent/hover states */
-
-	/* === CUSTOM SEMANTIC COLORS === */
-	--text-secondary: #475569; /* Slate 600 - body text, descriptions */
-	--text-disabled: #94a3b8; /* Slate 400 - disabled states */
-	--surface: #ffffff; /* White - cards, panels */
-	--surface-hover: #f8fafc; /* Very light gray - hover states */
-
-	/* === CUSTOM INTERACTIVE ELEMENTS === */
-	--primary: var(--brand-primary); /* Override shadcn primary */
-	--primary-hover: #0e7490; /* Cyan 700 - hover state */
-	--primary-text: #ffffff; /* White text on primary */
-
-	--secondary-hover: #e2e8f0; /* Slate 200 - secondary hover */
-	--secondary-text: #334155; /* Slate 700 - text on secondary */
-
-	/* === CUSTOM BORDERS & INPUTS === */
-	--border-hover: #cbd5e1; /* Slate 300 - focused borders */
-	--input-border: #d1d5db; /* Gray 300 - input borders */
-
-	/* === STATUS COLORS === */
-	--success: #10b981; /* Emerald 500 */
-	--success-text: #ffffff; /* White text on success */
-	--warning: #f59e0b; /* Amber 500 */
-	--warning-text: #ffffff; /* White text on warning */
-	--danger: #ef4444; /* Red 500 */
-	--danger-text: #ffffff; /* White text on danger */
-
-	/* === SHADOWS & EFFECTS === */
-	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-
-	/* === BORDER RADIUS OVERRIDE === */
-	--radius: 0.5rem; /* 8px - smaller than shadcn default (10px) */
-	--radius-sm: 0.375rem; /* 6px */
-	--radius-lg: 0.75rem; /* 12px */
-	--radius-xl: 1rem; /* 16px */
-
-	/* === SHADCN OVERRIDES (only non-identical mappings) === */
-	--primary-foreground: var(--primary-text);
-	--secondary-foreground: var(--secondary-text);
-	--muted: var(--surface-hover);
-	--accent: var(--surface-hover);
-	--destructive: var(--danger);
-	--destructive-foreground: var(--danger-text);
-	--ring: var(--primary);
-}
-
-/* ========================================
-   HEYKETSU CUSTOM DARK THEME OVERRIDES
-   Only values that differ from shadcn dark defaults
-   ======================================== */
-
-:root.dark,
-.dark {
-	/* === CUSTOM BACKGROUNDS === */
-	--background: #1b1d24; /* Custom dark background (different from shadcn) */
-	--surface: rgba(27, 30, 34, 0.596); /* Custom semi-transparent surface */
-	--surface-hover: #334155; /* Slate 700 - hover states */
-
-	/* === CUSTOM TEXT COLORS === */
-	--text-primary: #cfcfcf; /* Custom light text */
-	--text-secondary: #cbd5e1; /* Slate 300 - body text */
-	--text-disabled: #64748b; /* Slate 500 - disabled states */
-
-	/* === CUSTOM INTERACTIVE ELEMENTS === */
-	--primary: var(--brand-primary); /* Keep brand primary */
-	--primary-hover: var(--brand-accent);
-	--primary-text: #ffffff;
-
-	--secondary: #374151; /* Gray 700 - secondary buttons */
-	--secondary-hover: #4b5563; /* Gray 600 - secondary hover */
-	--secondary-text: #f9fafb; /* Gray 50 - text on secondary */
-
-	/* === CUSTOM BORDERS & INPUTS === */
-	--border: #37415194; /* Custom semi-transparent border */
-	--border-hover: #4b5563; /* Gray 600 - focused borders */
-	--input-bg: #303842; /* Custom input background */
-	--input-border: #374151; /* Gray 700 - input borders */
-
-	/* === SHADCN OVERRIDES (only different from defaults) === */
-	--foreground: var(--text-primary);
-	--card: var(--surface);
-	--card-foreground: var(--text-primary);
-	--popover: var(--surface);
-	--popover-foreground: var(--text-primary);
-	--primary-foreground: var(--primary-text);
-	--secondary-foreground: var(--secondary-text);
-	--muted: var(--surface-hover);
-	--accent: var(--surface-hover);
-	--accent-foreground: var(--text-primary);
-	--input: var(--input-bg);
-}
-
-h1 {
-	font-size: 1.5rem;
-	font-weight: 600;
-	color: var(--text-primary);
-}
-
-/* === APPLICATION STYLES === */
+} */
 
 /* Force dark mode for shadcn-svelte components */
 html {
@@ -270,6 +211,8 @@ html {
 html body {
 	color-scheme: dark;
 }
+
+/* === APPLICATION STYLES === */
 
 :root {
 	background-color: rgba(0, 0, 0, 0);
@@ -315,6 +258,14 @@ code {
 	width: 100vw;
 }
 
+/* === HEADINGS === */
+
+h1 {
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
 /* === SCROLLBAR === */
 
 /* Scrollbar styling */
@@ -333,7 +284,7 @@ code {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: var(--text-muted);
+	background-color: var(--primary);
 }
 
 /* === NO DRAG === */
