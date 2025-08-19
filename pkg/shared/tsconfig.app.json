@@ -7,7 +7,7 @@
 		"skipLibCheck": true, // Moved here to ensure it applies to all type checks
 		"moduleResolution": "bundler",
 		"isolatedModules": true,
-		"noEmit": false,
+		"emitDeclarationOnly": true,
 		"strict": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
