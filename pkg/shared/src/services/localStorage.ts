@@ -38,7 +38,7 @@ class LocalStorageService {
 			{ store: debugMenu.visibility, key: 'debug' },
 			{ store: apiStore.url, key: 'api' },
 			{ store: settingsStore.currentScreenId, key: 'screen' },
-			{ store: settingsStore.allSettings, key: 'settings' }
+			{ store: settingsStore.userSettings, key: 'settings' }
 		])
 
 		this.isInitialized = true
@@ -142,7 +142,7 @@ class LocalStorageService {
 				delete (window as { __INITIAL_SCREEN_ID__?: string }).__INITIAL_SCREEN_ID__
 			}
 
-			const currentSettings = get(settingsStore.allSettings)
+			const currentSettings = get(settingsStore.userSettings)
 			// Get the selected image from the current theme (day by default)
 			const selectedImage = currentSettings.shared.day?.selectedImage
 			return selectedImage || (images.length > 0 ? images[0].name : '')
@@ -184,14 +184,14 @@ class LocalStorageService {
 		// Validate screen-specific settings
 		if (settings.screens) {
 			for (const screenId in settings.screens) {
-				const screenSettings = settings.screens[screenId]
-				if (screenSettings.day?.selectedImage && !imageNames.includes(screenSettings.day.selectedImage)) {
+				const screenProfile = settings.screens[screenId]
+				if (screenProfile.day?.selectedImage && !imageNames.includes(screenProfile.day.selectedImage)) {
 					console.log(`📷 Screen "${screenId}" day selected image no longer exists, clearing`)
-					delete screenSettings.day.selectedImage
+					delete screenProfile.day.selectedImage
 				}
-				if (screenSettings.night?.selectedImage && !imageNames.includes(screenSettings.night.selectedImage)) {
+				if (screenProfile.night?.selectedImage && !imageNames.includes(screenProfile.night.selectedImage)) {
 					console.log(`📷 Screen "${screenId}" night selected image no longer exists, clearing`)
-					delete screenSettings.night.selectedImage
+					delete screenProfile.night.selectedImage
 				}
 			}
 		}
@@ -212,34 +212,34 @@ class LocalStorageService {
 				let localSettingsChanged = false
 
 				for (const screenId in allLocalSettings) {
-					const screenSettings = allLocalSettings[screenId]
+					const screenProfile = allLocalSettings[screenId]
 
 					// Check day settings
-					if (screenSettings.day?.selectedImage && !availableImages.includes(screenSettings.day.selectedImage)) {
+					if (screenProfile.day?.selectedImage && !availableImages.includes(screenProfile.day.selectedImage)) {
 						console.log(
-							`📷 Screen "${screenId}" day selected image "${screenSettings.day.selectedImage}" no longer exists, clearing override`
+							`📷 Screen "${screenId}" day selected image "${screenProfile.day.selectedImage}" no longer exists, clearing override`
 						)
-						delete screenSettings.day.selectedImage
+						delete screenProfile.day.selectedImage
 						localSettingsChanged = true
 					}
 
 					// Check night settings
-					if (screenSettings.night?.selectedImage && !availableImages.includes(screenSettings.night.selectedImage)) {
+					if (screenProfile.night?.selectedImage && !availableImages.includes(screenProfile.night.selectedImage)) {
 						console.log(
-							`📷 Screen "${screenId}" night selected image "${screenSettings.night.selectedImage}" no longer exists, clearing override`
+							`📷 Screen "${screenId}" night selected image "${screenProfile.night.selectedImage}" no longer exists, clearing override`
 						)
-						delete screenSettings.night.selectedImage
+						delete screenProfile.night.selectedImage
 						localSettingsChanged = true
 					}
 
 					// Clean up empty settings
-					if (screenSettings.day && Object.keys(screenSettings.day).length === 0) {
-						delete screenSettings.day
+					if (screenProfile.day && Object.keys(screenProfile.day).length === 0) {
+						delete screenProfile.day
 					}
-					if (screenSettings.night && Object.keys(screenSettings.night).length === 0) {
-						screenSettings.night = null
+					if (screenProfile.night && Object.keys(screenProfile.night).length === 0) {
+						screenProfile.night = null
 					}
-					if (!screenSettings.day && !screenSettings.night) {
+					if (!screenProfile.day && !screenProfile.night) {
 						delete allLocalSettings[screenId]
 						localSettingsChanged = true
 					}

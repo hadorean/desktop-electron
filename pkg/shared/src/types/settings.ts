@@ -17,7 +17,6 @@ export interface ScreenProfile {
 	showTimeDate: boolean
 	showWeather: boolean
 	showScreenSwitcher: boolean
-	favorites: string[]
 	settingsButtonPosition: SettingsButtonPosition
 }
 
@@ -53,6 +52,7 @@ export interface UserSettings {
 	currentTheme: DayNightMode
 	shared: ScreenSettings
 	screens: Record<string, ScreenSettings>
+	favorites: string[]
 }
 
 export interface SettingsUpdateEvent {
@@ -74,7 +74,6 @@ export const DefaultScreenProfile: ScreenProfile = {
 	showTimeDate: true,
 	showWeather: false,
 	showScreenSwitcher: true,
-	favorites: [],
 	settingsButtonPosition: 'bottom-right'
 }
 
@@ -88,5 +87,6 @@ export const DefaultScreenSettings: ScreenSettings = {
 export const DefaultUserSettings: UserSettings = {
 	currentTheme: 'day',
 	shared: DefaultScreenSettings,
-	screens: {}
+	screens: {},
+	favorites: []
 }

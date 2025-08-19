@@ -59,12 +59,12 @@
 	// Sort images to show favorites first - use derived to minimize recalculation
 	// Access individual stores from the imagesStore object
 	const { images, loading: imagesLoading, error: imagesError } = imagesStore
-	const { screenSettings } = settingsStore
+	const { screenProfile } = settingsStore
 
 	const sortedImages = $derived(
 		(() => {
 			const imageList = $images
-			const favorites = $screenSettings.favorites ?? []
+			const favorites = $screenProfile.favorites ?? []
 			if (imageList.length === 0) return []
 
 			return [...imageList].sort((a, b) => {
@@ -144,15 +144,13 @@
 										</div>
 									</div>
 									<button
-										class="favorite-button {($screenSettings.favorites ?? []).includes(image.name)
-											? 'is-favorite'
-											: ''}"
+										class="favorite-button {($screenProfile.favorites ?? []).includes(image.name) ? 'is-favorite' : ''}"
 										onclick={(e: Event) => toggleFavorite(image.name, e)}
-										title={($screenSettings.favorites ?? []).includes(image.name)
+										title={($screenProfile.favorites ?? []).includes(image.name)
 											? 'Remove from favorites'
 											: 'Add to favorites'}
 									>
-										{#if ($screenSettings.favorites ?? []).includes(image.name)}
+										{#if ($screenProfile.favorites ?? []).includes(image.name)}
 											★
 										{:else}
 											☆

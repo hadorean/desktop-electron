@@ -6,11 +6,11 @@
 	export let onToggle: () => void
 	export let buttonRef: HTMLElement | null = null
 
-	const { screenSettings } = settingsStore
+	const { screenProfile } = settingsStore
 
 	let buttonHovered: boolean = false
 
-	$: position = $screenSettings.settingsButtonPosition ?? 'bottom-right'
+	$: position = $screenProfile.settingsButtonPosition ?? 'bottom-right'
 	$: positionClasses = {
 		'bottom-right': 'bottom-4 right-4',
 		'top-right': 'top-4 right-4',

@@ -37,17 +37,17 @@ export class BackgroundManager {
 		})
 
 		// Enable/disable background windows based on settings
-		settingsStore.allSettings.subscribe(settings => {
+		settingsStore.userSettings.subscribe(settings => {
 			for (const screenId in settings.screens) {
 				if (!screenId.startsWith('monitor')) continue
-				const screenSettings = settings.screens[screenId]
+				const screenProfile = settings.screens[screenId]
 
 				const bg = this.backgrounds.get(screenId)
 				if (!bg) {
 					console.error(`Background not found for screen ${screenId}`)
 					continue
 				}
-				this.toggleBg(bg, screenSettings.monitorEnabled)
+				this.toggleBg(bg, screenProfile.monitorEnabled)
 			}
 		})
 
@@ -70,7 +70,7 @@ export class BackgroundManager {
 			const bg = { id, index, display } as Background
 			this.backgrounds.set(id, bg)
 			await this.saveMonitorIndex(id, index)
-			const enabled = get(settingsStore.allSettings).screens[id]?.monitorEnabled ?? true
+			const enabled = get(settingsStore.userSettings).screens[id]?.monitorEnabled ?? true
 			this.toggleBg(bg, enabled)
 		}
 	}
@@ -132,12 +132,12 @@ export class BackgroundManager {
 
 	private async saveMonitorIndex(monitorId: string, index: number): Promise<void> {
 		const settings = await settingsService.getSettings()
-		let screenSettings = settings.screens[monitorId]
-		if (!screenSettings) {
-			screenSettings = settings.screens[monitorId] = { ...DefaultScreenSettings, monitorIndex: index }
+		let screenProfile = settings.screens[monitorId]
+		if (!screenProfile) {
+			screenProfile = settings.screens[monitorId] = { ...DefaultScreenSettings, monitorIndex: index }
 			settingsService.updateSettings(settings)
-		} else if (screenSettings.monitorIndex !== index) {
-			screenSettings.monitorIndex = index
+		} else if (screenProfile.monitorIndex !== index) {
+			screenProfile.monitorIndex = index
 			settingsService.updateSettings(settings)
 		}
 	}

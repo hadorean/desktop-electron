@@ -4,7 +4,7 @@
 	import { api } from '../../services'
 	import { settingsStore } from '../../stores/settingsStore'
 
-	const { screenSettings } = settingsStore
+	const { screenProfile } = settingsStore
 
 	interface BackgroundState {
 		url: string
@@ -22,14 +22,14 @@
 
 	// Subscribe to settings store for background changes
 	$: {
-		const mode = $screenSettings.mode ?? 'image'
+		const mode = $screenProfile.mode ?? 'image'
 		let backgroundUrl = ''
 
 		if (mode === 'image') {
-			const selectedImage = $screenSettings.selectedImage ?? ''
+			const selectedImage = $screenProfile.selectedImage ?? ''
 			backgroundUrl = api.getImageUrl(selectedImage)
 		} else {
-			backgroundUrl = $screenSettings.url ?? ''
+			backgroundUrl = $screenProfile.url ?? ''
 		}
 
 		if (backgroundUrl !== currentBackgroundUrl || mode !== currentMode) {
@@ -38,7 +38,7 @@
 			startTransition()
 		}
 
-		imageScale = 1 + ($screenSettings.blur ?? 0) * 0.003
+		imageScale = 1 + ($screenProfile.blur ?? 0) * 0.003
 	}
 
 	function startTransition(): void {
@@ -51,7 +51,7 @@
 			previousBackground.tween?.stop()
 
 			previousBackground.tween = new Tween({ opacity: previousBackground.opacity })
-				.to({ opacity: 0 }, ($screenSettings.transitionTime ?? 1) * 1000)
+				.to({ opacity: 0 }, ($screenProfile.transitionTime ?? 1) * 1000)
 				.easing(Easing.Quadratic.Out)
 				.onUpdate(value => {
 					if (previousBackground) {
@@ -76,7 +76,7 @@
 		}
 
 		activeBackground.tween = new Tween({ opacity: 0 })
-			.to({ opacity: 1 }, ($screenSettings.transitionTime ?? 1) * 1000)
+			.to({ opacity: 1 }, ($screenProfile.transitionTime ?? 1) * 1000)
 			.easing(Easing.Quadratic.Out)
 			.onUpdate(value => {
 				if (activeBackground) {
@@ -121,13 +121,13 @@
 	}
 
 	onMount(() => {
-		const mode = $screenSettings.mode ?? 'image'
+		const mode = $screenProfile.mode ?? 'image'
 		let initialUrl = ''
 
-		if (mode === 'image' && $screenSettings.selectedImage) {
-			initialUrl = api.getImageUrl($screenSettings.selectedImage)
-		} else if (mode === 'url' && $screenSettings.url) {
-			initialUrl = $screenSettings.url
+		if (mode === 'image' && $screenProfile.selectedImage) {
+			initialUrl = api.getImageUrl($screenProfile.selectedImage)
+		} else if (mode === 'url' && $screenProfile.url) {
+			initialUrl = $screenProfile.url
 		}
 
 		if (initialUrl) {
@@ -146,9 +146,9 @@
 
 <div
 	class="background-container"
-	style="scale: {imageScale}; opacity: {$screenSettings.opacity ?? 1}; filter: {[
-		($screenSettings.blur ?? 0) > 0 ? `blur(${$screenSettings.blur}px)` : null,
-		`saturate(${$screenSettings.saturation ?? 1})`
+	style="scale: {imageScale}; opacity: {$screenProfile.opacity ?? 1}; filter: {[
+		($screenProfile.blur ?? 0) > 0 ? `blur(${$screenProfile.blur}px)` : null,
+		`saturate(${$screenProfile.saturation ?? 1})`
 	]
 		.filter(Boolean)
 		.join(' ')};"

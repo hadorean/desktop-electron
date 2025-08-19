@@ -7,7 +7,7 @@
 	let underlineRef: HTMLDivElement
 	let tabRefs: HTMLDivElement[] = $state([])
 
-	const { allSettings, currentScreenId, isLocalMode, isNightMode, screenIds } = settingsStore
+	const { userSettings, currentScreenId, isLocalMode, isNightTheme, screenIds } = settingsStore
 
 	// Reactive current tab value based on local mode and current screen
 	const currentTab = $derived($isLocalMode ? $currentScreenId : 'shared')
@@ -17,10 +17,10 @@
 		const tabs = ['shared', ...$screenIds]
 		const allScreenIds = $screenIds
 		return tabs.map(tabId => {
-			const settings = tabId === 'shared' ? $allSettings.shared : $allSettings.screens[tabId]
+			const settings = tabId === 'shared' ? $userSettings.shared : $userSettings.screens[tabId]
 			// Compute color and type instead of reading from settings
-			const color = tabId === 'shared' ? '#ffffff' : settingsStore.assignScreenColor(tabId, allScreenIds)
-			const type = tabId === 'shared' ? 'shared' : settingsStore.assignScreenType(tabId)
+			const color = tabId === 'shared' ? '#ffffff' : settingsStore.getScreenColor(tabId, allScreenIds)
+			const type = tabId === 'shared' ? 'shared' : settingsStore.getScreenType(tabId)
 			return {
 				id: tabId,
 				settings,
@@ -139,9 +139,9 @@
 				onkeydown={e => {
 					if (e.key === 'Enter' || e.key === ' ') settingsStore.toggleDayNightMode()
 				}}
-				title={$isNightMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
+				title={$isNightTheme ? 'Switch to Day Theme' : 'Switch to Night Theme'}
 			>
-				<Icon name={$isNightMode ? 'moon' : 'sun'} size="md" className="daynight-icon" />
+				<Icon name={$isNightTheme ? 'moon' : 'sun'} size="md" className="daynight-icon" />
 				<span class="screen-name invisible">Theme</span>
 			</div>
 		</div>

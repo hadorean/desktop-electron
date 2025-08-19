@@ -11,7 +11,7 @@
 	let initialSubscribeHandled = false
 	let unsubscribeSettings: (() => void) | null = null
 
-	const { allSettings, currentScreenId } = settingsStore
+	const { userSettings, currentScreenId } = settingsStore
 
 	onMount(() => {
 		// Setup Socket.IO connection status monitoring
@@ -49,7 +49,7 @@
 		})
 
 		// Subscribe to settings changes and send to server
-		unsubscribeSettings = allSettings.subscribe(value => {
+		unsubscribeSettings = userSettings.subscribe(value => {
 			if (!initialSubscribeHandled) {
 				initialSubscribeHandled = true
 				return // Skip the initial subscribe callback

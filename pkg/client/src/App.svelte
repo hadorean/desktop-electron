@@ -16,7 +16,7 @@
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
 
-	const { expandSettings, screenSettings, currentScreenType } = settingsStore
+	const { expandSettings, screenProfile, currentScreenType } = settingsStore
 
 	let showSettings: boolean = false
 	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null
@@ -143,16 +143,16 @@
 
 	<BackgroundImage />
 
-	{#if $screenSettings.showTimeDate}
+	{#if $screenProfile.showTimeDate}
 		<TimeDisplay />
 	{/if}
 
-	{#if $screenSettings.showWeather}
+	{#if $screenProfile.showWeather}
 		<WeatherDisplay />
 	{/if}
 
 	<SettingsButton
-		hideButton={$screenSettings.hideButton || $currentScreenType === 'static'}
+		hideButton={$screenProfile.hideButton || $currentScreenType === 'static'}
 		onToggle={toggleSettings}
 		bind:buttonRef={settingsButton}
 	/>

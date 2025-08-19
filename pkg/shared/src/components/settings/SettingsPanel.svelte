@@ -18,9 +18,9 @@
 	let screenSwitcher: ScreenSwitcher
 
 	const {
-		screenSettings,
-		editingSettings,
-		rootSettings,
+		screenProfile,
+		activeProfile,
+		baseProfile,
 		transitionTime,
 		isLocalMode,
 		currentScreen,
@@ -50,11 +50,11 @@
 		}
 	})
 
-	function updateProfile<K extends keyof typeof $editingSettings>(
+	function updateProfile<K extends keyof typeof $activeProfile>(
 		key: K,
-		value: (typeof $editingSettings)[K] | null
+		value: (typeof $activeProfile)[K] | null
 	): void {
-		settingsStore.updateEditingSettings(current => {
+		settingsStore.updateEditingProfile(current => {
 			if (value === null) {
 				// Remove property (reset to default)
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -87,112 +87,112 @@
 			<div class="setting-section">
 				<!-- Background Mode Selector -->
 				<!-- <BackgroundModeSelector
-					mode={$editingSettings.mode ?? $screenSettings.mode ?? 'image'}
+					mode={$activeProfile.mode ?? $screenProfile.mode ?? 'image'}
 					onModeChange={(newMode: 'image' | 'url') => handleSettingChange('mode', newMode)}
-					canRevert={$isLocalMode && $editingSettings.mode !== undefined}
+					canRevert={$isLocalMode && $activeProfile.mode !== undefined}
 					onRevert={() => handleSettingChange('mode', null)}
 				/> -->
 
 				<!-- Conditional Background Input -->
-				{#if ($editingSettings.mode ?? $screenSettings.mode ?? 'image') === 'image'}
+				{#if ($activeProfile.mode ?? $screenProfile.mode ?? 'image') === 'image'}
 					<ImageGrid
-						selectedImage={$screenSettings.selectedImage ?? ''}
+						selectedImage={$screenProfile.selectedImage ?? ''}
 						isOverride={$isLocalMode}
-						overrideValue={$editingSettings.selectedImage}
+						overrideValue={$activeProfile.selectedImage}
 						onImageChange={(newImage: string | null) => updateProfile('selectedImage', newImage)}
 					/>
 				{:else}
 					<UrlInput
-						url={$screenSettings.url ?? ''}
+						url={$screenProfile.url ?? ''}
 						isOverride={$isLocalMode}
-						overrideValue={$editingSettings.url}
+						overrideValue={$activeProfile.url}
 						onUrlChange={(newUrl: string | null) => updateProfile('url', newUrl)}
 					/>
 				{/if}
 
 				<SliderControl
 					label="Brightness"
-					value={$editingSettings.opacity ?? null}
+					value={$activeProfile.opacity ?? null}
 					min={0}
 					max={1}
 					step={0.01}
 					onChange={(newOpacity: number | null) => updateProfile('opacity', newOpacity)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={$rootSettings.opacity}
-					overrideValue={$editingSettings.opacity}
+					defaultValue={$baseProfile.opacity}
+					overrideValue={$activeProfile.opacity}
 					transition={$transitionTime}
 				/>
 
 				<SliderControl
 					label="Saturation"
-					value={$editingSettings.saturation ?? null}
+					value={$activeProfile.saturation ?? null}
 					min={0}
 					max={2}
 					step={0.01}
 					onChange={(newSaturation: number | null) => updateProfile('saturation', newSaturation)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={$rootSettings.saturation}
-					overrideValue={$editingSettings.saturation}
+					defaultValue={$baseProfile.saturation}
+					overrideValue={$activeProfile.saturation}
 					transition={$transitionTime}
 				/>
 
 				<SliderControl
 					label="Blur"
-					value={$editingSettings.blur ?? null}
+					value={$activeProfile.blur ?? null}
 					min={0}
 					max={50}
 					step={0.1}
 					onChange={(newBlur: number | null) => updateProfile('blur', newBlur)}
 					formatValue={(v: number) => `${v.toFixed(1)}px`}
 					isOverride={$isLocalMode}
-					defaultValue={$rootSettings.blur}
-					overrideValue={$editingSettings.blur}
+					defaultValue={$baseProfile.blur}
+					overrideValue={$activeProfile.blur}
 					transition={$transitionTime}
 				/>
 
 				<SliderControl
 					label="Transition Time"
-					value={$editingSettings.transitionTime ?? null}
+					value={$activeProfile.transitionTime ?? null}
 					min={0}
 					max={10}
 					step={0.1}
 					onChange={(newTransitionTime: number | null) => updateProfile('transitionTime', newTransitionTime)}
 					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
-					defaultValue={$rootSettings.transitionTime}
-					overrideValue={$editingSettings.transitionTime}
+					defaultValue={$baseProfile.transitionTime}
+					overrideValue={$activeProfile.transitionTime}
 					transition={$transitionTime}
 				/>
 			</div>
 
 			<ToggleControl
 				label="Time and date"
-				checked={$editingSettings.showTimeDate ?? $screenSettings.showTimeDate ?? true}
+				checked={$activeProfile.showTimeDate ?? $screenProfile.showTimeDate ?? true}
 				onChange={(newShowTimeDate: boolean | null) => updateProfile('showTimeDate', newShowTimeDate)}
 				isOverride={$isLocalMode}
-				overrideValue={$editingSettings.showTimeDate}
-				defaultValue={$rootSettings.showTimeDate}
+				overrideValue={$activeProfile.showTimeDate}
+				defaultValue={$baseProfile.showTimeDate}
 			/>
 
 			<ToggleControl
 				label="Weather"
-				checked={$editingSettings.showWeather ?? $screenSettings.showWeather ?? false}
+				checked={$activeProfile.showWeather ?? $screenProfile.showWeather ?? false}
 				onChange={(newShowWeather: boolean | null) => updateProfile('showWeather', newShowWeather)}
 				isOverride={$isLocalMode}
-				overrideValue={$editingSettings.showWeather}
-				defaultValue={$rootSettings.showWeather}
+				overrideValue={$activeProfile.showWeather}
+				defaultValue={$baseProfile.showWeather}
 			/>
 
 			{#if $currentScreenType === 'interactive'}
 				<ToggleControl
 					label="Auto-hide settings button"
-					checked={$editingSettings.hideButton ?? $screenSettings.hideButton ?? false}
+					checked={$activeProfile.hideButton ?? $screenProfile.hideButton ?? false}
 					onChange={(newHideButton: boolean | null) => updateProfile('hideButton', newHideButton)}
 					isOverride={$isLocalMode}
-					overrideValue={$editingSettings.hideButton}
-					defaultValue={$rootSettings.hideButton}
+					overrideValue={$activeProfile.hideButton}
+					defaultValue={$baseProfile.hideButton}
 				/>
 			{/if}
 
