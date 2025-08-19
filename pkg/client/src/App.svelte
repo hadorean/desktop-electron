@@ -63,7 +63,7 @@
 				document.addEventListener('mousedown', handleClickOutside)
 
 				// Setup socket listener for debug state changes
-				socketService.onDebugStateChanged(visible => {
+				socketService.debugStateChanged.subscribe(visible => {
 					console.log('Client app: Received debug state change:', visible)
 					debugMenu.setVisible(visible)
 				})

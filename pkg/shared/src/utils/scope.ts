@@ -1,8 +1,8 @@
-type Unsubscriber = () => void
+export type Unsubscriber = () => void
 
-type Callback<T> = (value: T) => void | (() => void)
+export type Callback<T> = ((value: T) => void) | ((value: T) => Promise<void>) | (() => void) | (() => Promise<void>)
 
-type Subscribable<T> = {
+export interface Subscribable<T> {
 	subscribe: (callback: Callback<T>) => Unsubscriber
 }
 

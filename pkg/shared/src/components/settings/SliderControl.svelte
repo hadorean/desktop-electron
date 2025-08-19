@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { settingsStore, type TransitionSettings } from '../../stores/settingsStore'
+	import { settingsStore } from '../../stores/settingsStore'
+	import type { TransitionSettings } from '../../types/settings'
 	import { Icon, Slider } from '../ui'
 
 	const {

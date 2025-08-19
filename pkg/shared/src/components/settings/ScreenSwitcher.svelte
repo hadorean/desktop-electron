@@ -113,7 +113,7 @@
 					onclick={() => handleTabClick(tab.id)}
 					role="tab"
 					tabindex="0"
-					onkeydown={e => {
+					onkeydown={(e: KeyboardEvent) => {
 						if (e.key === 'Enter' || e.key === ' ') handleTabClick(tab.id)
 					}}
 				>
@@ -136,7 +136,7 @@
 				onclick={() => settingsStore.toggleDayNightMode()}
 				role="button"
 				tabindex="0"
-				onkeydown={e => {
+				onkeydown={(e: KeyboardEvent) => {
 					if (e.key === 'Enter' || e.key === ' ') settingsStore.toggleDayNightMode()
 				}}
 				title={$isNightTheme ? 'Switch to Day Theme' : 'Switch to Night Theme'}

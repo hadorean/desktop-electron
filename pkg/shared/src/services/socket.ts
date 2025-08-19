@@ -1,7 +1,9 @@
 import { io, Socket } from 'socket.io-client'
 import { apiStore } from '../stores/apiStore'
-import type { SettingsUpdateEvent } from '../types'
+import { settingsStore } from '../stores/settingsStore'
+import type { ImagesUpdatedEvent, SettingsUpdateEvent } from '../types'
 import { ClientEvents, SocketEvents } from '../types'
+import { Signal, type ISignal } from '../utils/signal'
 
 // interface SettingsUpdatedResponse {
 // 	success: boolean
@@ -17,13 +19,29 @@ export class SocketService {
 	private maxReconnectAttempts = 5
 	private reconnectDelay = 1000
 
-	// Event handlers
-	private onSettingsUpdateCallback: ((event: SettingsUpdateEvent) => void) | null = null
-	private onConnectionStatusCallback: ((connected: boolean) => void) | null = null
-	private onDebugStateChangedCallback: ((visible: boolean) => void) | null = null
-	private onImagesUpdatedCallback:
-		| ((event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void)
-		| null = null
+	private updatingSettingsFromServer = false
+	private initialSubscribeHandled = false
+	private subbscribedToLocalSettings = false
+
+	private _settingsUpdated: Signal<SettingsUpdateEvent> = new Signal()
+	public get settingsUpdated(): ISignal<SettingsUpdateEvent> {
+		return this._settingsUpdated
+	}
+
+	private _connectionStatus: Signal<boolean> = new Signal()
+	public get connectionStatus(): ISignal<boolean> {
+		return this._connectionStatus
+	}
+
+	private _debugStateChanged: Signal<boolean> = new Signal()
+	public get debugStateChanged(): ISignal<boolean> {
+		return this._debugStateChanged
+	}
+
+	private _imagesUpdated: Signal<ImagesUpdatedEvent> = new Signal()
+	public get imagesUpdated(): ISignal<ImagesUpdatedEvent> {
+		return this._imagesUpdated
+	}
 
 	constructor() {
 		this.delayedInitialize()
@@ -65,13 +83,13 @@ export class SocketService {
 			console.log('🔌 Socket.IO connected:', this.socket?.id)
 			this.isConnected = true
 			this.reconnectAttempts = 0
-			this.onConnectionStatusCallback?.(true)
+			this._connectionStatus.emit(true)
 		})
 
 		this.socket.on('disconnect', reason => {
 			console.log('🔌 Socket.IO disconnected:', reason)
 			this.isConnected = false
-			this.onConnectionStatusCallback?.(false)
+			this._connectionStatus.emit(false)
 		})
 
 		this.socket.on('connect_error', error => {
@@ -83,45 +101,56 @@ export class SocketService {
 				console.error('🔌 Max reconnection attempts reached')
 			}
 
-			this.onConnectionStatusCallback?.(false)
+			this._connectionStatus.emit(false)
 		})
 
 		// Handle settings updates from server
 		this.socket.on(SocketEvents.SettingsUpdate, (event: SettingsUpdateEvent) => {
+			const clientId = socketService.getSocketId()
+			if (event.clientId == clientId) return
+
+			this.updatingSettingsFromServer = true
+			settingsStore.updateSettings(event.settings)
+			this.updatingSettingsFromServer = false
+
 			//console.log('🔌 Received settings update:', event)
-			this.onSettingsUpdateCallback?.(event)
+			this._settingsUpdated.emit(event)
 		})
 
 		// Handle debug state change events
 		this.socket.on(SocketEvents.DebugStateChanged, (data: { visible: boolean }) => {
 			//console.log('🔌 Received debug state change event:', data.visible)
-			this.onDebugStateChangedCallback?.(data.visible)
+			this._debugStateChanged.emit(data.visible)
 		})
 
 		// Handle images updated events
-		this.socket.on(
-			SocketEvents.ImagesUpdated,
-			(data: { timestamp: number; reason: string; filename?: string; eventType?: string }) => {
-				//console.log('🔌 Received images updated event:', data)
-				this.onImagesUpdatedCallback?.(data)
+		this.socket.on(SocketEvents.ImagesUpdated, (data: ImagesUpdatedEvent) => {
+			//console.log('🔌 Received images updated event:', data)
+			this._imagesUpdated.emit(data)
+		})
+
+		if (this.subbscribedToLocalSettings) return
+		this.subbscribedToLocalSettings = true
+
+		settingsStore.userSettings.subscribe(userSettings => {
+			if (!this.initialSubscribeHandled) {
+				this.initialSubscribeHandled = true
+				return // Skip the initial subscribe callback
 			}
-		)
-	}
 
-	/**
-	 * Update server URL and reconnect
-	 */
-	public setServerUrl(newUrl: string): void {
-		console.log('🔌 Updating server URL to:', newUrl)
+			// Check if server sync should be prevented (e.g., during validation operations)
+			// if (settingsStore.shouldPreventServerSync()) {
+			// 	console.log('🚫 Skipping server sync (silent update)')
+			// 	return
+			// }
 
-		if (this.socket) {
-			this.socket.disconnect()
-		}
-
-		// Update the base URL and reconnect
-		setTimeout(() => {
-			this.initializeConnection()
-		}, 500)
+			if (!this.updatingSettingsFromServer && this.getConnectionStatus()) {
+				//console.log('Updating settings from client:', value)
+				// Use socket ID as client ID
+				const clientId = this.getSocketId()
+				this.updateSettings(userSettings, clientId)
+			}
+		})
 	}
 
 	/**
@@ -163,36 +192,6 @@ export class SocketService {
 			settings,
 			clientId: clientId || this.socket.id
 		})
-	}
-
-	/**
-	 * Set callback for settings updates from server
-	 */
-	public onSettingsUpdate(callback: (event: SettingsUpdateEvent) => void): void {
-		this.onSettingsUpdateCallback = callback
-	}
-
-	/**
-	 * Set callback for connection status changes
-	 */
-	public onConnectionStatus(callback: (connected: boolean) => void): void {
-		this.onConnectionStatusCallback = callback
-	}
-
-	/**
-	 * Set callback for debug state change events
-	 */
-	public onDebugStateChanged(callback: (visible: boolean) => void): void {
-		this.onDebugStateChangedCallback = callback
-	}
-
-	/**
-	 * Set callback for images updated events
-	 */
-	public onImagesUpdated(
-		callback: (event: { timestamp: number; reason: string; filename?: string; eventType?: string }) => void
-	): void {
-		this.onImagesUpdatedCallback = callback
 	}
 
 	/**

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Lifespan, { type Span } from './Lifespan.svelte'
+	import Lifespan, { type Scope } from './Lifespan.svelte'
 
 	export let label: string | null = null
 
@@ -9,10 +9,10 @@
 
 	export let json: boolean = false
 
-	const init = (span: Span): void => {
+	const init = (s: Scope): void => {
 		const toLog = (x: unknown) => (!json || typeof x === 'string' ? x : JSON.stringify(x, null, 2))
 
-		span.subscribe(input, value => {
+		s.subscribe(input, value => {
 			if (label) {
 				console.log(label, toLog(value))
 			} else {

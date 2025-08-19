@@ -4,17 +4,10 @@
  */
 
 import { imagesStore } from '../stores/imagesStore'
+import type { ImagesUpdatedEvent } from '../types/sockets'
 import { api } from './api'
 import { localStorageService } from './localStorage'
 import { socketService } from './socket'
-
-// Type for image updated events (matches socket service signature)
-type ImageUpdatedEvent = {
-	timestamp: number
-	reason: string
-	filename?: string
-	eventType?: string
-}
 
 /**
  * Tracks processed events to prevent duplicates across all contexts
@@ -38,7 +31,7 @@ function initializeImageChangeHandling(context: string): () => void {
 	}
 
 	// Setup socket listener for images updated events
-	const handleImagesUpdated = async (event: ImageUpdatedEvent): Promise<void> => {
+	const handleImagesUpdated = async (event: ImagesUpdatedEvent): Promise<void> => {
 		console.log(`${context}: Received images updated event:`, event)
 
 		// Deduplicate events with the same timestamp
@@ -67,7 +60,7 @@ function initializeImageChangeHandling(context: string): () => void {
 	}
 
 	// Register listeners
-	socketService.onImagesUpdated(handleImagesUpdated)
+	socketService.imagesUpdated.subscribe(handleImagesUpdated)
 	const unsubscribeImagesChanged = imagesStore.onImagesChanged(handleImagesChanged)
 
 	// Create cleanup function

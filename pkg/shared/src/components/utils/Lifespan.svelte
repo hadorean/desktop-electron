@@ -1,13 +1,13 @@
 <script context="module" lang="ts">
-	export class Span extends Scope {}
+	import { Scope } from '../../utils/scope'
+	export type { Scope } from '../../utils/scope'
 </script>
 
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte'
-	import { Scope } from '../../utils/scope'
 
 	export let init: (scope: Scope) => void
-	let scope: Span = new Scope()
+	let scope: Scope = new Scope()
 
 	onMount(() => {
 		init(scope)

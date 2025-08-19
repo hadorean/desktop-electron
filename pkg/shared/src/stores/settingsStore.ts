@@ -76,6 +76,10 @@ const currentTransition = derived([transitionSettings, transitionOverride], ([se
 	return { ...settings, ...override } as TransitionSettings
 })
 
+const renderSettings = derived([userSettings, currentTransition], ([settings, transition]) => {
+	return { settings, transition }
+})
+
 when([currentScreenId, currentTheme], () => {
 	transitionOverride.set(makeTransition(get(screenProfile).transitionTime))
 })
@@ -292,6 +296,7 @@ export const settingsStore = {
 	activeProfile: readonly(activeProfile),
 
 	transition: readonly(currentTransition),
+	renderSettings: readonly(renderSettings),
 	updateTransition,
 
 	// Getters
