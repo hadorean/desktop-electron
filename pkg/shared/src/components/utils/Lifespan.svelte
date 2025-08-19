@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
 	import { Scope } from '../../utils/scope'
-	export type { Scope } from '../../utils/scope'
+	export { Scope } from '../../utils/scope'
 </script>
 
 <script lang="ts">
