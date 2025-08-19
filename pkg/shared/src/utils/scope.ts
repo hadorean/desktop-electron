@@ -23,3 +23,25 @@ export class Scope {
 		this.unsubscribers = []
 	}
 }
+
+export const when = (sources: Subscribable<unknown>[], callback: () => void) => {
+	const unsubscribers: Unsubscriber[] = []
+
+	let initialized = false
+
+	const action = () => {
+		if (!initialized) return
+		callback()
+	}
+
+	sources.forEach(source => {
+		unsubscribers.push(source.subscribe(action))
+	})
+
+	initialized = true
+	callback()
+
+	return () => {
+		unsubscribers.forEach(unsubscribe => unsubscribe())
+	}
+}

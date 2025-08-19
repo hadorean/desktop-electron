@@ -88,13 +88,13 @@ export class SocketService {
 
 		// Handle settings updates from server
 		this.socket.on(SocketEvents.SettingsUpdate, (event: SettingsUpdateEvent) => {
-			console.log('🔌 Received settings update:', event)
+			//console.log('🔌 Received settings update:', event)
 			this.onSettingsUpdateCallback?.(event)
 		})
 
 		// Handle debug state change events
 		this.socket.on(SocketEvents.DebugStateChanged, (data: { visible: boolean }) => {
-			console.log('🔌 Received debug state change event:', data.visible)
+			//console.log('🔌 Received debug state change event:', data.visible)
 			this.onDebugStateChangedCallback?.(data.visible)
 		})
 
@@ -102,7 +102,7 @@ export class SocketService {
 		this.socket.on(
 			SocketEvents.ImagesUpdated,
 			(data: { timestamp: number; reason: string; filename?: string; eventType?: string }) => {
-				console.log('🔌 Received images updated event:', data)
+				//console.log('🔌 Received images updated event:', data)
 				this.onImagesUpdatedCallback?.(data)
 			}
 		)
@@ -157,7 +157,7 @@ export class SocketService {
 			return
 		}
 
-		console.log('🔌 Sending settings update to server:', settings)
+		//console.log('🔌 Sending settings update to server:', settings)
 
 		this.emitToServer(SocketEvents.ClientUpdatedSettings, {
 			settings,

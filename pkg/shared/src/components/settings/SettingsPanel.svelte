@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Inspect } from '@hgrandry/dbg'
 	import { settingsStore } from '../../stores/settingsStore'
-	import { imageBackground } from '../../types/settings'
+	import { imageBackground, type TransitionSettings } from '../../types/settings'
 	import KeyboardShortcut from '../utils/KeyboardShortcut.svelte'
+	import Logger from '../utils/Logger.svelte'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
 	import SliderControl from './SliderControl.svelte'
@@ -22,11 +23,11 @@
 		screenProfile,
 		activeProfile,
 		baseProfile,
-		transitionTime,
 		isLocalMode,
 		currentScreen,
 		currentScreenId,
-		currentScreenType
+		currentScreenType,
+		transition
 	} = settingsStore
 
 	function switchScreen(event: KeyboardEvent): void {
@@ -37,11 +38,13 @@
 		}
 	}
 
-	// onMount(() => {
-	// 	settingsStore.activeProfile.subscribe(profile => {
-	// 		console.log('activeProfile', profile)
-	// 	})
-	// })
+	function updateTransitionableProfile<K extends keyof typeof $activeProfile & keyof TransitionSettings>(
+		key: K,
+		value: (typeof $activeProfile)[K] | null
+	): void {
+		settingsStore.updateTransition(key, 0)
+		updateProfile(key, value)
+	}
 
 	function updateProfile<K extends keyof typeof $activeProfile>(
 		key: K,
@@ -63,6 +66,8 @@
 		})
 	}
 </script>
+
+<Logger input={transition} />
 
 <KeyboardShortcut key="Tab" action={switchScreen} preventDefault />
 
@@ -111,12 +116,13 @@
 					min={0}
 					max={1}
 					step={0.01}
-					onChange={(newValue: number | null) => updateProfile('brightness', newValue)}
+					onChange={(newValue: number | null) => updateTransitionableProfile('brightness', newValue)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
 					defaultValue={$baseProfile.brightness}
 					overrideValue={$activeProfile.brightness}
-					transition={$transitionTime}
+					transition={$transition.brightness}
+					getTransition={t => t.brightness}
 				/>
 
 				<SliderControl
@@ -125,12 +131,13 @@
 					min={0}
 					max={2}
 					step={0.01}
-					onChange={(newValue: number | null) => updateProfile('saturation', newValue)}
+					onChange={(newValue: number | null) => updateTransitionableProfile('saturation', newValue)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
 					defaultValue={$baseProfile.saturation}
 					overrideValue={$activeProfile.saturation}
-					transition={$transitionTime}
+					transition={$transition.saturation}
+					getTransition={t => t.saturation}
 				/>
 
 				<SliderControl
@@ -139,12 +146,13 @@
 					min={0}
 					max={50}
 					step={0.1}
-					onChange={(newBlur: number | null) => updateProfile('blur', newBlur)}
+					onChange={(newBlur: number | null) => updateTransitionableProfile('blur', newBlur)}
 					formatValue={(v: number) => `${v.toFixed(1)}px`}
 					isOverride={$isLocalMode}
 					defaultValue={$baseProfile.blur}
 					overrideValue={$activeProfile.blur}
-					transition={$transitionTime}
+					transition={$transition.blur}
+					getTransition={t => t.blur}
 				/>
 
 				<SliderControl
@@ -153,12 +161,13 @@
 					min={0}
 					max={10}
 					step={0.1}
-					onChange={(newValue: number | null) => updateProfile('transitionTime', newValue)}
+					onChange={(newValue: number | null) => updateTransitionableProfile('transitionTime', newValue)}
 					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
 					defaultValue={$baseProfile.transitionTime}
 					overrideValue={$activeProfile.transitionTime}
-					transition={$transitionTime}
+					transition={$transition.transitionTime}
+					getTransition={t => t.transitionTime}
 				/>
 			</div>
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { settingsStore } from '../../stores/settingsStore'
+	import { settingsStore, type TransitionSettings } from '../../stores/settingsStore'
 	import { Icon, Slider } from '../ui'
 
 	const {
@@ -14,7 +14,8 @@
 		defaultValue = 0,
 		overrideValue = null,
 		disabled = false,
-		transition = 0
+		transition = 0,
+		getTransition
 	} = $props<{
 		label: string
 		value: number | null
@@ -28,6 +29,7 @@
 		overrideValue?: number | null
 		disabled?: boolean
 		transition?: number
+		getTransition: (settings: TransitionSettings) => number
 	}>()
 
 	const { currentScreenColor } = settingsStore
@@ -39,8 +41,8 @@
 	const canRevert = $derived(isOverridden || displayValue !== defaultValue)
 
 	let currentTransition = $state(transition)
-	settingsStore.currentTheme.subscribe(() => {
-		currentTransition = settingsStore.getTransitionTime()
+	settingsStore.transition.subscribe(t => {
+		currentTransition = getTransition(t)
 	})
 
 	function handleRevert(): void {
@@ -56,7 +58,7 @@
 	}
 
 	function handleValueChange(newValues: number[]): void {
-		console.log('handleValueChange', newValues)
+		//console.log('handleValueChange', newValues)
 		currentTransition = 0
 		if (currentTransition) return
 

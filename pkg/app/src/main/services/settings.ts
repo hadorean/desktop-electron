@@ -9,6 +9,7 @@ export class SettingsService {
 	private settings: UserSettings | null = null
 	private settingsPath: string
 	private defaultSettings: UserSettings = DefaultUserSettings
+	private savingTimeout: NodeJS.Timeout | null = null
 
 	static count = 0
 
@@ -42,7 +43,12 @@ export class SettingsService {
 		// TEMP // settingsStore.updateSettings(updatedSettings)
 
 		// Persist to file system
-		await this.saveToFileSystem(updatedSettings)
+		if (this.savingTimeout) {
+			clearTimeout(this.savingTimeout)
+		}
+		this.savingTimeout = setTimeout(async () => {
+			await this.saveToFileSystem(updatedSettings)
+		}, 1000)
 
 		return {
 			type: 'settings_update',

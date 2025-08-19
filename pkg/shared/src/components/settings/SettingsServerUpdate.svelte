@@ -22,6 +22,9 @@
 
 		// Setup settings update handler
 		socketService.onSettingsUpdate((event: SettingsUpdateEvent) => {
+			const clientId = socketService.getSocketId()
+			if (event.clientId == clientId) return
+
 			updatingSettingsFromServer = true
 			try {
 				console.log('Applying settings from server:', event.settings)
@@ -62,7 +65,7 @@
 			// }
 
 			if (!updatingSettingsFromServer && socketService.getConnectionStatus()) {
-				console.log('Updating settings from client:', value)
+				//console.log('Updating settings from client:', value)
 				// Use socket ID as client ID
 				const clientId = socketService.getSocketId()
 				socketService.updateSettings(value, clientId)

@@ -5,14 +5,17 @@ import {
 	defaultScreenId,
 	DefaultScreenProfile,
 	DefaultScreenSettings,
+	DefaultTransitionSettings,
 	DefaultUserSettings,
 	getProfile,
 	type DayNightMode,
 	type ScreenProfile,
 	type ScreenSettings,
 	type ScreenType,
+	type TransitionSettings,
 	type UserSettings
 } from '../types'
+import { when } from '../utils/scope'
 
 const currentScreenId = writable(defaultScreenId)
 
@@ -56,9 +59,31 @@ const currentScreen = derived([userSettings, currentScreenId, isLocalMode], ([al
 	return isLocal ? (all.screens[screenId] ?? DefaultScreenSettings) : all.shared
 })
 
-const transitionTime = derived([screenProfile], ([screen]) => {
-	return screen.transitionTime ?? 1
+const makeTransition = (time: number): TransitionSettings => {
+	return {
+		blur: time,
+		brightness: time,
+		saturation: time,
+		transitionTime: time
+	}
+}
+
+const transitionSettings = writable<TransitionSettings>(DefaultTransitionSettings)
+
+const transitionOverride = writable<Partial<TransitionSettings>>({})
+
+const currentTransition = derived([transitionSettings, transitionOverride], ([settings, override]) => {
+	return { ...settings, ...override } as TransitionSettings
 })
+
+when([currentScreenId, currentTheme], () => {
+	transitionOverride.set(makeTransition(get(screenProfile).transitionTime))
+})
+
+const updateTransition = (key: keyof TransitionSettings, value: number): void => {
+	if (get(transitionOverride)[key] == value) return
+	transitionOverride.update(current => ({ ...current, [key]: value }))
+}
 
 const currentScreenColor = derived(
 	[userSettings, currentScreenId, isLocalMode],
@@ -257,7 +282,6 @@ export const settingsStore = {
 	currentScreenColor: readonly(currentScreenColor),
 	currentScreenType: readonly(currentScreenType),
 	currentTheme: readonly(currentTheme),
-	transitionTime: readonly(transitionTime),
 
 	isLocalMode: readonly(isLocalMode),
 	isNightTheme: readonly(isNightTheme),
@@ -267,6 +291,9 @@ export const settingsStore = {
 	screenProfile: readonly(screenProfile),
 	activeProfile: readonly(activeProfile),
 
+	transition: readonly(currentTransition),
+	updateTransition,
+
 	// Getters
 	getCurrentTheme,
 	getScreenSettings,
@@ -274,7 +301,6 @@ export const settingsStore = {
 	getScreenType,
 	getScreenColor,
 	getFormattedScreenName,
-	getTransitionTime: () => get(transitionTime),
 
 	// Setters
 

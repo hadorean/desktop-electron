@@ -3,6 +3,7 @@
 export const defaultScreenId = 'monitor1'
 export const defaultColor = '#90A0A7'
 export const imageBackground = null
+export const defaultTransitionTime = 1
 
 export type DayNightMode = 'day' | 'night'
 export type SettingsButtonPosition = 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left'
@@ -20,15 +21,18 @@ export const colors = [
 	'#11e4b6'
 ]
 
-export interface ScreenProfile {
+export interface TransitionSettings {
+	blur: number
+	brightness: number
+	saturation: number
+	transitionTime: number
+}
+
+export interface ScreenProfile extends TransitionSettings {
 	image: string
 	mode: BackgroundMode // default is image
 	url: string
-	brightness: number
-	blur: number
-	saturation: number
 	hideButton: boolean
-	transitionTime: number
 	showTimeDate: boolean
 	showWeather: boolean
 }
@@ -60,6 +64,13 @@ export interface SettingsUpdateEvent {
 	settings: UserSettings
 	timestamp: number
 	clientId: string
+}
+
+export const DefaultTransitionSettings: TransitionSettings = {
+	blur: defaultTransitionTime,
+	brightness: defaultTransitionTime,
+	saturation: defaultTransitionTime,
+	transitionTime: defaultTransitionTime
 }
 
 export const DefaultScreenProfile: ScreenProfile = {
