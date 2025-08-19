@@ -46,25 +46,22 @@
 
 	function toggleFavorite(imageName: string, event: Event): void {
 		event.stopPropagation() // Prevent triggering the image selection
-		settingsStore.updateSharedSettings(current => {
-			const currentFavorites = current.favorites ?? []
-			return {
-				favorites: currentFavorites.includes(imageName)
-					? currentFavorites.filter((name: string) => name !== imageName)
-					: [...currentFavorites, imageName]
-			}
+		settingsStore.updateFavorites(current => {
+			return current.includes(imageName)
+				? current.filter((name: string) => name !== imageName)
+				: [...current, imageName]
 		})
 	}
 
 	// Sort images to show favorites first - use derived to minimize recalculation
 	// Access individual stores from the imagesStore object
 	const { images, loading: imagesLoading, error: imagesError } = imagesStore
-	const { screenProfile } = settingsStore
+	const { userSettings } = settingsStore
 
 	const sortedImages = $derived(
 		(() => {
 			const imageList = $images
-			const favorites = $screenProfile.favorites ?? []
+			const favorites = $userSettings.favorites ?? []
 			if (imageList.length === 0) return []
 
 			return [...imageList].sort((a, b) => {
@@ -144,13 +141,13 @@
 										</div>
 									</div>
 									<button
-										class="favorite-button {($screenProfile.favorites ?? []).includes(image.name) ? 'is-favorite' : ''}"
+										class="favorite-button {($userSettings.favorites ?? []).includes(image.name) ? 'is-favorite' : ''}"
 										onclick={(e: Event) => toggleFavorite(image.name, e)}
-										title={($screenProfile.favorites ?? []).includes(image.name)
+										title={($userSettings.favorites ?? []).includes(image.name)
 											? 'Remove from favorites'
 											: 'Add to favorites'}
 									>
-										{#if ($screenProfile.favorites ?? []).includes(image.name)}
+										{#if ($userSettings.favorites ?? []).includes(image.name)}
 											★
 										{:else}
 											☆

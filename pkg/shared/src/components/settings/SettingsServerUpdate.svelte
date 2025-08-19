@@ -56,10 +56,10 @@
 			}
 
 			// Check if server sync should be prevented (e.g., during validation operations)
-			if (settingsStore.shouldPreventServerSync()) {
-				console.log('🚫 Skipping server sync (silent update)')
-				return
-			}
+			// if (settingsStore.shouldPreventServerSync()) {
+			// 	console.log('🚫 Skipping server sync (silent update)')
+			// 	return
+			// }
 
 			if (!updatingSettingsFromServer && socketService.getConnectionStatus()) {
 				console.log('Updating settings from client:', value)

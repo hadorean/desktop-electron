@@ -30,7 +30,7 @@
 		transition?: number
 	}>()
 
-	const { currentScreenColor, transitionTime } = settingsStore
+	const { currentScreenColor } = settingsStore
 
 	const isOverridden = $derived(isOverride && overrideValue !== null)
 	const isGhost = $derived(isOverride && !isOverridden)
@@ -39,7 +39,7 @@
 	const canRevert = $derived(isOverridden || displayValue !== defaultValue)
 
 	let currentTransition = $state(transition)
-	settingsStore.currentTheme.subscribe(theme => {
+	settingsStore.currentTheme.subscribe(() => {
 		currentTransition = settingsStore.getTransitionTime()
 	})
 

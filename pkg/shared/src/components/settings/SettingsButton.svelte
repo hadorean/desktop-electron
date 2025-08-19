@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { settingsStore } from '../../stores/settingsStore'
 	import { Icon } from '../ui'
 
 	export let hideButton: boolean = false
 	export let onToggle: () => void
 	export let buttonRef: HTMLElement | null = null
 
-	const { screenProfile } = settingsStore
-
 	let buttonHovered: boolean = false
 
-	$: position = $screenProfile.settingsButtonPosition ?? 'bottom-right'
-	$: positionClasses = {
+	// $: position = $screenProfile.settingsButtonPosition ?? 'bottom-right'
+
+	const position = 'bottom-right'
+	const positionClasses = {
 		'bottom-right': 'bottom-4 right-4',
 		'top-right': 'top-4 right-4',
 		'bottom-left': 'bottom-4 left-4',

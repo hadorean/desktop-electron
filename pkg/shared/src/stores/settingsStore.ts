@@ -1,11 +1,12 @@
 import { derived, get, readonly, writable } from 'svelte/store'
 import {
 	colors,
+	defaultColor,
+	defaultScreenId,
 	DefaultScreenProfile,
 	DefaultScreenSettings,
 	DefaultUserSettings,
-	getThemeEditingSettings,
-	getThemeScreenSettings,
+	getProfile,
 	type DayNightMode,
 	type ScreenProfile,
 	type ScreenSettings,
@@ -13,22 +14,9 @@ import {
 	type UserSettings
 } from '../types'
 
-const defaultScreenId = 'monitor1'
-
 const currentScreenId = writable(defaultScreenId)
 
 const isLocalMode = writable(false)
-
-// Settings panel expansion state
-const expandSettings = writable(false)
-
-function setExpandSettings(value: boolean): void {
-	expandSettings.set(value)
-}
-
-function toggleExpandSettings(): void {
-	expandSettings.update(current => !current)
-}
 
 const userSettings = writable<UserSettings>(DefaultUserSettings)
 
@@ -45,20 +33,14 @@ const screenIds = derived(userSettings, $userSettings =>
 )
 
 const baseProfile = derived([userSettings, currentTheme, isLocalMode], ([all, theme, isLocal]) => {
-	const currentTheme = theme as 'day' | 'night'
-	return isLocal
-		? { ...DefaultScreenProfile, ...getThemeEditingSettings(all.shared, currentTheme) }
-		: DefaultScreenProfile
+	return isLocal ? { ...DefaultScreenProfile, ...getProfile(all.shared, theme) } : DefaultScreenProfile
 })
 
 // Active profile for the settings panel
 const activeProfile = derived(
 	[userSettings, currentScreenId, currentTheme, isLocalMode],
 	([all, screen, theme, isLocal]) => {
-		const currentTheme = theme as 'day' | 'night'
-		return isLocal
-			? getThemeScreenSettings(all.screens[screen] ?? DefaultScreenSettings, currentTheme)
-			: getThemeScreenSettings(all.shared, currentTheme)
+		return isLocal ? getProfile(all.screens[screen] ?? DefaultScreenSettings, theme) : getProfile(all.shared, theme)
 	}
 )
 
@@ -70,8 +52,8 @@ const screenProfile = derived([activeProfile, baseProfile], ([active, base]) => 
 	} as ScreenProfile
 })
 
-const currentScreen = derived([userSettings, currentScreenId], ([all, screenId]) => {
-	return all.screens[screenId] ?? DefaultScreenSettings
+const currentScreen = derived([userSettings, currentScreenId, isLocalMode], ([all, screenId, isLocal]) => {
+	return isLocal ? (all.screens[screenId] ?? DefaultScreenSettings) : all.shared
 })
 
 const transitionTime = derived([screenProfile], ([screen]) => {
@@ -82,8 +64,8 @@ const currentScreenColor = derived(
 	[userSettings, currentScreenId, isLocalMode],
 	([$userSettings, $currentScreenId, $isLocalMode]) => {
 		if (!$isLocalMode) {
-			// Shared/home screen uses white
-			return '#ffffff'
+			// Shared/home screen uses default color
+			return defaultColor
 		}
 
 		// Compute color based on screen index in the sorted list
@@ -99,9 +81,6 @@ const currentScreenType = derived([currentScreenId, isLocalMode], ([screenId, lo
 	// Compute type based on screenId pattern
 	return getScreenType(screenId)
 })
-
-// Flag to prevent server sync during internal operations
-let preventServerSync = false
 
 function setCurrentScreen(screenId: string): void {
 	console.log('Setting current screen to', screenId)
@@ -154,106 +133,65 @@ function getScreenProfile(id: string): Partial<ScreenProfile> | undefined {
 	return value.screens[id]?.[theme] ?? {}
 }
 
-function updateSharedSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
-	const theme = getCurrentTheme() as 'day' | 'night'
-
-	userSettings.update(value => {
-		const currentSharedSettings = value.shared
-		const currentThemeSettings = getThemeEditingSettings(currentSharedSettings, theme)
-		const updatedSettings = settings(currentThemeSettings)
-
-		return {
-			...value,
-			shared: {
-				...currentSharedSettings,
-				[theme]: updatedSettings
-			}
+function setDefaultImage(image: string): void {
+	userSettings.update(value => ({
+		...value,
+		shared: {
+			...value.shared,
+			day: { ...value.shared.day, image }
 		}
-	})
+	}))
 }
 
-function updateLocalSettings(settings: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
-	userSettings.update(value => {
-		const screen = get(currentScreenId) || defaultScreenId
-		const theme = getCurrentTheme() as 'day' | 'night'
-		const currentScreenSettings = value.screens[screen] ?? { day: {}, night: {} }
-		const currentThemeSettings = currentScreenSettings[theme] ?? {}
-		const updatedThemeSettings = settings(currentThemeSettings)
-
-		return {
-			...value,
-			screens: {
-				...value.screens,
-				[screen]: {
-					...currentScreenSettings,
-					[theme]: updatedThemeSettings
-				}
-			}
-		}
-	})
+function updateFavorites(modifier: (favorites: string[]) => string[]): void {
+	userSettings.update(value => ({
+		...value,
+		favorites: modifier(value.favorites)
+	}))
 }
 
 /**
  * Update settings for the current context (shared or local screen+theme)
  * This function handles the day/night logic and null checks automatically
  */
-function updateEditingProfile(modifier: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
+function updateProfile(modifier: (current: Partial<ScreenProfile>) => Partial<ScreenProfile>): void {
+	const theme = getCurrentTheme()
+	const editedProfile = get(activeProfile)
+	const settings = get(currentScreen)
+	const updatedProfile = modifier(editedProfile)
+
+	// If night mode and no overrides exist, don't create night settings
+	if (theme === 'night' && settings.night === null && Object.keys(updatedProfile).length === 0) {
+		return
+	}
+
 	if (get(isLocalMode)) {
 		// Update local screen settings for current theme
 		const screenId = get(currentScreenId) || defaultScreenId
-		const theme = getCurrentTheme()
 
 		userSettings.update(value => {
-			const currentScreenSettings = value.screens[screenId] ?? DefaultScreenSettings
-			const currentProfile = currentScreenSettings[theme] ?? {}
-			const updatedProfile = modifier(currentProfile)
-
-			// If night mode and no overrides exist, don't create night settings
-			if (theme === 'night' && currentScreenSettings.night === null && Object.keys(updatedProfile).length === 0) {
-				return value
-			}
-
 			return {
 				...value,
 				screens: {
 					...value.screens,
 					[screenId]: {
-						...currentScreenSettings,
+						...settings,
 						[theme]: updatedProfile
 					}
 				}
 			}
 		})
 	} else {
-		// Update shared settings for current theme
-		const theme = getCurrentTheme()
-
 		userSettings.update(value => {
-			const currentScreenSettings = value.shared
-			const currentProfile = currentScreenSettings[theme] ?? {}
-			const updatedProfile = modifier(currentProfile)
-
-			// If night mode and no overrides exist, don't create night settings
-			if (theme === 'night' && currentScreenSettings.night === null && Object.keys(updatedProfile).length === 0) {
-				return value
-			}
-
 			return {
 				...value,
 				shared: {
-					...currentScreenSettings,
+					...settings,
 					[theme]: updatedProfile
 				}
 			}
 		})
 	}
-}
-
-/**
- * Check if server sync should be prevented (for SettingsServerUpdate component)
- */
-function shouldPreventServerSync(): boolean {
-	return preventServerSync
 }
 
 /**
@@ -285,19 +223,6 @@ function getScreenColor(screenId: string, allScreenIds: string[]): string {
 	const colorIndex = screenIndex % availableColors.length
 
 	return availableColors[colorIndex]
-}
-
-/**
- * Ensure all screens have proper settings (colors and types are now computed, not stored)
- */
-function normalizeScreenSettings(): void {
-	// Colors and types are now computed on-demand, so this function only ensures
-	// that screen settings exist but doesn't store computed values
-	userSettings.update(settings => {
-		// No changes needed - colors and types are computed on demand
-		// This function is kept for potential future normalization needs
-		return settings
-	})
 }
 
 /**
@@ -339,7 +264,6 @@ export const settingsStore = {
 
 	userSettings: readonly(userSettings),
 	baseProfile: readonly(baseProfile),
-	expandSettings: readonly(expandSettings),
 	screenProfile: readonly(screenProfile),
 	activeProfile: readonly(activeProfile),
 
@@ -350,20 +274,21 @@ export const settingsStore = {
 	getScreenType,
 	getScreenColor,
 	getFormattedScreenName,
-	shouldPreventServerSync,
 	getTransitionTime: () => get(transitionTime),
 
 	// Setters
+
 	setCurrentScreen,
 	setLocalMode,
 	setCurrentTheme,
 	setMonitorEnabled,
+	setDefaultImage,
+
 	toggleDayNightMode,
-	updateSharedSettings,
-	updateEditingProfile,
-	normalizeScreenSettings,
-	resetSettings,
+
+	updateFavorites,
+	updateProfile,
 	updateSettings,
-	setExpandSettings,
-	toggleExpandSettings
+
+	resetSettings
 }

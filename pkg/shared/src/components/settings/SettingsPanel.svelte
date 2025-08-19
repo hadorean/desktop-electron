@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Inspect } from '@hgrandry/dbg'
-	import { onMount } from 'svelte'
 	import { settingsStore } from '../../stores/settingsStore'
+	import { imageBackground } from '../../types/settings'
+	import KeyboardShortcut from '../utils/KeyboardShortcut.svelte'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
 	import SliderControl from './SliderControl.svelte'
@@ -28,33 +29,25 @@
 		currentScreenType
 	} = settingsStore
 
-	// Document-level keyboard handler for Tab key
-	function handleDocumentKeyDown(event: KeyboardEvent): void {
-		// Only handle Tab when settings panel is expanded and visible
-		if (event.key === 'Tab' && expanded && settingsPanel) {
-			event.preventDefault()
-
+	function switchScreen(event: KeyboardEvent): void {
+		if (expanded && settingsPanel) {
 			// Switch screens based on direction
 			const direction = event.shiftKey ? 'backward' : 'forward'
 			screenSwitcher?.switchToNextScreen(direction)
 		}
 	}
 
-	onMount(() => {
-		// Add document-level event listener when component mounts
-		document.addEventListener('keydown', handleDocumentKeyDown)
-
-		// Clean up event listener when component unmounts
-		return () => {
-			document.removeEventListener('keydown', handleDocumentKeyDown)
-		}
-	})
+	// onMount(() => {
+	// 	settingsStore.activeProfile.subscribe(profile => {
+	// 		console.log('activeProfile', profile)
+	// 	})
+	// })
 
 	function updateProfile<K extends keyof typeof $activeProfile>(
 		key: K,
 		value: (typeof $activeProfile)[K] | null
 	): void {
-		settingsStore.updateEditingProfile(current => {
+		settingsStore.updateProfile(current => {
 			if (value === null) {
 				// Remove property (reset to default)
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -70,6 +63,8 @@
 		})
 	}
 </script>
+
+<KeyboardShortcut key="Tab" action={switchScreen} preventDefault />
 
 <div class="settings-panel" bind:this={settingsPanel} class:expanded class:transparent>
 	<ScreenSwitcher bind:this={screenSwitcher} />
@@ -94,12 +89,12 @@
 				/> -->
 
 				<!-- Conditional Background Input -->
-				{#if ($activeProfile.mode ?? $screenProfile.mode ?? 'image') === 'image'}
+				{#if $activeProfile.mode == imageBackground}
 					<ImageGrid
-						selectedImage={$screenProfile.selectedImage ?? ''}
+						selectedImage={$screenProfile.image ?? ''}
 						isOverride={$isLocalMode}
-						overrideValue={$activeProfile.selectedImage}
-						onImageChange={(newImage: string | null) => updateProfile('selectedImage', newImage)}
+						overrideValue={$activeProfile.image}
+						onImageChange={(newImage: string | null) => updateProfile('image', newImage)}
 					/>
 				{:else}
 					<UrlInput
@@ -112,15 +107,15 @@
 
 				<SliderControl
 					label="Brightness"
-					value={$activeProfile.opacity ?? null}
+					value={$activeProfile.brightness ?? null}
 					min={0}
 					max={1}
 					step={0.01}
-					onChange={(newOpacity: number | null) => updateProfile('opacity', newOpacity)}
+					onChange={(newValue: number | null) => updateProfile('brightness', newValue)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
-					defaultValue={$baseProfile.opacity}
-					overrideValue={$activeProfile.opacity}
+					defaultValue={$baseProfile.brightness}
+					overrideValue={$activeProfile.brightness}
 					transition={$transitionTime}
 				/>
 
@@ -130,7 +125,7 @@
 					min={0}
 					max={2}
 					step={0.01}
-					onChange={(newSaturation: number | null) => updateProfile('saturation', newSaturation)}
+					onChange={(newValue: number | null) => updateProfile('saturation', newValue)}
 					formatValue={(v: number) => v.toFixed(2)}
 					isOverride={$isLocalMode}
 					defaultValue={$baseProfile.saturation}
@@ -158,7 +153,7 @@
 					min={0}
 					max={10}
 					step={0.1}
-					onChange={(newTransitionTime: number | null) => updateProfile('transitionTime', newTransitionTime)}
+					onChange={(newValue: number | null) => updateProfile('transitionTime', newValue)}
 					formatValue={(v: number) => `${v.toFixed(1)}s`}
 					isOverride={$isLocalMode}
 					defaultValue={$baseProfile.transitionTime}
@@ -170,7 +165,7 @@
 			<ToggleControl
 				label="Time and date"
 				checked={$activeProfile.showTimeDate ?? $screenProfile.showTimeDate ?? true}
-				onChange={(newShowTimeDate: boolean | null) => updateProfile('showTimeDate', newShowTimeDate)}
+				onChange={(newValue: boolean | null) => updateProfile('showTimeDate', newValue)}
 				isOverride={$isLocalMode}
 				overrideValue={$activeProfile.showTimeDate}
 				defaultValue={$baseProfile.showTimeDate}
@@ -179,7 +174,7 @@
 			<ToggleControl
 				label="Weather"
 				checked={$activeProfile.showWeather ?? $screenProfile.showWeather ?? false}
-				onChange={(newShowWeather: boolean | null) => updateProfile('showWeather', newShowWeather)}
+				onChange={(newValue: boolean | null) => updateProfile('showWeather', newValue)}
 				isOverride={$isLocalMode}
 				overrideValue={$activeProfile.showWeather}
 				defaultValue={$baseProfile.showWeather}
@@ -189,7 +184,7 @@
 				<ToggleControl
 					label="Auto-hide settings button"
 					checked={$activeProfile.hideButton ?? $screenProfile.hideButton ?? false}
-					onChange={(newHideButton: boolean | null) => updateProfile('hideButton', newHideButton)}
+					onChange={(newValue: boolean | null) => updateProfile('hideButton', newValue)}
 					isOverride={$isLocalMode}
 					overrideValue={$activeProfile.hideButton}
 					defaultValue={$baseProfile.hideButton}

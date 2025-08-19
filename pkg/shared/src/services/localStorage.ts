@@ -97,11 +97,9 @@ class LocalStorageService {
 		if (typeof window === 'undefined' || !checkStorageAvailability()) {
 			// Set default image if available in non-browser environments
 			if (images.length > 0) {
-				settingsStore.updateSharedSettings(current => ({
-					...current,
-					selectedImage: images[0].name
-				}))
-				return images[0].name
+				const defaultImage = images[0].name
+				settingsStore.setDefaultImage(defaultImage)
+				return defaultImage
 			}
 			return ''
 		}
@@ -144,16 +142,14 @@ class LocalStorageService {
 
 			const currentSettings = get(settingsStore.userSettings)
 			// Get the selected image from the current theme (day by default)
-			const selectedImage = currentSettings.shared.day?.selectedImage
+			const selectedImage = currentSettings.shared.day?.image
 			return selectedImage || (images.length > 0 ? images[0].name : '')
 		} catch (error) {
 			console.error('Error loading settings from localStorage:', error)
 			if (images.length > 0) {
-				settingsStore.updateSharedSettings(current => ({
-					...current,
-					selectedImage: images[0].name
-				}))
-				return images[0].name
+				const defaultImage = images[0].name
+				settingsStore.setDefaultImage(defaultImage)
+				return defaultImage
 			}
 			return ''
 		}

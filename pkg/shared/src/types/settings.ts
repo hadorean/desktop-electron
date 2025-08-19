@@ -1,23 +1,36 @@
 // Settings type definitions
 
+export const defaultScreenId = 'monitor1'
+export const defaultColor = '#90A0A7'
+export const imageBackground = null
+
 export type DayNightMode = 'day' | 'night'
 export type SettingsButtonPosition = 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left'
 export type ScreenType = 'static' | 'interactive'
-export const colors = ['#90A0A7', 'rgb(0, 139, 204)', '#f0b71b', '#1ec735', '#e02828', '#7b16f0', '#d933fa', '#11e4b6']
+export type BackgroundMode = typeof imageBackground | 'url'
+
+export const colors = [
+	defaultColor,
+	'rgb(0, 139, 204)',
+	'#f0b71b',
+	'#1ec735',
+	'#e02828',
+	'#7b16f0',
+	'#d933fa',
+	'#11e4b6'
+]
 
 export interface ScreenProfile {
-	selectedImage: string
-	mode: 'image' | 'url'
+	image: string
+	mode: BackgroundMode // default is image
 	url: string
-	opacity: number
+	brightness: number
 	blur: number
 	saturation: number
 	hideButton: boolean
 	transitionTime: number
 	showTimeDate: boolean
 	showWeather: boolean
-	showScreenSwitcher: boolean
-	settingsButtonPosition: SettingsButtonPosition
 }
 
 export interface ScreenSettings {
@@ -27,22 +40,9 @@ export interface ScreenSettings {
 	monitorEnabled: boolean
 }
 
-export function getThemeScreenSettings(
-	settings: ScreenSettings | undefined,
-	theme: DayNightMode
-): Partial<ScreenProfile> {
+export function getProfile(settings: ScreenSettings | undefined, theme: DayNightMode): Partial<ScreenProfile> {
 	if (!settings) {
 		return DefaultScreenSettings.day
-	}
-	return theme === 'day' ? settings.day : (settings.night ?? {})
-}
-
-export function getThemeEditingSettings(
-	settings: ScreenSettings | undefined,
-	theme: DayNightMode
-): Partial<ScreenProfile> {
-	if (!settings) {
-		return {}
 	}
 	return theme === 'day' ? settings.day : (settings.night ?? {})
 }
@@ -63,18 +63,16 @@ export interface SettingsUpdateEvent {
 }
 
 export const DefaultScreenProfile: ScreenProfile = {
-	selectedImage: '',
-	mode: 'image',
+	image: '',
+	mode: imageBackground,
 	url: '',
-	opacity: 1,
+	brightness: 1,
 	blur: 0,
 	saturation: 1,
 	hideButton: false,
 	transitionTime: 1,
 	showTimeDate: true,
-	showWeather: false,
-	showScreenSwitcher: true,
-	settingsButtonPosition: 'bottom-right'
+	showWeather: false
 }
 
 export const DefaultScreenSettings: ScreenSettings = {

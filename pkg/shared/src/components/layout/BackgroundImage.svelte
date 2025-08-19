@@ -3,12 +3,13 @@
 	import { onMount } from 'svelte'
 	import { api } from '../../services'
 	import { settingsStore } from '../../stores/settingsStore'
+	import { type BackgroundMode, imageBackground } from '../../types/settings'
 
 	const { screenProfile } = settingsStore
 
 	interface BackgroundState {
 		url: string
-		mode: 'image' | 'url'
+		mode: BackgroundMode
 		tween: Tween | null
 		opacity: number
 	}
@@ -16,17 +17,17 @@
 	let activeBackground: BackgroundState | null = null
 	let backgroundStack: BackgroundState[] = []
 	let currentBackgroundUrl = ''
-	let currentMode: 'image' | 'url' = 'image'
+	let currentMode: BackgroundMode = imageBackground
 	let animationFrameId: number | null = null
 	let imageScale = 1
 
 	// Subscribe to settings store for background changes
 	$: {
-		const mode = $screenProfile.mode ?? 'image'
+		const mode = $screenProfile.mode
 		let backgroundUrl = ''
 
-		if (mode === 'image') {
-			const selectedImage = $screenProfile.selectedImage ?? ''
+		if (mode === null) {
+			const selectedImage = $screenProfile.image ?? ''
 			backgroundUrl = api.getImageUrl(selectedImage)
 		} else {
 			backgroundUrl = $screenProfile.url ?? ''
@@ -121,11 +122,11 @@
 	}
 
 	onMount(() => {
-		const mode = $screenProfile.mode ?? 'image'
+		const mode = $screenProfile.mode
 		let initialUrl = ''
 
-		if (mode === 'image' && $screenProfile.selectedImage) {
-			initialUrl = api.getImageUrl($screenProfile.selectedImage)
+		if (mode === imageBackground && $screenProfile.image) {
+			initialUrl = api.getImageUrl($screenProfile.image)
 		} else if (mode === 'url' && $screenProfile.url) {
 			initialUrl = $screenProfile.url
 		}
@@ -146,7 +147,7 @@
 
 <div
 	class="background-container"
-	style="scale: {imageScale}; opacity: {$screenProfile.opacity ?? 1}; filter: {[
+	style="scale: {imageScale}; opacity: {$screenProfile.brightness ?? 1}; filter: {[
 		($screenProfile.blur ?? 0) > 0 ? `blur(${$screenProfile.blur}px)` : null,
 		`saturate(${$screenProfile.saturation ?? 1})`
 	]
@@ -154,7 +155,7 @@
 		.join(' ')};"
 >
 	{#each backgroundStack as background (background.url + background.mode)}
-		{#if background.mode === 'image'}
+		{#if background.mode === imageBackground}
 			<img src={background.url} alt="Background" class="background-image" style="opacity: {background.opacity};" />
 		{:else if background.mode === 'url' && background.url}
 			<iframe
@@ -167,7 +168,7 @@
 		{/if}
 	{/each}
 	{#if activeBackground}
-		{#if activeBackground.mode === 'image'}
+		{#if activeBackground.mode === imageBackground}
 			<img
 				src={activeBackground.url}
 				alt="Background"

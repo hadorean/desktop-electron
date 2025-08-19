@@ -15,8 +15,10 @@
 	import { settingsStore } from '$shared/stores/settingsStore'
 	import { DebugMenu } from '@hgrandry/dbg'
 	import { onDestroy, onMount } from 'svelte'
+	import { uiStore } from './stores/uiStore'
 
-	const { expandSettings, screenProfile, currentScreenType } = settingsStore
+	const { screenProfile, currentScreenType } = settingsStore
+	const { expandSettings } = uiStore
 
 	let showSettings: boolean = false
 	let settingsClosingTimeout: ReturnType<typeof setTimeout> | null = null
@@ -80,14 +82,6 @@
 		})()
 	})
 
-	// Function to handle key down events
-	function handleKeyDown(event: KeyboardEvent): void {
-		if (event.key === 'Escape') {
-			toggleSettings()
-			event.preventDefault()
-		}
-	}
-
 	// Function to handle click outside events
 	function handleClickOutside(event: MouseEvent): void {
 		if ($expandSettings && settingsPanel && settingsButton) {
@@ -95,14 +89,14 @@
 			const isClickInside = settingsPanel.contains(target) || settingsButton.contains(target)
 
 			if (!isClickInside) {
-				settingsStore.setExpandSettings(false)
+				uiStore.setExpandSettings(false)
 			}
 		}
 	}
 
 	// Function to handle settings toggle
 	function toggleSettings(): void {
-		settingsStore.toggleExpandSettings()
+		uiStore.toggleExpandSettings()
 	}
 
 	// Handle expandSettings changes with explicit subscription to avoid reactive loops
