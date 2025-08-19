@@ -10,9 +10,13 @@
 			isConnected = connected
 		})
 	}
+
+	const cleanup = () => {
+		socketService.cleanup()
+	}
 </script>
 
-<Lifespan {init} />
+<Lifespan {init} {cleanup} />
 
 <Inspect>
 	{#if isConnected}

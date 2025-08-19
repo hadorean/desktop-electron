@@ -24,6 +24,16 @@ export class Scope {
 	}
 }
 
+export function subscribeNext<T>(source: Subscribable<T>, callback: Callback<T>): Unsubscriber {
+	let initialized = false
+	const action = (value: T) => {
+		if (!initialized) return
+		callback(value)
+	}
+
+	return source.subscribe(action)
+}
+
 export const when = (sources: Subscribable<unknown>[], callback: () => void) => {
 	const unsubscribers: Unsubscriber[] = []
 

@@ -1,8 +1,9 @@
 import { io, Socket } from 'socket.io-client'
 import { apiStore } from '../stores/apiStore'
 import { settingsStore } from '../stores/settingsStore'
-import type { ImagesUpdatedEvent, SettingsUpdateEvent } from '../types'
-import { ClientEvents, SocketEvents } from '../types'
+import type { ImagesUpdatedEvent, SettingsUpdateEvent, TransitionSettings, UserSettings } from '../types'
+import { SocketEvents } from '../types'
+import { Scope } from '../utils/scope'
 import { Signal, type ISignal } from '../utils/signal'
 
 // interface SettingsUpdatedResponse {
@@ -43,6 +44,8 @@ export class SocketService {
 		return this._imagesUpdated
 	}
 
+	private scope: Scope = new Scope()
+
 	constructor() {
 		this.delayedInitialize()
 	}
@@ -53,7 +56,7 @@ export class SocketService {
 			apiStore.url.subscribe(url => {
 				if (typeof window !== 'undefined' && url) {
 					console.log('🔌 API URL changed, reinitializing socket:', url)
-					socketService.reinitialize()
+					this.reinitialize()
 				}
 			})
 		}, 100)
@@ -72,6 +75,7 @@ export class SocketService {
 		})
 
 		this.setupEventHandlers()
+		this.subscribeToLocalSettings()
 	}
 
 	private setupEventHandlers(): void {
@@ -107,14 +111,14 @@ export class SocketService {
 		// Handle settings updates from server
 		this.socket.on(SocketEvents.SettingsUpdate, (event: SettingsUpdateEvent) => {
 			const clientId = socketService.getSocketId()
-			if (event.clientId == clientId) return
+			if (event.clientId == clientId || this.updatingSettingsFromServer) return
 
 			this.updatingSettingsFromServer = true
 			settingsStore.updateSettings(event.settings)
 			this.updatingSettingsFromServer = false
 
-			//console.log('🔌 Received settings update:', event)
-			this._settingsUpdated.emit(event)
+			console.log('🔌 Received settings update:', event)
+			//this._settingsUpdated.emit(event)
 		})
 
 		// Handle debug state change events
@@ -129,10 +133,17 @@ export class SocketService {
 			this._imagesUpdated.emit(data)
 		})
 
+		this.socket.on('transition_changed', (data: { transition: TransitionSettings }) => {
+			console.log('🔌 Received transition changed event:', data)
+			settingsStore.setTransition(data.transition)
+		})
+	}
+
+	private subscribeToLocalSettings(): void {
 		if (this.subbscribedToLocalSettings) return
 		this.subbscribedToLocalSettings = true
 
-		settingsStore.userSettings.subscribe(userSettings => {
+		this.scope.subscribe(settingsStore.userSettings, userSettings => {
 			if (!this.initialSubscribeHandled) {
 				this.initialSubscribeHandled = true
 				return // Skip the initial subscribe callback
@@ -145,11 +156,18 @@ export class SocketService {
 			// }
 
 			if (!this.updatingSettingsFromServer && this.getConnectionStatus()) {
-				//console.log('Updating settings from client:', value)
+				console.log('Updating settings from client:')
 				// Use socket ID as client ID
-				const clientId = this.getSocketId()
-				this.updateSettings(userSettings, clientId)
+				this.updateSettings(userSettings)
 			}
+		})
+
+		this.scope.subscribe(settingsStore.transition, transition => {
+			console.log('🔌 Transition changed:', transition)
+			this.emitToServer('transition_changed', {
+				transition
+			})
+			//subscribeNext(settingsStore.transition, transition => {
 		})
 	}
 
@@ -158,7 +176,7 @@ export class SocketService {
 	 */
 	public reinitialize(): void {
 		if (this.socket) {
-			this.socket.disconnect()
+			this.disconnect()
 		}
 
 		setTimeout(() => {
@@ -169,7 +187,7 @@ export class SocketService {
 	/**
 	 * Type-safe emit for client-to-server events
 	 */
-	private emitToServer(event: ClientEvents, data: unknown): void {
+	private emitToServer(event: string, data: unknown): void {
 		if (!this.isConnected || !this.socket) {
 			console.warn('🔌 Cannot send event - not connected')
 			return
@@ -180,7 +198,7 @@ export class SocketService {
 	/**
 	 * Send settings update to server
 	 */
-	public updateSettings(settings: unknown, clientId?: string): void {
+	public updateSettings(settings: UserSettings): void {
 		if (!this.isConnected || !this.socket) {
 			console.warn('🔌 Cannot send settings update - not connected')
 			return
@@ -190,7 +208,7 @@ export class SocketService {
 
 		this.emitToServer(SocketEvents.ClientUpdatedSettings, {
 			settings,
-			clientId: clientId || this.socket.id
+			clientId: this.socket.id
 		})
 	}
 
@@ -228,6 +246,10 @@ export class SocketService {
 			this.socket = null
 		}
 		this.isConnected = false
+	}
+
+	cleanup(): void {
+		this.scope.cleanup()
 	}
 }
 

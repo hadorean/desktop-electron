@@ -297,6 +297,9 @@ export const settingsStore = {
 
 	transition: readonly(currentTransition),
 	renderSettings: readonly(renderSettings),
+	setTransition: (transition: TransitionSettings) => {
+		transitionSettings.set(transition)
+	},
 	updateTransition,
 
 	// Getters

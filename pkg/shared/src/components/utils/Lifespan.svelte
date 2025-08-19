@@ -7,6 +7,8 @@
 	import { onDestroy, onMount } from 'svelte'
 
 	export let init: (scope: Scope) => void
+	export let cleanup: ((scope: Scope) => void) | null = null
+
 	let scope: Scope = new Scope()
 
 	onMount(() => {
@@ -15,5 +17,6 @@
 
 	onDestroy(() => {
 		scope.cleanup()
+		cleanup?.(scope)
 	})
 </script>

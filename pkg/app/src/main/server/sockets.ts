@@ -1,8 +1,11 @@
 import { debugMenu } from '$shared/stores/debugStore'
-import { ClientEventMap, ClientEvents, ServerEventMap, ServerEvents, SocketEvents } from '$shared/types/sockets'
+import { ClientEventMap, ClientEvents, SocketEvents } from '$shared/types/sockets'
 import { createServer } from 'http'
 import { Socket, Server as SocketIOServer } from 'socket.io'
 import { settingsService } from '../services/settings'
+
+type AsyncHandler<T> = (data: T) => Promise<void>
+type Handler<T> = ((data: T) => void) | AsyncHandler<T> | null
 
 export class SocketManager {
 	private io: SocketIOServer
@@ -57,7 +60,7 @@ export class SocketManager {
 			}
 
 			// Handle settings updates from clients - type-safe
-			this.onClientEvent(socket, SocketEvents.ClientUpdatedSettings, async data => {
+			socket.on(SocketEvents.ClientUpdatedSettings, async data => {
 				try {
 					const { settings, clientId } = data
 					const updateEvent = await settingsService.updateSettings(settings, clientId)
@@ -69,16 +72,35 @@ export class SocketManager {
 				}
 			})
 
+			//this.broadcast(socket, 'transition_changed')
+
 			socket.on('disconnect', () => {
 				console.log(`🔌 Client disconnected: ${socket.id}`)
 			})
 		})
 	}
 
+	private broadcast<T>(socket: Socket, event: string, handler: Handler<T>): void {
+		socket.on(event, async (data: T) => {
+			try {
+				if (handler) {
+					const result = handler(data)
+					if (result instanceof Promise) {
+						await result
+					}
+				}
+				console.log(`🔌 Broadcasting ${event}:`, data)
+				socket.broadcast.emit(event, data)
+			} catch (error) {
+				console.error(`Error handling socket ${event}:`, error)
+			}
+		})
+	}
+
 	/**
 	 * Broadcast an event to all connected clients
 	 */
-	public emit<T extends ServerEvents>(event: T, data: ServerEventMap[T]): void {
+	public emit(event: string, data: unknown): void {
 		this.io.emit(event, data)
 	}
 
