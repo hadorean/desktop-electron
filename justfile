@@ -4,19 +4,39 @@
 
 default-version := "patch" 
 
+# Development
+
+# Start all (shared, client, electron)
 dev:
 	clear
 	pnpm dev
-
-app:
-	clear
-	pnpm dev:app
-
+	
+# Start the web client
 web:
 	clear
 	pnpm dev:web
 
-# all, shared, client, app
+# Start the electron app
+app:
+	clear
+	pnpm dev:app
+
+# Run the installer
+run:
+	./pkg/app/dist/*.exe
+
+# Run the mkdocs server
+doc:
+	python -m mkdocs serve
+
+# Initial setup
+
+setup:
+	pnpm reinstall
+
+# Type checking
+
+# what = all | shared | client | app
 check what="all": 
 	clear
 	pnpm format --log-level=warn
@@ -37,7 +57,9 @@ check-client:
 check-app:
 	pnpm typecheck:app
 
-	# all, shared, client, app
+# Linting
+
+# what = all | shared | client | app
 lint what="all": 
 	clear
 	just lint-{{what}}
@@ -56,13 +78,6 @@ lint-client:
 lint-app:
 	pnpm lint:app
 
-# Run the mkdocs server
-doc:
-	python -m mkdocs serve
-
-run:
-	./pkg/app/dist/*.exe
-
 # Shad components library
 
 # Add a shadcn component
@@ -72,11 +87,12 @@ shad command="add" component="":
 # Run the shadcn demo
 demo-shad:
 	cd pkg/shadcn && pnpm dev
-	
 
 [confirm("Are you sure you want to clean the node_modules (y/n)?")]
 clean:
 	node scripts/rm_modules.js
+
+# Build and publishing
 
 # Publish a new version
 publish-patch:

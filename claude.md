@@ -115,6 +115,18 @@ pnpm dev
 just dev
 ```
 
+### Dependency Management
+
+```bash
+# Clean installation (removes cache, node_modules, lockfile and reinstalls)
+pnpm reinstall
+
+# Alternative manual approach
+pnpm store prune && rm -rf node_modules pnpm-lock.yaml && pnpm install
+```
+
+**Note**: The project uses `.pnpmrc` to allow build scripts for native modules like `electron` and `electron-as-wallpaper`. This prevents installation issues with native bindings.
+
 ### Building
 
 ```bash

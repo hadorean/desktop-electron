@@ -1,6 +1,7 @@
 {
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
+		"reinstall": "node scripts/clean-install.js",
 		"build:shared": "cd pkg/shared && pnpm build",
 		"build:client": "cd pkg/client && pnpm build",
 		"build:app": "cd pkg/app && pnpm build",
