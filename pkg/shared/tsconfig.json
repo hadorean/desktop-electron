@@ -1,29 +1,4 @@
 {
-	"compilerOptions": {
-		"composite": true,
-		"target": "ES2022",
-		"module": "ESNext",
-		"baseUrl": ".", // Added to ensure proper module resolution
-		"skipLibCheck": true, // Moved here to ensure it applies to all type checks
-		"moduleResolution": "bundler",
-		"isolatedModules": true,
-		"noEmit": false,
-		"strict": true,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"forceConsistentCasingInFileNames": true,
-		"declaration": true,
-		"declarationMap": false,
-		"outDir": "./dist",
-		"rootDir": "./src",
-		"lib": ["ES2022", "DOM"],
-		"types": ["node", "svelte"],
-		"paths": {
-			"$stores/*": ["./src/stores/*", "node_modules/*", "src/types/*"],
-			"$lib": ["./src/lib"],
-			"$lib/*": ["./src/lib/*"]
-		}
-	},
-	"include": ["src/**/*.ts", "src/**/*.js", "src/**/*.d.ts", "src/**/*.svelte"],
-	"exclude": ["node_modules", "dist"]
+	"files": [],
+	"references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }

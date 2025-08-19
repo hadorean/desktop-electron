@@ -31,7 +31,6 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			$stores: path.resolve(__dirname, './src/stores'),
 			$lib: path.resolve('./src/lib')
 		}
 	}
