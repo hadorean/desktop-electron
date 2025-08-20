@@ -1,5 +1,4 @@
 import { userOptionsStore } from '$shared/stores/userOptionsStore'
-import { ServerEventMap, ServerEvents } from '$shared/types/sockets'
 import cors from 'cors'
 import express from 'express'
 import { createServer } from 'http'
@@ -135,7 +134,7 @@ export class LocalServer {
 		return this.isRunning
 	}
 
-	public emit<T extends ServerEvents>(event: T, data: ServerEventMap[T]): void {
+	public emit<T>(event: string, data: T): void {
 		this.sockets.emit(event, data)
 	}
 

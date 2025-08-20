@@ -60,7 +60,7 @@ function initializeImageChangeHandling(context: string): () => void {
 	}
 
 	// Register listeners
-	socketService.imagesUpdated.subscribe(handleImagesUpdated)
+	socketService.on.imagesUpdated.subscribe(handleImagesUpdated)
 	const unsubscribeImagesChanged = imagesStore.onImagesChanged(handleImagesChanged)
 
 	// Create cleanup function

@@ -1,5 +1,4 @@
 import { ApiRoutes } from '$shared/types/api'
-import { SocketEvents } from '$shared/types/sockets'
 import { constants } from 'fs'
 import { access } from 'fs/promises'
 import { join } from 'path'
@@ -195,7 +194,7 @@ export function registerRoutes(localServer: LocalServer): void {
 			}
 
 			const updateEvent = await settingsService.updateSettings(settings, clientId)
-			localServer.emit(SocketEvents.SettingsUpdate, updateEvent)
+			localServer.emit('settings_update', updateEvent.settings)
 
 			return res.json({
 				message: 'Settings updated successfully',

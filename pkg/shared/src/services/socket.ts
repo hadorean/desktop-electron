@@ -1,17 +1,10 @@
 import { io, Socket } from 'socket.io-client'
 import { apiStore } from '../stores/apiStore'
 import { settingsStore } from '../stores/settingsStore'
-import type { ImagesUpdatedEvent, SettingsUpdateEvent, TransitionSettings, UserSettings } from '../types'
-import { SocketEvents } from '../types'
+import type { ImagesUpdatedEvent, SettingsUpdateEvent, SocketEvent, TransitionSettings, UserSettings } from '../types'
+import { Flag, Ref, ScopedFlag } from '../utils/flag'
 import { Scope } from '../utils/scope'
 import { Signal, type ISignal } from '../utils/signal'
-
-// interface SettingsUpdatedResponse {
-// 	success: boolean
-// 	settings?: unknown
-// 	timestamp?: number
-// 	error?: string
-// }
 
 export class SocketService {
 	private socket: Socket | null = null
@@ -21,27 +14,20 @@ export class SocketService {
 	private reconnectDelay = 1000
 
 	private updatingSettingsFromServer = false
-	private initialSubscribeHandled = false
+	private updatingTransitionFromServer = new Ref(false)
+	private initialSubscribeHandled = new Flag()
 	private subbscribedToLocalSettings = false
 
-	private _settingsUpdated: Signal<SettingsUpdateEvent> = new Signal()
-	public get settingsUpdated(): ISignal<SettingsUpdateEvent> {
-		return this._settingsUpdated
-	}
+	private settingsUpdated: Signal<SettingsUpdateEvent> = new Signal()
+	private connectionStatus: Signal<boolean> = new Signal()
+	private debugStateChanged: Signal<boolean> = new Signal()
+	private imagesUpdated: Signal<ImagesUpdatedEvent> = new Signal()
 
-	private _connectionStatus: Signal<boolean> = new Signal()
-	public get connectionStatus(): ISignal<boolean> {
-		return this._connectionStatus
-	}
-
-	private _debugStateChanged: Signal<boolean> = new Signal()
-	public get debugStateChanged(): ISignal<boolean> {
-		return this._debugStateChanged
-	}
-
-	private _imagesUpdated: Signal<ImagesUpdatedEvent> = new Signal()
-	public get imagesUpdated(): ISignal<ImagesUpdatedEvent> {
-		return this._imagesUpdated
+	public on = {
+		settingsUpdated: this.settingsUpdated as ISignal<SettingsUpdateEvent>,
+		connectionStatus: this.connectionStatus as ISignal<boolean>,
+		debugStateChanged: this.debugStateChanged as ISignal<boolean>,
+		imagesUpdated: this.imagesUpdated as ISignal<ImagesUpdatedEvent>
 	}
 
 	private scope: Scope = new Scope()
@@ -87,13 +73,13 @@ export class SocketService {
 			console.log('🔌 Socket.IO connected:', this.socket?.id)
 			this.isConnected = true
 			this.reconnectAttempts = 0
-			this._connectionStatus.emit(true)
+			this.connectionStatus.emit(true)
 		})
 
 		this.socket.on('disconnect', reason => {
 			console.log('🔌 Socket.IO disconnected:', reason)
 			this.isConnected = false
-			this._connectionStatus.emit(false)
+			this.connectionStatus.emit(false)
 		})
 
 		this.socket.on('connect_error', error => {
@@ -105,16 +91,16 @@ export class SocketService {
 				console.error('🔌 Max reconnection attempts reached')
 			}
 
-			this._connectionStatus.emit(false)
+			this.connectionStatus.emit(false)
 		})
 
 		// Handle settings updates from server
-		this.socket.on(SocketEvents.SettingsUpdate, (event: SettingsUpdateEvent) => {
+		this.socket.on('settings_update', (event: SocketEvent<UserSettings>) => {
 			const clientId = socketService.getSocketId()
 			if (event.clientId == clientId || this.updatingSettingsFromServer) return
 
 			this.updatingSettingsFromServer = true
-			settingsStore.updateSettings(event.settings)
+			settingsStore.updateSettings(event.data)
 			this.updatingSettingsFromServer = false
 
 			console.log('🔌 Received settings update:', event)
@@ -122,20 +108,21 @@ export class SocketService {
 		})
 
 		// Handle debug state change events
-		this.socket.on(SocketEvents.DebugStateChanged, (data: { visible: boolean }) => {
+		this.socket.on('debug_state_changed', (event: SocketEvent<{ visible: boolean }>) => {
 			//console.log('🔌 Received debug state change event:', data.visible)
-			this._debugStateChanged.emit(data.visible)
+			this.debugStateChanged.emit(event.data.visible)
 		})
 
 		// Handle images updated events
-		this.socket.on(SocketEvents.ImagesUpdated, (data: ImagesUpdatedEvent) => {
+		this.socket.on('images_updated', (event: SocketEvent<ImagesUpdatedEvent>) => {
 			//console.log('🔌 Received images updated event:', data)
-			this._imagesUpdated.emit(data)
+			this.imagesUpdated.emit(event.data)
 		})
 
-		this.socket.on('transition_changed', (data: { transition: TransitionSettings }) => {
-			console.log('🔌 Received transition changed event:', data)
-			settingsStore.setTransition(data.transition)
+		this.socket.on('transition_changed', (event: SocketEvent<TransitionSettings>) => {
+			console.log('🔌 Received transition changed event:', event)
+			using _ = new ScopedFlag(this.updatingTransitionFromServer.set)
+			settingsStore.setTransition(event.data)
 		})
 	}
 
@@ -144,8 +131,7 @@ export class SocketService {
 		this.subbscribedToLocalSettings = true
 
 		this.scope.subscribe(settingsStore.userSettings, userSettings => {
-			if (!this.initialSubscribeHandled) {
-				this.initialSubscribeHandled = true
+			if (this.initialSubscribeHandled.turn()) {
 				return // Skip the initial subscribe callback
 			}
 
@@ -158,15 +144,14 @@ export class SocketService {
 			if (!this.updatingSettingsFromServer && this.getConnectionStatus()) {
 				console.log('Updating settings from client:')
 				// Use socket ID as client ID
-				this.updateSettings(userSettings)
+				this.emit('settings_update', userSettings)
 			}
 		})
 
 		this.scope.subscribe(settingsStore.transition, transition => {
+			if (this.updatingTransitionFromServer.get()) return
 			console.log('🔌 Transition changed:', transition)
-			this.emitToServer('transition_changed', {
-				transition
-			})
+			this.emit('transition_changed', transition)
 			//subscribeNext(settingsStore.transition, transition => {
 		})
 	}
@@ -187,29 +172,12 @@ export class SocketService {
 	/**
 	 * Type-safe emit for client-to-server events
 	 */
-	private emitToServer(event: string, data: unknown): void {
+	private emit<T>(event: string, data: T): void {
 		if (!this.isConnected || !this.socket) {
 			console.warn('🔌 Cannot send event - not connected')
 			return
 		}
-		this.socket.emit(event, data)
-	}
-
-	/**
-	 * Send settings update to server
-	 */
-	public updateSettings(settings: UserSettings): void {
-		if (!this.isConnected || !this.socket) {
-			console.warn('🔌 Cannot send settings update - not connected')
-			return
-		}
-
-		//console.log('🔌 Sending settings update to server:', settings)
-
-		this.emitToServer(SocketEvents.ClientUpdatedSettings, {
-			settings,
-			clientId: this.socket.id
-		})
+		this.socket.emit(event, { data, clientId: this.getSocketId() } as SocketEvent<T>)
 	}
 
 	/**

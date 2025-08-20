@@ -1,6 +1,5 @@
 import { debugMenu } from '$shared/stores/debugStore'
 import { IpcEvents, RendererEvents } from '$shared/types/ipc'
-import { SocketEvents } from '$shared/types/sockets'
 import { app } from 'electron'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
@@ -69,7 +68,7 @@ function sendToRenderer(event: RendererEvents, data: unknown): void {
 function broadcastState(visible: boolean): void {
 	try {
 		// Broadcast to socket clients
-		localServer?.emit(SocketEvents.DebugStateChanged, { visible, timestamp: Date.now() })
+		localServer?.emit('debug_state_changed', { visible })
 		// Send to main window renderer via IPC
 		sendToRenderer(IpcEvents.DebugStateChanged, visible)
 	} catch (error) {

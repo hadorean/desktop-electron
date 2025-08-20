@@ -1,11 +1,12 @@
 import { debugMenu } from '$shared/stores/debugStore'
-import { ClientEventMap, ClientEvents, SocketEvents } from '$shared/types/sockets'
+import { type SocketEvent } from '$shared/types/sockets'
 import { createServer } from 'http'
 import { Socket, Server as SocketIOServer } from 'socket.io'
+import { UserSettings } from '../../../../shared/src/types/settings'
 import { settingsService } from '../services/settings'
 
-type AsyncHandler<T> = (data: T) => Promise<void>
-type Handler<T> = ((data: T) => void) | AsyncHandler<T> | null
+type AsyncHandler<T> = (data: T) => Promise<T>
+type Handler<T> = ((data: T) => T) | AsyncHandler<T> | null
 
 export class SocketManager {
 	private io: SocketIOServer
@@ -20,18 +21,6 @@ export class SocketManager {
 		this.setupSocketHandlers()
 	}
 
-	/**
-	 * Type-safe wrapper for handling client-to-server events
-	 */
-	private onClientEvent<T extends ClientEvents>(
-		socket: Socket,
-		event: T,
-		handler: (data: ClientEventMap[T]) => void | Promise<void>
-	): void {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		socket.on(event, handler as any)
-	}
-
 	private setupSocketHandlers(): void {
 		this.io.on('connection', async socket => {
 			console.log(`🔌 Client connected: ${socket.id}`)
@@ -39,40 +28,38 @@ export class SocketManager {
 			// Send current settings to newly connected client
 			try {
 				const settings = await settingsService.getSettings()
-				socket.emit(SocketEvents.SettingsUpdate, {
-					type: 'settings_update',
-					settings,
-					timestamp: Date.now(),
-					clientId: 'server'
-				})
+				this.emit('settings_update', settings)
 			} catch (error) {
 				console.error('Error sending settings to new client:', error)
 			}
 
 			// Send current debug state to newly connected client
 			try {
-				socket.emit(SocketEvents.DebugStateChanged, {
-					visible: debugMenu.getVisible(),
-					timestamp: Date.now()
-				})
+				this.emit('debug_state_changed', { visible: debugMenu.getVisible() })
 			} catch (error) {
 				console.error('Error sending debug state to new client:', error)
 			}
 
-			// Handle settings updates from clients - type-safe
-			socket.on(SocketEvents.ClientUpdatedSettings, async data => {
-				try {
-					const { settings, clientId } = data
-					const updateEvent = await settingsService.updateSettings(settings, clientId)
+			// // Handle settings updates from clients - type-safe
+			// socket.on(SocketEvents.ClientUpdatedSettings, async data => {
+			// 	try {
+			// 		const { settings, clientId } = data
+			// 		const updateEvent = await settingsService.updateSettings(settings, clientId)
 
-					// Broadcast to all other clients
-					socket.broadcast.emit(SocketEvents.SettingsUpdate, updateEvent)
-				} catch (error) {
-					console.error('Error handling socket settings update:', error)
-				}
+			// 		// Broadcast to all other clients
+			// 		socket.broadcast.emit(SocketEvents.SettingsUpdate, updateEvent)
+			// 	} catch (error) {
+			// 		console.error('Error handling socket settings update:', error)
+			// 	}
+			// })
+
+			this.relay<Partial<UserSettings>>(socket, 'settings_update', async event => {
+				const { data: settings, clientId } = event
+				const updated = await settingsService.updateSettings(settings, clientId)
+				return { data: updated.settings, clientId: updated.clientId }
 			})
 
-			//this.broadcast(socket, 'transition_changed')
+			//this.relay(socket, 'transition_changed')
 
 			socket.on('disconnect', () => {
 				console.log(`🔌 Client disconnected: ${socket.id}`)
@@ -80,17 +67,24 @@ export class SocketManager {
 		})
 	}
 
-	private broadcast<T>(socket: Socket, event: string, handler: Handler<T>): void {
-		socket.on(event, async (data: T) => {
+	/**
+	 * Relay an event to all connected clients
+	 * @param socket - The socket to relay the event to
+	 * @param event - The event to relay
+	 * @param handler - optional: The handler to use to process the event locally and return an updated event data
+	 */
+	private relay<T>(socket: Socket, event: string, handler: Handler<SocketEvent<T>> = null): void {
+		socket.on(event, async (data: SocketEvent<T>) => {
 			try {
+				let updatedData = data
 				if (handler) {
 					const result = handler(data)
 					if (result instanceof Promise) {
-						await result
+						updatedData = await result
 					}
 				}
-				console.log(`🔌 Broadcasting ${event}:`, data)
-				socket.broadcast.emit(event, data)
+				console.log(`🔌 Broadcasting ${event}:`, updatedData)
+				socket.broadcast.emit(event, updatedData)
 			} catch (error) {
 				console.error(`Error handling socket ${event}:`, error)
 			}
@@ -100,8 +94,8 @@ export class SocketManager {
 	/**
 	 * Broadcast an event to all connected clients
 	 */
-	public emit(event: string, data: unknown): void {
-		this.io.emit(event, data)
+	public emit<T>(event: string, data: T): void {
+		this.io.emit(event, { data, clientId: 'server' } as SocketEvent<T>)
 	}
 
 	/**
@@ -113,7 +107,7 @@ export class SocketManager {
 		eventType?: string
 	): void {
 		console.log(`🔌 Broadcasting images updated: ${reason} ${filename ? `(${filename})` : ''}`)
-		this.emit(SocketEvents.ImagesUpdated, {
+		this.emit('images_updated', {
 			timestamp: Date.now(),
 			reason,
 			filename,
