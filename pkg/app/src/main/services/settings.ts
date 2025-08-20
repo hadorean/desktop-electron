@@ -39,7 +39,7 @@ export class SettingsService {
 
 		// Update memory
 		this.settings = updatedSettings
-		settingsStore.updateSettings(updatedSettings)
+		// TEMP // settingsStore.updateSettings(updatedSettings)
 
 		// Persist to file system
 		await this.saveToFileSystem(updatedSettings)
