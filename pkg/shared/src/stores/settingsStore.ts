@@ -59,14 +59,14 @@ const currentScreen = derived([userSettings, currentScreenId, isLocalMode], ([al
 	return isLocal ? (all.screens[screenId] ?? DefaultScreenSettings) : all.shared
 })
 
-const makeTransition = (time: number): TransitionSettings => {
-	return {
-		blur: time,
-		brightness: time,
-		saturation: time,
-		transitionTime: time
-	}
-}
+// const makeTransition = (time: number): TransitionSettings => {
+// 	return {
+// 		blur: time,
+// 		brightness: time,
+// 		saturation: time,
+// 		transitionTime: time
+// 	}
+// }
 
 const transitionSettings = writable<TransitionSettings>(DefaultTransitionSettings)
 
@@ -81,7 +81,7 @@ const renderSettings = derived([userSettings, currentTransition], ([settings, tr
 })
 
 when([currentScreenId, currentTheme], () => {
-	transitionOverride.set(makeTransition(get(screenProfile).transitionTime))
+	transitionOverride.set({})
 })
 
 const updateTransition = (key: keyof TransitionSettings, value: number): void => {

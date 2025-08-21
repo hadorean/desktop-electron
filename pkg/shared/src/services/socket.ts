@@ -2,7 +2,7 @@ import { io, Socket } from 'socket.io-client'
 import { apiStore } from '../stores/apiStore'
 import { settingsStore } from '../stores/settingsStore'
 import type { ImagesUpdatedEvent, RenderSettings, SocketEvent } from '../types'
-import { Flag, Ref } from '../utils/flag'
+import { Flag } from '../utils/flag'
 import { Scope } from '../utils/scope'
 import { Signal, type ISignal } from '../utils/signal'
 
@@ -14,7 +14,6 @@ export class SocketService {
 	private reconnectDelay = 1000
 
 	private updatingSettingsFromServer = false
-	private updatingTransitionFromServer = new Ref(false)
 	private initialSubscribeHandled = new Flag()
 	private subbscribedToLocalSettings = false
 

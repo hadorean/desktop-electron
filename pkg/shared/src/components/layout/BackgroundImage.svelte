@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { Easing, Tween } from '@tweenjs/tween.js'
 	import { onMount } from 'svelte'
+	import { get } from 'svelte/store'
 	import { api } from '../../services'
 	import { settingsStore } from '../../stores/settingsStore'
 	import { type BackgroundMode, imageBackground } from '../../types/settings'
+	import { when } from '../../utils/scope'
+	import { Tweener } from '../../utils/tweens'
 
 	const { screenProfile } = settingsStore
 
@@ -14,15 +17,27 @@
 		opacity: number
 	}
 
-	let activeBackground: BackgroundState | null = null
-	let backgroundStack: BackgroundState[] = []
-	let currentBackgroundUrl = ''
-	let currentMode: BackgroundMode = imageBackground
-	let animationFrameId: number | null = null
-	let imageScale = 1
+	let activeBackground: BackgroundState | null = $state(null)
+	let backgroundStack: BackgroundState[] = $state([])
+	let currentBackgroundUrl = $state('')
+	let currentMode: BackgroundMode = $state(imageBackground)
+	let animationFrameId: number | null = $state(null)
+	let effectTween: Tween | null = $state(null)
+
+	type EffectState = {
+		value: number
+		tween: Tween | null
+	}
+
+	let blur = $state<EffectState>({ value: 0, tween: null })
+	let saturation = $state<EffectState>({ value: 1, tween: null })
+	let brightness = $state<EffectState>({ value: 1, tween: null })
+	let imageScale = $derived(1 + (blur.value ?? 0) * 0.003)
+
+	const tweener = new Tweener()
 
 	// Subscribe to settings store for background changes
-	$: {
+	$effect(() => {
 		const mode = $screenProfile.mode
 		let backgroundUrl = ''
 
@@ -38,9 +53,44 @@
 			currentMode = mode
 			startTransition()
 		}
+	})
 
-		imageScale = 1 + ($screenProfile.blur ?? 0) * 0.003
+	const updateProp = (target: number, prop: EffectState, duration: number) => {
+		if (target != prop.value) {
+			if (duration == 0) {
+				tweener.stop(prop)
+				prop.value = target
+				return
+			}
+			tweener.restart(
+				prop,
+				new Tween({ value: prop.value })
+					.to({ value: target }, (duration ?? 1) * 1000)
+					.easing(Easing.Quadratic.Out)
+					.onUpdate(x => {
+						prop.value = x.value
+						if (x.value === target) {
+							tweener.stop(blur)
+						}
+					})
+			)
+		}
 	}
+
+	onMount(() => {
+		const unsubscribe = when([settingsStore.screenProfile, settingsStore.transition], () => {
+			const screenProfile = get(settingsStore.screenProfile)
+			const transition = get(settingsStore.transition)
+
+			updateProp(screenProfile.blur, blur, transition.blur)
+			updateProp(screenProfile.saturation, saturation, transition.saturation)
+			updateProp(screenProfile.brightness, brightness, transition.brightness)
+		})
+		return () => {
+			unsubscribe()
+			tweener.dispose()
+		}
+	})
 
 	function startTransition(): void {
 		if (!currentBackgroundUrl) return
@@ -49,23 +99,23 @@
 		if (activeBackground) {
 			const previousBackground = activeBackground
 			backgroundStack = [...backgroundStack, previousBackground]
-			previousBackground.tween?.stop()
 
-			previousBackground.tween = new Tween({ opacity: previousBackground.opacity })
-				.to({ opacity: 0 }, ($screenProfile.transitionTime ?? 1) * 1000)
-				.easing(Easing.Quadratic.Out)
-				.onUpdate(value => {
-					if (previousBackground) {
-						previousBackground.opacity = value.opacity
-						if (value.opacity <= 0) {
-							// Remove from stack when fully transparent
-							backgroundStack = backgroundStack.filter(bg => bg !== previousBackground)
-							previousBackground.tween?.stop()
-							previousBackground.tween = null
+			tweener.restart(
+				previousBackground,
+				new Tween({ opacity: previousBackground.opacity })
+					.to({ opacity: 0 }, ($screenProfile.transitionTime ?? 1) * 1000)
+					.easing(Easing.Quadratic.Out)
+					.onUpdate(value => {
+						if (previousBackground) {
+							previousBackground.opacity = value.opacity
+							if (value.opacity <= 0) {
+								// Remove from stack when fully transparent
+								backgroundStack = backgroundStack.filter(bg => bg !== previousBackground)
+								tweener.stop(previousBackground)
+							}
 						}
-					}
-				})
-				.start()
+					})
+			)
 		}
 
 		// Set new background as active and start fading in
@@ -76,49 +126,20 @@
 			tween: null
 		}
 
-		activeBackground.tween = new Tween({ opacity: 0 })
-			.to({ opacity: 1 }, ($screenProfile.transitionTime ?? 1) * 1000)
-			.easing(Easing.Quadratic.Out)
-			.onUpdate(value => {
-				if (activeBackground) {
-					activeBackground.opacity = value.opacity
-					if (value.opacity >= 1) {
-						activeBackground.tween?.stop()
-						activeBackground.tween = null
+		tweener.start(
+			activeBackground,
+			new Tween({ opacity: 0 })
+				.to({ opacity: 1 }, ($screenProfile.transitionTime ?? 1) * 1000)
+				.easing(Easing.Quadratic.Out)
+				.onUpdate(value => {
+					if (activeBackground) {
+						activeBackground.opacity = value.opacity
+						if (value.opacity >= 1) {
+							tweener.stop(activeBackground)
+						}
 					}
-				}
-			})
-			.start()
-
-		if (animationFrameId === null) {
-			animationFrameId = requestAnimationFrame(animate)
-		}
-	}
-
-	function animate(time: number): void {
-		let hasActiveTweens = false
-
-		// Update active background tween
-		if (activeBackground?.tween) {
-			activeBackground.tween.update(time)
-			hasActiveTweens = true
-		}
-
-		// Update stack tweens and clean up completed ones
-		backgroundStack = backgroundStack.filter(background => {
-			if (background.tween) {
-				background.tween.update(time)
-				hasActiveTweens = true
-				return true
-			}
-			return false
-		})
-
-		if (hasActiveTweens) {
-			animationFrameId = requestAnimationFrame(animate)
-		} else {
-			animationFrameId = null
-		}
+				})
+		)
 	}
 
 	onMount(() => {
@@ -147,12 +168,9 @@
 
 <div
 	class="background-container"
-	style="scale: {imageScale}; opacity: {$screenProfile.brightness ?? 1}; filter: {[
-		($screenProfile.blur ?? 0) > 0 ? `blur(${$screenProfile.blur}px)` : null,
-		`saturate(${$screenProfile.saturation ?? 1})`
-	]
-		.filter(Boolean)
-		.join(' ')};"
+	style="scale: {imageScale}; opacity: {brightness.value}; filter: {blur.value > 0
+		? `blur(${blur.value}px)`
+		: null} saturate({saturation.value});"
 >
 	{#each backgroundStack as background (background.url + background.mode)}
 		{#if background.mode === imageBackground}
