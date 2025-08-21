@@ -134,7 +134,7 @@ export class SocketService {
 			// }
 
 			if (!this.updatingSettingsFromServer && this.getConnectionStatus()) {
-				console.log('Updating settings from client:')
+				//console.log('Updating settings from client:')
 				// Use socket ID as client ID
 				this.emit('settings_update', renderSettings)
 			}

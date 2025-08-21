@@ -3,7 +3,6 @@
 	import { settingsStore } from '../../stores/settingsStore'
 	import { imageBackground, type TransitionSettings } from '../../types/settings'
 	import KeyboardShortcut from '../utils/KeyboardShortcut.svelte'
-	import Logger from '../utils/Logger.svelte'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
 	import SliderControl from './SliderControl.svelte'
@@ -67,7 +66,7 @@
 	}
 </script>
 
-<Logger input={transition} />
+<!-- <Logger input={transition} /> -->
 
 <KeyboardShortcut key="Tab" action={switchScreen} preventDefault />
 
