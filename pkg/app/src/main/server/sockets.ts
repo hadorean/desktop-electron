@@ -1,8 +1,8 @@
 import { debugMenu } from '$shared/stores/debugStore'
+import { DefaultTransitionSettings, RenderSettings } from '$shared/types/settings'
 import { type SocketEvent } from '$shared/types/sockets'
 import { createServer } from 'http'
 import { Socket, Server as SocketIOServer } from 'socket.io'
-import { UserSettings } from '../../../../shared/src/types/settings'
 import { settingsService } from '../services/settings'
 
 type AsyncHandler<T> = (data: T) => Promise<T>
@@ -28,7 +28,7 @@ export class SocketManager {
 			// Send current settings to newly connected client
 			try {
 				const settings = await settingsService.getSettings()
-				this.emit('settings_update', settings)
+				this.emit('settings_update', { settings, transition: DefaultTransitionSettings })
 			} catch (error) {
 				console.error('Error sending settings to new client:', error)
 			}
@@ -53,13 +53,14 @@ export class SocketManager {
 			// 	}
 			// })
 
-			this.relay<Partial<UserSettings>>(socket, 'settings_update', async event => {
-				const { data: settings, clientId } = event
-				const updated = await settingsService.updateSettings(settings, clientId)
-				return { data: updated.settings, clientId: updated.clientId }
+			this.relay<RenderSettings>(socket, 'settings_update', async event => {
+				const { data } = event
+				const updated = await settingsService.updateSettings(data.settings)
+				const result = { settings: updated, transition: data.transition } as RenderSettings
+				return { data: result, clientId: 'server' }
 			})
 
-			//this.relay(socket, 'transition_changed')
+			//this.relay<TransitionSettings>(socket, 'transition_changed')
 
 			socket.on('disconnect', () => {
 				console.log(`🔌 Client disconnected: ${socket.id}`)

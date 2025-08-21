@@ -185,27 +185,27 @@ export function registerRoutes(localServer: LocalServer): void {
 		}
 	})
 
-	server.post(ApiRoutes.UpdateSettings, async (req, res) => {
-		try {
-			const { settings, clientId = 'api-client' } = req.body
+	// server.post(ApiRoutes.UpdateSettings, async (req, res) => {
+	// 	try {
+	// 		const { settings } = req.body
 
-			if (!settings || typeof settings !== 'object') {
-				return res.status(400).json({ error: 'Bad Request', message: 'Invalid settings data provided' })
-			}
+	// 		if (!settings || typeof settings !== 'object') {
+	// 			return res.status(400).json({ error: 'Bad Request', message: 'Invalid settings data provided' })
+	// 		}
 
-			const updateEvent = await settingsService.updateSettings(settings, clientId)
-			localServer.emit('settings_update', updateEvent.settings)
+	// 		const updated = await settingsService.updateSettings(settings)
+	// 		localServer.emit('settings_update', updated)
 
-			return res.json({
-				message: 'Settings updated successfully',
-				settings: updateEvent.settings,
-				timestamp: updateEvent.timestamp
-			})
-		} catch (error) {
-			console.error('Error updating settings:', error)
-			return res.status(500).json({ error: 'Internal Server Error', message: 'Failed to update settings' })
-		}
-	})
+	// 		return res.json({
+	// 			message: 'Settings updated successfully',
+	// 			settings: updated,
+	// 			timestamp: Date.now()
+	// 		})
+	// 	} catch (error) {
+	// 		console.error('Error updating settings:', error)
+	// 		return res.status(500).json({ error: 'Internal Server Error', message: 'Failed to update settings' })
+	// 	}
+	// })
 
 	// Background routes for each monitor
 	server.get(`${ApiRoutes.Background}/:monitorId`, (req, res) => {

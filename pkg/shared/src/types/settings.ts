@@ -59,11 +59,9 @@ export interface UserSettings {
 	favorites: string[]
 }
 
-export interface SettingsUpdateEvent {
-	type: 'settings_update'
+export interface RenderSettings {
+	transition: TransitionSettings
 	settings: UserSettings
-	timestamp: number
-	clientId: string
 }
 
 export const DefaultTransitionSettings: TransitionSettings = {

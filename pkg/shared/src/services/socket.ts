@@ -1,8 +1,8 @@
 import { io, Socket } from 'socket.io-client'
 import { apiStore } from '../stores/apiStore'
 import { settingsStore } from '../stores/settingsStore'
-import type { ImagesUpdatedEvent, SettingsUpdateEvent, SocketEvent, TransitionSettings, UserSettings } from '../types'
-import { Flag, Ref, ScopedFlag } from '../utils/flag'
+import type { ImagesUpdatedEvent, RenderSettings, SocketEvent } from '../types'
+import { Flag, Ref } from '../utils/flag'
 import { Scope } from '../utils/scope'
 import { Signal, type ISignal } from '../utils/signal'
 
@@ -18,13 +18,13 @@ export class SocketService {
 	private initialSubscribeHandled = new Flag()
 	private subbscribedToLocalSettings = false
 
-	private settingsUpdated: Signal<SettingsUpdateEvent> = new Signal()
+	private settingsUpdated: Signal<RenderSettings> = new Signal()
 	private connectionStatus: Signal<boolean> = new Signal()
 	private debugStateChanged: Signal<boolean> = new Signal()
 	private imagesUpdated: Signal<ImagesUpdatedEvent> = new Signal()
 
 	public on = {
-		settingsUpdated: this.settingsUpdated as ISignal<SettingsUpdateEvent>,
+		settingsUpdated: this.settingsUpdated as ISignal<RenderSettings>,
 		connectionStatus: this.connectionStatus as ISignal<boolean>,
 		debugStateChanged: this.debugStateChanged as ISignal<boolean>,
 		imagesUpdated: this.imagesUpdated as ISignal<ImagesUpdatedEvent>
@@ -95,34 +95,26 @@ export class SocketService {
 		})
 
 		// Handle settings updates from server
-		this.socket.on('settings_update', (event: SocketEvent<UserSettings>) => {
+		this.listen('settings_update', (event: SocketEvent<RenderSettings>) => {
 			const clientId = socketService.getSocketId()
 			if (event.clientId == clientId || this.updatingSettingsFromServer) return
 
 			this.updatingSettingsFromServer = true
-			settingsStore.updateSettings(event.data)
+			settingsStore.updateSettings(event.data.settings)
+			settingsStore.setTransition(event.data.transition)
 			this.updatingSettingsFromServer = false
-
-			console.log('🔌 Received settings update:', event)
-			//this._settingsUpdated.emit(event)
 		})
 
 		// Handle debug state change events
-		this.socket.on('debug_state_changed', (event: SocketEvent<{ visible: boolean }>) => {
+		this.listen('debug_state_changed', (event: SocketEvent<{ visible: boolean }>) => {
 			//console.log('🔌 Received debug state change event:', data.visible)
 			this.debugStateChanged.emit(event.data.visible)
 		})
 
 		// Handle images updated events
-		this.socket.on('images_updated', (event: SocketEvent<ImagesUpdatedEvent>) => {
+		this.listen('images_updated', (event: SocketEvent<ImagesUpdatedEvent>) => {
 			//console.log('🔌 Received images updated event:', data)
 			this.imagesUpdated.emit(event.data)
-		})
-
-		this.socket.on('transition_changed', (event: SocketEvent<TransitionSettings>) => {
-			console.log('🔌 Received transition changed event:', event)
-			using _ = new ScopedFlag(this.updatingTransitionFromServer.set)
-			settingsStore.setTransition(event.data)
 		})
 	}
 
@@ -130,7 +122,7 @@ export class SocketService {
 		if (this.subbscribedToLocalSettings) return
 		this.subbscribedToLocalSettings = true
 
-		this.scope.subscribe(settingsStore.userSettings, userSettings => {
+		this.scope.subscribe(settingsStore.renderSettings, renderSettings => {
 			if (this.initialSubscribeHandled.turn()) {
 				return // Skip the initial subscribe callback
 			}
@@ -144,15 +136,15 @@ export class SocketService {
 			if (!this.updatingSettingsFromServer && this.getConnectionStatus()) {
 				console.log('Updating settings from client:')
 				// Use socket ID as client ID
-				this.emit('settings_update', userSettings)
+				this.emit('settings_update', renderSettings)
 			}
 		})
+	}
 
-		this.scope.subscribe(settingsStore.transition, transition => {
-			if (this.updatingTransitionFromServer.get()) return
-			console.log('🔌 Transition changed:', transition)
-			this.emit('transition_changed', transition)
-			//subscribeNext(settingsStore.transition, transition => {
+	private listen<T>(event: string, handler: (data: SocketEvent<T>) => void): void {
+		this.socket?.on(event, data => {
+			console.log('🔌 Received event:', event, data)
+			handler(data)
 		})
 	}
 

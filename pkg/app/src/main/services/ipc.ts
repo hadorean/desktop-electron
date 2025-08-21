@@ -136,8 +136,8 @@ export function initIpc(): void {
 					...settings
 				}
 			}
-			const updateEvent = await settingsService.updateSettings(updatedSettings, 'ipc-client')
-			return { success: true, data: updateEvent.settings }
+			const updated = await settingsService.updateSettings(updatedSettings)
+			return { success: true, data: updated }
 		} catch (error) {
 			console.error('IPC settings-update-shared error:', error)
 			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
@@ -158,8 +158,8 @@ export function initIpc(): void {
 					}
 				}
 			}
-			const updateEvent = await settingsService.updateSettings(updatedSettings, 'ipc-client')
-			return { success: true, data: updateEvent.settings }
+			const updated = await settingsService.updateSettings(updatedSettings)
+			return { success: true, data: updated }
 		} catch (error) {
 			console.error('IPC settings-update-local error:', error)
 			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }

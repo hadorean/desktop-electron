@@ -1,5 +1,5 @@
 import { settingsStore } from '$shared/stores/settingsStore'
-import type { SettingsUpdateEvent, UserSettings } from '$shared/types'
+import { type UserSettings } from '$shared/types'
 import { DefaultUserSettings } from '$shared/types/settings'
 import { app } from 'electron'
 import { promises as fs } from 'fs'
@@ -34,7 +34,7 @@ export class SettingsService {
 	/**
 	 * Update settings and persist to file system
 	 */
-	async updateSettings(newSettings: Partial<UserSettings>, clientId: string = 'notset'): Promise<SettingsUpdateEvent> {
+	async updateSettings(newSettings: Partial<UserSettings>): Promise<UserSettings> {
 		const currentSettings = await this.getSettings()
 		const updatedSettings = { ...currentSettings, ...newSettings }
 
@@ -50,12 +50,7 @@ export class SettingsService {
 			await this.saveToFileSystem(updatedSettings)
 		}, 1000)
 
-		return {
-			type: 'settings_update',
-			settings: updatedSettings,
-			timestamp: Date.now(),
-			clientId
-		}
+		return updatedSettings
 	}
 
 	/**
