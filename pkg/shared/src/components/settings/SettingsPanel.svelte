@@ -178,7 +178,7 @@
 				overrideValue={$activeProfile.showTimeDate}
 				defaultValue={$baseProfile.showTimeDate}
 			/>
-
+			<!-- 
 			<ToggleControl
 				label="Weather"
 				checked={$activeProfile.showWeather ?? $screenProfile.showWeather ?? false}
@@ -186,7 +186,7 @@
 				isOverride={$isLocalMode}
 				overrideValue={$activeProfile.showWeather}
 				defaultValue={$baseProfile.showWeather}
-			/>
+			/> -->
 
 			{#if $currentScreenType === 'interactive'}
 				<ToggleControl

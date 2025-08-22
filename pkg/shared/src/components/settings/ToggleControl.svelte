@@ -77,6 +77,7 @@
 <style>
 	.toggle-control {
 		width: 100%;
+		--border: rgba(165, 165, 165, 0.7);
 	}
 
 	.toggle-row {
@@ -140,10 +141,14 @@
 		justify-content: center;
 	}
 
+	:global(.switch-button:focus-visible) {
+		/* outline: 1px solid color-mix(in srgb, var(--toggle-color, var(--primary)) 40%, transparent) !important; */
+	}
+
 	/* Regular switch styling with screen color */
 	:global(.switch-button.switch-checked:not(.ghost-toggle):not(.override-toggle)) {
 		background-color: var(--toggle-color, var(--primary)) !important;
-		border-color: var(--toggle-color, var(--primary)) !important;
+		/* border-color: var(--toggle-color, var(--primary)) !important; */
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
@@ -156,24 +161,25 @@
 	/* Override mode styling - make more visible */
 	:global(.override-toggle) {
 		opacity: 1 !important;
+		--border: var(--toggle-color, var(--primary));
 	}
 
 	:global(.override-toggle.switch-checked) {
 		background-color: var(--toggle-color, var(--primary)) !important;
-		border-color: var(--toggle-color, var(--primary)) !important;
+		/* border-color: var(--toggle-color, var(--primary)) !important; */
 		box-shadow: 0 0 8px rgba(var(--toggle-color, var(--primary)), 0.3) !important;
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
 	:global(.override-toggle:not(.switch-checked)) {
-		background-color: rgba(255, 255, 255, 0.2) !important;
-		border: 1px solid var(--toggle-color, var(--primary)) !important;
+		background-color: color-mix(in srgb, var(--toggle-color, var(--primary)) 40%, transparent) !important;
+		/* border: 1px solid var(--toggle-color, var(--primary)) !important; */
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
 
 	:global(.override-toggle .switch-thumb) {
 		background-color: white !important;
-		border: 1px solid var(--toggle-color, var(--primary)) !important;
+		/* border: 1px solid var(--toggle-color, var(--primary)) !important; */
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 	}
@@ -186,7 +192,7 @@
 
 	/* Ghost mode styling */
 	:global(.ghost-toggle) {
-		opacity: 0.5;
+		opacity: 0.7;
 		transition: opacity 0.2s ease;
 		background-color: transparent !important;
 		border: 1px solid var(--border) !important;

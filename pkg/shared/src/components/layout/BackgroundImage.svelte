@@ -103,7 +103,6 @@
 					.to({ opacity: 1 }, ($screenProfile.transitionTime ?? 1) * 1000)
 					.easing(Easing.Quadratic.Out)
 					.onUpdate(value => {
-						console.log('Update', value.opacity)
 						if (newBackground) {
 							current.opacity = value.opacity
 						}
@@ -112,8 +111,6 @@
 			)
 		}
 	}
-
-	$inspect(current?.opacity)
 </script>
 
 <ImageFilter {tweener}>
