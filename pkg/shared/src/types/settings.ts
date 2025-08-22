@@ -80,7 +80,7 @@ export const DefaultScreenProfile: ScreenProfile = {
 	saturation: 1,
 	hideButton: false,
 	transitionTime: 1,
-	showTimeDate: true,
+	showTimeDate: false,
 	showWeather: false
 }
 

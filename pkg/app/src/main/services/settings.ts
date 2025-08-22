@@ -1,9 +1,9 @@
-import { settingsStore } from '$shared/stores/settingsStore'
 import { type UserSettings } from '$shared/types'
 import { DefaultUserSettings } from '$shared/types/settings'
 import { app } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
+import { monitorStore } from '../stores/monitorStore'
 
 export class SettingsService {
 	private settings: UserSettings | null = null
@@ -17,7 +17,7 @@ export class SettingsService {
 		this.settingsPath = join(app.getPath('userData'), `settings.json`)
 		console.log('SettingsService constructor', SettingsService.count++)
 		this.getSettings().then(settings => {
-			settingsStore.updateSettings(settings)
+			this.updateMonitors(settings)
 		})
 	}
 
@@ -31,6 +31,13 @@ export class SettingsService {
 		return this.settings || this.defaultSettings
 	}
 
+	async updateMonitors(settings: UserSettings): Promise<void> {
+		var updatedMonitors = Object.fromEntries(
+			Object.entries(settings.screens).map(([key, value]) => [key, value.monitorEnabled])
+		)
+		monitorStore.updateMonitors(updatedMonitors)
+	}
+
 	/**
 	 * Update settings and persist to file system
 	 */
@@ -40,6 +47,7 @@ export class SettingsService {
 
 		// Update memory
 		this.settings = updatedSettings
+		this.updateMonitors(updatedSettings)
 		// TEMP // settingsStore.updateSettings(updatedSettings)
 
 		// Persist to file system

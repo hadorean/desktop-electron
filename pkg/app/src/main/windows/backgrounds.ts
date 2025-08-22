@@ -1,10 +1,10 @@
-import { settingsStore } from '$shared/stores/settingsStore'
 import { DefaultScreenSettings } from '$shared/types/settings'
 import { BrowserWindow, screen } from 'electron'
 import { attach, detach, reset } from 'electron-as-wallpaper'
 import { get } from 'svelte/store'
 import { settingsService } from '../services/settings'
 import { getLocalServer, localServer, setBg } from '../stores/appStore'
+import { monitorStore } from '../stores/monitorStore'
 
 type Background = {
 	id: string
@@ -22,7 +22,6 @@ export class BackgroundManager {
 	constructor() {
 		this.serverUrl = getLocalServer()?.getUrl() ?? null
 		this.setupServerWatcher()
-		this.start()
 	}
 
 	start(): void {
@@ -36,20 +35,20 @@ export class BackgroundManager {
 			this.backgrounds.set(id, { id, index, display } as Background)
 		})
 
-		// Enable/disable background windows based on settings
-		settingsStore.userSettings.subscribe(settings => {
-			for (const screenId in settings.screens) {
-				if (!screenId.startsWith('monitor')) continue
-				const screenProfile = settings.screens[screenId]
+		// // Enable/disable background windows based on settings
+		// settingsStore.userSettings.subscribe(settings => {
+		// 	for (const screenId in settings.screens) {
+		// 		if (!screenId.startsWith('monitor')) continue
+		// 		const screenProfile = settings.screens[screenId]
 
-				const bg = this.backgrounds.get(screenId)
-				if (!bg) {
-					console.error(`Background not found for screen ${screenId}`)
-					continue
-				}
-				this.toggleBg(bg, screenProfile.monitorEnabled)
-			}
-		})
+		// 		const bg = this.backgrounds.get(screenId)
+		// 		if (!bg) {
+		// 			console.error(`Background not found for screen ${screenId}`)
+		// 			continue
+		// 		}
+		// 		this.toggleBg(bg, screenProfile.monitorEnabled)
+		// 	}
+		// })
 
 		// Ensure monitor index is saved in settings
 		this.backgrounds.forEach(async bg => {
@@ -59,6 +58,16 @@ export class BackgroundManager {
 		screen.addListener('display-added', async (_event, display) => await this.addDisplay(display))
 		screen.addListener('display-removed', (_event, display) => this.removeDisplay(display))
 		screen.addListener('display-metrics-changed', (_event, display) => this.reloadDisplay(display))
+
+		monitorStore.monitors.subscribe(monitors => {
+			this.backgrounds.forEach((bg, monitorId) => {
+				if (monitors[monitorId]) {
+					this.enableBg(bg)
+				} else {
+					this.disableBg(bg)
+				}
+			})
+		})
 	}
 
 	private async addDisplay(display: Electron.Display) {
@@ -70,7 +79,7 @@ export class BackgroundManager {
 			const bg = { id, index, display } as Background
 			this.backgrounds.set(id, bg)
 			await this.saveMonitorIndex(id, index)
-			const enabled = get(settingsStore.userSettings).screens[id]?.monitorEnabled ?? true
+			const enabled = get(monitorStore.monitors)[id] ?? true
 			this.toggleBg(bg, enabled)
 		}
 	}
@@ -118,7 +127,7 @@ export class BackgroundManager {
 		if (bg.window == null) {
 			const window = this.createWindow(bg)
 			bg.window = window
-		} else {
+		} else if (!bg.window.isVisible()) {
 			bg.window.show()
 		}
 	}
@@ -396,7 +405,8 @@ export class BackgroundManager {
 	}
 }
 
-export const initBackgrounds = (): void => {
+export function initBackgrounds(): void {
 	const bg = new BackgroundManager()
+	bg.start()
 	setBg(bg)
 }
