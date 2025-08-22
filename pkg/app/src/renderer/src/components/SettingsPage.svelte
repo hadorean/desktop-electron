@@ -44,6 +44,8 @@
 		flex-direction: column;
 		position: relative;
 		padding: 1rem;
+		max-width: 560px;
+		margin: 0 auto;
 	}
 
 	footer {

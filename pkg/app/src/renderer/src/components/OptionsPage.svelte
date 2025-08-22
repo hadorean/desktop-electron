@@ -491,6 +491,8 @@
 		height: 100%;
 		width: 100%;
 		overflow-y: auto;
+		max-width: 560px;
+		margin: 0 auto;
 	}
 
 	.header {
