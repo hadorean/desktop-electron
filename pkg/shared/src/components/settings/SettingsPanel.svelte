@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { Inspect } from '@hgrandry/dbg'
+	import { onMount } from 'svelte'
+	import { get } from 'svelte/store'
 	import { settingsStore } from '../../stores/settingsStore'
 	import { imageBackground, type TransitionSettings } from '../../types/settings'
+	import { when } from '../../utils/scope'
+	import Fadein from '../utils/Fadein.svelte'
 	import KeyboardShortcut from '../utils/KeyboardShortcut.svelte'
 	import ImageGrid from './ImageGrid.svelte'
 	import ScreenSwitcher from './ScreenSwitcher.svelte'
@@ -10,10 +14,15 @@
 	import UrlInput from './UrlInput.svelte'
 
 	// Props
-	export let expanded: boolean = false
-	//export let errorMessage: string = "";
-	export let settingsPanel: HTMLElement | null = null
-	export let transparent: boolean = false
+	let {
+		expanded = false,
+		transparent = false,
+		settingsPanel = $bindable()
+	} = $props<{
+		expanded?: boolean
+		transparent?: boolean
+		settingsPanel?: HTMLElement | null
+	}>()
 
 	// Reference to ScreenSwitcher component
 	let screenSwitcher: ScreenSwitcher
@@ -64,6 +73,14 @@
 			}
 		})
 	}
+
+	let showContent = $state(false)
+
+	onMount(() => {
+		return when([currentScreen], () => {
+			showContent = get(currentScreenType) !== 'static' || get(currentScreen).monitorEnabled
+		})
+	})
 </script>
 
 <!-- <Logger input={transition} /> -->
@@ -82,122 +99,124 @@
 		</Inspect>
 
 		<div class="settings-groups">
-			<!-- Background Selection -->
-			<div class="setting-section">
-				<!-- Background Mode Selector -->
-				<!-- <BackgroundModeSelector
+			<Fadein visible={showContent}>
+				<!-- Background Selection -->
+				<div class="setting-section">
+					<!-- Background Mode Selector -->
+					<!-- <BackgroundModeSelector
 					mode={$activeProfile.mode ?? $screenProfile.mode ?? 'image'}
 					onModeChange={(newMode: 'image' | 'url') => handleSettingChange('mode', newMode)}
 					canRevert={$isLocalMode && $activeProfile.mode !== undefined}
 					onRevert={() => handleSettingChange('mode', null)}
 				/> -->
+					<!-- Conditional Background Input -->
+					{#if $activeProfile.mode == imageBackground}
+						<ImageGrid
+							selectedImage={$screenProfile.image ?? ''}
+							isOverride={$isLocalMode}
+							overrideValue={$activeProfile.image}
+							onImageChange={(newImage: string | null) => updateProfile('image', newImage)}
+						/>
+					{:else}
+						<UrlInput
+							url={$screenProfile.url ?? ''}
+							isOverride={$isLocalMode}
+							overrideValue={$activeProfile.url}
+							onUrlChange={(newUrl: string | null) => updateProfile('url', newUrl)}
+						/>
+					{/if}
 
-				<!-- Conditional Background Input -->
-				{#if $activeProfile.mode == imageBackground}
-					<ImageGrid
-						selectedImage={$screenProfile.image ?? ''}
+					<SliderControl
+						label="Brightness"
+						value={$activeProfile.brightness ?? null}
+						min={0}
+						max={1}
+						step={0.01}
+						onChange={(newValue: number | null) => updateTransitionableProfile('brightness', newValue)}
+						formatValue={(v: number) => v.toFixed(2)}
 						isOverride={$isLocalMode}
-						overrideValue={$activeProfile.image}
-						onImageChange={(newImage: string | null) => updateProfile('image', newImage)}
+						defaultValue={$baseProfile.brightness}
+						overrideValue={$activeProfile.brightness}
+						transition={$transition.brightness}
+						getTransition={t => t.brightness}
 					/>
-				{:else}
-					<UrlInput
-						url={$screenProfile.url ?? ''}
+
+					<SliderControl
+						label="Saturation"
+						value={$activeProfile.saturation ?? null}
+						min={0}
+						max={2}
+						step={0.01}
+						onChange={(newValue: number | null) => updateTransitionableProfile('saturation', newValue)}
+						formatValue={(v: number) => v.toFixed(2)}
 						isOverride={$isLocalMode}
-						overrideValue={$activeProfile.url}
-						onUrlChange={(newUrl: string | null) => updateProfile('url', newUrl)}
+						defaultValue={$baseProfile.saturation}
+						overrideValue={$activeProfile.saturation}
+						transition={$transition.saturation}
+						getTransition={t => t.saturation}
 					/>
-				{/if}
 
-				<SliderControl
-					label="Brightness"
-					value={$activeProfile.brightness ?? null}
-					min={0}
-					max={1}
-					step={0.01}
-					onChange={(newValue: number | null) => updateTransitionableProfile('brightness', newValue)}
-					formatValue={(v: number) => v.toFixed(2)}
-					isOverride={$isLocalMode}
-					defaultValue={$baseProfile.brightness}
-					overrideValue={$activeProfile.brightness}
-					transition={$transition.brightness}
-					getTransition={t => t.brightness}
-				/>
+					<SliderControl
+						label="Blur"
+						value={$activeProfile.blur ?? null}
+						min={0}
+						max={50}
+						step={0.1}
+						onChange={(newBlur: number | null) => updateTransitionableProfile('blur', newBlur)}
+						formatValue={(v: number) => `${v.toFixed(1)}px`}
+						isOverride={$isLocalMode}
+						defaultValue={$baseProfile.blur}
+						overrideValue={$activeProfile.blur}
+						transition={$transition.blur}
+						getTransition={t => t.blur}
+					/>
 
-				<SliderControl
-					label="Saturation"
-					value={$activeProfile.saturation ?? null}
-					min={0}
-					max={2}
-					step={0.01}
-					onChange={(newValue: number | null) => updateTransitionableProfile('saturation', newValue)}
-					formatValue={(v: number) => v.toFixed(2)}
-					isOverride={$isLocalMode}
-					defaultValue={$baseProfile.saturation}
-					overrideValue={$activeProfile.saturation}
-					transition={$transition.saturation}
-					getTransition={t => t.saturation}
-				/>
+					<SliderControl
+						label="Transition Time"
+						value={$activeProfile.transitionTime ?? null}
+						min={0}
+						max={10}
+						step={0.1}
+						onChange={(newValue: number | null) => updateTransitionableProfile('transitionTime', newValue)}
+						formatValue={(v: number) => `${v.toFixed(1)}s`}
+						isOverride={$isLocalMode}
+						defaultValue={$baseProfile.transitionTime}
+						overrideValue={$activeProfile.transitionTime}
+						transition={$transition.transitionTime}
+						getTransition={t => t.transitionTime}
+					/>
+				</div>
 
-				<SliderControl
-					label="Blur"
-					value={$activeProfile.blur ?? null}
-					min={0}
-					max={50}
-					step={0.1}
-					onChange={(newBlur: number | null) => updateTransitionableProfile('blur', newBlur)}
-					formatValue={(v: number) => `${v.toFixed(1)}px`}
-					isOverride={$isLocalMode}
-					defaultValue={$baseProfile.blur}
-					overrideValue={$activeProfile.blur}
-					transition={$transition.blur}
-					getTransition={t => t.blur}
-				/>
-
-				<SliderControl
-					label="Transition Time"
-					value={$activeProfile.transitionTime ?? null}
-					min={0}
-					max={10}
-					step={0.1}
-					onChange={(newValue: number | null) => updateTransitionableProfile('transitionTime', newValue)}
-					formatValue={(v: number) => `${v.toFixed(1)}s`}
-					isOverride={$isLocalMode}
-					defaultValue={$baseProfile.transitionTime}
-					overrideValue={$activeProfile.transitionTime}
-					transition={$transition.transitionTime}
-					getTransition={t => t.transitionTime}
-				/>
-			</div>
-
-			<ToggleControl
-				label="Time and date"
-				checked={$activeProfile.showTimeDate ?? $screenProfile.showTimeDate ?? true}
-				onChange={(newValue: boolean | null) => updateProfile('showTimeDate', newValue)}
-				isOverride={$isLocalMode}
-				overrideValue={$activeProfile.showTimeDate}
-				defaultValue={$baseProfile.showTimeDate}
-			/>
-			<!-- 
-			<ToggleControl
-				label="Weather"
-				checked={$activeProfile.showWeather ?? $screenProfile.showWeather ?? false}
-				onChange={(newValue: boolean | null) => updateProfile('showWeather', newValue)}
-				isOverride={$isLocalMode}
-				overrideValue={$activeProfile.showWeather}
-				defaultValue={$baseProfile.showWeather}
-			/> -->
-
-			{#if $currentScreenType === 'interactive'}
+				<div class="setting-section">
+					<ToggleControl
+						label="Time and date"
+						checked={$activeProfile.showTimeDate ?? $screenProfile.showTimeDate ?? true}
+						onChange={(newValue: boolean | null) => updateProfile('showTimeDate', newValue)}
+						isOverride={$isLocalMode}
+						overrideValue={$activeProfile.showTimeDate}
+						defaultValue={$baseProfile.showTimeDate}
+					/>
+					<!-- 
 				<ToggleControl
-					label="Auto-hide settings button"
-					checked={$activeProfile.hideButton ?? $screenProfile.hideButton ?? false}
-					onChange={(newValue: boolean | null) => updateProfile('hideButton', newValue)}
+					label="Weather"
+					checked={$activeProfile.showWeather ?? $screenProfile.showWeather ?? false}
+					onChange={(newValue: boolean | null) => updateProfile('showWeather', newValue)}
 					isOverride={$isLocalMode}
-					overrideValue={$activeProfile.hideButton}
-					defaultValue={$baseProfile.hideButton}
-				/>
-			{/if}
+					overrideValue={$activeProfile.showWeather}
+					defaultValue={$baseProfile.showWeather}
+				/> -->
+					{#if $currentScreenType === 'interactive'}
+						<ToggleControl
+							label="Auto-hide settings button"
+							checked={$activeProfile.hideButton ?? $screenProfile.hideButton ?? false}
+							onChange={(newValue: boolean | null) => updateProfile('hideButton', newValue)}
+							isOverride={$isLocalMode}
+							overrideValue={$activeProfile.hideButton}
+							defaultValue={$baseProfile.hideButton}
+						/>
+					{/if}
+				</div>
+			</Fadein>
 
 			{#if $currentScreenType === 'static'}
 				<ToggleControl
@@ -247,7 +266,6 @@
 	.settings-groups {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
 	}
 
 	.setting-section {
@@ -255,6 +273,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 2rem;
+		margin-bottom: 2rem;
 	}
 
 	/* .section-title {
