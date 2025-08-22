@@ -1,11 +1,12 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte'
 	let {
 		class: className,
 		children,
 		...restProps
 	} = $props<{
 		class?: string
-		children?: import('svelte').Snippet
+		children?: Snippet
 		[key: string]: unknown
 	}>()
 </script>
