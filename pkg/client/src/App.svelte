@@ -17,7 +17,7 @@
 	import { onDestroy, onMount } from 'svelte'
 	import { uiStore } from './stores/uiStore'
 
-	const { screenProfile, currentScreenType } = settingsStore
+	const { screenProfile, currentScreenType, isLocalMode } = settingsStore
 	const { expandSettings } = uiStore
 
 	let showSettings: boolean = false
@@ -146,7 +146,7 @@
 	{/if}
 
 	<SettingsButton
-		hideButton={$screenProfile.hideButton || $currentScreenType === 'static'}
+		hideButton={$screenProfile.hideButton || $currentScreenType === 'static' || !$isLocalMode}
 		onToggle={toggleSettings}
 		bind:buttonRef={settingsButton}
 	/>

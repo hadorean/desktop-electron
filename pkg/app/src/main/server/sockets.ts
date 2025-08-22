@@ -84,7 +84,7 @@ export class SocketManager {
 						updatedData = await result
 					}
 				}
-				console.log(`🔌 Broadcasting ${event}:`, updatedData)
+				//console.log(`🔌 Broadcasting ${event}:`, updatedData)
 				socket.broadcast.emit(event, updatedData)
 			} catch (error) {
 				console.error(`Error handling socket ${event}:`, error)
@@ -107,7 +107,7 @@ export class SocketManager {
 		filename?: string,
 		eventType?: string
 	): void {
-		console.log(`🔌 Broadcasting images updated: ${reason} ${filename ? `(${filename})` : ''}`)
+		//console.log(`🔌 Broadcasting images updated: ${reason} ${filename ? `(${filename})` : ''}`)
 		this.emit('images_updated', {
 			timestamp: Date.now(),
 			reason,
