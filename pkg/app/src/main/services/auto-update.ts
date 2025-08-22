@@ -40,11 +40,7 @@ export function initAutoUpdate(): {
 
 	autoUpdater.on('update-available', (info: UpdateInfo) => {
 		console.log('Update available:', info)
-		sendToRenderer(IpcEvents.UpdateAvailable, {
-			version: info.version,
-			releaseDate: info.releaseDate,
-			releaseNotes: info.releaseNotes
-		})
+		sendToRenderer(IpcEvents.UpdateAvailable, info)
 	})
 
 	autoUpdater.on('update-not-available', info => {

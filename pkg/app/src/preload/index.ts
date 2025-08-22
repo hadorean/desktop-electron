@@ -1,4 +1,4 @@
-import type { UserOptions, VersionInfo } from '$shared/types'
+import type { UserOptions } from '$shared/types'
 import { IpcEvents } from '$shared/types/ipc'
 import type { ScreenProfile } from '$shared/types/settings'
 import { electronAPI } from '@electron-toolkit/preload'
@@ -24,7 +24,7 @@ const api = {
 	downloadUpdate: () => ipcRenderer.invoke(IpcEvents.DownloadUpdate),
 	installUpdate: () => ipcRenderer.invoke(IpcEvents.InstallUpdate),
 	// Auto-update event listeners
-	onUpdateAvailable: (callback: (info: VersionInfo) => void) => {
+	onUpdateAvailable: (callback: (info: UpdateInfo) => void) => {
 		ipcRenderer.on(IpcEvents.UpdateAvailable, (_, info) => callback(info))
 	},
 	onUpdateDownloadProgress: (callback: (progressObj: ProgressInfo) => void) => {
