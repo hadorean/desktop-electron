@@ -1,6 +1,6 @@
 import { createStore } from '$shared/utils'
 import { LocalServer } from '../server'
-import { BackgroundManager } from '../windows/backgrounds.svelte'
+import { BackgroundManager } from '../windows/backgrounds'
 import { MainWindow } from '../windows/mainWindow'
 
 export const { store: isQuitting, set: setIsQuitting } = createStore<boolean>(false)

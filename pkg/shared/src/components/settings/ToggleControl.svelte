@@ -141,9 +141,9 @@
 		justify-content: center;
 	}
 
-	:global(.switch-button:focus-visible) {
-		/* outline: 1px solid color-mix(in srgb, var(--toggle-color, var(--primary)) 40%, transparent) !important; */
-	}
+	/* :global(.switch-button:focus-visible) { */
+	/* outline: 1px solid color-mix(in srgb, var(--toggle-color, var(--primary)) 40%, transparent) !important; */
+	/* } */
 
 	/* Regular switch styling with screen color */
 	:global(.switch-button.switch-checked:not(.ghost-toggle):not(.override-toggle)) {

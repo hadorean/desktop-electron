@@ -6,7 +6,7 @@
 	let isConnected = false
 
 	const init = (s: Scope) => {
-		s.subscribe(socketService.connectionStatus, connected => {
+		s.subscribe(socketService.on.connectionStatus, connected => {
 			isConnected = connected
 		})
 	}
