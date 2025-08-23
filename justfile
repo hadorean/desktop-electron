@@ -29,10 +29,35 @@ run:
 doc:
 	python -m mkdocs serve
 
-# Initial setup
+# Build and publishing
+
+# Publish a new version
+publish-patch:
+	just version
+	just publish
+
+# Build the installer
+build:
+	just move-prev-exe	
+	pnpm package:win
+
+# Build and run the installer
+build_run:
+	just build
+	just run
+
+# Build the chrome extension
+chrome:
+	cd pkg/chrome && pnpm build
+
+# Setup
 
 setup:
 	pnpm reinstall
+
+# Generate icons from the logo.svg file in pkg/shared/src/assets/icons
+icons:
+	pnpm generate-icons
 
 # Type checking
 
@@ -91,21 +116,6 @@ demo-shad:
 [confirm("Are you sure you want to clean the node_modules (y/n)?")]
 clean:
 	node scripts/rm_modules.js
-
-# Build and publishing
-
-# Publish a new version
-publish-patch:
-	just version
-	just publish
-
-build:
-	just move-prev-exe	
-	pnpm package:win
-
-build_run:
-	just build
-	just run
 
 # Update the version
 # To set version explicitly: publish 1.0.1

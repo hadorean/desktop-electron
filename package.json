@@ -29,7 +29,8 @@
 		"version": "node scripts/version.js",
 		"publish": "node scripts/publish.js",
 		"delete-tags": "node scripts/delete-tags.js",
-		"remote-build": "node scripts/gh-build.js"
+		"remote-build": "node scripts/gh-build.js",
+		"generate-icons": "node scripts/generate-icons.js"
 	},
 	"dependencies": {
 		"@hgrandry/dbg": "0.1.10",
@@ -79,7 +80,9 @@
 		"tw-animate-css": "^1.3.7",
 		"typescript": "^5.8.3",
 		"vite": "^7.1.2",
-		"wait-on": "^8.0.4"
+		"wait-on": "^8.0.4",
+		"sharp": "^0.34.0",
+		"png-to-ico": "^2.1.8"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
