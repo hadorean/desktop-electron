@@ -193,7 +193,3 @@ reset:
 # Recover from a bad commit
 recover:
 	git reflog
-
-split-subtree path, new-branch, subtree-origin="":
-	 git subtree split --prefix={{path}} origin {{new-branch}}
-	 git remote add subtree-origin {{subtree-origin}}
