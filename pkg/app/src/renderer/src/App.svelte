@@ -1,7 +1,8 @@
 <script lang="ts">
-	import KeyboardShortcut from '$shared/components/utils/KeyboardShortcut.svelte'
+	import { KeyboardShortcuts } from '$shared'
 	import { api, imagesService } from '$shared/services'
 	import { imagesStore } from '$shared/stores/imagesStore'
+	import { settingsStore } from '$shared/stores/settingsStore'
 	import { userOptionsStore } from '$shared/stores/userOptionsStore'
 	import { onMount } from 'svelte'
 	import { CustomHeader, OptionsPage, PageContainer } from './components'
@@ -9,7 +10,6 @@
 	import { init } from './services/app'
 	import { appConfig } from './stores/appConfigStore'
 	import { currentPage, gotoPage } from './stores/pageStore'
-
 	let transparent = $state(false)
 
 	onMount(async () => {
@@ -31,10 +31,20 @@
 		}
 	}
 
+	function toggleDayNightMode(): void {
+		console.log('toggleDayNightMode')
+		settingsStore.toggleDayNightMode()
+	}
+
 	const { userOptions } = userOptionsStore
 </script>
 
-<KeyboardShortcut key="Escape" action={togglePage} />
+<KeyboardShortcuts
+	shortcuts={[
+		{ key: 'Escape', action: togglePage },
+		{ key: 'n', action: toggleDayNightMode }
+	]}
+/>
 
 <div class:transparent class="flex h-full flex-col" style="--opacity: {transparent ? $userOptions.windowOpacity : 1}">
 	{#if transparent}

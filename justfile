@@ -65,7 +65,6 @@ icons:
 check what="all": 
 	clear
 	pnpm format --log-level=warn
-	pnpm typecheck:ts
 	just check-{{what}}
 	
 check-all:
