@@ -31,5 +31,6 @@
 		"../shared/src/**/*.js",
 		"../shared/src/**/*.ts",
 		"../shared/src/**/*.svelte"
-	]
+	],
+	"exclude": ["node_modules", "dist", "build", "out", "assets"]
 }

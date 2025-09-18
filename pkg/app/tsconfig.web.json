@@ -9,6 +9,7 @@
 		"../shared/src/**/*.svelte",
 		"../shared/src/**/*.ts"
 	],
+	"exclude": ["node_modules", "dist", "build", "out", "assets"],
 	"compilerOptions": {
 		"composite": true,
 		"verbatimModuleSyntax": true,

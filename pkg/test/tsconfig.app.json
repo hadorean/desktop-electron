@@ -28,5 +28,6 @@
 		"../shadcn/src/**/*.ts",
 		"../shadcn/src/**/*.js",
 		"../shadcn/src/**/*.svelte"
-	]
+	],
+	"exclude": ["node_modules", "dist", "build", "out", "assets"]
 }
