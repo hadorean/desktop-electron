@@ -6,12 +6,20 @@ import { join } from 'path'
 import { getLocalServer } from '../stores/appStore'
 import { monitorStore } from '../stores/monitorStore'
 
+class Ref<T> {
+	public value: T
+	constructor(value: T) {
+		this.value = value
+	}
+}
+
 export class SettingsService {
 	private settings: UserSettings | null = null
 	private settingsPath: string
 	private defaultSettings: UserSettings = DefaultUserSettings
 	private savingTimeout: NodeJS.Timeout | null = null
 	private currentTheme: DayNightMode | null = null
+	private scheduleTimeout: Ref<NodeJS.Timeout | null> = new Ref<NodeJS.Timeout | null>(null)
 
 	static count = 0
 
@@ -20,13 +28,23 @@ export class SettingsService {
 		console.log('SettingsService constructor', SettingsService.count++)
 		this.getSettings().then(settings => {
 			this.updateMonitors(settings)
+			this.toggleSchedule()
 		})
-		setInterval(() => {
-			this.updateSchedule()
-		}, 1000)
 	}
 
-	private updateSchedule(): void {
+	private toggleSchedule(): void {
+		if (this.settings?.shared.schedule?.enabled) {
+			if (!this.scheduleTimeout.value) {
+				this.repeatEvery(() => this.updateThemeFromSchedule(), 60 * 1000, this.scheduleTimeout)
+			}
+		} else if (this.scheduleTimeout.value) {
+			clearTimeout(this.scheduleTimeout.value)
+			this.scheduleTimeout.value = null
+		}
+	}
+
+	private updateThemeFromSchedule(): void {
+		console.log('Updating theme from schedule')
 		if (this.settings?.shared.schedule?.enabled) {
 			const now = new Date()
 			const time = now.getHours() + now.getMinutes() / 60
@@ -56,6 +74,29 @@ export class SettingsService {
 		})
 	}
 
+	private repeatEvery(
+		func: () => void,
+		interval: number,
+		ref: Ref<NodeJS.Timeout | null> | null = null
+	): Ref<NodeJS.Timeout | null> {
+		// Check current time and calculate the delay until next interval
+		const now = new Date().getTime()
+		const delay = interval - (now % interval)
+		ref = ref || new Ref<NodeJS.Timeout | null>(null)
+
+		function start() {
+			// Execute function now...
+			func()
+			// ... and every interval
+			ref!.value = setInterval(func, interval)
+		}
+
+		// Delay execution until it's an even interval
+		ref!.value = setTimeout(start, delay)
+
+		return ref
+	}
+
 	/**
 	 * Get current settings from memory, loading from file if not cached
 	 */
@@ -83,6 +124,8 @@ export class SettingsService {
 		// Update memory
 		this.settings = updatedSettings
 		this.updateMonitors(updatedSettings)
+		this.toggleSchedule()
+		this.updateThemeFromSchedule()
 		// TEMP // settingsStore.updateSettings(updatedSettings)
 
 		// Persist to file system
