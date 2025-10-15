@@ -5,7 +5,7 @@ import { getMainWindow } from '../stores/appStore'
 export function initShortcuts(): void {
 	// (Ctrl+B) to toggle main window
 	try {
-		globalShortcut.register('CommandOrControl+Shift+B', () => {
+		globalShortcut.register('CommandOrControl+Alt+W', () => {
 			getMainWindow()?.toggle()
 		})
 		globalShortcut.register('CommandOrControl+Shift+I', () => {
@@ -15,7 +15,7 @@ export function initShortcuts(): void {
 			win.webContents.toggleDevTools()
 		})
 		// (Ctrl+D) to toggle debug menu
-		globalShortcut.register('CommandOrControl+Shift+D', () => {
+		globalShortcut.register('CommandOrControl+Alt+D', () => {
 			try {
 				const win = getMainWindow()?.get()
 				if (!win || !win.isFocused()) return
@@ -25,7 +25,7 @@ export function initShortcuts(): void {
 			}
 		})
 		// (Ctrl+N) to toggle day/night mode
-		globalShortcut.register('CommandOrControl+Shift+N', () => {
+		globalShortcut.register('CommandOrControl+Alt+N', () => {
 			try {
 				const win = getMainWindow()?.get()
 				if (!win || !win.isFocused()) return

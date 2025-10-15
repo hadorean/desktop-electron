@@ -34,7 +34,8 @@ export class SettingsService {
 			const nightTime = this.settings.shared.schedule.night
 			if (time >= dayTime) {
 				if (time >= nightTime) {
-					this.setCurrentTheme('night')
+					const theme = dayTime > nightTime ? 'day' : 'night'
+					this.setCurrentTheme(theme)
 				} else {
 					this.setCurrentTheme('day')
 				}
