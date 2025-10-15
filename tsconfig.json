@@ -30,5 +30,5 @@
 		"pkg/shared/src/**/*.svelte",
 		"pkg/shared/src/**/*.d.ts"
 	],
-	"exclude": ["node_modules", "**/node_modules", "dist", "out", "**/dist", "**/out", "assets"]
+	"exclude": ["**/node_modules/**", "**/dist/**", "**/out/**", "**/assets/**"]
 }

@@ -1,38 +1,40 @@
+import { debugMenu } from '$shared/stores/debugStore'
 import { globalShortcut } from 'electron'
+import { getMainWindow } from '../stores/appStore'
 
 export function initShortcuts(): void {
 	// (Ctrl+B) to toggle main window
 	try {
-		// globalShortcut.register('CommandOrControl+Shift+B', () => {
-		// 	getMainWindow()?.toggle()
-		// })
-		// globalShortcut.register('CommandOrControl+Shift+I', () => {
-		// 	const win = getMainWindow()?.get()
-		// 	if (!win || !win.isFocused()) return
-		// 	if (!debugMenu.getVisible()) return
-		// 	win.webContents.toggleDevTools()
-		// })
-		// // (Ctrl+D) to toggle debug menu
-		// globalShortcut.register('CommandOrControl+Shift+D', () => {
-		// 	try {
-		// 		const win = getMainWindow()?.get()
-		// 		if (!win || !win.isFocused()) return
-		// 		debugMenu.toggle()
-		// 	} catch (error) {
-		// 		console.error('Failed to toggle debug menu:', error)
-		// 	}
-		// })
-		// // (Ctrl+N) to toggle day/night mode
-		// globalShortcut.register('CommandOrControl+Shift+N', () => {
-		// 	try {
-		// 		const win = getMainWindow()?.get()
-		// 		if (!win || !win.isFocused()) return
-		// 		// Send message directly to renderer process
-		// 		win.webContents.send('toggle-day-night-mode')
-		// 	} catch (error) {
-		// 		console.error('Failed to toggle day/night mode:', error)
-		// 	}
-		// })
+		globalShortcut.register('CommandOrControl+Shift+B', () => {
+			getMainWindow()?.toggle()
+		})
+		globalShortcut.register('CommandOrControl+Shift+I', () => {
+			const win = getMainWindow()?.get()
+			if (!win || !win.isFocused()) return
+			if (!debugMenu.getVisible()) return
+			win.webContents.toggleDevTools()
+		})
+		// (Ctrl+D) to toggle debug menu
+		globalShortcut.register('CommandOrControl+Shift+D', () => {
+			try {
+				const win = getMainWindow()?.get()
+				if (!win || !win.isFocused()) return
+				debugMenu.toggle()
+			} catch (error) {
+				console.error('Failed to toggle debug menu:', error)
+			}
+		})
+		// (Ctrl+N) to toggle day/night mode
+		globalShortcut.register('CommandOrControl+Shift+N', () => {
+			try {
+				const win = getMainWindow()?.get()
+				if (!win || !win.isFocused()) return
+				// Send message directly to renderer process
+				win.webContents.send('toggle-day-night-mode')
+			} catch (error) {
+				console.error('Failed to toggle day/night mode:', error)
+			}
+		})
 	} catch (err) {
 		console.error('Failed to register global shortcuts:', err)
 	}

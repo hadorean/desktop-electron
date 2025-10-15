@@ -42,6 +42,11 @@ export interface ScreenSettings {
 	night: Partial<ScreenProfile> | null
 	monitorIndex: number | null
 	monitorEnabled: boolean
+	schedule?: {
+		enabled: boolean
+		day: number
+		night: number
+	} | null
 }
 
 export function getProfile(settings: ScreenSettings | undefined, theme: DayNightMode): Partial<ScreenProfile> {

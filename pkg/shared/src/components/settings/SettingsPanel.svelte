@@ -81,6 +81,16 @@
 			showContent = get(currentScreenType) !== 'static' || get(currentScreen).monitorEnabled
 		})
 	})
+
+	function formatTime(time: number): string {
+		var suffix = time >= 12 && time < 24 ? 'pm' : 'am'
+		time = time % 12
+		var minutes = Math.round((time % 1) * 60)
+		var hours = Math.floor(time)
+		var hourText = hours === 0 ? '12' : hours < 10 ? `0${hours}` : hours
+		var minuteText = minutes === 0 ? ':00' : minutes < 10 ? `:0${minutes}` : `:${minutes}`
+		return `${hourText}${minuteText} ${suffix}`
+	}
 </script>
 
 <!-- <Logger input={transition} /> -->
@@ -227,6 +237,50 @@
 					}}
 					defaultValue={true}
 				/>
+			{/if}
+
+			{#if !$isLocalMode}
+				<div class="setting-section">
+					<ToggleControl
+						label="Schedule"
+						checked={$currentScreen.schedule?.enabled ?? false}
+						onChange={(x: boolean | null) => {
+							settingsStore.setScheduleEnabled(x ?? true)
+						}}
+						defaultValue={true}
+					/>
+
+					{#if $currentScreen.schedule?.enabled}
+						<SliderControl
+							label="Day time"
+							value={$currentScreen.schedule?.day ?? null}
+							min={0}
+							max={24}
+							step={0.25}
+							onChange={(newValue: number | null) => settingsStore.setDayTime(newValue)}
+							formatValue={(v: number) => formatTime(v)}
+							isOverride={$isLocalMode}
+							defaultValue={settingsStore.defaultSchedule.day}
+							overrideValue={$activeProfile.transitionTime}
+							transition={$transition.transitionTime}
+							getTransition={t => t.transitionTime}
+						/>
+						<SliderControl
+							label="Night time"
+							value={$currentScreen.schedule?.night ?? null}
+							min={0}
+							max={24}
+							step={0.25}
+							onChange={(newValue: number | null) => settingsStore.setNightTime(newValue)}
+							formatValue={(v: number) => formatTime(v)}
+							isOverride={$isLocalMode}
+							defaultValue={settingsStore.defaultSchedule.night}
+							overrideValue={$activeProfile.transitionTime}
+							transition={$transition.transitionTime}
+							getTransition={t => t.transitionTime}
+						/>
+					{/if}
+				</div>
 			{/if}
 		</div>
 	</div>

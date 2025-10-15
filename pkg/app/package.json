@@ -1,6 +1,6 @@
 {
   "name": "heyketsu",
-  "version": "0.1.74",
+  "version": "0.1.75",
   "description": "A peaceful space for your desktop and browser",
   "main": "./out/main/index.js",
   "author": "Hadrien Grandry",
@@ -19,7 +19,7 @@
     "dev:electron": "electron-vite dev",
     "dev": "concurrently --kill-others --names \"CLIENT,ELECTRON\" --prefix-colors \"blue,green\" \"pnpm dev:client:start\" \"pnpm dev:electron:start\"",
     "dev:client:start": "cd ../client && pnpm dev",
-    "dev:electron:start": "concurrently --kill-others --names \"WATCH-SHARED,ELECTRON\" --prefix-colors \"magenta,green\" \"node ../../scripts/wait-for-client.js && cross-env NODE_ENV=development pnpm dev:electron\"",
+    "dev:electron:start": "concurrently --kill-others --names \"WATCH-SHARED,ELECTRON\" --prefix-colors \"magenta,green\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development pnpm dev:electron\"",
     "dev:templates:watch": "nodemon --watch src/main/templates --ext ejs --exec \"echo Templates changed - refresh browser\"",
     "dev:client:build": "cd ../client && pnpm build",
     "build": "pnpm typecheck && electron-vite build && pnpm copy-shared",

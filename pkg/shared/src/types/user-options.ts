@@ -19,6 +19,6 @@ export const DefaultUserOptions: UserOptions = {
 	imageDirectory: 'D:\\pictures\\wall', // Default fallback
 	port: 8080,
 	autoStart: true,
-	openWindowOnStart: false,
+	openWindowOnStart: true,
 	windowOpacity: 1.0
 }

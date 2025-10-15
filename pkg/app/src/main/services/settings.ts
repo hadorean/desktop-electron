@@ -1,8 +1,9 @@
 import { type UserSettings } from '$shared/types'
-import { DefaultUserSettings } from '$shared/types/settings'
+import { DayNightMode, DefaultTransitionSettings, DefaultUserSettings } from '$shared/types/settings'
 import { app } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
+import { getLocalServer } from '../stores/appStore'
 import { monitorStore } from '../stores/monitorStore'
 
 export class SettingsService {
@@ -10,6 +11,7 @@ export class SettingsService {
 	private settingsPath: string
 	private defaultSettings: UserSettings = DefaultUserSettings
 	private savingTimeout: NodeJS.Timeout | null = null
+	private currentTheme: DayNightMode | null = null
 
 	static count = 0
 
@@ -18,6 +20,38 @@ export class SettingsService {
 		console.log('SettingsService constructor', SettingsService.count++)
 		this.getSettings().then(settings => {
 			this.updateMonitors(settings)
+		})
+		setInterval(() => {
+			this.updateSchedule()
+		}, 1000)
+	}
+
+	private updateSchedule(): void {
+		if (this.settings?.shared.schedule?.enabled) {
+			const now = new Date()
+			const time = now.getHours() + now.getMinutes() / 60
+			const dayTime = this.settings.shared.schedule.day
+			const nightTime = this.settings.shared.schedule.night
+			if (time >= dayTime) {
+				if (time >= nightTime) {
+					this.setCurrentTheme('night')
+				} else {
+					this.setCurrentTheme('day')
+				}
+			} else if (time >= nightTime) {
+				this.setCurrentTheme('night')
+			}
+		}
+	}
+
+	private setCurrentTheme(theme: DayNightMode): void {
+		if (this.currentTheme == theme || this.settings == null) return
+		console.log('Setting current theme to', theme)
+		this.currentTheme = theme
+		this.updateSettings({ currentTheme: theme })
+		getLocalServer()?.emit('settings_update', {
+			settings: { ...this.settings!, currentTheme: theme },
+			transition: DefaultTransitionSettings
 		})
 	}
 
@@ -32,7 +66,7 @@ export class SettingsService {
 	}
 
 	async updateMonitors(settings: UserSettings): Promise<void> {
-		var updatedMonitors = Object.fromEntries(
+		const updatedMonitors = Object.fromEntries(
 			Object.entries(settings.screens).map(([key, value]) => [key, value.monitorEnabled])
 		)
 		monitorStore.updateMonitors(updatedMonitors)

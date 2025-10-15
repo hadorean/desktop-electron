@@ -149,6 +149,42 @@ function setMonitorEnabled(enabled: boolean): void {
 	}))
 }
 
+const defaultSchedule = { enabled: true, day: 7, night: 19 }
+
+function setScheduleEnabled(enabled: boolean): void {
+	userSettings.update(settings => ({
+		...settings,
+		shared: {
+			...settings.shared,
+			schedule: settings.shared.schedule ? { ...settings.shared.schedule, enabled } : defaultSchedule
+		}
+	}))
+}
+
+function setDayTime(dayTime: number | null): void {
+	userSettings.update(settings => ({
+		...settings,
+		shared: {
+			...settings.shared,
+			schedule: settings.shared.schedule
+				? { ...settings.shared.schedule, day: dayTime ?? defaultSchedule.day }
+				: { ...defaultSchedule, day: dayTime ?? defaultSchedule.day }
+		}
+	}))
+}
+
+function setNightTime(nightTime: number | null): void {
+	userSettings.update(settings => ({
+		...settings,
+		shared: {
+			...settings.shared,
+			schedule: settings.shared.schedule
+				? { ...settings.shared.schedule, night: nightTime ?? defaultSchedule.night }
+				: { ...defaultSchedule, night: nightTime ?? defaultSchedule.night }
+		}
+	}))
+}
+
 // Return the day/night settings for a given screen id
 function getScreenSettings(id: string): ScreenSettings {
 	const value = get(userSettings)
@@ -309,6 +345,7 @@ export const settingsStore = {
 	getScreenType,
 	getScreenColor,
 	getFormattedScreenName,
+	defaultSchedule,
 
 	// Setters
 
@@ -316,6 +353,9 @@ export const settingsStore = {
 	setLocalMode,
 	setCurrentTheme,
 	setMonitorEnabled,
+	setScheduleEnabled,
+	setDayTime,
+	setNightTime,
 	setDefaultImage,
 
 	toggleDayNightMode,

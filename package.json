@@ -66,12 +66,14 @@
 		"eslint-plugin-svelte": "^3.11.0",
 		"lucide-svelte": "^0.539.0",
 		"nodemon": "^3.1.10",
+		"png-to-ico": "^2.1.8",
 		"postcss": "^8.4.31",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",
 		"prettier-plugin-tailwindcss": "^0.5.0",
 		"rimraf": "^6.0.1",
 		"shadcn-svelte": "^1.0.6",
+		"sharp": "^0.34.0",
 		"svelte": "^5.38.1",
 		"svelte-check": "^4.3.1",
 		"tailwind-merge": "^3.3.1",
@@ -80,13 +82,18 @@
 		"tw-animate-css": "^1.3.7",
 		"typescript": "^5.8.3",
 		"vite": "^7.1.2",
-		"wait-on": "^8.0.4",
-		"sharp": "^0.34.0",
-		"png-to-ico": "^2.1.8"
+		"wait-on": "^8.0.4"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
+			"electron",
 			"esbuild"
+		],
+		"ignoredBuiltDependencies": [
+			"@tailwindcss/oxide",
+			"electron-as-wallpaper",
+			"sharp",
+			"svelte-preprocess"
 		]
 	}
 }

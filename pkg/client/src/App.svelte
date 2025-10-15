@@ -177,7 +177,7 @@
 		display: flex;
 		flex-direction: column;
 		padding: 1rem;
-		max-width: 520px;
+		max-width: 480px;
 	}
 
 	#settings-drawer.open {
