@@ -228,7 +228,7 @@ export function registerRoutes(localServer: LocalServer): void {
 		}
 
 		const data = {
-			title: 'Hey ketsu',
+			title: 'Wholepaper',
 			timestamp: new Date().toISOString(),
 			route: req.path,
 			query: req.query,

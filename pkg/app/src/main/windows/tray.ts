@@ -4,7 +4,7 @@ import { getBg, getLocalServer, getMainWindow, setIsQuitting } from '../stores/a
 
 export function initTray(): Tray {
 	const tray = new Tray(icon)
-	tray.setToolTip('Hey Ketsu')
+	tray.setToolTip('Wholepaper')
 
 	const contextMenu = Menu.buildFromTemplate([
 		{

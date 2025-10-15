@@ -1,26 +1,26 @@
-appId: com.heyketsu.app
-productName: Hey Ketsu
+appId: com.wholepaper.app
+productName: Wholepaper
 electronVersion: 37.2.3
 directories:
   buildResources: build
 files:
-  - out/**/*
-  - node_modules/**/*
-  - build/**/*
-  - resources/**/*
-  - package.json
-  - '!**/.vscode/*'
-  - '!src/*'
-  - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!svelte.config.mjs'
-  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
-  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-  - '!node_modules/@heyketsu/shared/**/*'
-  - '!**/.env'
+- out/**/*
+- node_modules/**/*
+- build/**/*
+- resources/**/*
+- package.json
+- '!**/.vscode/*'
+- '!src/*'
+- '!electron.vite.config.{js,ts,mjs,cjs}'
+- '!svelte.config.mjs'
+- '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+- '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+- '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+- '!node_modules/@wholepaper/shared/**/*'
+- '!**/.env'
 asar: true
 asarUnpack:
-  - resources/**
+- resources/**
 win:
   executableName: hey-ketsu
 nsis:
@@ -31,18 +31,18 @@ nsis:
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+  - NSCameraUsageDescription: Application requests access to the device's camera.
+  - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
+  - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
+  - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
   target:
-    - AppImage
-    - snap
-    - deb
+  - AppImage
+  - snap
+  - deb
   maintainer: electronjs.org
   category: Utility
 appImage:

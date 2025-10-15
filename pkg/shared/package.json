@@ -1,5 +1,5 @@
 {
-	"name": "@heyketsu/shared",
+	"name": "@wholepaper/shared",
 	"version": "1.0.0",
 	"description": "Shared Svelte components, types, utilities, and constants for Hey Ketsu",
 	"type": "module",

@@ -21,9 +21,9 @@ function main() {
 
 		// Define file paths
 		const distDir = path.join(__dirname, '..', 'pkg', 'app', 'dist')
-		const setupExe = path.join(distDir, `heyketsu-${version}-setup.exe`)
+		const setupExe = path.join(distDir, `wholepaper-${version}-setup.exe`)
 		const latestYml = path.join(distDir, 'latest.yml')
-		const blockmap = path.join(distDir, `heyketsu-${version}-setup.exe.blockmap`)
+		const blockmap = path.join(distDir, `wholepaper-${version}-setup.exe.blockmap`)
 
 		// Check if files exist
 		const filesToUpload = [setupExe, latestYml]

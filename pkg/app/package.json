@@ -1,7 +1,7 @@
 {
-  "name": "heyketsu",
-  "version": "0.1.79",
-  "description": "A peaceful space for your desktop and browser",
+  "name": "wholepaper",
+  "version": "0.1.80",
+  "description": "Wholepaper",
   "main": "./out/main/index.js",
   "author": "Hadrien Grandry",
   "homepage": "https://hgrandry.net",

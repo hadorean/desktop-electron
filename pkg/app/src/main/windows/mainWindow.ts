@@ -31,7 +31,7 @@ export function createWindow(): BrowserWindow {
 		hasShadow: !transparent,
 		titleBarStyle: transparent ? 'hidden' : 'default',
 		titleBarOverlay: false,
-		title: transparent ? '' : 'Hey',
+		title: transparent ? '' : 'Wholepaper',
 		skipTaskbar: !transparent,
 		thickFrame: !transparent,
 		minimizable: true,
