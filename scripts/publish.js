@@ -6,9 +6,9 @@
  * This script creates a release on GitHub by uploading the latest distribution files.
  */
 
-const fs = require('fs')
-const path = require('path')
-const { execSync } = require('child_process')
+import { execSync } from 'child_process'
+import fs from 'fs'
+import path from 'path'
 
 function main() {
 	try {
@@ -79,7 +79,7 @@ function main() {
 			console.log(`2. Run "npm run package:win" to rebuild`)
 			console.log(`3. Run "npm run create-release" again`)
 			return
-		} catch (error) {
+		} catch {
 			// Release doesn't exist, continue with creation
 		}
 
@@ -97,8 +97,8 @@ function main() {
 	}
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
 	main()
 }
 
-module.exports = { main }
+export { main }
