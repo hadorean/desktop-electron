@@ -252,6 +252,16 @@ importers:
       mode-watcher:
         specifier: ^1.1.0
         version: 1.1.0(svelte@5.39.8)
+    devDependencies:
+      '@internationalized/date':
+        specifier: ^3.10.0
+        version: 3.10.0
+      '@lucide/svelte':
+        specifier: ^0.544.0
+        version: 0.544.0(svelte@5.39.8)
+      bits-ui:
+        specifier: ^2.11.4
+        version: 2.11.4(@internationalized/date@3.10.0)(svelte@5.39.8)
 
   pkg/shared:
     dependencies:
@@ -988,6 +998,11 @@ packages:
 
   '@lucide/svelte@0.515.0':
     resolution: {integrity: sha512-CEAyqcZmNBfYzVgaRmK2RFJP5tnbXxekRyDk0XX/eZQRfsJmkDvmQwXNX8C869BgNeryzmrRyjHhUL6g9ZOHNA==}
+    peerDependencies:
+      svelte: ^5
+
+  '@lucide/svelte@0.544.0':
+    resolution: {integrity: sha512-9f9O6uxng2pLB01sxNySHduJN3HTl5p0HDu4H26VR51vhZfiMzyOMe9Mhof3XAk4l813eTtl+/DYRvGyoRR+yw==}
     peerDependencies:
       svelte: ^5
 
@@ -5193,6 +5208,10 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@lucide/svelte@0.515.0(svelte@5.39.8)':
+    dependencies:
+      svelte: 5.39.8
+
+  '@lucide/svelte@0.544.0(svelte@5.39.8)':
     dependencies:
       svelte: 5.39.8
 

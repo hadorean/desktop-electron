@@ -12,11 +12,23 @@
 		<Button onclick={() => console.log('clicked')}>Click me</Button>
 		<Switch />
 		<Demo.Select />
-		<Demo.Slider />
 	</article>
 	<article>
 		<Demo.Card />
 	</article>
+	<article>
+		<Demo.ContextMenu />
+		<Demo.DropdownMenu />
+		<Demo.HoverCard />
+	</article>
+	<article>
+		<Demo.Slider />
+		<Demo.SliderMultiple />
+	</article>
+	<article>
+		<Demo.Breadcrumb />
+	</article>
+	<article><Demo.Checkbox /></article>
 </main>
 
 <ModeWatcher />
